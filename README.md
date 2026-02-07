@@ -14,22 +14,17 @@ MD‑DDL is a simple, readable way for **humans and AI to collaboratively define
 
 MD‑DDL documents are the *authoritative source of truth* for your data definitions.
 
----
 ```
                           Humans + AI
                                ↓
                              MD‑DDL
                                ↓
                             Compiler
-             ┌─────────────────┴────────────────────┐
- ┌──────────────────────────┐          ┌──────────────────────────┐
- │     Knowledge Graph      │          │ Data Products & Schemas  │
- │ (RDF / OWL / Prop Graph) │          │ (DDL, Avro, APIs, etc.)  │
- └──────────────────────────┘          └──────────────────────────┘
+             ┌─────────────────┴──────────────────┐
+       Knowledge Graph                 Data Products & Schemas  
+   (RDF / OWL / Prop Graph)            (DDL, Avro, APIs, etc.)  
              ↓
- ┌──────────────────────────┐
- │ Catalog / API /Reasoning │
- └──────────────────────────┘
+   Catalog / API /Reasoning  
 ```
 ---
 
@@ -54,40 +49,40 @@ MD‑DDL defines:
 - **Domains** (Sales, Finance, Risk…)
 - **Entities** (Customer, Transaction…)
 - **Attributes** (with classification, sensitivity, PII, keys, patterns…)
-- **Relationships** (including cross‑domain links)
+- **Relationships**
+- **Constraints** (business rules, validations, referential integrity)  
 - **Enumerations** (controlled vocabularies)
-- **Registries** (reusable attribute definitions)
-- **Constraints**
 - **Diagrams** (Mermaid/PlantUML)
+- **Metadata** - Lineage, ownership, tags, etc.)
+
+---
+
+## **What MD-DDL Generates**
+
+- **Data Product Definitions**
+- **Schemas**
+  - SQL/DDL
+  - Avro/Parquet schemas
+  - Open API
+- Event definitions
+- Data quality rules
 
 ---
 
 ## **What the knowledge graph does**  
 Once compiled from the MD-DDL, the knowledge graph becomes the **semantic runtime** powering:
 
-### **1. UI / Catalog / API**
 - Data Dictionary & Catalogue
-- Lineage
 - Visual modelling tools  
 - Search and discovery  
 - Impact analysis  
 - Domain maps  
 - API generation  
-
-### **2. Data Products / Schemas**
-- SQL/DDL  
-- Avro/Parquet schemas  
-- Data Product Definitions
-- Open API
-- Event definitions  
-- Data quality rules  
-
-### **3. Reasoning**
-- Lineage inference  
-- Cross‑domain dependency analysis  
-- Governance enforcement  
-- Semantic search  
-- AI‑assisted modelling  
+- **AI Reasoning**
+  - Lineage inference
+  - Cross‑domain dependency analysis
+  - Governance enforcement
+  - Semantic search
 
 ---
 

@@ -14,17 +14,15 @@ MD‑DDL is a simple, readable way for **humans and AI to collaboratively define
 
 MD‑DDL documents are the *authoritative source of truth* for your data definitions.
 
-```
-                          Humans + AI
-                               ↓
-                             MD‑DDL
-                               ↓
-                            Compiler
-             ┌─────────────────┴──────────────────┐
-       Knowledge Graph                 Data Products & Schemas  
-   (RDF / OWL / Prop Graph)            (DDL, Avro, APIs, etc.)  
-             ↓
-   Catalog / API /Reasoning  
+```mermaid
+flowchart TD
+
+    A[Humans + AI] --> B[MD-DDL]
+    B --> C[Compiler]
+    C --> E[Data Products & Schemas]
+    C --> D[Knowledge Graph]
+    D --> F[Catalog & Reasoning]
+    F --> A
 ```
 ---
 

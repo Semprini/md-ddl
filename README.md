@@ -27,7 +27,11 @@ flowchart TD
 ---
 
 ## **Why MD‑DDL exists**  
-Traditional modelling tools (UML, ERDs, enterprise catalogues) are either too technical, too rigid, or too disconnected from modern workflows and AI accessibility. Meanwhile, knowledge graphs are powerful but not approachable for everyday contributors.
+Traditional data governance tools are proprietary and not AI‑native. Most off‑the‑shelf platforms are now bolting AI onto systems that were never designed to be accessible to AI or usable outside their own product ecosystem. Modern AI has made it clear that your data - and especially your data definitions - must be open, portable, and accessible in simple, universal formats.
+
+Existing data‑modelling approaches (UML, ERDs, enterprise catalogues) are either too technical, too rigid, or too disconnected from modern workflows. They are difficult for everyday contributors to use and difficult for AI systems to interpret reliably. At the same time, knowledge graphs have become central to modern data management, but the knowledge for building them remain inaccessible to most teams.
+
+MD‑DDL exists to bridge this gap: a Markdown‑native, human‑first, AI‑friendly way to define data meaning that is simple enough for anyone to contribute to, and structured enough for machines to reason over.
 
 MD‑DDL bridges the gap by combining:
 
@@ -37,7 +41,7 @@ MD‑DDL bridges the gap by combining:
 - **Git** for governance and collaboration  
 - **AI** for generation, validation, and refactoring  
 
-This creates a modelling ecosystem that is **business‑friendly**, **developer‑friendly**, and **AI‑friendly**.
+This creates a data ecosystem that is **business‑friendly**, **developer‑friendly**, and **AI‑friendly**.
 
 ---
 
@@ -50,6 +54,7 @@ MD‑DDL defines:
 - **Relationships**
 - **Constraints** (business rules, validations, referential integrity)  
 - **Enumerations** (controlled vocabularies)
+- **Business Event definitions** 
 - **Diagrams** (Mermaid/PlantUML)
 - **Metadata** - Lineage, ownership, tags, etc.)
 
@@ -57,13 +62,14 @@ MD‑DDL defines:
 
 ## **What MD-DDL Generates**
 
-- **Data Product Definitions**
+- **Data Catalogue / Dictionary**
+- **Data Product Specifications**
 - **Schemas**
   - SQL/DDL
   - Avro/Parquet schemas
   - Open API
-- Event definitions
 - Data quality rules
+- Technical Event Mapping
 
 ---
 

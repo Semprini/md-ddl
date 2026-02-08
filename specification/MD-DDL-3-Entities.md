@@ -2,7 +2,7 @@
 
 ### **Entity Declaration**
 
-Entities appear under a level‑2 heading:
+The Entities section appear under a level‑2 heading:
 
 ```markdown
 ## Entities

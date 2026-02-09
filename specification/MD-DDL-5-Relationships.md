@@ -1,8 +1,9 @@
 # **Relationships**
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
 
 Relationships are **first‑class citizens**.
 
-### **Relationship Section**
+### **Relationship Declaration**
 
 ```markdown
 ## Relationships

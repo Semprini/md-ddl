@@ -1,4 +1,6 @@
 # **Entities**
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+
 
 ### **Entity Declaration**
 
@@ -16,7 +18,7 @@ Each entity is introduced with a **level‑3 heading**:
 
 ### **Entity Description**
 
-Free‑text Markdown under the heading describes the entity.
+Free‑text Markdown under the heading describes the entity in more detail than was found in the domain summary.
 
 ### **Entity Definition**
 

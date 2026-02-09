@@ -1,4 +1,5 @@
 # **Events**
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
 
 Events represent meaningful business‑level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 

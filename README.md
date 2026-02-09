@@ -21,6 +21,7 @@ flowchart TD
     B --> C[Compiler]
     C --> E[Data Products & Schemas]
     C --> D[Knowledge Graph]
+    D --> E
     D --> F[Catalog & Reasoning]
     F --> A
 ```
@@ -41,7 +42,7 @@ MD‑DDL bridges the gap by combining:
 - **Git** for governance and collaboration  
 - **AI** for generation, validation, and refactoring  
 
-This creates a data ecosystem that is **business‑friendly**, **developer‑friendly**, and **AI‑friendly**.
+This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, and **AI‑friendly**.
 
 ---
 

@@ -1,29 +1,11 @@
 # Customer
-
-The Customer domain contains all concepts related to customer identity,
-profiles, preferences, and lifecycle.
-
-## Metadata
-```yaml
-owners:
-  - data.manager@example.com
-stewards:
-  - jane.doe@example.com
-tags:
-  - core
-  - pii
-```
-### Domain Diagram 
-
-```mermaid 
-flowchart LR 
-    A[Customer] -->|has many| b[Customer Preference]
-```
+*Note this simple example uses a single file for the details of entities, enums, relationships and events. This is for brevity and to show how linking works. Decide on your file structure based on it's readability for humans and context management for AI.*
 
 ## Entities
 
 ### Customer
 The primary representation of a customer in the organisation.
+Any role that is responsible for authority or access to customer data is a Customer.
 
 ```yaml
 attributes:
@@ -51,6 +33,8 @@ attributes:
 ## Enums
 
 ### Loyalty Tier
+A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending.
+
 ```yaml
 values:
   - Bronze

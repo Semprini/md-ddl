@@ -41,3 +41,6 @@ ownership: Customer
 - The compiler infers inverse relationships  
 
 ---
+
+...next: [Events](MD-DDL-6-Events.md)
+

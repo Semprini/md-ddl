@@ -28,3 +28,5 @@ values:
 ````
 
 ---
+
+...next: [Relationships](MD-DDL-5-Relationships.md)

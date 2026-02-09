@@ -45,3 +45,5 @@ attributes:
 - No relationship attributes. Relationships are defined in the relationships section.  
 
 ---
+
+...next: [Enums](MD-DDL-4-Enumerations.md)

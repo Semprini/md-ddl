@@ -150,3 +150,6 @@ The domain file is conceptual only. It does not define or enforce types. However
 - object
 
 ---
+
+...next: [Entities](MD-DDL-3-Entities.md)
+

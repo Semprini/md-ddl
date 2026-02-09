@@ -84,3 +84,7 @@ This mirrors Anthropic's "skills" concept but improves on it by:
 **Compiler Simplicity**
 - The compiler knows exactly where to find summaries and details.
 - The compiler merges both layers into a single conceptual/logical and physical model.
+
+---
+
+...next: [Domains](MD-DDL-2-Domains.md)

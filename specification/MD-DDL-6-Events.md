@@ -53,6 +53,13 @@ attributes:
   - name: timestamp
     type: datetime
 ```
+```yaml
+constraints:
+  - name: Ownership Validation
+    logic: "Customer.ID == Customer Preference.OwnerID"
+  - name: Logical Sequence
+    logic: "Event.timestamp >= Customer Preference.CreatedAt"
+```
 ````
 
 ### **Required fields**

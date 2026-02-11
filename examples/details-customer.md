@@ -8,6 +8,7 @@ The primary representation of a customer in the organisation.
 Any role that is responsible for authority or access to customer data is a Customer.
 
 ```yaml
+extends: Party Role
 attributes:
   - name: Customer Id
     type: string
@@ -17,6 +18,21 @@ attributes:
     pii: true
   - name: Loyalty Tier
     type: enum:LoyaltyTier
+  - name: Balance 
+    type: Decimal
+```
+```yaml
+constraints:
+  - name: Valid Date Range
+    logic: "End Date > Start Date"
+  - name: Positive Liquidity
+    logic: "Balance > 0"
+```
+```yaml
+governance:
+  pii: true
+  retention: 7 years
+  access_role: HR_ADMIN
 ```
 
 ### Customer Preference
@@ -53,4 +69,10 @@ source: Customer
 target: Customer Preference
 cardinality: one-to-many
 ownership: Customer
+```
+```yaml
+constraints:
+  - name: Active Customer Preference Only
+    logic: "Customer.Status == 'Active' OR Customer Preference.EffectiveStatus == 'Inactive'"
+    description: "A customer cannot have active preferences if their account is not active."
 ```

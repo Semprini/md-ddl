@@ -26,13 +26,29 @@ A structured block defines the entity's attributes:
 
 ````markdown
 ```yaml
+extends: Party Role
 attributes:
-  - name: customer identifier
+  - name: Customer Identifier
     type: string
     identifier: true
-  - name: email address
+  - name: Email Address
     type: string
     pii: true
+  - balance: 
+    type: Decimal
+```
+```yaml
+constraints:
+  - name: Valid Date Range
+    logic: "End Date > Start Date"
+  - name: Positive Liquidity
+    logic: "Balance > 0"
+```
+```yaml
+governance:
+  pii: true
+  retention: 7 years
+  access_role: HR_ADMIN
 ```
 ````
 

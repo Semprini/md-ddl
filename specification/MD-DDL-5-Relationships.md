@@ -30,15 +30,21 @@ target: Customer Preference
 cardinality: one-to-many
 ownership: Customer
 ```
+```yaml
+constraints:
+  - name: Active Customer Preference Only
+    logic: "Customer.Status == 'Active' OR Customer Preference.EffectiveStatus == 'Inactive'"
+    description: "A customer cannot have active preferences if their account is not active."
+```
 ````
 
 ### **Relationship Rules**
 
-- Natural‑language names  
-- No duplication  
-- Ownership is optional  
-- Cardinality uses natural language or UML notation  
-- The compiler infers inverse relationships  
+- Natural‑language names
+- No duplication
+- Ownership is optional
+- Cardinality uses natural language or UML notation
+- The compiler infers inverse relationships
 
 ---
 

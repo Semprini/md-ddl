@@ -1,7 +1,7 @@
 # **Events**
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
 
-Events represent meaningful business‑level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
+Events represent meaningful business-level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 
 ---
 
@@ -41,42 +41,32 @@ The description may include:
 
 ## **Event Definition**
 
-A structured YAML or JSON block defines the event’s formal properties:
+A structured YAML or JSON block defines the event's formal properties:
 
 ````markdown
 ```yaml
 actor: Customer
 entity: Customer Preference
 attributes:
-  - name: updated fields
-    type: array
-  - name: timestamp
-    type: datetime
+  - updated fields:
+      type: array
+  - timestamp:
+      type: datetime
 ```
 ```yaml
 constraints:
-  - name: Ownership Validation
-    logic: "Customer.ID == Customer Preference.OwnerID"
-  - name: Logical Sequence
-    logic: "Event.timestamp >= Customer Preference.CreatedAt"
+  - Ownership Validation:
+      logic: "Customer.ID == Customer Preference.OwnerID"
+  - Logical Sequence:
+      logic: "Event.timestamp >= Customer Preference.CreatedAt"
+```
+```yaml
+governance:
+  retention: 7 years
+  access_role: HR_ADMIN
+  classification: Confidential
 ```
 ````
-
-### **Required fields**
-
-| Field | Description |
-|-------|-------------|
-| `actor` | The entity or role that initiates or causes the event. |
-| `entity` | The primary entity whose state has changed. |
-
-### **Optional fields**
-
-| Field | Description |
-|-------|-------------|
-| `attributes` | Additional data carried by the event (e.g., changed fields, metadata). |
-| `relationships` | Optional references to related entities. |
-| `classification` | Sensitivity, governance, or lineage metadata. |
-| `conditions` | Optional rules describing when the event should be emitted. |
 
 ---
 
@@ -95,13 +85,20 @@ constraints:
    Events should not reference CDC, SQL operations, or ETL logic.
 
 5. **Events may appear in any file**  
-   As long as the file begins with the domain’s level‑1 heading, the compiler will assemble them.
+   As long as the file begins with the domain's level‑1 heading, the compiler will assemble them.
 
 6. **Events may be linked to entities and relationships**  
    Through `actor`, `entity`, and optional `relationships`.
 
 7. **Events are optional**  
    Domains may define zero, one, or many events.
+
+8. **Contextual Payloads**
+
+   The attributes block should focus on the delta (what changed) and the context (why it changed), rather than a full copy of the entity.
+
+9: **Temporal Priority** 
+   Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
 
 ---
 
@@ -115,10 +112,10 @@ Triggered when a customer changes one or more preferences.
 actor: Customer
 entity: Customer Preference
 attributes:
-  - name: updated fields
-    type: array
-  - name: timestamp
-    type: datetime
+  - updated fields:
+      type: array
+  - timestamp:
+      type: datetime
 ```
 ````
 

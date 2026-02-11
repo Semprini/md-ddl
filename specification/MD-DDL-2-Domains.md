@@ -1,6 +1,8 @@
 # **Domains**
 
-### **Domain Declaration**
+In MD-DDL, the Domain file acts as the router for the Knowledge Graph. While detail files provide the DNA (Attributes/Constraints), the Domain file provides the Anatomy (How entities, events, and relationships sit together).
+
+## **Domain Declaration**
 
 A domain is declared using a **level‑1 Markdown heading**:
 
@@ -8,25 +10,26 @@ A domain is declared using a **level‑1 Markdown heading**:
 # Customer
 ```
 
-### **Domain Description**
+## **Domain Description**
 
 All free‑text Markdown under the H1 heading and before the next H2 heading is considered the domain description.
 
-### **Domain Metadata**
+## **Domain Metadata**
 
 Metadata is appears under a level‑2 heading:
 
 ```markdown
 ## Metadata
 ```
+Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
 
-Metadata may include:
-
-- owners
-- stewards
-- tags
-- classification
-- diagrams
+Category|Metadata Keys|Purpose
+--------|-------------|-------
+Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
+Governance & Security|classification, confidentiality, pii|The default security posture for the entire domain.
+Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frameworks governing this data.
+Lifecycle|status (Draft/Live), version, source_systems|The maturity and origin of the data domain.
+Discovery|tags|Searchability
 
 ### **Metadata Format**
 
@@ -34,26 +37,47 @@ Metadata is expressed as YAML or JSON inside a fenced code block:
 
 ````markdown
 ## Metadata
+
 ```yaml
+# Accountability
 owners:
   - data.customer@example.com
 stewards:
   - jane.doe@example.com
+technical_leads:
+  - architecture.team@example.com
+
+# Governance & Security
+classification: "Highly Confidential"
+pii: true
+regulatory_scope:
+  - GDPR
+  - CCPA
+default_retention: "7 years"
+
+# Lifecycle & Discovery
+status: "Production"
+version: "2.1.0"
 tags:
-  - core
-  - pii
+  - Core
+  - MasterData
+  - B2C
+source_systems:
+  - "Salesforce CRM"
+  - "SAP ERP"
 ```
 ````
 
 ### **Diagrams**
 
-Diagrams appear under level‑3 headings inside the Metadata section:
+Diagrams appear under level‑3 headings inside the Metadata section to separate Data about the Domain from Visuals of the Domain.:
 
 ````markdown
 ### Domain Overview Diagram
+High-level view of how Customer data flows into downstream analytics.
 ```mermaid
 flowchart LR
-    Customer --> "Customer Preference"
+    Customer --> Customer Preference
 ```
 ````
 

@@ -9,7 +9,7 @@ Enums appear under:
 ## Enums
 ```
 
-Enums can be defined as a simple list of values or a structured dictionary if the values require additional metadata.
+Enums can be defined as a simple list of values or a dictionary if the values require additional metadata.
 
 Simple Format:
 
@@ -28,15 +28,15 @@ Categorizes customers by their annual spend and engagement levels.
 
 ```yaml
 values:
-  - Bronze:
-      description: Entry level tier
-      score: 1
-  - Silver:
-      description: Standard tier
-      score: 2
-  - Gold:
-      description: Premium tier
-      score: 3
+  Bronze:
+    description: Entry level tier
+    score: 1
+  Silver:
+    description: Standard tier
+    score: 2
+  Gold:
+    description: Premium tier
+    score: 3
 ```
 ````
 

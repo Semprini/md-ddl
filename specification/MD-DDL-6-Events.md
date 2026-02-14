@@ -44,27 +44,38 @@ The description may include:
 A structured YAML or JSON block defines the event's formal properties:
 
 ````markdown
+### Customer Preference Updated
+
+Emitted when a customer modifies their communication or interaction preferences.
 ```yaml
 actor: Customer
 entity: Customer Preference
-attributes:
-  - updated fields:
-      type: array
-  - timestamp:
-      type: datetime
-```
-```yaml
+emitted_on: 
+  - create
+  - update
+business_meaning: Customer has expressed a change in how they wish to interact with the business
+downstream_impact:
+  - Marketing campaigns must respect updated preferences
+  - Communication systems must apply new settings
+  - Compliance audit trail is maintained
+
 constraints:
-  - Ownership Validation:
-      logic: "Customer.ID == Customer Preference.OwnerID"
-  - Logical Sequence:
-      logic: "Event.timestamp >= Customer Preference.CreatedAt"
-```
-```yaml
+  Ownership Validation:
+    check: "Customer.ID == Customer Preference.Customer ID"
+    description: Preference change must be for the acting customer
+  
+  Active Customer Only:
+    check: "Customer.Status == 'Active'"
+    description: Only active customers can update preferences
+
 governance:
   retention: 7 years
-  access_role: HR_ADMIN
+  access_role: CUSTOMER_SERVICE
   classification: Confidential
+  pii: true
+  compliance_relevance:
+    - GDPR Right to Object
+    - CCPA Opt-Out
 ```
 ````
 

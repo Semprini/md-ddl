@@ -158,22 +158,3 @@ Emited when any system updates a field which is used to configure customer inter
 This allows the domain file to act as a semantic index of the domain.
 
 ---
-
-# **Type System**
-
-The domain file is conceptual only. It does not define or enforce types. However, a description may contain a type description if it is relevant for context and clarity. In the detail files, MD‑DDL supports:
-
-- string
-- integer
-- decimal
-- boolean
-- date
-- datetime
-- enum: Enum Name
-- array
-- object
-
----
-
-...next: [Entities](MD-DDL-3-Entities.md)
-

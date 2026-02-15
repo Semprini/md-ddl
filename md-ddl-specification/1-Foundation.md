@@ -111,11 +111,11 @@ This means:
 # **Document Structure**
 
 MD‑DDL is composed of several logical components: 
-- [Domains](MD-DDL-2-Domains.md)
-- [Entities](MD-DDL-3-Entities.md)
-- [Enumerations](MD-DDL-4-Enumerations.md)
-- [Relationships](MD-DDL-5-Relationships.md)
-- [Events](MD-DDL-6-Events.md)
+- [Domains](2-Domains.md)
+- [Entities](3-Entities.md)
+- [Enumerations](4-Enumerations.md)
+- [Relationships](5-Relationships.md)
+- [Events](6-Events.md)
 
 If providing the specification to an AI, you might get better results with the complete spec in a single file:
 
@@ -123,8 +123,8 @@ If providing the specification to an AI, you might get better results with the c
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, and Events:
 
-1. A **summary definition** in the domain file  
-2. A **detailed definition** in a separate file  
+1. A **summary definition** in the domain file
+2. A **detailed definition** in a separate file
 
 This structure supports both human readability and AI context management.
 
@@ -180,4 +180,4 @@ The file structure is a convention, not a technical requirement - it's designed 
 
 ---
 
-...next: [Domains](MD-DDL-2-Domains.md)
+...next: [Domains](2-Domains.md)

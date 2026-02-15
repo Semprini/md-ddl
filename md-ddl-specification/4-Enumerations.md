@@ -48,4 +48,4 @@ values:
 
 ---
 
-...next: [Relationships](MD-DDL-5-Relationships.md)
+...next: [Relationships](5-Relationships.md)

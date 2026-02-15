@@ -1,4 +1,4 @@
-# **MD‑DDL Specification (Draft 0.3)**  
+# **MD‑DDL Specification (Draft 0.4)**  
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
 ---
@@ -7,10 +7,10 @@
 
 MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining  domains, entities, attributes, enums, and relationships. It is designed to be readable by humans, generatable by AI, and compilable into:
 
-- Data catalogs  
-- Knowledge graphs  
-- Data product definitions  
-- Schemas and technical artifacts  
+- Data catalogs
+- Knowledge graphs
+- Data product definitions
+- Schemas and technical artifacts
 
 MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks for structured definitions and Mermaid or PlantUML for diagramming. Structural consistency is enforced by the compiler and supported by companion AI agents.
 
@@ -73,7 +73,7 @@ domains/customer/diagrams/overview.md
 
 - The domain file provides a compact summary of all conceptual objects.  
 - AI agents load only the summaries initially.  
-- When deeper context is needed, they follow the `[detail]` link to load the full definition.
+- When deeper context is needed, they follow the `detail:` link to load the full definition.
 
 This mirrors Anthropic’s "skills" concept but improves on it by:
 
@@ -186,7 +186,11 @@ Below the metadata section there are several sections, each with a level‑2 hea
 
 ### <entity name>
 Conceptual definition.
-[detail](link to details)
+- detail: [<entity name>](link to details)
+- specializes: [<entity name>](link to parent entity details)
+- references: 
+    - [<external reference1>](reference url1)
+    - [<external reference2>](reference url2)
 
 ## Enums
 ...
@@ -217,40 +221,53 @@ Formal JSON/YAML block and diagrams...
 
 ### Customer
 The primary representation of a customer in the organisation.
-[detail](entities/customer.md)
+- detail: [Customer](entities/customer.md)
 
 ### Customer Preference
 Represents customer‑specific settings and preferences.
-[detail](entities/customer-preference.md) 
+- detail [Customer Preference](entities/customer-preference.md) 
 
 ## Enums
 
 ### Loyalty Tier
 A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending.
-[detail](enums/loyalty-tier.md) 
+- detail: [Loyalty Tier](enums/loyalty-tier.md) 
 
 ## Relationships
 
 ### Customer Has Preferences
 A customer can have 0 to many preferences which are used for interactions with our business.
-[detail](relationships/customer-has-preferences.md) 
+- detail: [Customer Has Preferences](relationships/customer-has-preferences.md) 
 
 ## Events
+
+### Customer Preference Updated
 Emited when any system updates a field which is used to configure customer interactions.
-[detail](events/customer-preference-updated.md) 
+- detail: [Customer Preference Updated](events/customer-preference-updated.md) 
 
 ```
 
 ## Rules for Summary Definitions
 
 - The summary must include a short natural‑language description.
-- The summary must include a [detail]\(link to the full definition file.)
+- The summary must include a `detail:` link to the full definition file.
+- If the entity specializes another entity, include a `specializes:` link to the parent entity before the detail link.
 - The summary should not include YAML or formal attributes. It is a conceptual definition.
 - The summary must be below the entity's level‑3 heading.
 - The summary is authoritative but high level for the entity name.
 - The summary is intentionally brief, designed for AI agents to load upfront and humans to scan quickly.
 
 This allows the domain file to act as a semantic index of the domain.
+
+### Specialization in Summaries
+
+When an entity specializes (inherits from) another entity, declare this in the summary with a link to the parent:
+```markdown
+### Individual
+A natural person who participates in financial activities.
+- specializes: [Party](entities/party.md)
+- detail: [Individual](entities/individual.md)
+```
 
 ---
 

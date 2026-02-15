@@ -166,4 +166,4 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 ---
 
-...next: [Enums](MD-DDL-4-Enumerations.md)
+...next: [Enums](4-Enumerations.md)

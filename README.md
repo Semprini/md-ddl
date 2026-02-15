@@ -1,14 +1,13 @@
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
 # md-ddl
-The "Common Language" for Business Data
 
 MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning**
 
 It is a standard and tools, designed to be the bridges between people who *define the business* (Owners, Stewards, Analysts) and people who *build the systems* (Engineers, Architects) and companion AI Agents. It is:
 
-- Human‑friendly  
 - AI‑native
+- Human‑friendly  
 - Version‑controlled
 - Semantically rich
 - Ready for automation

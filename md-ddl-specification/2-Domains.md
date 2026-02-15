@@ -158,3 +158,5 @@ Emited when any system updates a field which is used to configure customer inter
 This allows the domain file to act as a semantic index of the domain.
 
 ---
+
+...next: [Entities](3-Entities.md)

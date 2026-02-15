@@ -64,5 +64,5 @@ constraints:
 
 ---
 
-...next: [Events](MD-DDL-6-Events.md)
+...next: [Events](6-Events.md)
 

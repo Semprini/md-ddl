@@ -91,6 +91,7 @@ graph TD
   ContactAddress --> |references|Address
 
   Party["<a href='entities/party.md'>Party</a>"]
+  Individual[<a href='entities/individual.md'>Individual</a>]
   PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
   Address["<a href='entities/address.md'>Address</a>"]
   ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]

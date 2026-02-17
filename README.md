@@ -4,6 +4,8 @@
 
 MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning**
 
+The standard can be found in this repo at [1-Foundation.md](md-ddl-specification/1-Foundation.md)
+
 It is a standard and tools, designed to be the bridges between people who *define the business* (Owners, Stewards, Analysts) and people who *build the systems* (Engineers, Architects) and companion AI Agents. It is:
 
 - AI‑native

@@ -43,6 +43,60 @@ source_systems:
   - "Payment Systems"
 ```
 
+```mermaid
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: LINEAR_SEGMENTS
+  look: classic
+  theme: dark
+---
+graph TD
+
+  Individual --> |is a|Party
+  Company --> |is a|Party
+  TermDepositAgreement --> |is a|Agreement
+  LoanAgreement --> |is a|Agreement
+
+  Party <--> |related to|Party
+  Party --> |assumes|PartyRole
+
+  Customer --> |is a|PartyRole
+  Merchant --> |is a|PartyRole
+  Payee --> |is a|PartyRole
+  Payer --> |is a|PartyRole
+  Teller --> |is a|PartyRole
+  PaymentInitiator --> |is a|PartyRole
+
+  Party --> |has|ContactAddress
+  PartyRole -->|uses|ContactAddress
+  Customer --> |holds|Account
+  Customer --> |has|CustomerPreferences
+  PartyRole --> |governed by|Agreement
+  PaymentTransaction --> |has|Payer
+  PaymentTransaction --> |has|Payee
+  PaymentTransaction --> |initiated by|PaymentInitiator
+  PaymentTransactionAccount --> |involved in|PaymentTransaction
+  PaymentTransactionAccount --> |debits|Account
+  PaymentTransactionAccount --> |credits|Account
+  Teller --> |processes|PaymentTransaction
+  Merchant --> |processes|PaymentTransaction
+
+  Account --> |holds|Product
+  Branch --> |services|Account
+
+  Product --> |in terms of|Agreement
+  ContactAddress --> |references|Address
+
+  Party["<a href='entities/party.md'>Party</a>"]
+  PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
+  Address["<a href='entities/address.md'>Address</a>"]
+  ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
+
+```
+
 ## Entities
 
 ### Party

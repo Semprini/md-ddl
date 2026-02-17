@@ -70,18 +70,112 @@ source_systems:
 
 ### **Diagrams**
 
-Diagrams appear under level‑3 headings inside the Metadata section to separate Data about the Domain from Visuals of the Domain.:
+Diagrams appear under level‑3 headings inside the Metadata section, after the
+YAML metadata block. This separates data *about* the domain from visuals *of*
+the domain.
+
+A domain file should contain at least one **Domain Overview Diagram** that
+shows the full entity graph for the domain. This diagram is the primary
+navigational and communicative artefact of the domain file — it must give any
+reader an immediate understanding of how all concepts relate to each other.
+
+The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR`
+(left-right) Mermaid syntax with the ELK layout engine for consistent,
+readable positioning of complex graphs.
+
+#### **What to include in the Domain Overview Diagram**
+
+The diagram must show:
+
+1. **All entities** defined in the domain
+2. **Inheritance relationships** using `-->|is a|` notation
+3. **All relationships** between entities using labelled edges whose verb
+   matches the relationship name defined in the Relationships section
+4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]`
+   syntax. Not every node needs a link — prioritise the abstract and most-referenced
+   entities.
+
+The diagram must not show:
+- Attributes (these belong in entity detail files)
+- Cardinality notation (this belongs in relationship detail files)
+- Enumeration values (these belong in enum detail files)
+
+#### **Diagram Syntax Rules**
+
+- Use `graph TD` for domains with deep inheritance hierarchies
+- Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for
+  complex graphs to prevent edge crossings
+- Relationship edge labels must use the verb form from the Relationships
+  section: `-->|assumes|`, `-->|references|`, `-->|governed by|`
+- Inheritance is always expressed as `Child -->|is a|Parent`
+- Bidirectional relationships use `<-->|label|`
+- Entity hyperlinks use plain anchor tags: `<a href='path'>Display Name</a>`
+  with no additional CSS class attributes
+- Node identifiers in the graph use PascalCase for readability
+  (e.g., `PartyRole`, `ContactAddress`) but the display label uses
+  natural language where a hyperlink is defined
+
+#### **Example Domain Overview Diagram**
 
 ````markdown
 ### Domain Overview Diagram
-High-level view of how Customer data flows into downstream analytics.
+
 ```mermaid
-flowchart LR
-    Customer --> Customer Preference
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: LINEAR_SEGMENTS
+  look: classic
+  theme: dark
+---
+graph TD
+
+  Individual --> |is a|Party
+  Company --> |is a|Party
+  TermDepositAgreement --> |is a|Agreement
+  LoanAgreement --> |is a|Agreement
+
+  Party["<a href='entities/party.md'>Party</a>"]
 ```
 ````
 
+#### **Why the Domain Overview Diagram matters**
+
+The domain diagram is the first artefact an AI agent or a new team member
+loads when working with a domain. It establishes:
+
+- **Scope**: what concepts are owned by this domain
+- **Structure**: how inheritance hierarchies are organised
+- **Connectivity**: which entities are central vs peripheral
+- **Navigation**: hyperlinks on key entities provide one-click access to
+  detail files from the diagram itself
+
+A well-maintained domain diagram makes the two-layer structure of MD‑DDL
+work in practice — the domain file is the map, and the diagram is the
+visual index of that map.
+
+#### **Additional Diagrams**
+
+Beyond the overview, a domain file may contain additional level‑3 diagrams
+focusing on a specific sub-area. For example:
+
+````markdown
+### Transaction Flow Diagram
+Shows how payment transactions move through party roles.
+
+```mermaid
+graph LR
+  Payer --> |initiates|PaymentTransaction
+  PaymentTransaction --> |credits|Payee
+```
+````
+
+Additional diagrams are optional. The Domain Overview Diagram is required.
+
 ---
+
 ## **Domain Structure**
 
 Below the metadata section there are several sections, each with a level‑2 heading. The sections are: 
@@ -91,7 +185,11 @@ Below the metadata section there are several sections, each with a level‑2 hea
 
 ### <entity name>
 Conceptual definition.
-[detail](link to details)
+- detail: [<entity name>](link to details)
+- specializes: [<entity name>](link to parent entity details)
+- references: 
+    - [<external reference1>](reference url1)
+    - [<external reference2>](reference url2)
 
 ## Enums
 ...
@@ -122,40 +220,53 @@ Formal JSON/YAML block and diagrams...
 
 ### Customer
 The primary representation of a customer in the organisation.
-[detail](entities/customer.md)
+- detail: [Customer](entities/customer.md)
 
 ### Customer Preference
 Represents customer‑specific settings and preferences.
-[detail](entities/customer-preference.md) 
+- detail [Customer Preference](entities/customer-preference.md) 
 
 ## Enums
 
 ### Loyalty Tier
 A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending.
-[detail](enums/loyalty-tier.md) 
+- detail: [Loyalty Tier](enums/loyalty-tier.md) 
 
 ## Relationships
 
 ### Customer Has Preferences
 A customer can have 0 to many preferences which are used for interactions with our business.
-[detail](relationships/customer-has-preferences.md) 
+- detail: [Customer Has Preferences](relationships/customer-has-preferences.md) 
 
 ## Events
+
+### Customer Preference Updated
 Emited when any system updates a field which is used to configure customer interactions.
-[detail](events/customer-preference-updated.md) 
+- detail: [Customer Preference Updated](events/customer-preference-updated.md) 
 
 ```
 
 ## Rules for Summary Definitions
 
 - The summary must include a short natural‑language description.
-- The summary must include a [detail]\(link to the full definition file.)
+- The summary must include a `detail:` link to the full definition file.
+- If the entity specializes another entity, include a `specializes:` link to the parent entity before the detail link.
 - The summary should not include YAML or formal attributes. It is a conceptual definition.
 - The summary must be below the entity's level‑3 heading.
 - The summary is authoritative but high level for the entity name.
 - The summary is intentionally brief, designed for AI agents to load upfront and humans to scan quickly.
 
 This allows the domain file to act as a semantic index of the domain.
+
+### Specialization in Summaries
+
+When an entity specializes (inherits from) another entity, declare this in the summary with a link to the parent:
+```markdown
+### Individual
+A natural person who participates in financial activities.
+- specializes: [Party](entities/party.md)
+- detail: [Individual](entities/individual.md)
+```
 
 ---
 

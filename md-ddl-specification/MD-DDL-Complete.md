@@ -91,6 +91,9 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 - The compiler knows exactly where to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
+### Detail File Flexibility
+Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships. The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
+
 ---
 
 # **Domains**
@@ -165,18 +168,11 @@ source_systems:
 
 ### **Diagrams**
 
-Diagrams appear under level‑3 headings inside the Metadata section, after the
-YAML metadata block. This separates data *about* the domain from visuals *of*
-the domain.
+Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
-A domain file should contain at least one **Domain Overview Diagram** that
-shows the full entity graph for the domain. This diagram is the primary
-navigational and communicative artefact of the domain file — it must give any
-reader an immediate understanding of how all concepts relate to each other.
+A domain file should contain at least one **Domain Overview Diagram** that shows the full entity graph for the domain. This diagram is the primary navigational and communicative artefact of the domain file — it must give any reader an immediate understanding of how all concepts relate to each other.
 
-The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR`
-(left-right) Mermaid syntax with the ELK layout engine for consistent,
-readable positioning of complex graphs.
+The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR` (left-right) Mermaid syntax with the ELK layout engine for consistent, readable positioning of complex graphs.
 
 #### **What to include in the Domain Overview Diagram**
 
@@ -184,11 +180,8 @@ The diagram must show:
 
 1. **All entities** defined in the domain
 2. **Inheritance relationships** using `-->|is a|` notation
-3. **All relationships** between entities using labelled edges whose verb
-   matches the relationship name defined in the Relationships section
-4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]`
-   syntax. Not every node needs a link — prioritise the abstract and most-referenced
-   entities.
+3. **All relationships** between entities using labelled edges whose verb matches the relationship name defined in the Relationships section
+4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]` syntax. Not every node needs a link — prioritise the abstract and most-referenced entities.
 
 The diagram must not show:
 - Attributes (these belong in entity detail files)
@@ -198,8 +191,7 @@ The diagram must not show:
 #### **Diagram Syntax Rules**
 
 - Use `graph TD` for domains with deep inheritance hierarchies
-- Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for
-  complex graphs to prevent edge crossings
+- Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for complex graphs to prevent edge crossings
 - Relationship edge labels must use the verb form from the Relationships
   section: `-->|assumes|`, `-->|references|`, `-->|governed by|`
 - Inheritance is always expressed as `Child -->|is a|Parent`
@@ -271,23 +263,18 @@ graph TD
 
 #### **Why the Domain Overview Diagram matters**
 
-The domain diagram is the first artefact an AI agent or a new team member
-loads when working with a domain. It establishes:
+The domain diagram is the first artefact an AI agent or a new team member loads when working with a domain. It establishes:
 
 - **Scope**: what concepts are owned by this domain
 - **Structure**: how inheritance hierarchies are organised
 - **Connectivity**: which entities are central vs peripheral
-- **Navigation**: hyperlinks on key entities provide one-click access to
-  detail files from the diagram itself
+- **Navigation**: hyperlinks on key entities provide one-click access to detail files from the diagram itself
 
-A well-maintained domain diagram makes the two-layer structure of MD‑DDL
-work in practice — the domain file is the map, and the diagram is the
-visual index of that map.
+A well-maintained domain diagram makes the two-layer structure of MD‑DDL work in practice — the domain file is the map, and the diagram is the visual index of that map.
 
 #### **Additional Diagrams**
 
-Beyond the overview, a domain file may contain additional level‑3 diagrams
-focusing on a specific sub-area. For example:
+Beyond the overview, a domain file may contain additional level‑3 diagrams focusing on a specific sub-area. For example:
 
 ````markdown
 ### Transaction Flow Diagram
@@ -301,6 +288,16 @@ graph LR
 ````
 
 Additional diagrams are optional. The Domain Overview Diagram is required.
+
+### Conceptual vs Logical Diagrams
+
+MD-DDL uses two distinct diagram types for different purposes:
+|Diagram|Location|Purpose|Relationship Labels|
+|-------|--------|-------|-------------------|
+|`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Required — must match Relationships section|
+`classDiagram`|Entity detail file|Logical model — structural realization of the entity|Optional — structural intent only
+
+The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
 
 ---
 ## **Domain Structure**
@@ -329,6 +326,15 @@ Conceptual definition.
 The order of these sections is not important. See the specification details of each for more information.
 
 ### Sample Structure
+
+- Recommended: Entity-Centric Detail Files
+- A common and encouraged pattern is to define, in a single file, one entity alongside all relationships that originate from it. This keeps ownership clear and reduces cross-file navigation. Example layout:
+
+```
+entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
+entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
+entities/address.md      ← Address entity (no outbound relationships)
+```
 
 Below is an example of how a domain file is structured.
 
@@ -376,7 +382,7 @@ Emited when any system updates a field which is used to configure customer inter
 ## Rules for Summary Definitions
 
 - The summary must include a short natural‑language description.
-- The summary must include a `detail:` link to the full definition file.
+- The summary must include a detail: link to the full definition file. Where multiple concepts share a detail file, each concept's summary links to the same file. The compiler resolves each concept by its level‑3 heading within that file.
 - If the entity specializes another entity, include a `specializes:` link to the parent entity before the detail link.
 - The summary should not include YAML or formal attributes. It is a conceptual definition.
 - The summary must be below the entity's level‑3 heading.
@@ -398,11 +404,16 @@ A natural person who participates in financial activities.
 ---
 
 # **Entities**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
 
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. The domain name should provide a link back to the domain file like:
+
+```markdown
+# [My Domain](../domain.md)
+```
 
 ## **Entity Declaration**
 
+A detail file may contain any combination of ## Entities, ## Enums, and ## Relationships sections. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
 The Entities section appear under a level‑2 heading:
 
 ```markdown
@@ -440,8 +451,7 @@ classDiagram
 
 ### **The Subject Class**
 
-The entity being defined is the **subject class**. It is always written as a
-full class block with its attributes listed inside:
+The entity being defined is the **subject class**. It is always written as a full class block with its attributes listed inside:
 
 ```
   class Party{
@@ -454,27 +464,20 @@ full class block with its attributes listed inside:
 
 **Rules for the subject class:**
 
-- The class name uses PascalCase matching the entity heading (e.g., `Party`,
-  `ContactAddress`, `PartyRole`)
-- If the entity is abstract — never instantiated directly, only specialised —
-  add `<<abstract>>` as the first line inside the class block
+- The class name uses PascalCase matching the entity heading (e.g., `Party`, `ContactAddress`, `PartyRole`)
+- If the entity is abstract — never instantiated directly, only specialised - add `<<abstract>>` as the first line inside the class block
 - The primary identifier attribute is prefixed with `*` to mark it as the key
 - All attributes defined in the entity's YAML block must appear in the diagram
 - Attribute types use the Mermaid classifier syntax:
   - Primitives: `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`
   - Enumerations: `enum~EnumName~` (e.g., `enum~PartyStatus~`, `enum~CountryCode~`)
   - Arrays: append `[]` to the type (e.g., `enum~CountryCode~[]`, `string[]`)
-- Inherited attributes from parent entities are **not** repeated in the
-  subject class — only attributes defined in this entity's own YAML block
-  are shown
-- Attribute format is `AttributeName : Type` with a space either side of
-  the colon
+- Inherited attributes from parent entities are **not** repeated in the subject class — only attributes defined in this entity's own YAML block are shown
+- Attribute format is `AttributeName : Type` with a space either side of the colon
 
 ### **Related Classes**
 
-All other classes that appear in the diagram — parents, children, and related
-entities — are **reference classes**. They are never defined with attribute
-blocks. Instead they use the linked class syntax:
+All other classes that appear in the diagram — parents, children, and related entities — are **reference classes**. They are never defined with attribute blocks. Instead they use the linked class syntax:
 
 ```
   class Party["<a href='party.md'>Party</a>"]
@@ -484,15 +487,10 @@ blocks. Instead they use the linked class syntax:
 
 - Use plain anchor tags: `<a href='path'>Display Name</a>`
 - No CSS class attributes on the anchor tag
-- The `href` path is relative to the current file's location and uses
-  snake_case filenames (e.g., `party.md`, `party_role.md`,
-  `contact_address.md`)
-- Display Name uses natural language with spaces matching the entity heading
-  (e.g., `Party Role`, `Contact Address`)
-- All reference class definitions are grouped at the bottom of the diagram,
-  after all relationship lines
-- If a specialisation child has no detail file yet, it may appear as a bare
-  unlinked class: `class Customer` — without a block or link
+- The `href` path is relative to the current file's location and uses snake_case filenames (e.g., `party.md`, `party_role.md`, `contact_address.md`)
+- Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
+- All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
+- If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
 
 ### **Inheritance**
 
@@ -503,8 +501,7 @@ Inheritance uses the Mermaid `--|>` arrow with the child on the left:
   Company --|> Party
 ```
 
-This reads as "Individual is a specialisation of Party." The direction matches
-the domain overview diagram convention of `Child -->|is a|Parent`.
+This reads as "Individual is a specialisation of Party." The direction matches the domain overview diagram convention of `Child -->|is a|Parent`.
 
 When an entity **is** a specialisation, show the parent as a reference class:
 
@@ -513,8 +510,7 @@ When an entity **is** a specialisation, show the parent as a reference class:
   class Party["<a href='party.md'>Party</a>"]
 ```
 
-When an entity **has** specialisations, show each child as a reference class
-(or bare class if not yet defined):
+When an entity **has** specialisations, show each child as a reference class (or bare class if not yet defined):
 
 ```
   Individual --|> Party
@@ -525,27 +521,23 @@ When an entity **has** specialisations, show each child as a reference class
 
 ### **Relationships**
 
-All immediate relationships to and from the entity are shown with labelled
-arrows, cardinality, and a relationship label that matches the verb used in
-the Relationships section of the domain file:
+All immediate relationships to and from the entity are shown with labelled arrows and cardinality. The classDiagram is a logical realization of the entity — relationship labels here describe the structural link (e.g., has, references) and do not need to match the conceptual relationship names defined in the domain Relationships section. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
 ```
-  Party "1" --> "0..*" PartyRole : assumes
-  PartyRole "0..*" --> "0..*" ContactAddress : uses
-  ContactAddress "0..*" --> "1" Address : references
+  Party "1" --> "0..*" PartyRole
+  PartyRole "0..*" --> "0..*" ContactAddress
+  ContactAddress "0..*" --> "1" Address
 ```
+
+Relationship labels on classDiagram arrows are optional. When included, they describe the structural navigation intent, not the conceptual relationship name.
 
 **Rules for relationships:**
 
-- Cardinality is always shown on both ends using quoted strings:
-  `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
-- The relationship label after `:` uses the verb from the domain Relationships
-  section — it must match exactly
-- The arrow direction reflects the ownership or navigational direction:
-  the entity that *holds the reference* is the source (`-->`)
+- Cardinality is always shown on both ends using quoted strings: `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
+- The relationship label after `:` uses the verb from the domain Relationships section — it must match exactly
+- The arrow direction reflects the ownership or navigational direction: the entity that *holds the reference* is the source (`-->`)
 - Bidirectional relationships use `<-->`
-- Every entity in a relationship line must have a corresponding reference
-  class definition at the bottom of the diagram
+- Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
 
 ### **Ordering Within the Diagram**
 
@@ -572,11 +564,7 @@ classDiagram
     <<abstract>>
     * Party Identifier : string
     Legal Name : string
-    Also Known As : string[]
-    Party Status : enum~PartyStatus~
     Risk Rating : enum~FinancialCrimeRiskRating~
-    Sanctions Screen Status : enum~SanctionsScreenStatus~
-    Next Review Date : date
   }
 
   Individual --|> Party
@@ -611,6 +599,7 @@ attributes:
   Balance:
     type: Decimal
 ```
+
 ```yaml
 constraints:
   Valid Date Range:
@@ -618,6 +607,7 @@ constraints:
   Positive Liquidity:
     check: "Balance > 0"
 ```
+
 ```yaml
 governance:
   pii: true
@@ -680,7 +670,6 @@ Array constraints can be specified in the square brackets. For example, `string[
 
 - Valid cardinality syntax: `[n]`, `[n..m]`, `[n..*]`, or `[*]`
 - If no carditality is provided, `[*]` is assumed.
-
 
 ## Constraint Definition
 

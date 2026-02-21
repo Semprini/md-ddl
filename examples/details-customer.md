@@ -1,9 +1,11 @@
-# Customer
+# Customer Domain
+
 *Note this simple example uses a single file for the details of entities, enums, relationships and events. This is for brevity and to show how linking works. Decide on your file structure based on it's readability for humans and context management for AI.*
 
 ## Entities
 
 ### Customer
+
 The primary representation of a customer in the organisation.
 Any role that is responsible for authority or access to customer data is a Customer.
 
@@ -21,6 +23,7 @@ attributes:
   - name: Balance 
     type: Decimal
 ```
+
 ```yaml
 constraints:
   - name: Valid Date Range
@@ -28,6 +31,7 @@ constraints:
   - name: Positive Liquidity
     logic: "Balance > 0"
 ```
+
 ```yaml
 governance:
   pii: true
@@ -36,6 +40,7 @@ governance:
 ```
 
 ### Customer Preference
+
 Represents customer‑specific settings and preferences.
 
 ```yaml
@@ -49,6 +54,7 @@ attributes:
 ## Enums
 
 ### Loyalty Tier
+
 A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending.
 
 ```yaml
@@ -62,7 +68,8 @@ values:
 ## Relationships
 
 ### Customer Has Preferences
-Customers can have zero or more preferences, and preferences are owned by a customer. A preference cannot exist without a customer, and a customer can exist without preferences. 
+
+Customers can have zero or more preferences, and preferences are owned by a customer. A preference cannot exist without a customer, and a customer can exist without preferences.
 
 ```yaml
 source: Customer
@@ -70,6 +77,7 @@ target: Customer Preference
 cardinality: one-to-many
 ownership: Customer
 ```
+
 ```yaml
 constraints:
   - name: Active Customer Preference Only

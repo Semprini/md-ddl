@@ -1,9 +1,10 @@
-# **MD‑DDL Specification (Draft 0.4)**  
+# **MD‑DDL Specification (Draft 0.5)**  
+
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
 ---
 
-# **Overview**
+## **Overview**
 
 MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining  domains, entities, attributes, enums, and relationships. It is designed to be readable by humans, generatable by AI, and compilable into:
 
@@ -16,7 +17,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 
 ---
 
-# **Core Principles**
+## **Core Principles**
 
 1. **Single Source of Truth**  
    Every concept is defined once in the domain, in one canonical location. A design choice is weather to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
@@ -38,15 +39,15 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 
 ---
 
-# **Document Structure**
+## **Document Structure**
 
-MD‑DDL is composed of several logical components: 
+MD‑DDL is composed of several logical components:
+
 - [Domains](#domains)
 - [Entities](#entities)
 - [Enumerations](#enumerations)
 - [Relationships](#relationships)
 - [Events](#events)
-
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, and Events:
 
@@ -57,7 +58,7 @@ This structure supports both human readability and AI context management.
 
 Example domain layout:
 
-```
+```shell
 domains/customer/domain.md
 domains/customer/entities/customer.md
 domains/customer/entities/customer-preference.md
@@ -67,9 +68,9 @@ domains/customer/diagrams/overview.md
 
 ---
 
-## **Two‑Layer Structure**
+### **Two‑Layer Structure**
 
-### **AI Context Management**
+#### **AI Context Management**
 
 - The domain file provides a compact summary of all conceptual objects.  
 - AI agents load only the summaries initially.  
@@ -81,26 +82,27 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 - Avoiding duplication
 - Ensuring humans can browse the domain easily
 
-### **Human Readability**
+#### **Human Readability**
 
 - The domain file becomes a clean, navigable table of contents.  
 - Detail files remain focused, concise, and free from clutter.
 
-### **Compiler Simplicity**
+#### **Compiler Simplicity**
 
 - The compiler knows exactly where to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
-### Detail File Flexibility
+#### Detail File Flexibility
+
 Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships. The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
 
 ---
 
-# **Domains**
+## **Domains**
 
 In MD-DDL, the Domain file acts as the router for the Knowledge Graph. While detail files provide the DNA (Attributes/Constraints), the Domain file provides the Anatomy (How entities, events, and relationships sit together).
 
-## **Domain Declaration**
+### **Domain Declaration**
 
 A domain is declared using a **level‑1 Markdown heading**:
 
@@ -108,17 +110,18 @@ A domain is declared using a **level‑1 Markdown heading**:
 # Customer
 ```
 
-## **Domain Description**
+### **Domain Description**
 
 All free‑text Markdown under the H1 heading and before the next H2 heading is considered the domain description.
 
-## **Domain Metadata**
+### **Domain Metadata**
 
 Metadata is appears under a level‑2 heading:
 
 ```markdown
 ## Metadata
 ```
+
 Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
 
 Category|Metadata Keys|Purpose
@@ -129,7 +132,7 @@ Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frame
 Lifecycle|status (Draft/Live), version, source_systems|The maturity and origin of the data domain.
 Discovery|tags|Searchability
 
-### **Metadata Format**
+#### **Metadata Format**
 
 Metadata is expressed as YAML or JSON inside a fenced code block:
 
@@ -166,7 +169,7 @@ source_systems:
 ```
 ````
 
-### **Diagrams**
+#### **Diagrams**
 
 Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
@@ -174,7 +177,7 @@ A domain file should contain at least one **Domain Overview Diagram** that shows
 
 The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR` (left-right) Mermaid syntax with the ELK layout engine for consistent, readable positioning of complex graphs.
 
-#### **What to include in the Domain Overview Diagram**
+##### **What to include in the Domain Overview Diagram**
 
 The diagram must show:
 
@@ -184,11 +187,12 @@ The diagram must show:
 4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]` syntax. Not every node needs a link — prioritise the abstract and most-referenced entities.
 
 The diagram must not show:
+
 - Attributes (these belong in entity detail files)
 - Cardinality notation (this belongs in relationship detail files)
 - Enumeration values (these belong in enum detail files)
 
-#### **Diagram Syntax Rules**
+##### **Diagram Syntax Rules**
 
 - Use `graph TD` for domains with deep inheritance hierarchies
 - Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for complex graphs to prevent edge crossings
@@ -202,7 +206,7 @@ The diagram must not show:
   (e.g., `PartyRole`, `ContactAddress`) but the display label uses
   natural language where a hyperlink is defined
 
-#### **Example: Financial Crime Domain Overview Diagram**
+##### **Example: Financial Crime Domain Overview Diagram**
 
 ````markdown
 ### Domain Overview Diagram
@@ -261,7 +265,7 @@ graph TD
 ```
 ````
 
-#### **Why the Domain Overview Diagram matters**
+##### **Why the Domain Overview Diagram matters**
 
 The domain diagram is the first artefact an AI agent or a new team member loads when working with a domain. It establishes:
 
@@ -272,7 +276,7 @@ The domain diagram is the first artefact an AI agent or a new team member loads 
 
 A well-maintained domain diagram makes the two-layer structure of MD‑DDL work in practice — the domain file is the map, and the diagram is the visual index of that map.
 
-#### **Additional Diagrams**
+##### **Additional Diagrams**
 
 Beyond the overview, a domain file may contain additional level‑3 diagrams focusing on a specific sub-area. For example:
 
@@ -289,20 +293,22 @@ graph LR
 
 Additional diagrams are optional. The Domain Overview Diagram is required.
 
-### Conceptual vs Logical Diagrams
+#### Conceptual vs Logical Diagrams
 
 MD-DDL uses two distinct diagram types for different purposes:
-|Diagram|Location|Purpose|Relationship Labels|
-|-------|--------|-------|-------------------|
-|`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Required — must match Relationships section|
+
+Diagram|Location|Purpose|Relationship Labels
+-------|--------|-------|-------------------
+`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Required — must match Relationships section
 `classDiagram`|Entity detail file|Logical model — structural realization of the entity|Optional — structural intent only
 
 The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
 
 ---
-## **Domain Structure**
 
-Below the metadata section there are several sections, each with a level‑2 heading. The sections are: 
+### **Domain Structure**
+
+Below the metadata section there are several sections, each with a level‑2 heading. The sections are:
 
 ```markdown
 ## Entities
@@ -325,12 +331,12 @@ Conceptual definition.
 
 The order of these sections is not important. See the specification details of each for more information.
 
-### Sample Structure
+#### Sample Structure
 
 - Recommended: Entity-Centric Detail Files
 - A common and encouraged pattern is to define, in a single file, one entity alongside all relationships that originate from it. This keeps ownership clear and reduces cross-file navigation. Example layout:
 
-```
+```shell
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
@@ -379,7 +385,7 @@ Emited when any system updates a field which is used to configure customer inter
 
 ```
 
-## Rules for Summary Definitions
+### Rules for Summary Definitions
 
 - The summary must include a short natural‑language description.
 - The summary must include a detail: link to the full definition file. Where multiple concepts share a detail file, each concept's summary links to the same file. The compiler resolves each concept by its level‑3 heading within that file.
@@ -391,9 +397,10 @@ Emited when any system updates a field which is used to configure customer inter
 
 This allows the domain file to act as a semantic index of the domain.
 
-### Specialization in Summaries
+#### Specialization in Summaries
 
 When an entity specializes (inherits from) another entity, declare this in the summary with a link to the parent:
+
 ```markdown
 ### Individual
 A natural person who participates in financial activities.
@@ -403,7 +410,7 @@ A natural person who participates in financial activities.
 
 ---
 
-# **Entities**
+## **Entities**
 
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. The domain name should provide a link back to the domain file like:
 
@@ -411,7 +418,7 @@ Each file must declare which domain it is part of by starting with a Level 1 hea
 # [My Domain](../domain.md)
 ```
 
-## **Entity Declaration**
+### **Entity Declaration**
 
 A detail file may contain any combination of ## Entities, ## Enums, and ## Relationships sections. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
 The Entities section appear under a level‑2 heading:
@@ -426,15 +433,15 @@ Each entity is introduced with a **level‑3 heading**:
 ### Customer
 ```
 
-## **Entity Description**
+### **Entity Description**
 
 Free‑text Markdown under the heading describes the entity in more detail than was found in the domain summary.
 
-## **Entity Diagram**
+### **Entity Diagram**
 
 Every entity detail file must include a `classDiagram` immediately after the entity description and before the YAML definition blocks. The diagram is the visual contract for the entity — it shows the entity's own attributes, its position in the inheritance hierarchy, and all of its immediate relationships to other entities.
 
-### **Diagram Configuration**
+#### **Diagram Configuration**
 
 All entity diagrams use the ELK layout engine for consistent rendering:
 
@@ -449,11 +456,11 @@ classDiagram
 ```
 ````
 
-### **The Subject Class**
+#### **The Subject Class**
 
 The entity being defined is the **subject class**. It is always written as a full class block with its attributes listed inside:
 
-```
+```text
   class Party{
     <<abstract>>
     * Party Identifier : string
@@ -475,11 +482,11 @@ The entity being defined is the **subject class**. It is always written as a ful
 - Inherited attributes from parent entities are **not** repeated in the subject class — only attributes defined in this entity's own YAML block are shown
 - Attribute format is `AttributeName : Type` with a space either side of the colon
 
-### **Related Classes**
+#### **Related Classes**
 
 All other classes that appear in the diagram — parents, children, and related entities — are **reference classes**. They are never defined with attribute blocks. Instead they use the linked class syntax:
 
-```
+```text
   class Party["<a href='party.md'>Party</a>"]
 ```
 
@@ -492,11 +499,11 @@ All other classes that appear in the diagram — parents, children, and related 
 - All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
 - If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
 
-### **Inheritance**
+#### **Inheritance**
 
 Inheritance uses the Mermaid `--|>` arrow with the child on the left:
 
-```
+```text
   Individual --|> Party
   Company --|> Party
 ```
@@ -505,25 +512,25 @@ This reads as "Individual is a specialisation of Party." The direction matches t
 
 When an entity **is** a specialisation, show the parent as a reference class:
 
-```
+```text
   Individual --|> Party
   class Party["<a href='party.md'>Party</a>"]
 ```
 
 When an entity **has** specialisations, show each child as a reference class (or bare class if not yet defined):
 
-```
+```text
   Individual --|> Party
   Company --|> Party
   class Individual["<a href='individual.md'>Individual</a>"]
   class Company["<a href='company.md'>Company</a>"]
 ```
 
-### **Relationships**
+#### **Entity Relationships**
 
 All immediate relationships to and from the entity are shown with labelled arrows and cardinality. The classDiagram is a logical realization of the entity — relationship labels here describe the structural link (e.g., has, references) and do not need to match the conceptual relationship names defined in the domain Relationships section. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
-```
+```text
   Party "1" --> "0..*" PartyRole
   PartyRole "0..*" --> "0..*" ContactAddress
   ContactAddress "0..*" --> "1" Address
@@ -539,7 +546,7 @@ Relationship labels on classDiagram arrows are optional. When included, they des
 - Bidirectional relationships use `<-->`
 - Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
 
-### **Ordering Within the Diagram**
+#### **Ordering Within the Diagram**
 
 To keep diagrams readable and consistent, follow this ordering:
 
@@ -549,7 +556,7 @@ To keep diagrams readable and consistent, follow this ordering:
 4. Relationship lines (`-->` with cardinality and label)
 5. All reference class definitions (`class Foo["<a href='...'>...</a>"]`)
 
-### **Example**
+#### **Example**
 
 **Abstract entity with specialisations and outbound relationships (Party):**
 
@@ -579,13 +586,15 @@ classDiagram
 ```
 ````
 
-## **Entity Definition**
+### **Entity Definition**
 
 A structured block defines the entity's attributes and logic. MD‑DDL follows a Key-as-Name philosophy to eliminate redundancy and ensure that the human-readable label used in the documentation is the exact same identifier used in the Knowledge Graph.:
 
 ````markdown
 ```yaml
 extends: Party Role
+mutability: immutable | append_only | slowly_changing | frequently_changing | reference
+existence: independent | dependent | associative
 temporal:
   tracking: valid_time
   description: Preferences are valid for specific time periods and can be future-dated
@@ -617,7 +626,7 @@ governance:
 ```
 ````
 
-**The "Key-as-Name" Principle**
+### The "Key-as-Name" Principle
 
 By using the business term (e.g., Positive Liquidity) as the YAML key rather than a nested property (e.g., name: Positive Liquidity), we achieve:
 
@@ -625,9 +634,9 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 - Reduced Friction: There is no "translation layer" between the documentation and the database schema. What you see in the heading or key is what appears in the Graph node.
 - Logical Referencing: Sub-entities that inherit from this entity can specifically override or reference a constraint by its key name, allowing for a cleaner "Logic Lineage."
 
-## Temporal Tracking Types
+### Temporal Tracking Types
 
-This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined. 
+This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
 Type|Description|Compiler Behavior
 ----|-----------|------------------
@@ -636,11 +645,33 @@ Type|Description|Compiler Behavior
 `bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
 `point_in_time`|Event timestamp only|For events - single timestamp, immutable
 
+### Existence
+
+This optional section defines if this entity can exist independently.
+
+- independent — meaningful on its own; doesn't require another entity to give it purpose (Customer, Product, Location)
+- dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
+- associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
+
+The compiler uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
+
+### Mutability
+
+This optional section defines how the data changes over time.
+
+- immutable — once written, never changes (event records, ledger entries)
+- append_only — new rows added, existing rows never updated (logs, transactions)
+- slowly_changing — changes occasionally, history may matter (customer address, product category)
+- frequently_changing — changes often, current value is what matters (account balance, inventory level)
+- reference — essentially static, managed by a small number of administrators (country codes, currency codes)
+
+The compiler sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+
 ---
 
-## Attribute Definition
+### Attribute Definition
 
-### Attribute Properties
+#### Attribute Properties
 
 Property|Required|Description|Example
 --------|--------|-----------|-------
@@ -650,7 +681,7 @@ Property|Required|Description|Example
 `unique`|No|Whether values must be unique across all instances (default: `false`)|`true` or `false`
 `default`|No|Default value when not explicitly provided|`0`, `"Unknown"`, `false`
 
-### Type System
+#### Type System
 
 Type|Description|Examples
 ----|-----------|--------
@@ -662,7 +693,7 @@ Type|Description|Examples
 `datetime`|Date with time (timezone-aware)|2024-03-15T14:30:00Z
 `enum:<Enum Name>`|Reference to a defined enumeration|`enum:Loyalty Tier`, `enum:Country Code`
 
-### Arrays
+#### Arrays
 
 All types above support arrays by appending `[]` to the type name. For example, `string[]` or `decimal[]`
 
@@ -671,11 +702,11 @@ Array constraints can be specified in the square brackets. For example, `string[
 - Valid cardinality syntax: `[n]`, `[n..m]`, `[n..*]`, or `[*]`
 - If no carditality is provided, `[*]` is assumed.
 
-## Constraint Definition
+### Constraint Definition
 
 Constraints define validation rules and business logic that span one or more attributes. They appear under a `constraints:` section in the entity or relationship YAML.
 
-### Constraint Properties
+#### Constraint Properties
 
 Property|Purpose|Example
 --------|-------|-------
@@ -683,12 +714,13 @@ Property|Purpose|Example
 `not_null`|Require attribute to have a value|`not_null: Email Address` or `not_null: [First Name, Last Name]`
 `check`|Boolean expression that must be true|`check: "Age >= 18"`
 `derived`|Define computed/calculated attributes|`derived: {attribute: Full Name, expression: "First Name + ' ' + Last Name"}`
-`lifecycle_stage`: Enforce completeness at specific lifecycle stages|`lifecycle_stage: [Registration, KYC Complete]`
+`lifecycle_stage`|Enforce completeness at specific lifecycle stages|`lifecycle_stage: [Registration, KYC Complete]`
 `description`|Human-readable explanation|"Customer must be 18 or older"
 
 One of unique, not_null, check, or derived must be present.
 
 Example:
+
 ```yaml
 constraints:
   Contact Information Required:
@@ -699,9 +731,10 @@ constraints:
 
 ---
 
-## Rules
+### Rules
 
 **Inheritance:**
+
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
 
@@ -717,7 +750,7 @@ The parser will merge all YAML/JSON blocks found under a single L3 heading into 
 
 Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead, the Relationships section handles the link. This prevents "Foreign Key Drift."
 
-### **Naming Rules**
+#### **Naming Rules**
 
 - Natural Language Priority: Entity and attribute names must use natural language (e.g., Email Address, not email_addr).
 - Case & Spaces: Names are case-sensitive and support spaces.
@@ -726,10 +759,11 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 ---
 
-# **Enumerations**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+## **Enumerations**
 
-## **Enum Declaration**
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+
+### **Enum Declaration**
 
 Enums appear under:
 
@@ -768,7 +802,7 @@ values:
 ```
 ````
 
-## Naming Rules
+### Naming Rules
 
 - Natural Language: Values should use business-friendly names (e.g., Part Time, not PT).
 - Normalization: The compiler will handle the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target physical system.
@@ -776,12 +810,13 @@ values:
 
 ---
 
-# **Relationships**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+## **Relationships**
+
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
 
 Relationships are **first‑class citizens**.
 
-## **Relationship Declaration**
+### **Relationship Declaration**
 
 ```markdown
 ## Relationships
@@ -793,11 +828,12 @@ Each relationship uses a level‑3 heading:
 ### Customer Has Preferences
 ```
 
-### **Relationship Description**
+#### **Relationship Description**
 
 Free‑text Markdown describes the semantics.
 
-## **Relationship Definition**
+### **Relationship Definition**
+
 Relationships define the semantic and structural connection between two entities.
 
 ````markdown
@@ -806,6 +842,7 @@ source: Customer
 type: owns
 target: Customer Preference
 cardinality: one-to-many
+granularity: atomic | group | period
 ownership: Customer
 ```
 ```yaml
@@ -816,7 +853,7 @@ constraints:
 ```
 ````
 
-## Relationship Types
+### Relationship Types
 
 - `owns`: Strongest link. The target entity's life is bound to the source. Example: Customer owns Account. (If the customer is deleted, the account must be too).
 - `has` / `associates_with`: A loose connection where both entities can exist independently. Example: Contact has Location.
@@ -828,28 +865,41 @@ constraints:
 - `governs`: A set of rules or a domain controlling an entity. Example: GDPR Policy governs Customer PII.
 - `masks` / `protects`: Security-specific relationships. Example: Vault Service masks Credit Card Number.
 
-## Relationship Rules
+### Granularity
+
+Describes the resolution at which a relationship operates relative to the entities it connects.
+
+Type|Description|Compiler Behavior
+----|-----------|-----------------
+atomic|The relationship holds at the finest level of detail — one instance on each side participates individually.|The compiler treats this as a direct join at full grain.
+group|the related entity represents a collection or summary of instances on the other side (e.g. a monthly budget linked to individual daily transactions).|The compiler will generate aggregation logic to bridge the difference.
+period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|The compiler will emit snapshot or point-in-time join logic accordingly.
+
+If not specified, the compiler defaults to atomic.
+
+### Relationship Rules
 
 - First-Class Identity: Every relationship is a distinct node in the graph. It can hold its own metadata, constraints, and versioning.
 - Directional Logic: The source is the origin of the relationship, and the target is the destination.
 - Inverse Inference: The compiler automatically generates the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
 - Constraint Awareness: Constraints in a relationship can reference attributes from both the source and the target entities using the Entity.Attribute syntax.
 
-**Naming Rules**
+#### **Relationship Naming Rules**
 
 - Action-Oriented: Use natural language that describes the interaction (e.g., Account Holds Balance or Customer Places Order).
 - Avoid Key Redundancy: Do not define Foreign Keys (e.g., Customer ID) inside the Entity attributes. The Relationship definition handles this link automatically.
 
 ---
 
-# **Events**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+## **Events**
+
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
 
 Events represent meaningful business-level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 
 ---
 
-## **Event Declaration**
+### **Event Declaration**
 
 An event is declared using a **level‑3 Markdown heading** under the `## Events` section:
 
@@ -864,7 +914,7 @@ Event names use **natural language**, not camelCase, PascalCase, or snake_case.
 
 ---
 
-## **Event Description**
+### **Event Description**
 
 Free‑text Markdown immediately following the heading provides a human‑readable description of the event. This describes the business meaning, not the technical implementation.
 
@@ -883,7 +933,7 @@ The description may include:
 
 ---
 
-## **Event Definition**
+### **Event Definition**
 
 A structured YAML or JSON block defines the event's formal properties:
 
@@ -925,7 +975,7 @@ governance:
 
 ---
 
-## **Event Rules**
+### **Event Rules**
 
 1. **Natural‑language naming**  
    Event names must be written in natural language (e.g., “Customer Preference Updated”).
@@ -952,12 +1002,12 @@ governance:
 
    The attributes block should focus on the delta (what changed) and the context (why it changed), rather than a full copy of the entity.
 
-9: **Temporal Priority** 
+9: **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
 
 ---
 
-## **Example Event**
+### **Example Event**
 
 ````markdown
 ### Customer Preference Updated

@@ -1,9 +1,16 @@
-# **Entities**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+# MD-DDL
 
+## **Entities**
 
-## **Entity Declaration**
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. The domain name should provide a link back to the domain file like:
 
+```markdown
+# [My Domain](../domain.md)
+```
+
+### **Entity Declaration**
+
+A detail file may contain any combination of ## Entities, ## Enums, and ## Relationships sections. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
 The Entities section appear under a level‑2 heading:
 
 ```markdown
@@ -16,15 +23,15 @@ Each entity is introduced with a **level‑3 heading**:
 ### Customer
 ```
 
-## **Entity Description**
+### **Entity Description**
 
 Free‑text Markdown under the heading describes the entity in more detail than was found in the domain summary.
 
-## **Entity Diagram**
+### **Entity Diagram**
 
 Every entity detail file must include a `classDiagram` immediately after the entity description and before the YAML definition blocks. The diagram is the visual contract for the entity — it shows the entity's own attributes, its position in the inheritance hierarchy, and all of its immediate relationships to other entities.
 
-### **Diagram Configuration**
+#### **Diagram Configuration**
 
 All entity diagrams use the ELK layout engine for consistent rendering:
 
@@ -39,12 +46,11 @@ classDiagram
 ```
 ````
 
-### **The Subject Class**
+#### **The Subject Class**
 
-The entity being defined is the **subject class**. It is always written as a
-full class block with its attributes listed inside:
+The entity being defined is the **subject class**. It is always written as a full class block with its attributes listed inside:
 
-```
+```text
   class Party{
     <<abstract>>
     * Party Identifier : string
@@ -55,29 +61,22 @@ full class block with its attributes listed inside:
 
 **Rules for the subject class:**
 
-- The class name uses PascalCase matching the entity heading (e.g., `Party`,
-  `ContactAddress`, `PartyRole`)
-- If the entity is abstract — never instantiated directly, only specialised —
-  add `<<abstract>>` as the first line inside the class block
+- The class name uses PascalCase matching the entity heading (e.g., `Party`, `ContactAddress`, `PartyRole`)
+- If the entity is abstract — never instantiated directly, only specialised - add `<<abstract>>` as the first line inside the class block
 - The primary identifier attribute is prefixed with `*` to mark it as the key
 - All attributes defined in the entity's YAML block must appear in the diagram
 - Attribute types use the Mermaid classifier syntax:
   - Primitives: `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`
   - Enumerations: `enum~EnumName~` (e.g., `enum~PartyStatus~`, `enum~CountryCode~`)
   - Arrays: append `[]` to the type (e.g., `enum~CountryCode~[]`, `string[]`)
-- Inherited attributes from parent entities are **not** repeated in the
-  subject class — only attributes defined in this entity's own YAML block
-  are shown
-- Attribute format is `AttributeName : Type` with a space either side of
-  the colon
+- Inherited attributes from parent entities are **not** repeated in the subject class — only attributes defined in this entity's own YAML block are shown
+- Attribute format is `AttributeName : Type` with a space either side of the colon
 
-### **Related Classes**
+#### **Related Classes**
 
-All other classes that appear in the diagram — parents, children, and related
-entities — are **reference classes**. They are never defined with attribute
-blocks. Instead they use the linked class syntax:
+All other classes that appear in the diagram — parents, children, and related entities — are **reference classes**. They are never defined with attribute blocks. Instead they use the linked class syntax:
 
-```
+```text
   class Party["<a href='party.md'>Party</a>"]
 ```
 
@@ -85,70 +84,59 @@ blocks. Instead they use the linked class syntax:
 
 - Use plain anchor tags: `<a href='path'>Display Name</a>`
 - No CSS class attributes on the anchor tag
-- The `href` path is relative to the current file's location and uses
-  snake_case filenames (e.g., `party.md`, `party_role.md`,
-  `contact_address.md`)
-- Display Name uses natural language with spaces matching the entity heading
-  (e.g., `Party Role`, `Contact Address`)
-- All reference class definitions are grouped at the bottom of the diagram,
-  after all relationship lines
-- If a specialisation child has no detail file yet, it may appear as a bare
-  unlinked class: `class Customer` — without a block or link
+- The `href` path is relative to the current file's location and uses snake_case filenames (e.g., `party.md`, `party_role.md`, `contact_address.md`)
+- Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
+- All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
+- If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
 
-### **Inheritance**
+#### **Inheritance**
 
 Inheritance uses the Mermaid `--|>` arrow with the child on the left:
 
-```
+```text
   Individual --|> Party
   Company --|> Party
 ```
 
-This reads as "Individual is a specialisation of Party." The direction matches
-the domain overview diagram convention of `Child -->|is a|Parent`.
+This reads as "Individual is a specialisation of Party." The direction matches the domain overview diagram convention of `Child -->|is a|Parent`.
 
 When an entity **is** a specialisation, show the parent as a reference class:
 
-```
+```text
   Individual --|> Party
   class Party["<a href='party.md'>Party</a>"]
 ```
 
-When an entity **has** specialisations, show each child as a reference class
-(or bare class if not yet defined):
+When an entity **has** specialisations, show each child as a reference class (or bare class if not yet defined):
 
-```
+```text
   Individual --|> Party
   Company --|> Party
   class Individual["<a href='individual.md'>Individual</a>"]
   class Company["<a href='company.md'>Company</a>"]
 ```
 
-### **Relationships**
+#### **Entity Relationships**
 
-All immediate relationships to and from the entity are shown with labelled
-arrows, cardinality, and a relationship label that matches the verb used in
-the Relationships section of the domain file:
+All immediate relationships to and from the entity are shown with labelled arrows and cardinality. The classDiagram is a logical realization of the entity — relationship labels here describe the structural link (e.g., has, references) and do not need to match the conceptual relationship names defined in the domain Relationships section. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
+```text
+  Party "1" --> "0..*" PartyRole
+  PartyRole "0..*" --> "0..*" ContactAddress
+  ContactAddress "0..*" --> "1" Address
 ```
-  Party "1" --> "0..*" PartyRole : assumes
-  PartyRole "0..*" --> "0..*" ContactAddress : uses
-  ContactAddress "0..*" --> "1" Address : references
-```
+
+Relationship labels on classDiagram arrows are optional. When included, they describe the structural navigation intent, not the conceptual relationship name.
 
 **Rules for relationships:**
 
-- Cardinality is always shown on both ends using quoted strings:
-  `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
-- The relationship label after `:` uses the verb from the domain Relationships
-  section — it must match exactly
-- The arrow direction reflects the ownership or navigational direction:
-  the entity that *holds the reference* is the source (`-->`)
+- Cardinality is always shown on both ends using quoted strings: `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
+- The relationship label after `:` uses the verb from the domain Relationships section — it must match exactly
+- The arrow direction reflects the ownership or navigational direction: the entity that *holds the reference* is the source (`-->`)
 - Bidirectional relationships use `<-->`
-- Every entity in a relationship line must have a corresponding reference
-  class definition at the bottom of the diagram
+- Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
 
-### **Ordering Within the Diagram**
+#### **Ordering Within the Diagram**
 
 To keep diagrams readable and consistent, follow this ordering:
 
@@ -158,7 +146,7 @@ To keep diagrams readable and consistent, follow this ordering:
 4. Relationship lines (`-->` with cardinality and label)
 5. All reference class definitions (`class Foo["<a href='...'>...</a>"]`)
 
-### **Example**
+#### **Example**
 
 **Abstract entity with specialisations and outbound relationships (Party):**
 
@@ -173,11 +161,7 @@ classDiagram
     <<abstract>>
     * Party Identifier : string
     Legal Name : string
-    Also Known As : string[]
-    Party Status : enum~PartyStatus~
     Risk Rating : enum~FinancialCrimeRiskRating~
-    Sanctions Screen Status : enum~SanctionsScreenStatus~
-    Next Review Date : date
   }
 
   Individual --|> Party
@@ -192,13 +176,15 @@ classDiagram
 ```
 ````
 
-## **Entity Definition**
+### **Entity Definition**
 
 A structured block defines the entity's attributes and logic. MD‑DDL follows a Key-as-Name philosophy to eliminate redundancy and ensure that the human-readable label used in the documentation is the exact same identifier used in the Knowledge Graph.:
 
 ````markdown
 ```yaml
 extends: Party Role
+mutability: immutable | append_only | slowly_changing | frequently_changing | reference
+existence: independent | dependent | associative
 temporal:
   tracking: valid_time
   description: Preferences are valid for specific time periods and can be future-dated
@@ -230,7 +216,7 @@ governance:
 ```
 ````
 
-**The "Key-as-Name" Principle**
+### The "Key-as-Name" Principle
 
 By using the business term (e.g., Positive Liquidity) as the YAML key rather than a nested property (e.g., name: Positive Liquidity), we achieve:
 
@@ -238,9 +224,9 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 - Reduced Friction: There is no "translation layer" between the documentation and the database schema. What you see in the heading or key is what appears in the Graph node.
 - Logical Referencing: Sub-entities that inherit from this entity can specifically override or reference a constraint by its key name, allowing for a cleaner "Logic Lineage."
 
-## Temporal Tracking Types
+### Temporal Tracking Types
 
-This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined. 
+This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
 Type|Description|Compiler Behavior
 ----|-----------|------------------
@@ -249,11 +235,33 @@ Type|Description|Compiler Behavior
 `bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
 `point_in_time`|Event timestamp only|For events - single timestamp, immutable
 
+### Existence
+
+This optional section defines if this entity can exist independently.
+
+- independent — meaningful on its own; doesn't require another entity to give it purpose (Customer, Product, Location)
+- dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
+- associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
+
+The compiler uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
+
+### Mutability
+
+This optional section defines how the data changes over time.
+
+- immutable — once written, never changes (event records, ledger entries)
+- append_only — new rows added, existing rows never updated (logs, transactions)
+- slowly_changing — changes occasionally, history may matter (customer address, product category)
+- frequently_changing — changes often, current value is what matters (account balance, inventory level)
+- reference — essentially static, managed by a small number of administrators (country codes, currency codes)
+
+The compiler sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+
 ---
 
-## Attribute Definition
+### Attribute Definition
 
-### Attribute Properties
+#### Attribute Properties
 
 Property|Required|Description|Example
 --------|--------|-----------|-------
@@ -263,7 +271,7 @@ Property|Required|Description|Example
 `unique`|No|Whether values must be unique across all instances (default: `false`)|`true` or `false`
 `default`|No|Default value when not explicitly provided|`0`, `"Unknown"`, `false`
 
-### Type System
+#### Type System
 
 Type|Description|Examples
 ----|-----------|--------
@@ -275,7 +283,7 @@ Type|Description|Examples
 `datetime`|Date with time (timezone-aware)|2024-03-15T14:30:00Z
 `enum:<Enum Name>`|Reference to a defined enumeration|`enum:Loyalty Tier`, `enum:Country Code`
 
-### Arrays
+#### Arrays
 
 All types above support arrays by appending `[]` to the type name. For example, `string[]` or `decimal[]`
 
@@ -284,12 +292,11 @@ Array constraints can be specified in the square brackets. For example, `string[
 - Valid cardinality syntax: `[n]`, `[n..m]`, `[n..*]`, or `[*]`
 - If no carditality is provided, `[*]` is assumed.
 
-
-## Constraint Definition
+### Constraint Definition
 
 Constraints define validation rules and business logic that span one or more attributes. They appear under a `constraints:` section in the entity or relationship YAML.
 
-### Constraint Properties
+#### Constraint Properties
 
 Property|Purpose|Example
 --------|-------|-------
@@ -297,12 +304,13 @@ Property|Purpose|Example
 `not_null`|Require attribute to have a value|`not_null: Email Address` or `not_null: [First Name, Last Name]`
 `check`|Boolean expression that must be true|`check: "Age >= 18"`
 `derived`|Define computed/calculated attributes|`derived: {attribute: Full Name, expression: "First Name + ' ' + Last Name"}`
-`lifecycle_stage`: Enforce completeness at specific lifecycle stages|`lifecycle_stage: [Registration, KYC Complete]`
+`lifecycle_stage`|Enforce completeness at specific lifecycle stages|`lifecycle_stage: [Registration, KYC Complete]`
 `description`|Human-readable explanation|"Customer must be 18 or older"
 
 One of unique, not_null, check, or derived must be present.
 
 Example:
+
 ```yaml
 constraints:
   Contact Information Required:
@@ -313,9 +321,10 @@ constraints:
 
 ---
 
-## Rules
+### Rules
 
 **Inheritance:**
+
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
 
@@ -331,7 +340,7 @@ The parser will merge all YAML/JSON blocks found under a single L3 heading into 
 
 Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead, the Relationships section handles the link. This prevents "Foreign Key Drift."
 
-### **Naming Rules**
+#### **Naming Rules**
 
 - Natural Language Priority: Entity and attribute names must use natural language (e.g., Email Address, not email_addr).
 - Case & Spaces: Names are case-sensitive and support spaces.

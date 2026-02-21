@@ -1,7 +1,10 @@
-# **Enumerations**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+# MD-DDL
 
-## **Enum Declaration**
+## **Enumerations**
+
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+
+### **Enum Declaration**
 
 Enums appear under:
 
@@ -40,7 +43,7 @@ values:
 ```
 ````
 
-## Naming Rules
+### Naming Rules
 
 - Natural Language: Values should use business-friendly names (e.g., Part Time, not PT).
 - Normalization: The compiler will handle the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target physical system.

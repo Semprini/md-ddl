@@ -8,7 +8,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 
 ## Skill Structure
 
-```
+```shell
 /skills/
   /{skill-name}/
     SKILL.md                          # Main skill file (compact, always loaded)
@@ -31,7 +31,8 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 ```
 
 **Example - domain-discovery skill**:
-```
+
+```shell
 /skills/
   /domain-discovery/
     SKILL.md                          # Core discovery workflow
@@ -43,7 +44,8 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 ```
 
 **Example - entity-or-enum skill**:
-```
+
+```shell
 /skills/
   /entity-or-enum/
     SKILL.md                          # Core classification decision tree
@@ -63,6 +65,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 **Size**: 100-200 lines maximum
 
 **Contains**:
+
 - Quick decision frameworks
 - Questions to ask the user (only when information missing)
 - Common patterns
@@ -70,6 +73,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 - When to load standards/regulators (on-demand)
 
 **Does NOT contain**:
+
 - Complete industry standard details
 - Full regulatory requirements
 - Exhaustive examples
@@ -88,6 +92,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 **Structure**: Multiple guidance files per skill, each focused on a specific topic
 
 **Examples**:
+
 - `domain-discovery/governance-considerations.md` - How governance affects domain design
 - `domain-discovery/domain-boundaries.md` - Deciding where domains start and end
 - `domain-discovery/canonical-vs-ddd.md` - Single canonical vs domain-driven approach
@@ -95,6 +100,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 - `inheritance/multi-level-hierarchies.md` - When and how to use >2 level inheritance
 
 **Contains**:
+
 - Core principles and deep explanations
 - Decision frameworks with edge cases
 - Cross-industry pattern comparisons
@@ -102,7 +108,8 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 - Complex scenario handling
 - Complete case studies
 
-**When AI loads**: 
+**When AI loads**:
+
 - Skill indicates "load {specific-guidance-file} when..."
 - User's scenario doesn't fit common patterns
 - First time modeling a particular pattern
@@ -120,12 +127,14 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 **Size**: 300-1000 lines
 
 **Contains**:
+
 - End-to-end modeling examples
 - User-AI dialogue flows
 - Complete domain.md outputs
 - Rationale for decisions made
 
 **When AI loads**:
+
 - User asks "can you show me an example?"
 - AI needs reference implementation
 - Complex multi-step workflow
@@ -141,6 +150,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 **Size**: 500-2000 lines per standard
 
 **Contains**:
+
 - Standard overview and structure
 - How to find concept definitions
 - URL patterns for references
@@ -148,11 +158,13 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 - When standard terminology differs from business language
 - Integration with other standards
 
-**When AI loads**:
+**When AI loads**:`
+
 - User mentions industry or specific standard
 - **ONLY loads standards relevant to user's industry**
 
 **Examples**:
+
 - `external-standard-mapping/standards/bian.md` - Banking (BIAN BOM)
 - `external-standard-mapping/standards/acord.md` - Insurance
 - `external-standard-mapping/standards/tm-forum.md` - Telecommunications
@@ -169,6 +181,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 **Size**: 500-2000 lines per regulator
 
 **Contains**:
+
 - Regulator overview and scope
 - Key regulations/standards (e.g., APRA CPS 234)
 - Metadata requirements for entities
@@ -177,10 +190,12 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 - Compliance framework mappings
 
 **When AI loads**:
+
 - User mentions jurisdiction or specific regulator
 - **ONLY loads regulators relevant to user's jurisdiction**
 
 **Examples**:
+
 - `regulatory-compliance/regulators/apra.md` - Australian Prudential Regulation Authority
 - `regulatory-compliance/regulators/rbnz.md` - Reserve Bank of New Zealand
 - `regulatory-compliance/regulators/basel.md` - Basel Committee standards
@@ -196,6 +211,7 @@ MD-DDL skills are designed for AI-native data modeling where the AI has the pen 
 ### Problem
 
 Industry standards and regulations are massive:
+
 - BIAN has 300+ service domains
 - APRA has dozens of prudential standards
 - Basel III/IV is a complex framework
@@ -203,9 +219,9 @@ Industry standards and regulations are massive:
 
 ### Solution
 
-**Infer from context, ask only when unclear**
+'*Infer from context, ask only when unclear*'
 
-```
+```text
 User: "Model financial crime for a New Zealand bank"
 
 AI (domain-discovery skill):
@@ -228,16 +244,17 @@ AI (domain-discovery skill):
 ```
 
 **When AI asks**:
+
 - Ambiguous jurisdiction (e.g., "international bank" - which countries?)
 - Unusual regulatory combination
 - User mentions cross-border operations without specifying countries
 - Missing critical information (e.g., "financial institution" - bank? insurance? securities?)
 
 **AI should NOT ask**:
+
 - When jurisdiction is clear from context ("New Zealand bank" → RBNZ)
 - When industry standard is obvious ("bank" → BIAN, "insurer" → ACORD)
 - When regulatory frameworks are standard for the industry (banking → Basel, FATF)
-
 
 ---
 
@@ -273,6 +290,7 @@ Based on user's jurisdiction (inferred from context), load applicable regulators
 For recurring projects, users can provide upfront context to avoid repeated questions:
 
 **user-context.yaml**:
+
 ```yaml
 organization:
   name: "Example Bank NZ"
@@ -294,6 +312,7 @@ regulators:
 ```
 
 AI reads this and automatically loads:
+
 - `standards/bian.md`
 - `standards/iso20022.md`
 - `regulators/apra.md`
@@ -306,6 +325,7 @@ AI reads this and automatically loads:
 ## Complete Skill Set
 
 ### Core Modeling Skills
+
 1. **domain-discovery** - Research and scope domains
 2. **entity-or-enum** - Classify concepts
 3. **inheritance** - Design entity hierarchies
@@ -314,8 +334,6 @@ AI reads this and automatically loads:
 6. **constraint-logic** - Express business rules
 7. **summary-writing** - Write effective concept summaries
 8. **iterative-workflow** - Manage the modeling process
-
-### Integration Skills
 9. **external-standard-mapping** - Reference industry standards (with on-demand standard loading)
 10. **regulatory-compliance** - Apply regulatory metadata (with on-demand regulator loading)
 
@@ -324,6 +342,7 @@ AI reads this and automatically loads:
 ## Skill Development Principles
 
 ### Compact Skills (SKILL.md)
+
 - ✅ Quick decision trees
 - ✅ Questions to ask users (only when information missing)
 - ✅ Inference from context when possible
@@ -334,6 +353,7 @@ AI reads this and automatically loads:
 - ❌ No industry-specific deep dives
 
 ### Detailed Guidance Files
+
 - ✅ Focused on specific topic (not everything in one file)
 - ✅ Comprehensive explanations
 - ✅ Edge cases and anti-patterns
@@ -343,6 +363,7 @@ AI reads this and automatically loads:
 - ❌ Only loaded when skill indicates or user needs
 
 ### Standards & Regulators
+
 - ✅ Deep industry/jurisdiction knowledge
 - ✅ URL patterns and mappings
 - ✅ Specific requirements
@@ -359,4 +380,4 @@ AI reads this and automatically loads:
 2. **Scalability**: Can add new standards/regulators without bloating core skills
 3. **Maintainability**: Standards and regulations updated independently of core modeling skills
 4. **Clarity**: Separation of modeling patterns (universal) from industry specifics (contextual)
-5. **Flexibility**: Same modeling skills work across all industries, standards loaded adapt to context
+5. **Flexibility**: Same modeling skills work across all industries, standards loaded adapt to context.

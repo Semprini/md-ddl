@@ -3,6 +3,7 @@
 ## Overview
 
 APRA is the prudential regulator for the Australian financial services industry, regulating:
+
 - Banks
 - Credit unions and building societies  
 - General and life insurance companies
@@ -15,11 +16,13 @@ APRA is the prudential regulator for the Australian financial services industry,
 ### CPS 234 - Information Security
 
 **Impact on MD-DDL**:
+
 - Data classification required for all entities
 - Information asset inventory (entities in domain model)
 - Data residency requirements
 
 **Metadata to include**:
+
 ```yaml
 governance:
   classification: "Confidential" | "Highly Confidential" | "Public"
@@ -33,6 +36,7 @@ governance:
 ```
 
 **Entities particularly affected**:
+
 - Customer (PII, highly confidential)
 - Account (financial data, confidential)
 - Transaction (payment data, confidential)
@@ -40,10 +44,12 @@ governance:
 ### CPS 220 - Risk Management
 
 **Impact on MD-DDL**:
+
 - Risk assessment metadata on entities
 - Material risk identification
 
 **Metadata to include**:
+
 ```yaml
 governance:
   risk_category: "Credit Risk" | "Operational Risk" | "Market Risk" | "Liquidity Risk"
@@ -53,10 +59,12 @@ governance:
 ### CPS 231 - Outsourcing
 
 **Impact on MD-DDL**:
+
 - Track if data is processed by third parties
 - Identify material outsourcing arrangements
 
 **Metadata to include**:
+
 ```yaml
 governance:
   outsourced_processing: true | false
@@ -67,10 +75,12 @@ governance:
 ### APS 222 - Associations with Related Entities
 
 **Impact on MD-DDL**:
+
 - Track related party relationships
 - Cross-border data flows
 
 **Relationships to model**:
+
 ```markdown
 ### Related Entity Relationship
 Tracks associations between the institution and related entities for regulatory reporting.
@@ -81,12 +91,14 @@ Tracks associations between the institution and related entities for regulatory 
 ### Data Quality Standards
 
 APRA expects:
+
 - Data accuracy
 - Data completeness
 - Data timeliness
 - Data validity
 
 **MD-DDL Constraints**:
+
 ```yaml
 constraints:
   Data Quality - Completeness:
@@ -101,12 +113,14 @@ constraints:
 ### Regulatory Reporting Entities
 
 Key entities for APRA reporting:
+
 - Customer (ARF 320 series)
 - Loan (ARF 320 series)  
 - Capital positions (APS 110)
 - Liquidity (APS 210)
 
 **Metadata to include**:
+
 ```yaml
 governance:
   apra_reporting:
@@ -118,10 +132,12 @@ governance:
 ## Data Retention Requirements
 
 APRA expects institutions to retain data for:
+
 - **Financial records**: 7 years minimum
 - **Superannuation records**: Longer retention
 
 **Metadata to include**:
+
 ```yaml
 governance:
   retention: "7 years post account closure"
@@ -133,6 +149,7 @@ governance:
 If data crosses borders (e.g., NZ to Australia):
 
 **Metadata to include**:
+
 ```yaml
 governance:
   cross_border_transfer: true
@@ -145,6 +162,7 @@ governance:
 CPS 234 requires notification of material data breaches.
 
 **Metadata to include**:
+
 ```yaml
 governance:
   breach_notification_required: true
@@ -156,10 +174,12 @@ governance:
 APRA implements Basel standards in Australia. When modeling:
 
 **Load both**:
+
 - [APRA](apra.md) for Australian-specific requirements
 - [Basel](basel.md) for international capital/liquidity standards
 
 **Example**:
+
 ```yaml
 governance:
   regulatory_scope:
@@ -170,7 +190,7 @@ governance:
 ## Common APRA-Impacted Entities
 
 Entity | APRA Standard | Key Metadata
--------|---------------|-------------
+------ | ------------- | ------------
 Customer | CPS 234, APS 222 | classification: "Highly Confidential", pii: true
 Account | CPS 234, ARF 320 | apra_reporting: true, retention: "7 years"
 Transaction | CPS 234, APS 210 | classification: "Confidential", audit_all_access: true
@@ -179,6 +199,6 @@ Related Entity | APS 222 | related_party: true
 
 ## Resources
 
-- APRA Website: https://www.apra.gov.au
-- CPS 234: https://www.apra.gov.au/sites/default/files/CPS_234_July_2019_0.pdf
-- Prudential Standards: https://www.apra.gov.au/prudential-framework
+- [APRA Website](https://www.apra.gov.au)
+- [CPS 234](https://www.apra.gov.au/sites/default/files/CPS_234_July_2019_0.pdf)
+- [Prudential Standards](https://www.apra.gov.au/prudential-framework)

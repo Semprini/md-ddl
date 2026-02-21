@@ -1,11 +1,14 @@
-# **Events**
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. 
+# MD-DDL
+
+## **Events**
+
+Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
 
 Events represent meaningful business-level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 
 ---
 
-## **Event Declaration**
+### **Event Declaration**
 
 An event is declared using a **level‑3 Markdown heading** under the `## Events` section:
 
@@ -20,7 +23,7 @@ Event names use **natural language**, not camelCase, PascalCase, or snake_case.
 
 ---
 
-## **Event Description**
+### **Event Description**
 
 Free‑text Markdown immediately following the heading provides a human‑readable description of the event. This describes the business meaning, not the technical implementation.
 
@@ -39,7 +42,7 @@ The description may include:
 
 ---
 
-## **Event Definition**
+### **Event Definition**
 
 A structured YAML or JSON block defines the event's formal properties:
 
@@ -81,7 +84,7 @@ governance:
 
 ---
 
-## **Event Rules**
+### **Event Rules**
 
 1. **Natural‑language naming**  
    Event names must be written in natural language (e.g., “Customer Preference Updated”).
@@ -108,12 +111,12 @@ governance:
 
    The attributes block should focus on the delta (what changed) and the context (why it changed), rather than a full copy of the entity.
 
-9: **Temporal Priority** 
+9: **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
 
 ---
 
-## **Example Event**
+### **Example Event**
 
 ````markdown
 ### Customer Preference Updated

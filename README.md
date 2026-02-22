@@ -1,12 +1,18 @@
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-# md-ddl
+# Markdown Data Definition Language (md-ddl)
+
+- *Draft 0.5*
+
+**The data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
+
+MD-DDL is a Markdown-native standard designed to solve the "semantic fragmentation" of modern enterprises. It allows humans and AI to collaboratively define not just *what* data is, but *what it means* and *how it is governed*.
 
 MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning**
 
-The standard can be found in this repo at [1-Foundation.md](md-ddl-specification/1-Foundation.md)
+The standard into can be found in this repo at [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or point your AI to the complete specification at [md-ddl-specification](./md-ddl-specification/MD-DDL-Complete.md).
 
-It is a standard and tools, designed to be the bridges between people who *define the business* (Owners, Stewards, Analysts) and people who *build the systems* (Engineers, Architects) and companion AI Agents. It is:
+md-ddl is:
 
 - AI‑native
 - Human‑friendly  
@@ -25,17 +31,20 @@ flowchart TD
     D --> F[Catalog & Reasoning]
     F --> A
 ```
+
 This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, **tech friendly** and **AI‑friendly**.
 
 ---
 
 ## 🌟Why use md-ddl?
 
-1. **Speak the Same Language**
+### **AI as a Collaborative Partner**
 
-Stop choosing between a "business glossary" and "technical schemas". With md-ddl, the description of a Customer sits right on top of the technical rules. It creates a single source of truth that humans can read and machines can compile.
+MD-DDL comes with **AI Skills** - pre-configured prompts and logic that teach LLMs how to:
 
-2. **AI as a Collaborative Partner**
+- Perform **Domain Discovery** to scope new business areas.
+- Map internal concepts to **External Standards**.
+- Apply **Prudential Governance** metadata automatically.
 
 md-ddl uses clear text and structured logic, it acts as a "Babel Fish" for AI Agents.
 
@@ -43,29 +52,46 @@ Agents can help model: An AI can read your Markdown, compare with industry stand
 
 Automated Reasoning: AI can "walk" your model to find logic gaps or security risks that a human might miss.
 
-3. **A Navigable "Map" of Your Logic**
+### **Standards are a superpower**
 
-Most data models are static lists. md-ddl creates a Knowledge Graph. This means you can ask your data model questions:
+Don't model from scratch. MD-DDL is designed to ingest and align with global industry standards out of the box:
 
-- "If we change how we calculate 'Loyalty Tier', what else breaks?"
-- "Which departments are using data marked as 'Sensitive'?"
-- "Who is responsible for the 'Invoice' entity in the Finance domain?"
+- **Banking**: Native patterns for **BIAN** and **ISO 20022**.
+- **Compliance**: Built-in guidance for **Basel (BCBS)**, **APRA**, and **GDPR**.
+- **Traceability**: Every entity and attribute can link directly to the regulatory requirement or standard that defines it.
 
-4. **Built-in Guardrails (Governance)**
+### **Context-Aware Governance**
 
-Data security shouldn't be an afterthought. md-ddl lets you bake "Privacy" and "Business Rules" directly into the definition of your data. 
+MD-DDL moves governance from the abmulance at the bottom of the cliff into the data definition itself. By embedding regulatory requirements and business logic early in the project/data lifecycle, the model becomes self-governing across different architectural strategies.
 
+**Boundary-Specific Policies**: Apply governance rules based on your modeling strategy. Reference data can follow a Single Canonical policy, while core entities use Domain-Driven boundaries to isolate risk and sensitivity.
 
-5. **Smart Rules (Constraints)**
+**Regulatory DNA**: Ingest and inherit compliance metadata from global and local standards like APRA, Basel (BCBS), and GDPR directly within the entity YAML.
+
+**Executable Business Rules**: Define logic (e.g., "Transaction date cannot be in the future") as first-class constraints that can be compiled into automated data quality checks.
+
+**Automatic Lineage**: The compiler uses domain headers and relationship blocks to automatically map how sensitive data flows between domains, making impact analysis and breach notification (e.g., CPS 234) simpler.
+
+### **Smart Rules (Constraints)**
 
 Business rules like "A customer balance can never be less than zero" aren't just buried in code. They are elevated as visible "Constraints" that link back to the data they protect.
 
 ## 🛠 How it Works
+
 1. **Write:** Use Markdown to describe your business domains, entities and how they relate.
 
 2. **Define:** Use simple YAML blocks to list the technical details and rules.
 
-3. **Compile:** The md-ddl tool reads your file and builds a Knowledge Graph-a smart, searchable web of your organisation's data.
+3. **Compile:** The md-ddl tool reads your file and builds:
+
+    - A Knowledge Graph-a smart, searchable web of your organisation's data.
+    - Data-in-motion schemas
+    - Data-at-rest schemas
+        - 3rd Normal Form
+        - Dimensional data models
+        - Columnar
+    - Data governance rules
+    - Data management artefacts & lineage
 
 By using the same Markdown files everyone already knows how to read, md-ddl ensures that your data's meaning is never lost in translation.
 
@@ -75,7 +101,7 @@ By using the same Markdown files everyone already knows how to read, md-ddl ensu
 
 MD‑DDL uses a tiered structure to capture everything from high-level business strategy to low-level technical requirements.
 
-1. **Structural Components (The Hierarchy)**
+### **Structural Components (The Hierarchy)**
 
 These are the primary building blocks of your model. Each has its own identity and can be queried independently in a Knowledge Graph.
 
@@ -85,24 +111,25 @@ These are the primary building blocks of your model. Each has its own identity a
 - Business Events: Point-in-time occurrences (e.g., TransactionCreated, PolicyRenewed).
 - Enumerations: Controlled vocabularies and reference data (e.g., CountryCodes, LoyaltyTiers).
 
-2. **Logical Descriptors (The Details)**
+### **Logical Descriptors (The Details)**
 
 These define the "shape" of your structural components.
 
 - Attributes: Detailed field definitions including data types, patterns, and identifiers.
 - Semantic Inheritance: The ability to specialized concepts (e.g., Admin extends User) to inherit logic and governance.
 
-3. **Intelligence & Behavior (The Logic)**
+### **Intelligence & Behavior (The Logic)**
 
-- Constraints: Formalized business rules (e.g., "Balance > 0") that link attributes and entities together.
-- Validation Rules: Logic that ensures data integrity across relationships and event payloads.
+- **Constraints**: Formalized business rules (e.g., "Balance > 0") that link attributes and entities together.
+- **Validation Rules**: Logic that ensures data integrity across relationships and event payloads.
+- **Temporal Priority**: Every event and entity includes sequence logic to reconstruct the history of your data.
 
-4. **Management & Governance (The Metadata)**
+### **Management & Governance (The Metadata)**
 
 - Data Governance: Explicit markers for PII, Sensitivity, and Data Classification.
 - Management: Operational metadata including Ownership, Lineage, and custom Tags.
 
-5. **Visualizations**
+### **Visualizations**
 
 - Native Diagramming: Support for embedded Mermaid or PlantUML code blocks, allowing your diagrams to live directly alongside the definitions they represent.
 

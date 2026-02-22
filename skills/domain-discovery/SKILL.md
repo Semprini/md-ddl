@@ -6,7 +6,7 @@ description: Research and scope a MD-DDL domain by identifying business concepts
 # Domain Discovery Process
 
 ## Step 1: Understand Context
-Ask user:
+Ask user if you have not already discussed:
 1. **What business problem are we solving?**
 2. **What industry/domain are you in?** (Banking, Insurance, Telecom, Healthcare, etc.)
 3. **What regulatory jurisdictions apply?** (Australia, NZ, EU, US, etc.)

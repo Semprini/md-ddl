@@ -3,6 +3,7 @@
 ## Entities
 
 ### Address
+
 An Address is the canonical record of a physical or postal location. It holds only the structured components of the location itself — no party association, no purpose, no verification metadata. Those belong on Contact Address.
 
 Separating Address from Contact Address enables deduplication: a single Address record serves as the reference point for all parties associated with that location. This is significant in a financial crime context — when two or more unrelated parties share the same Address, that shared reference is a detectable network signal without requiring any fuzzy address matching across duplicated strings.

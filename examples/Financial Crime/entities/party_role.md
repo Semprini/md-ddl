@@ -3,6 +3,7 @@
 ## Entities
 
 ### Party Role
+
 A Party Role represents the specific capacity or context in which a Party
 participates in a business relationship with the institution. Aligned to the
 BIAN BOM, Party Role is the abstract concept that separates *who* a party is
@@ -106,6 +107,7 @@ attributes:
       have completed CDD as a Customer but still require separate CDD
       assessment as a Beneficial Owner of a related entity.
 ```
+
 ```yaml
 constraints:
   Role End After Start:
@@ -134,6 +136,7 @@ constraints:
       This ensures the valid time period is always closed correctly for
       audit and regulatory reporting purposes.
 ```
+
 ```yaml
 governance:
   pii: false

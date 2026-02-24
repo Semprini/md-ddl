@@ -3,6 +3,7 @@
 ## Entities
 
 ### Individual
+
 An Individual is a natural person who has, or may have, a financial
 relationship with the institution. Individual specialises Party, inheriting
 all universal party attributes and adding those that are specific to a
@@ -81,6 +82,7 @@ attributes:
       Due Diligence under the AML/CTF Act 2006 and RBNZ AML/CFT Act 2009
       section 22.
 ```
+
 ```yaml
 constraints:
   Date of Birth Required at Onboarding:
@@ -103,6 +105,7 @@ constraints:
       and RBNZ AML/CFT Act 2009. The Risk Rating constraint is evaluated
       against the inherited attribute.
 ```
+
 ```yaml
 governance:
   pii: true

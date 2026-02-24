@@ -12,6 +12,7 @@ Ask user if you have not already discussed:
 3. **What regulatory jurisdictions apply?** (Australia, NZ, EU, US, etc.)
 4. **Are there specific industry standards to align with?**
 
+
 ## Step 2: Determine Modeling Strategy
 Before modeling, determine the boundary strategy to manage semantic complexity.
 

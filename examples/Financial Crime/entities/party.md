@@ -3,6 +3,7 @@
 ## Entities
 
 ### Party
+
 A Party is any individual or legal entity that has, or may have, a financial relationship with the institution. Aligned to the BIAN Party Reference Data Directory, Party is the foundational abstract concept from which all financial crime subjects are derived — it carries only the attributes that are universal across every party type.
 
 In the Financial Crime domain a Party represents any subject that may be assessed for risk, screened against watchlists, investigated, or reported to a regulatory authority. A Party does not hold relationships directly — it participates through a Party Role (e.g., Account Holder, Beneficial Owner, Signatory). The same Party may hold multiple roles across multiple products simultaneously.

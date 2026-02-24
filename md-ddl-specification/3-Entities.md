@@ -131,7 +131,7 @@ Relationship labels on classDiagram arrows are optional. When included, they des
 **Rules for relationships:**
 
 - Cardinality is always shown on both ends using quoted strings: `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
-- The relationship label after `:` uses the verb from the domain Relationships section — it must match exactly
+- In class diagrams the relationship label is optional. We are realizing the concepts from the domain in a logical model so there may not be a direct relationship.
 - The arrow direction reflects the ownership or navigational direction: the entity that *holds the reference* is the source (`-->`)
 - Bidirectional relationships use `<-->`
 - Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
@@ -290,7 +290,7 @@ All types above support arrays by appending `[]` to the type name. For example, 
 Array constraints can be specified in the square brackets. For example, `string[1..5]` means 1 to 5 strings. `decimal[0..*]` means 0 or more decimals. `enum:Country Code[2]` means exactly 2 country codes.
 
 - Valid cardinality syntax: `[n]`, `[n..m]`, `[n..*]`, or `[*]`
-- If no carditality is provided, `[*]` is assumed.
+- If no cardinality is provided, `[*]` is assumed.
 
 ### Constraint Definition
 
@@ -331,10 +331,6 @@ constraints:
 **Identifiers:**
 
 Every Entity should have at least one attribute marked identifier: true. If missing, the Knowledge Graph treats the entity as a "Logic Object" rather than a "Data Object."
-
-**Parser:**
-
-The parser will merge all YAML/JSON blocks found under a single L3 heading into a single Entity node.
 
 **No Relationship Attributes:**
 

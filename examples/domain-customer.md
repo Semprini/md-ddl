@@ -17,34 +17,34 @@ tags:
 ### Customer Overview Diagram
 
 ```mermaid
-flowchart LR 
-    A[Customer] -->|has many| b[Customer Preference]
+---
+config:
+  layout: elk
+---
+graph TD
+
+  Individual --> |is a|Party
+
+  Party <--> |related to|Party
+  Party --> |assumes|PartyRole
+
+  Customer --> |is a|PartyRole    
 ```
 
 ## Entities
 
-*Note this simple example uses a single file for the details of entities, enums, relationships and events. This is for brevity and to show how linking works. Decide on your file structure based on it's readability for humans and context management for AI.*
-
-### Customer
-
-The primary representation of a customer in the organisation.
-[detail](details-customer.md#customer-1)
-
-### Customer Preference
-
-Represents customer‑specific settings and preferences.
-[detail](details-customer.md#customer-preference)
+name | specializes | description | reference
+---- | ----- | ---- | ----
+[Customer](./details.md#Customer) | [PartyRole](./details.md#PartyRole) | A customer is an individual who has a relationship with the organisation. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 
 ## Enums
 
-### Loyalty Tier
-
-A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending.
-[detail](details-customer.md#loyalty-tier)
+name | description | reference
+---- | ----- | ----
+[Loyalty Tier](./details.md#LoyaltyTier) | A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending. | [BIAN BOM - Loyalty Tier](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LoyaltyTier)
 
 ## Relationships
 
-### Customer Has Preferences
-
-Customers can have zero or more preferences, and preferences are owned by a customer.
-[detail](details-customer.md#customer-has-preferences)
+name | description | reference
+---- | ----- | ----
+[Customer Has Preferences](./details.md#CustomerHasPreferences) | Customers can have zero or more preferences, and preferences are owned by a customer. | [BIAN BOM - Customer Has Preferences](https://bian-modelapi-v4.azurewebsites)

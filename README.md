@@ -2,7 +2,7 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-- *Draft 0.5*
+- *Draft 0.6*
 
 **The data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 

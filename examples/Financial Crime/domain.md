@@ -48,11 +48,9 @@ source_systems:
 ```mermaid
 ---
 config:
-  layout: elk
-  look: classic
-  theme: dark
+  layout: elk
 ---
-graph TD
+graph
 
   Individual --> |is a|Party
   Company --> |is a|Party
@@ -94,7 +92,6 @@ graph TD
   PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
   Address["<a href='entities/address.md'>Address</a>"]
   ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
-
 ```
 
 ## Entities

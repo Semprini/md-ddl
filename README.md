@@ -2,142 +2,182 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-- *Draft 0.6*
+*Draft 0.6*
 
 **The data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 
 MD-DDL is a Markdown-native standard designed to solve the "semantic fragmentation" of modern enterprises. It allows humans and AI to collaboratively define not just *what* data is, but *what it means* and *how it is governed*.
 
-MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning**
+MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning.**
 
-The standard into can be found in this repo at [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or point your AI to the complete specification at [md-ddl-specification](./md-ddl-specification/MD-DDL-Complete.md).
+The specification can be found in this repo at [1-Foundation.md](./md-ddl-specification/1-Foundation.md), or point your AI directly to the complete single-file version at [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md).
 
 md-ddl is:
 
 - AI‑native
-- Human‑friendly  
+- Human‑friendly
 - Version‑controlled
 - Semantically rich
 - Ready for automation
 
 ```mermaid
 flowchart TD
+    SME[Subject Matter Experts]
+    Stewards[Data Stewards & Architects]
 
-    A[Humans + AI] --> B[MD-DDL]
-    B --> C[Compiler]
-    C --> E[Data Products & Schemas]
-    C --> D[Knowledge Graph]
-    D --> E
-    D --> F[Catalog & Reasoning]
-    F --> A
+    subgraph Agents["AI Agents"]
+        AO[Agent Ontology\nDiscover · Design · Author]
+        AR[Agent Regulation\nAudit · Monitor · Remediate]
+    end
+
+    subgraph Model["MD-DDL Model"]
+        D[Domain Files\nSummary Tables + Diagrams]
+        E[Detail Files\nEntities · Relationships · Events]
+        D --> E
+    end
+
+    subgraph Outputs["Generated Artefacts"]
+        KG[Knowledge Graph]
+        SC[Schemas\n3NF · Dimensional · Messaging]
+        GV[Governance Rules\n& Lineage]
+    end
+
+    SME --> AO
+    Stewards --> AO
+    Stewards --> AR
+    AO --> Model
+    AR --> Model
+    Model --> Outputs
+    Outputs --> KG
+    KG --> AR
+    KG --> SME
 ```
 
-This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, **tech friendly** and **AI‑friendly**.
+This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, **tech‑friendly**, and **AI‑friendly**.
 
 ---
 
-## 🌟Why use md-ddl?
+## 🌟 Why use md-ddl?
 
-### **AI as a Collaborative Partner**
+### **AI Agents as Collaborative Partners**
 
-MD-DDL comes with **AI Skills** - pre-configured prompts and logic that teach LLMs how to:
+MD-DDL ships with two purpose-built AI agents that cover the full data management lifecycle — from first conversation to ongoing regulatory assurance.
 
-- Perform **Domain Discovery** to scope new business areas.
-- Map internal concepts to **External Standards**.
-- Apply **Prudential Governance** metadata automatically.
+**[Agent Ontology](./agents/agent-ontology/AGENT.md)** is the primary authoring interface. Instead of a human writing MD-DDL from scratch, they describe a business process and Agent Ontology drives the conversation. It interviews subject matter experts, identifies applicable industry standards, reasons through inheritance hierarchies and modelling trade-offs, and produces a draft domain model — summary tables first, detail files only after human review. It operates across four specialist skills that load on demand:
 
-md-ddl uses clear text and structured logic, it acts as a "Babel Fish" for AI Agents.
+- **Domain Scoping** — interview protocol, boundary decisions, canonical vs. domain-driven strategy
+- **Entity Modelling** — concept realisation, inheritance reasoning, existence and mutability
+- **Relationship & Events** — semantic connections, business events, temporal sequencing
+- **Standards Alignment** — BIAN, ISO 20022, FHIR, ACORD, and more
 
-Agents can help model: An AI can read your Markdown, compare with industry standard models and help users create knowledge as well as schema.
+**[Agent Regulation](./agents/agent-regulation/AGENT.md)** is the ongoing compliance layer. It audits domain and entity files against loaded regulatory frameworks, monitors for regulatory change, and produces structured gap reports with prioritised remediation. It understands the three-level governance structure of MD-DDL — domain metadata, entity governance blocks, and attribute-level PII flags — and checks all three. It operates across two skills:
 
-Automated Reasoning: AI can "walk" your model to find logic gaps or security risks that a human might miss.
+- **Regulatory Compliance** — jurisdiction mapping, regulator file loading (APRA, GDPR, Basel, FATF, and more)
+- **Compliance Audit** — systematic three-level audit protocol, severity classification, gap reporting
+
+MD‑DDL's plain Markdown and structured YAML acts as a "Babel Fish" for these agents — and for any LLM you point at the spec. Because the model is human-readable text, agents can reason over it, walk relationships to find logic gaps, and generate technical artefacts directly from the same files your business stakeholders review.
 
 ### **Standards are a superpower**
 
 Don't model from scratch. MD-DDL is designed to ingest and align with global industry standards out of the box:
 
 - **Banking**: Native patterns for **BIAN** and **ISO 20022**.
-- **Compliance**: Built-in guidance for **Basel (BCBS)**, **APRA**, and **GDPR**.
+- **Compliance**: Built-in guidance for **Basel (BCBS)**, **APRA**, **RBNZ**, and **GDPR**.
 - **Traceability**: Every entity and attribute can link directly to the regulatory requirement or standard that defines it.
 
 ### **Context-Aware Governance**
 
-MD-DDL moves governance from the abmulance at the bottom of the cliff into the data definition itself. By embedding regulatory requirements and business logic early in the project/data lifecycle, the model becomes self-governing across different architectural strategies.
+MD-DDL moves governance away from the ambulance at the bottom of the cliff and into the data definition itself. By embedding regulatory requirements and business logic early in the data lifecycle, the model becomes self-governing across different architectural strategies.
 
-**Boundary-Specific Policies**: Apply governance rules based on your modeling strategy. Reference data can follow a Single Canonical policy, while core entities use Domain-Driven boundaries to isolate risk and sensitivity.
+**Boundary-Specific Policies**: Apply governance rules based on your modelling strategy. Reference data can follow a Single Canonical policy, while core entities use Domain-Driven boundaries to isolate risk and sensitivity.
 
-**Regulatory DNA**: Ingest and inherit compliance metadata from global and local standards like APRA, Basel (BCBS), and GDPR directly within the entity YAML.
+**Regulatory DNA**: Inherit compliance metadata from global and local standards like APRA, Basel (BCBS), and GDPR directly within the entity YAML. Agent Regulation keeps this metadata current as regulations change.
 
 **Executable Business Rules**: Define logic (e.g., "Transaction date cannot be in the future") as first-class constraints that can be compiled into automated data quality checks.
 
-**Automatic Lineage**: The compiler uses domain headers and relationship blocks to automatically map how sensitive data flows between domains, making impact analysis and breach notification (e.g., CPS 234) simpler.
+**Automatic Lineage**: The domain and relationship structure automatically maps how sensitive data flows between domains, making impact analysis and breach notification (e.g., CPS 234) simpler.
 
 ### **Smart Rules (Constraints)**
 
-Business rules like "A customer balance can never be less than zero" aren't just buried in code. They are elevated as visible "Constraints" that link back to the data they protect.
+Business rules like "A customer balance can never be less than zero" aren't buried in code. They are elevated as visible Constraints that link back to the data they protect — and can be generated into automated data quality checks.
+
+---
 
 ## 🛠 How it Works
 
-1. **Write:** Use Markdown to describe your business domains, entities and how they relate.
+### 1. Discover
+Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events. It checks applicable industry standards and surfaces modelling trade-offs for human decision before writing a line of MD-DDL.
 
-2. **Define:** Use simple YAML blocks to list the technical details and rules.
+### 2. Model
+Using structured Markdown and YAML, Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, each containing the full entity definitions, constraints, governance metadata, and diagrams.
 
-3. **Compile:** The md-ddl tool reads your file and builds:
+### 3. Generate
+Point any LLM at your MD-DDL files and instruct it to generate artefacts. The structured format makes this reliable without custom tooling:
 
-    - A Knowledge Graph-a smart, searchable web of your organisation's data.
-    - Data-in-motion schemas
-    - Data-at-rest schemas
-        - 3rd Normal Form
-        - Dimensional data models
-        - Columnar
-    - Data governance rules
-    - Data management artefacts & lineage
+- **Knowledge Graph** — a queryable semantic web of your organisation's data
+- **Schemas** — 3rd Normal Form, dimensional models, columnar layouts, and messaging schemas
+- **Governance artefacts** — lineage maps, data quality rules, regulatory reports
 
-By using the same Markdown files everyone already knows how to read, md-ddl ensures that your data's meaning is never lost in translation.
-
----
-
-## What is defined in the MD‑DDL standard?
-
-MD‑DDL uses a tiered structure to capture everything from high-level business strategy to low-level technical requirements.
-
-### **Structural Components (The Hierarchy)**
-
-These are the primary building blocks of your model. Each has its own identity and can be queried independently in a Knowledge Graph.
-
-- Domains: The highest level of organization (e.g., Sales, Finance, Risk).
-- Entities: The persistent "nouns" of your business (e.g., Customer, Account, Product).
-- Relationships: The "verbs" that connect entities (e.g., Customer Owns Account).
-- Business Events: Point-in-time occurrences (e.g., TransactionCreated, PolicyRenewed).
-- Enumerations: Controlled vocabularies and reference data (e.g., CountryCodes, LoyaltyTiers).
-
-### **Logical Descriptors (The Details)**
-
-These define the "shape" of your structural components.
-
-- Attributes: Detailed field definitions including data types, patterns, and identifiers.
-- Semantic Inheritance: The ability to specialized concepts (e.g., Admin extends User) to inherit logic and governance.
-
-### **Intelligence & Behavior (The Logic)**
-
-- **Constraints**: Formalized business rules (e.g., "Balance > 0") that link attributes and entities together.
-- **Validation Rules**: Logic that ensures data integrity across relationships and event payloads.
-- **Temporal Priority**: Every event and entity includes sequence logic to reconstruct the history of your data.
-
-### **Management & Governance (The Metadata)**
-
-- Data Governance: Explicit markers for PII, Sensitivity, and Data Classification.
-- Management: Operational metadata including Ownership, Lineage, and custom Tags.
-
-### **Visualizations**
-
-- Native Diagramming: Support for embedded Mermaid or PlantUML code blocks, allowing your diagrams to live directly alongside the definitions they represent.
+### 4. Govern
+Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps. Governance is not a one-time activity — it runs continuously against the living model.
 
 ---
 
-By treating Events, Relationships, and Constraints as first-class citizens, md-ddl transforms your data model from a static document into an active intelligence layer. Because everything is interconnected, any stakeholder can ask the graph questions that are implausible to answer with traditional documentation.
+## 📐 What MD‑DDL defines
 
-In a traditional model, these answers are buried in code or trapped in people's heads.
+MD‑DDL uses a tiered structure to capture everything from high-level business intent to low-level technical requirements.
+
+### Structural Components
+
+The primary building blocks of your model. Each has its own identity and can be queried independently in a Knowledge Graph.
+
+- **Domains** — the highest level of organisation (e.g., Sales, Finance, Risk)
+- **Entities** — the persistent nouns of your business (e.g., Customer, Account, Product)
+- **Relationships** — the semantic connections between entities (e.g., Customer Holds Account)
+- **Events** — point-in-time business occurrences (e.g., Customer Onboarded, Transaction Executed)
+- **Enumerations** — controlled vocabularies and reference data (e.g., Country Code, Loyalty Tier)
+
+### Logical Descriptors
+
+Define the shape of your structural components.
+
+- **Attributes** — field definitions including data types, identifiers, and PII flags
+- **Semantic Inheritance** — specialised concepts (e.g., Customer extends Party Role) inherit logic and governance from their parents
+
+### Intelligence & Behaviour
+
+- **Constraints** — formalised business rules (e.g., "Balance > 0") that link attributes and entities together and compile into data quality checks
+- **Temporal Tracking** — every entity declares how it changes over time: immutable, append-only, slowly changing, or bitemporal
+- **Existence & Mutability** — entity-level declarations that drive compiler output for dimensional modelling
+
+### Management & Governance
+
+- **Data Governance** — explicit markers for PII, classification, retention, residency, and breach notification
+- **Regulatory Scope** — every domain and entity declares which frameworks govern it
+- **Ownership & Lineage** — operational metadata including data owners, stewards, and source systems
+
+### Visualisations
+
+Native diagramming via embedded Mermaid code blocks — domain overview graphs and entity class diagrams live directly alongside the definitions they represent, not in a separate tool.
+
+---
+
+By treating Events, Relationships, and Constraints as first-class citizens, MD-DDL transforms your data model from a static document into an active intelligence layer. Because everything is interconnected, any stakeholder — or agent — can ask the graph questions that are implausible to answer with traditional documentation.
+
+In a traditional model, those answers are buried in code or trapped in people's heads.
+
+---
+
+## 📁 Repository layout
+
+```
+md-ddl-specification/     The normative standard
+agents/
+  agent-ontology/         Discovery and design agent
+  agent-regulation/       Regulatory compliance and audit agent
+examples/
+  Financial Crime/        Reference-quality domain and entity files
+```
 
 ---
 

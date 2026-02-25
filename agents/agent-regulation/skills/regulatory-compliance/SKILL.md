@@ -211,8 +211,3 @@ If entity has no specific regulatory requirements:
 - Omit detailed regulatory metadata
 - May still include basic classification and retention
 - Document in detail file: "No specific regulatory requirements identified"
-
-## Related Skills
-
-- [external-standard-mapping](../external-standard-mapping/SKILL.md) - Standards and regulations often overlap
-- [domain-discovery](../domain-discovery/SKILL.md) - Initial regulatory identification happens during domain discovery

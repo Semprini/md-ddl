@@ -8,7 +8,7 @@
 
 MD-DDL is a Markdown-native standard designed to solve the "semantic fragmentation" of modern enterprises. It allows humans and AI to collaboratively define not just *what* data is, but *what it means* and *how it is governed*.
 
-MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning.**
+MD‑DDL is a simple, readable way for **humans and AI to collaboratively define data meaning** — whether you are building a domain model, defining a canonical data product, or governing a data asset across its full lifecycle.
 
 The specification can be found in this repo at [1-Foundation.md](./md-ddl-specification/1-Foundation.md), or point your AI directly to the complete single-file version at [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md).
 
@@ -104,6 +104,29 @@ MD-DDL moves governance away from the ambulance at the bottom of the cliff and i
 
 Business rules like "A customer balance can never be less than zero" aren't buried in code. They are elevated as visible Constraints that link back to the data they protect — and can be generated into automated data quality checks.
 
+### **Domains as Data Products**
+
+An MD-DDL domain is not just an organisational boundary — it is a complete data product definition.
+
+A domain file already captures everything needed to define a data product: business purpose, ownership and stewardship, governance posture, regulatory scope, retention obligations, source systems, the full conceptual model of entities and relationships, and the events that signal state changes. When you apply a **Canonical** modelling strategy, the domain becomes a **Foundational Data Product** — a governed, reusable asset that other teams and systems consume without redefining.
+
+This means the effort of modelling a domain is also the effort of defining the data product. You are not maintaining two documents; you are maintaining one.
+
+The practical mapping:
+
+MD-DDL | Data Product concept
+--- | ---
+Domain | Data product definition
+Canonical domain | Foundational / platform data product
+Bounded context domain | Team-owned data product
+Entities + relationships | Data product schema / semantic model
+Events | Output port change events
+Governance metadata | Data product SLA — classification, retention, PII, residency
+Owners + stewards | Data product owner and domain team
+Generated schemas | Data product output ports (3NF, dimensional, messaging)
+
+> **Looking ahead to v0.7:** The spec will formalise the data product mapping with explicit output port declarations and inter-domain consumption contracts. The domain structure is already the right shape — v0.7 will name it explicitly and add the contracts that make consumption governable.
+
 ---
 
 ## 🛠 How it Works
@@ -130,7 +153,101 @@ Agent Regulation audits your model against applicable regulatory frameworks, mon
 
 ---
 
-## 📐 What MD‑DDL defines
+## 🔌 Integrating md-ddl into your project
+
+MD-DDL is a **dependency** of your modelling project, not an artifact of it. Your domain and entity files are the artifacts — the spec and agents are the tools you use to create and govern them. The goal is to make the standard available to your AI tooling without it becoming something you own or maintain.
+
+The recommended approach is a **git submodule**. This is the closest equivalent to `pip install` for a Markdown-based standard: the spec lives in your repository at a pinned version, updates independently of your model files, and is never duplicated.
+
+### Step 1 — Add md-ddl as a submodule
+
+```bash
+git submodule add https://github.com/[org]/md-ddl .md-ddl
+git submodule update --init
+```
+
+This creates a `.md-ddl/` directory in your project root containing the full spec and agents, pinned to the current commit. To update to a new version later:
+
+```bash
+git submodule update --remote .md-ddl
+```
+
+### Step 2 — Configure your AI tooling
+
+Tell your AI tooling where to find the spec and agents. Configuration depends on your environment.
+
+---
+
+#### GitHub Copilot in VS Code
+
+Create `.github/copilot-instructions.md` in your project root:
+
+```markdown
+## MD-DDL Standard
+
+This project uses MD-DDL for data modelling. The standard and agents are in `.md-ddl/`.
+
+- Full specification: `.md-ddl/md-ddl-specification/MD-DDL-Complete.md`
+- Agent Ontology (discovery and design): `.md-ddl/agents/agent-ontology/AGENT.md`
+- Agent Regulation (compliance and audit): `.md-ddl/agents/agent-regulation/AGENT.md`
+
+When working on domain or entity files in this project, read the relevant agent
+prompt and spec sections before making changes. Follow the authoring flow defined
+in Agent Ontology: domain summary tables first, detail files only after review.
+```
+
+---
+
+#### Claude Code
+
+Create `CLAUDE.md` in your project root:
+
+```markdown
+## MD-DDL Standard
+
+This project uses MD-DDL for data modelling. The standard and agents are in `.md-ddl/`.
+
+- Full specification: `.md-ddl/md-ddl-specification/MD-DDL-Complete.md`
+- Agent Ontology (discovery and design): `.md-ddl/agents/agent-ontology/AGENT.md`
+- Agent Regulation (compliance and audit): `.md-ddl/agents/agent-regulation/AGENT.md`
+
+When working on domain or entity files, load the relevant agent prompt first.
+```
+
+---
+
+#### Claude.ai Projects
+
+If you are using Claude.ai rather than a local IDE, add these files to your Project Knowledge:
+
+1. `MD-DDL-Complete.md` — the full specification
+2. `agents/agent-ontology/AGENT.md` — if you are modelling
+3. `agents/agent-regulation/AGENT.md` — if you are auditing compliance
+
+No submodule is needed for this approach, but you will not have version pinning. Re-upload when you want to move to a newer version of the standard.
+
+---
+
+### Your project structure
+
+Once integrated, your project contains your model files — not the standard itself:
+
+```text
+your-project/
+  .md-ddl/                  ← submodule — the standard (not yours to edit)
+  .github/
+    copilot-instructions.md ← or CLAUDE.md — points AI at the submodule
+  domains/
+    customer/
+      domain.md             ← your model files (these are the artifacts)
+      entities/
+        customer.md
+        account.md
+    payments/
+      domain.md
+```
+
+The `.md-ddl/` directory is a read-only dependency. Your modelling work lives entirely outside it.
 
 MD‑DDL uses a tiered structure to capture everything from high-level business intent to low-level technical requirements.
 
@@ -138,7 +255,7 @@ MD‑DDL uses a tiered structure to capture everything from high-level business 
 
 The primary building blocks of your model. Each has its own identity and can be queried independently in a Knowledge Graph.
 
-- **Domains** — the highest level of organisation (e.g., Sales, Finance, Risk)
+- **Domains** — the highest level of organisation (e.g., Sales, Finance, Risk). Also the unit of definition for a data product — a canonical domain is a foundational data product.
 - **Entities** — the persistent nouns of your business (e.g., Customer, Account, Product)
 - **Relationships** — the semantic connections between entities (e.g., Customer Holds Account)
 - **Events** — point-in-time business occurrences (e.g., Customer Onboarded, Transaction Executed)
@@ -178,12 +295,18 @@ In a traditional model, those answers are buried in code or trapped in people's 
 ## 📁 Repository layout
 
 ```text
-md-ddl-specification/     The normative standard
+md-ddl-specification/         The normative standard
+  1-Foundation.md             Core principles and document structure
+  MD-DDL-Complete.md          Single-file version for AI context loading
+  ...                         Individual section files (2–6)
+
 agents/
-  agent-ontology/         Discovery and design agent
-  agent-regulation/       Regulatory compliance and audit agent
+  agent-ontology/             Discovery and design agent
+  agent-regulation/           Regulatory compliance and audit agent
+
 examples/
-  Financial Crime/        Reference-quality domain and entity files
+  Financial Crime/            Reference-quality domain with full entity detail files
+  Simple Customer/            Minimal example — single detail file, good starting point
 ```
 
 ---

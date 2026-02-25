@@ -2,9 +2,9 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-*Draft 0.6*
+`current version: Draft 0.6`
 
-**The data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
+**A data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 
 MD-DDL is a Markdown-native standard designed to solve the "semantic fragmentation" of modern enterprises. It allows humans and AI to collaboratively define not just *what* data is, but *what it means* and *how it is governed*.
 
@@ -21,36 +21,39 @@ md-ddl is:
 - Ready for automation
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 flowchart TD
     SME[Subject Matter Experts]
     Stewards[Data Stewards & Architects]
 
-    subgraph Agents["AI Agents"]
-        AO[Agent Ontology\nDiscover · Design · Author]
-        AR[Agent Regulation\nAudit · Monitor · Remediate]
+    subgraph Model["MD-DDL Model"]
+        D[Domain Files<br/>Summary Tables + Diagrams]
+        E[Detail Files<br/>Entities · Relationships · Events]
+        D --> E
     end
 
-    subgraph Model["MD-DDL Model"]
-        D[Domain Files\nSummary Tables + Diagrams]
-        E[Detail Files\nEntities · Relationships · Events]
-        D --> E
+    subgraph Agents["AI Agents"]
+        AO["Agent Ontology<br/>Discover · Design · Author"]
+        AR["Agent Regulation<br/>Audit · Monitor · Remediate"]
     end
 
     subgraph Outputs["Generated Artefacts"]
         KG[Knowledge Graph]
-        SC[Schemas\n3NF · Dimensional · Messaging]
-        GV[Governance Rules\n& Lineage]
+        SC[Schemas<br/>3NF · Dimensional · Messaging]
+        GV[Governance Rules<br/>& Lineage]
     end
 
-    SME --> AO
-    Stewards --> AO
-    Stewards --> AR
+    Model --> Outputs
     AO --> Model
     AR --> Model
-    Model --> Outputs
-    Outputs --> KG
-    KG --> AR
-    KG --> SME
+    SME --> Agents
+    SME --> Model
+    Stewards --> Agents
+    Stewards --> Model
+    Outputs --> Agents
 ```
 
 This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, **tech‑friendly**, and **AI‑friendly**.
@@ -106,12 +109,15 @@ Business rules like "A customer balance can never be less than zero" aren't buri
 ## 🛠 How it Works
 
 ### 1. Discover
+
 Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events. It checks applicable industry standards and surfaces modelling trade-offs for human decision before writing a line of MD-DDL.
 
 ### 2. Model
+
 Using structured Markdown and YAML, Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, each containing the full entity definitions, constraints, governance metadata, and diagrams.
 
 ### 3. Generate
+
 Point any LLM at your MD-DDL files and instruct it to generate artefacts. The structured format makes this reliable without custom tooling:
 
 - **Knowledge Graph** — a queryable semantic web of your organisation's data
@@ -119,6 +125,7 @@ Point any LLM at your MD-DDL files and instruct it to generate artefacts. The st
 - **Governance artefacts** — lineage maps, data quality rules, regulatory reports
 
 ### 4. Govern
+
 Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps. Governance is not a one-time activity — it runs continuously against the living model.
 
 ---

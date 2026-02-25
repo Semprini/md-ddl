@@ -2,7 +2,7 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-`current version: Draft 0.6`
+> **Version 0.6.4** (Latest)
 
 **A data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 
@@ -177,7 +177,7 @@ In a traditional model, those answers are buried in code or trapped in people's 
 
 ## 📁 Repository layout
 
-```
+```text
 md-ddl-specification/     The normative standard
 agents/
   agent-ontology/         Discovery and design agent

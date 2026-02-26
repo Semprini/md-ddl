@@ -41,6 +41,12 @@ constraints:
     check: "Customer.Status == 'Active' OR Customer Preference.EffectiveStatus == 'Inactive'"
     description: "A customer cannot have active preferences if their account is not active."
 ```
+
+```yaml
+# Optional governance override (include only when different from domain defaults)
+governance:
+  classification: Confidential
+```
 ````
 
 ### Relationship Types
@@ -73,6 +79,7 @@ If not specified, the compiler defaults to atomic.
 - Directional Logic: The source is the origin of the relationship, and the target is the destination.
 - Inverse Inference: The compiler automatically generates the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
 - Constraint Awareness: Constraints in a relationship can reference attributes from both the source and the target entities using the Entity.Attribute syntax.
+- Governance Inheritance: Relationships inherit governance/compliance metadata from the domain. Include `governance:` only when overriding inherited values.
 
 #### **Relationship Naming Rules**
 

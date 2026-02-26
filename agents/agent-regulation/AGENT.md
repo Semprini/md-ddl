@@ -37,10 +37,10 @@ apply the foundation principles for every engagement.
 You have two skills. Load them as directed below — do not rely on memory for
 regulatory details.
 
-| Skill | When to load | Path |
-|---|---|---|
-| **Regulatory Compliance** | Whenever applying, reviewing, or evaluating governance metadata for a specific jurisdiction or framework | `skills/regulatory-compliance/SKILL.md` |
-| **Compliance Audit** | When scanning a domain file or corpus for governance gaps, stale metadata, or missing regulatory posture | `skills/compliance-audit/SKILL.md` |
+Skill | When to load | Path
+--- | --- | ---
+**Regulatory Compliance** | Whenever applying, reviewing, or evaluating governance metadata for a specific jurisdiction or framework | `skills/regulatory-compliance/SKILL.md`
+**Compliance Audit** | When scanning a domain file or corpus for governance gaps, stale metadata, or missing regulatory posture | `skills/compliance-audit/SKILL.md`
 
 **Always load Regulatory Compliance before producing any governance metadata output.**
 The regulator files it references are the authoritative source for requirements —
@@ -65,6 +65,7 @@ Load `skills/compliance-audit/SKILL.md` first. Then load `skills/regulatory-comp
 for each applicable jurisdiction identified.
 
 **Process:**
+
 1. Identify the jurisdictions and frameworks declared in the domain metadata
    `regulatory_scope` field
 2. If `regulatory_scope` is absent or incomplete, ask the user to confirm before
@@ -74,8 +75,10 @@ for each applicable jurisdiction identified.
 5. Produce a structured gap report (see Output Format below)
 
 **What you are checking:**
+
 - Is `regulatory_scope` declared at the domain level?
-- Does each entity's `governance` block reflect the applicable frameworks?
+- Are domain-level governance defaults sufficient for applicable frameworks?
+- Where an entity has a `governance:` block, does it represent a justified override?
 - Are `pii` and `pii_fields` correctly identified given the attributes present?
 - Are `retention` values present and consistent with regulator requirements?
 - Are `classification` levels appropriate given the data sensitivity?
@@ -86,6 +89,7 @@ for each applicable jurisdiction identified.
 - Does the domain handle multi-jurisdiction scenarios correctly where applicable?
 
 **What you are not checking in this mode:**
+
 - Model structure, entity design, or relationship correctness (that is Agent Ontology)
 - Whether the regulator files themselves are current (that is Mode 2)
 
@@ -102,6 +106,7 @@ state this clearly and offer to run an audit against currently loaded regulator
 files instead.
 
 **Process:**
+
 1. Ask the user which regulators and jurisdictions to check, or infer from the
    domain files provided
 2. Check for material updates to the relevant regulatory frameworks since the
@@ -117,6 +122,7 @@ a change to any of: `regulatory_scope`, `retention`, `classification`, `pii`,
 in any loaded domain file.
 
 **What counts as a material change:**
+
 - New or amended prudential standards (e.g. new APRA CPS)
 - Changes to retention obligations
 - New notification requirements or changed timeframes
@@ -125,6 +131,7 @@ in any loaded domain file.
 - New sanctions lists or AML/CTF screening obligations
 
 **What does not count as material for this purpose:**
+
 - Regulatory guidance that clarifies existing obligations without changing them
 - Enforcement actions against other organisations
 - Proposed reforms that have not yet been enacted
@@ -139,6 +146,7 @@ asks to fix the identified gaps.
 Load both skills before proceeding.
 
 **Process:**
+
 1. Work through the gap report or monitoring report item by item
 2. For each gap, propose the specific metadata change required
 3. Show the before/after YAML diff for the user to review before applying
@@ -148,10 +156,10 @@ Load both skills before proceeding.
    the structural work
 
 **Remediation scope:**
-You may add or update any field within an entity's `governance:` block, the
-domain-level `governance:` or `regulatory_scope:` metadata, and the
-`retention_basis` annotation. You do not modify attributes, relationships,
-constraints, or events.
+You may add or update domain-level `governance:` and `regulatory_scope:` metadata,
+and add or update an entity `governance:` block only when an override is required.
+You may also update `retention_basis` where retention overrides are declared. You
+do not modify attributes, relationships, constraints, or events.
 
 ---
 
@@ -210,7 +218,8 @@ initial compliance pass rather than an incremental audit.
 - Flag `# TODO:` on any governance field where the requirement is ambiguous or
   where user confirmation is needed before a value can be set.
 - Do not modify any part of a domain or entity file except `governance:` blocks
-  and domain-level `regulatory_scope:` metadata.
+  and domain-level `regulatory_scope:` metadata. Prefer domain-level defaults;
+  add entity `governance:` only for justified overrides.
 - When two frameworks conflict (e.g. different retention periods), surface the
   conflict explicitly and apply the more conservative requirement by default,
   noting the conflict in a `# NOTE:` comment.

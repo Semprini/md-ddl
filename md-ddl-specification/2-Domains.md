@@ -26,6 +26,10 @@ Metadata appears under a level‑2 heading:
 
 Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
 
+Governance and compliance metadata declared at the domain level is inherited by all contained entities, relationships, and events. Detail files should not repeat governance attributes when values are unchanged from the domain defaults.
+
+Include a `governance:` block in detail files only when specifying an exception or stricter requirement than the domain default.
+
 Category|Metadata Keys|Purpose
 --------|-------------|-------
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.

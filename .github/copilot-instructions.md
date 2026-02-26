@@ -2,9 +2,7 @@
 
 ## What this repository is
 
-This repo is the **source of the MD-DDL standard** — its specification, agent
-prompts, skills, and worked examples. It is not a runtime application and not a
-domain modelling workspace.
+This repo is the **source of the MD-DDL standard** — its specification, agent prompts, skills, and worked examples. It is not a runtime application and not a domain modelling workspace.
 
 Contributors here are working on one of four things:
 
@@ -13,8 +11,7 @@ Contributors here are working on one of four things:
 3. **Examples** — reference domain and entity files that demonstrate the spec
 4. **Tooling** — any compiler, validator, or utility that processes MD-DDL files
 
-Understanding which of these you are working on determines everything about how
-to proceed.
+Understanding which of these you are working on determines everything about how to proceed.
 
 ---
 
@@ -59,10 +56,8 @@ examples/
 
 ### The spec is the authority — agents defer to it
 
-Every rule in every agent prompt and skill must be traceable to the spec.
-If a rule exists in an agent prompt but not in the spec, it should either be
-added to the spec (if it's a genuine standard) or removed from the prompt
-(if it's agent-specific behaviour).
+Every rule in every agent prompt and skill must be traceable to the spec. If a rule exists in an agent prompt but not in the spec, it should either be
+added to the spec (if it's a genuine standard) or removed from the prompt (if it's agent-specific behaviour).
 
 ### Section ownership
 
@@ -77,22 +72,15 @@ Each spec section owns a distinct layer of the language:
 | `5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax |
 | `6-Events.md` | Event structure, payload design, temporal priority, actor/entity |
 
-When adding or changing a rule, edit the owning section only. Do not duplicate
-rules across sections.
+When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
 ### MD-DDL-Complete.md
 
-This is a generated file — a concatenation of sections 1–6 in order. It exists
-for AI context loading (single-file spec injection into agent prompts). Do not
-edit it directly. Regenerate it by concatenating the section files after any
-spec change.
+This is a generated file — a concatenation of sections 1–6 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a url link to the next file.
 
 ### Versioning
 
-The spec uses semantic versioning in the H1 heading of each file. A version bump
-is required any time a rule changes in a way that would alter the output of a
-correctly-authored MD-DDL file. Corrections to examples or prose clarifications
-do not require a version bump.
+The spec uses semantic versioning in the H1 heading of each file. A version bump is required any time a rule changes in a way that would alter the output of a correctly-authored MD-DDL file. Corrections to examples or prose clarifications do not require a version bump.
 
 ---
 
@@ -100,10 +88,8 @@ do not require a version bump.
 
 ### The agent/spec relationship
 
-Agent prompts and skills are **guidance built on top of the spec** — they teach
-an AI how to apply the rules, not what the rules are. If you find yourself
-repeating a spec rule verbatim inside a skill, that's a signal to reference the
-spec file instead.
+Agent prompts and skills are **guidance built on top of the spec** — they teach an AI how to apply the rules, not what the rules are. If you find yourself
+repeating a spec rule verbatim inside a skill, that's a signal to reference the spec file instead.
 
 ### Skill structure
 
@@ -115,47 +101,33 @@ skills/<skill-name>/
   references/           Spec sections or external references loaded on demand
 ```
 
-The `SKILL.md` body should stay under 500 lines. Heavy spec content belongs in
-`references/` and is loaded only when the skill is active. See the skill-creator
-skill pattern for detailed guidance on writing effective skill files.
+The `SKILL.md` body should stay under 500 lines. Heavy spec content belongs in `references/` and is loaded only when the skill is active. See the skill-creator skill pattern for detailed guidance on writing effective skill files.
 
 ### The spec reference stub pattern
 
-Reference files in `skills/*/references/` are stubs that point to the canonical
-spec file — they do not duplicate content. This means a spec update propagates
-automatically without touching agent files. When adding a new spec reference,
-create the stub and point it at the correct `md-ddl-specification/` file.
+Reference files in `skills/*/references/` are stubs that point to the canonical spec file — they do not duplicate content. This means a spec update propagates automatically without touching agent files. When adding a new spec reference, create the stub and point it at the correct `md-ddl-specification/` file.
 
 ### Agent responsibilities and boundaries
 
-Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent
-that belong to another agent's stage.
+Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent that belong to another agent's stage.
 
 | Agent | Lifecycle stage | Owns |
 |---|---|---|
 | `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring |
 | `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation |
 
-**Boundary rule:** Agent Ontology applies governance metadata during authoring
-(first pass). Agent Regulation audits and maintains that metadata over time
-(ongoing assurance). If a compliance gap requires a structural model change —
-a new entity, attribute, or relationship — Agent Regulation flags it and
-defers the structural work to Agent Ontology. Do not add structural modelling
-capability to Agent Regulation.
+**Boundary rule:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
+(ongoing assurance). If a compliance gap requires a structural model change — a new entity, attribute, or relationship — Agent Regulation flags it and
+defers the structural work to Agent Ontology. Do not add structural modelling capability to Agent Regulation.
 
 ### Shared skills
 
-Some skills are used by more than one agent. The `regulatory-compliance` skill
-is the current example — Agent Ontology uses it to apply governance metadata
-during domain authoring; Agent Regulation uses it as the requirements benchmark
-during audits.
+Some skills are used by more than one agent. The `regulatory-compliance` skill is the current example — Agent Ontology uses it to apply governance metadata
+during domain authoring; Agent Regulation uses it as the requirements benchmark during audits.
 
-Shared skills live under the agent that owns them conceptually. Agent Regulation
-owns `regulatory-compliance` because compliance assurance is its primary purpose.
-Agent Ontology loads it as an external reference.
+Shared skills live under the agent that owns them conceptually. Agent Regulation owns `regulatory-compliance` because compliance assurance is its primary purpose. Agent Ontology loads it as an external reference.
 
-When editing a shared skill, consider the impact on both agents. The skill's
-trigger description should reflect all contexts in which it is used.
+When editing a shared skill, consider the impact on both agents. The skill's trigger description should reflect all contexts in which it is used.
 
 ### Adding a new agent
 
@@ -163,12 +135,10 @@ New agents follow the same structure as `agent-ontology/`:
 - `AGENT.md` — identity, behaviour modes, skill index, non-negotiable output rules
 - `skills/` — one skill per coherent process area, not per spec section
 
-The skill index in `AGENT.md` is the triggering mechanism. Write trigger
-descriptions to be specific and slightly pushy — the agent should load a skill
+The skill index in `AGENT.md` is the triggering mechanism. Write trigger descriptions to be specific and slightly pushy — the agent should load a skill
 when in doubt, not skip it to save context.
 
-Before adding a new agent, confirm it occupies a distinct lifecycle stage not
-already covered. Add it to the agent responsibilities table above.
+Before adding a new agent, confirm it occupies a distinct lifecycle stage not already covered. Add it to the agent responsibilities table above.
 
 ### What belongs in agents, not in the spec
 
@@ -186,15 +156,11 @@ None of these are rules of the language. They are guidance for applying the lang
 
 ### What examples are for
 
-Examples serve two purposes: they demonstrate correct spec application for human
-readers, and they act as AI context references (agents are instructed to use
-`examples/Financial Crime/` as the quality benchmark).
+Examples serve two purposes: they demonstrate correct spec application for human readers, and they act as AI context references (agents are instructed to use `examples/Financial Crime/` as the quality benchmark).
 
 ### The current reference example
 
-`examples/Financial Crime/` is the highest-quality example in the repo. When in
-doubt about what correct MD-DDL looks like, this is the reference. The domain file
-uses v0.6 table format; the entity files use current classDiagram and YAML patterns.
+`examples/Financial Crime/` is the highest-quality example in the repo. When in doubt about what correct MD-DDL looks like, this is the reference. The domain file uses v0.6 table format; the entity files use current classDiagram and YAML patterns.
 
 ### Adding or updating examples
 
@@ -213,14 +179,8 @@ When upgrading an example, update all patterns in the file in a single pass — 
 
 ## Cross-cutting rules for all contributions
 
-- **Spec owns the rules.** Agents and examples implement them. When they conflict,
-  fix the agent or example, not the spec (unless the spec is genuinely wrong).
-- **One source of truth per rule.** If a rule appears in multiple places, that's
-  technical debt. Flag it.
-- **No invented content.** Do not fabricate standards references, regulatory
-  requirements, or example data that is not verifiable.
-- **Validate Markdown structure** on any changed file: table/link integrity,
-  Mermaid syntax, heading hierarchy, and YAML block correctness.
-- **No runtime assumptions.** There is no build system. Validation is structural
-  and manual (or via a linter if one is added). Do not add code that assumes a
-  compilation or test pipeline exists unless one has been defined.
+- **Spec owns the rules.** Agents and examples implement them. When they conflict, fix the agent or example, not the spec (unless the spec is genuinely wrong).
+- **One source of truth per rule.** If a rule appears in multiple places, that's technical debt. Flag it.
+- **No invented content.** Do not fabricate standards references, regulatory requirements, or example data that is not verifiable.
+- **Validate Markdown structure** on any changed file: table/link integrity, Mermaid syntax, heading hierarchy, and YAML block correctness.
+- **No runtime assumptions.** There is no build system. Validation is structural and manual (or via a linter if one is added). Do not add code that assumes a compilation or test pipeline exists unless one has been defined.

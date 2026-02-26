@@ -1,4 +1,4 @@
-# **MD‑DDL Specification (Draft 0.6)**  
+# **MD‑DDL Specification (Draft 0.5)**  
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -20,7 +20,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 ## **Core Principles**
 
 1. **Single Source of Truth**  
-   Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
+   Every concept is defined once in the domain, in one canonical location. A design choice is weather to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
 
 2. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
@@ -43,11 +43,11 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 
 MD‑DDL is composed of several logical components:
 
-- [Domains](#domains)
-- [Entities](#entities)
-- [Enumerations](#enumerations)
-- [Relationships](#relationships)
-- [Events](#events)
+- [Domains](2-Domains.md)
+- [Entities](3-Entities.md)
+- [Enumerations](4-Enumerations.md)
+- [Relationships](5.Relationships.md)
+- [Events](6.Events.md)
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, and Events:
 
@@ -96,10 +96,6 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 
 Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships. The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
 
-**Parser:**
-
-In the detail files, the parser will merge all YAML/JSON blocks found under a single L3 heading into a single node to describe the entity/relationship/enum/event. This allows for cosmetic separation of the definition, constrains and governance sections.
-
 ---
 
 ## **Domains**
@@ -127,6 +123,10 @@ Metadata appears under a level‑2 heading:
 ```
 
 Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
+
+Governance and compliance metadata declared at the domain level is inherited by all contained entities, relationships, and events. Detail files should not repeat governance attributes when values are unchanged from the domain defaults.
+
+Include a `governance:` block in detail files only when specifying an exception or stricter requirement than the domain default.
 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
@@ -647,11 +647,10 @@ constraints:
 ```
 
 ```yaml
+# Optional governance override (include only when different from domain defaults)
 governance:
-  pii: true
-  retention: 7 years
-  access_role: HR_ADMIN
-  classification: Confidential
+  classification: Restricted
+  retention: 10 years
 ```
 ````
 
@@ -766,6 +765,7 @@ constraints:
 
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
+- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes in entity detail files; include a `governance:` block only for overrides.
 
 **Identifiers:**
 
@@ -876,6 +876,12 @@ constraints:
     check: "Customer.Status == 'Active' OR Customer Preference.EffectiveStatus == 'Inactive'"
     description: "A customer cannot have active preferences if their account is not active."
 ```
+
+```yaml
+# Optional governance override (include only when different from domain defaults)
+governance:
+  classification: Confidential
+```
 ````
 
 ### Relationship Types
@@ -908,6 +914,7 @@ If not specified, the compiler defaults to atomic.
 - Directional Logic: The source is the origin of the relationship, and the target is the destination.
 - Inverse Inference: The compiler automatically generates the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
 - Constraint Awareness: Constraints in a relationship can reference attributes from both the source and the target entities using the Entity.Attribute syntax.
+- Governance Inheritance: Relationships inherit governance/compliance metadata from the domain. Include `governance:` only when overriding inherited values.
 
 #### **Relationship Naming Rules**
 
@@ -988,13 +995,7 @@ constraints:
     description: Only active customers can update preferences
 
 governance:
-  retention: 7 years
-  access_role: CUSTOMER_SERVICE
-  classification: Confidential
-  pii: true
-  compliance_relevance:
-    - GDPR Right to Object
-    - CCPA Opt-Out
+   classification: Confidential
 ```
 ````
 
@@ -1029,6 +1030,9 @@ governance:
 
 9. **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
+
+10. **Governance Inheritance**
+   Events inherit governance/compliance metadata from the domain. Include a `governance:` block only when an event requires an override.
 
 ---
 

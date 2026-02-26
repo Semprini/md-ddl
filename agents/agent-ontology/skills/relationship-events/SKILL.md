@@ -1,12 +1,6 @@
 ---
 name: relationship-events
-description: >
-  Use this skill when connecting entities with relationships, when modelling what
-  happens when something changes (business events), when cardinality or ownership
-  questions arise, when the user asks "what happens when X" or "who initiates Y",
-  or when deciding whether something is a relationship attribute vs. an entity
-  attribute. Also use when the user asks about event payloads, downstream impacts,
-  or temporal sequencing of business state changes.
+description: Use this skill when connecting entities with relationships, when modelling what happens when something changes (business events), when cardinality or ownership questions arise, when the user asks "what happens when X" or "who initiates Y",  or when deciding whether something is a relationship attribute vs. an entity attribute. Also use when the user asks about event payloads, downstream impacts, or temporal sequencing of business state changes.
 ---
 
 # Skill: Relationships & Events
@@ -172,7 +166,8 @@ If the user conflates them, clarify:
 - [ ] Business description explains the trigger and meaning (no technical mechanics)
 - [ ] YAML includes `actor`, `entity`, `emitted_on`, `business_meaning`
 - [ ] `downstream_impact` populated
-- [ ] `governance` block includes classification, retention, pii, compliance_relevance
+- [ ] Domain-level governance defaults are confirmed for the event
+- [ ] `governance` block is included only when the event needs an override
 - [ ] At least one timestamp or sequence attribute present (temporal priority rule)
 - [ ] Constraints block present if actor/ownership validation is needed
 - [ ] Event name uses natural language (not camelCase, not past-tense verb only)

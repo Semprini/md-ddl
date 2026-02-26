@@ -72,13 +72,7 @@ constraints:
     description: Only active customers can update preferences
 
 governance:
-  retention: 7 years
-  access_role: CUSTOMER_SERVICE
-  classification: Confidential
-  pii: true
-  compliance_relevance:
-    - GDPR Right to Object
-    - CCPA Opt-Out
+   classification: Confidential
 ```
 ````
 
@@ -113,6 +107,9 @@ governance:
 
 9. **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
+
+10. **Governance Inheritance**
+   Events inherit governance/compliance metadata from the domain. Include a `governance:` block only when an event requires an override.
 
 ---
 

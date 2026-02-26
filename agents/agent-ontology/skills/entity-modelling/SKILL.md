@@ -1,11 +1,6 @@
 ---
 name: entity-modelling
-description: >
-  Use this skill when modelling entities or their attributes, when the user says
-  "types of" or "kinds of" something, when inheritance questions arise, or when
-  deciding whether a concept should be a first-class entity, an enum, an attribute,
-  or a relationship attribute. Also use when the user is unsure whether two similar
-  concepts are the same entity or separate ones.
+description: Use this skill when modelling entities or their attributes, when the user says "types of" or "kinds of" something, when inheritance questions arise, or when deciding whether a concept should be a first-class entity, an enum, an attribute, or a relationship attribute. Also use when the user is unsure whether two similar concepts are the same entity or separate ones.
 ---
 
 # Skill: Entity Modelling
@@ -127,7 +122,7 @@ a wrong dimensional model.
 
 Before presenting a drafted entity detail file:
 
-- [ ] File begins with `# [Domain Name](../domain.md)` as the H1
+- [ ] File begins with H1 heading with domain name as a link to domain.md
 - [ ] Entity introduced with H3 heading under `## Entities`
 - [ ] classDiagram present immediately after description, before YAML
 - [ ] ELK layout engine declared in diagram config
@@ -139,7 +134,8 @@ Before presenting a drafted entity detail file:
 - [ ] At least one attribute with `identifier: true` in YAML
 - [ ] `existence` and `mutability` declared
 - [ ] No foreign key attributes present
-- [ ] `# TODO:` on any governance fields the user could not confirm
+- [ ] Domain-level governance defaults are confirmed for the entity
+- [ ] If a `governance:` block is present, it contains only override fields and `# TODO:` where required
 - [ ] Constraint keys use natural language (Key-as-Name principle)
 
 ---

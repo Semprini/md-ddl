@@ -44,20 +44,31 @@ Once relevant regulator(s) loaded:
 
 1. User defines entity: "We need to model Customer"
 2. Consult loaded regulator guidance for metadata requirements
-3. Apply appropriate governance metadata to entity
-4. Include regulatory scope in domain and entity metadata
+3. Set domain-level governance defaults first (classification, pii, regulatory_scope, default_retention)
+4. Add entity-level `governance:` only for stricter or exceptional overrides
 
-**Example with APRA loaded**:
+**Example with APRA loaded (domain defaults first)**:
 ```
 User: "Model Customer entity"
 AI: Checks regulators/apra.md → identifies PII requirements, CPS 234 scope
-AI: Applies metadata:
+AI: Applies domain metadata defaults:
   governance:
     classification: "Highly Confidential"
     pii: true
     regulatory_scope:
       - APRA CPS 234
       - APRA APS 222
+AI: Adds entity `governance:` only if Customer needs stricter settings than domain defaults.
+```
+
+If an entity has no exception, omit its `governance:` block and inherit domain defaults.
+
+**Example entity override (only when needed)**:
+```
+AI: Applies metadata override:
+  governance:
+    retention: "10 years post relationship end"
+    retention_basis: "APRA record keeping requirements"
 ```
 
 ## Common Regulatory Metadata Properties
@@ -95,21 +106,11 @@ Entities can override domain defaults when needed.
 
 ## Entity-Level Regulatory Metadata
 
-Apply specific requirements to individual entities:
+Apply only entity-specific overrides that differ from domain defaults:
 
 ```yaml
 # In entities/customer.md
 governance:
-  classification: "Highly Confidential"
-  pii: true
-  pii_fields:
-    - Date of Birth
-    - Tax Identification Number
-    - Email Address
-  regulatory_scope:
-    - APRA CPS 234 (Information Security)
-    - APRA APS 222 (Associations with Related Entities)
-    - RBNZ BS13 (Governance)
   retention: "10 years post relationship end"
   retention_basis: "APRA record keeping requirements"
   audit_all_access: true

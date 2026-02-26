@@ -208,11 +208,10 @@ constraints:
 ```
 
 ```yaml
+# Optional governance override (include only when different from domain defaults)
 governance:
-  pii: true
-  retention: 7 years
-  access_role: HR_ADMIN
-  classification: Confidential
+  classification: Restricted
+  retention: 10 years
 ```
 ````
 
@@ -327,6 +326,7 @@ constraints:
 
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
+- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes in entity detail files; include a `governance:` block only for overrides.
 
 **Identifiers:**
 

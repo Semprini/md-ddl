@@ -2,7 +2,7 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-> **Version 0.6.4** (Latest)
+> **Version 0.6.5** (Latest)
 
 **A data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 
@@ -137,7 +137,7 @@ Agent Ontology interviews your subject matter experts and proposes candidate ent
 
 ### 2. Model
 
-Using structured Markdown and YAML, Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, each containing the full entity definitions, constraints, governance metadata, and diagrams.
+Using structured Markdown and YAML, Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, each containing the full entity definitions, constraints, override governance metadata (when needed), and diagrams.
 
 ### 3. Generate
 

@@ -14,6 +14,9 @@ attribute definitions, constraints, and enumeration definitions.
   (source: `md-ddl-specification/3-Entities.md`)
 - Full enumeration specification: `references/enumerations-spec.md`
   (source: `md-ddl-specification/4-Enumerations.md`)
+- Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
+  (use for ownership/cardinality decisions, dimensional implementation reasoning,
+  and final `existence` value selection)
 
 Read the relevant reference before drafting any entity or enum. Key sections:
 
@@ -115,6 +118,9 @@ omit them or leave them as defaults without a conscious decision.
 
 Ask the user explicitly if these are not obvious. A wrong existence value produces
 a wrong dimensional model.
+
+When relationship cardinality/ownership materially affects dimensional realization,
+apply `conceptual-to-physical-realisation.md` before finalizing `existence`.
 
 ---
 

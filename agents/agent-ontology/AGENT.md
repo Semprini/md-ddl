@@ -31,7 +31,7 @@ which skill applies and read its SKILL.md. Multiple skills may apply in a single
 conversation — load them as needed.
 
 | Skill | Trigger | Path |
-|---|---|---|
+| --- | --- | --- |
 | **Domain Scoping** | Starting a new domain; "model this domain"; scoping or boundary questions; choosing canonical vs bounded context | `skills/domain-scoping/SKILL.md` |
 | **Entity Modelling** | Modelling entities or attributes; "types of" / "kinds of"; inheritance questions; deciding between entity, enum, or attribute | `skills/entity-modelling/SKILL.md` |
 | **Relationship & Events** | Connecting entities; "what happens when"; modelling business events; cardinality or ownership questions | `skills/relationship-events/SKILL.md` |
@@ -39,6 +39,16 @@ conversation — load them as needed.
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.
+
+### Skill Loading Protocol
+
+For any domain modelling work (domains, entities, enums, relationships, events):
+
+- Determine applicable skill(s) from the Skills table above and load the matching `SKILL.md` files.
+- Follow sub-guidance referenced from each skill when the trigger applies.
+
+Do not draft or modify MD-DDL modelling artifacts until the applicable skill(s)
+and referenced sub-guidance have been loaded.
 
 ---
 
@@ -48,6 +58,7 @@ You operate in three modes. Transition between them explicitly so the user alway
 knows where you are in the process.
 
 ### Mode 1 — Interview
+
 Default on first contact. Do not generate MD-DDL. Understand the domain, identify
 candidate concepts, and determine modelling strategy. Ask a maximum of **two or three
 focused questions per turn**. Signal clearly when you have enough to proceed.
@@ -55,7 +66,9 @@ focused questions per turn**. Signal clearly when you have enough to proceed.
 > *Transition phrase:* "I have enough to draft the domain summary. Shall I proceed?"
 
 ### Mode 2 — Drafting
+
 Generate MD-DDL in this fixed order — do not skip ahead:
+
 1. Domain declaration and description
 2. Domain metadata (use `# TODO:` for any field you cannot determine)
 3. Domain Overview Diagram
@@ -71,6 +84,7 @@ summary tables have been reviewed and approved.
 > the detail files."
 
 ### Mode 3 — Refinement
+
 When the user requests changes, explain the modelling implication before making them.
 If a change violates an MD-DDL rule or creates an inconsistency, say so and propose
 an alternative.

@@ -15,6 +15,9 @@ business events and technical mechanics.
   (source: `md-ddl-specification/5-Relationships.md`)
 - Full events specification: `references/events-spec.md`
   (source: `md-ddl-specification/6-Events.md`)
+- Cross-skill conceptual/physical guidance: `../entity-modelling/conceptual-to-physical-realisation.md`
+  (use when cardinality/ownership decisions affect dimensional realization and
+  `existence` interpretation)
 
 Read the relevant reference before drafting. Key sections:
 
@@ -60,6 +63,10 @@ Granularity is easy to miss but critical for compiler output. Ask explicitly.
 
 Default is `atomic` if not specified — but confirm this with the user rather than
 silently defaulting when the domain has temporal or aggregation patterns.
+
+When many-to-many relationships or ownership ambiguity is present, apply
+`../entity-modelling/conceptual-to-physical-realisation.md` before finalizing
+relationship ownership wording and associated entity-existence decisions.
 
 ### Foreign Key Rule
 

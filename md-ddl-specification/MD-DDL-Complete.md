@@ -1,3 +1,5 @@
+# **MD‑DDL Specification (Draft 0.6)**  
+
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
 ---

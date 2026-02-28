@@ -1,5 +1,3 @@
-# **MD‑DDL Specification (Draft 0.5)**  
-
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
 ---
@@ -95,8 +93,6 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 #### Detail File Flexibility
 
 Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships. The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
-
----
 
 ## **Domains**
 
@@ -340,7 +336,7 @@ The Entities table summarizes the core concepts of the domain.
 
 #### **Enums Table**
 
-Summarizes the discrete value sets used within the domain.
+Summarizes the discrete value sets used within the domain. Enums should be named as a plural - E.g. Customer Types.
 
 Column | Purpose
 --- | ---
@@ -796,7 +792,7 @@ Enums appear under:
 ## Enums
 ```
 
-Enums can be defined as a simple list of values or a dictionary if the values require additional metadata.
+Enums can be defined as a simple list of values or a dictionary if the values require additional metadata. Enums should be named as a plural - E.g. Customer Types.
 
 Simple Format:
 
@@ -1052,5 +1048,3 @@ attributes:
       type: datetime
 ```
 ````
-
----

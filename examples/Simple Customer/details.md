@@ -24,7 +24,7 @@ temporal:
 attributes:
   Customer Id:
     type: string
-    identifier: true
+    identifier: primary
   Email Address:
     type: string
     pii: true
@@ -70,7 +70,7 @@ temporal:
 attributes:
   Preference Id:
     type: string
-    identifier: true
+    identifier: primary
   Preference Name:
     type: string
   Value:

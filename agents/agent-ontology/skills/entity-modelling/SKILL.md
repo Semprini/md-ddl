@@ -5,8 +5,7 @@ description: Use this skill when modelling entities or their attributes, when th
 
 # Skill: Entity Modelling
 
-Covers concept realisation decisions, inheritance hierarchies, entity YAML structure,
-attribute definitions, constraints, and enumeration definitions.
+Covers concept realisation decisions, inheritance hierarchies, entity YAML structure, attribute definitions, constraints, and enumeration definitions.
 
 ## MD-DDL Reference
 
@@ -15,14 +14,12 @@ attribute definitions, constraints, and enumeration definitions.
 - Full enumeration specification: `references/enumerations-spec.md`
   (source: `md-ddl-specification/4-Enumerations.md`)
 - Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
-  (use for ownership/cardinality decisions, dimensional implementation reasoning,
-  and final `existence` value selection)
+  (use for ownership/cardinality decisions, dimensional implementation reasoning, and final `existence` value selection)
 
 Read the relevant reference before drafting any entity or enum. Key sections:
 
 **Entities spec:** Entity Declaration, Entity Diagram rules, Entity Definition (YAML),
-Key-as-Name principle, Attribute Properties, Type System, Constraint Definition,
-Temporal Tracking, Existence, Mutability, Naming Rules.
+Key-as-Name principle, Attribute Properties, Type System, Constraint Definition, Temporal Tracking, Existence, Mutability, Naming Rules.
 
 **Enumerations spec:** Enum Declaration, Simple vs. Dictionary format,
 Naming Rules (natural language values).
@@ -31,8 +28,7 @@ Naming Rules (natural language values).
 
 ## Concept Realisation Framework
 
-When the user is uncertain what a concept *is*, apply this framework and explain
-your reasoning before drafting anything.
+When the user is uncertain what a concept *is*, apply this framework and explain your reasoning before drafting anything.
 
 ### Make it an Entity if:
 - It has its own identity and lifecycle independent of other entities
@@ -57,21 +53,19 @@ your reasoning before drafting anything.
 - It is only ever referenced through its parent entity
 - It cannot be shared across or re-used by other entities
 
-**When it is genuinely ambiguous**, present the options to the user as a short
-trade-off table:
+**When it is genuinely ambiguous**, present the options to the user as a short trade-off table:
 
-| Option | Advantage | Disadvantage |
-|---|---|---|
-| Separate entity | Full governance, auditable, extensible | More relationships to manage |
-| Attribute | Simpler model | No independent lifecycle or audit trail |
-| Enum | Zero maintenance if stable | Can't evolve to carry attributes later without a refactor |
+Option | Advantage | Disadvantage
+--- | --- | ---
+Separate entity | Full governance, auditable, extensible | More relationships to manage
+Attribute | Simpler model | No independent lifecycle or audit trail
+Enum | Zero maintenance if stable | Can't evolve to carry attributes later without a refactor
 
 ---
 
 ## Inheritance Reasoning
 
-When a user describes "types of" something, or entities that share common properties,
-walk through this logic explicitly before committing to a hierarchy.
+When a user describes "types of" something, or entities that share common properties, walk through this logic explicitly before committing to a hierarchy.
 
 **Step 1 — Is shared behaviour real?**
 Do the candidate subtypes share actual attributes and constraints, or just a label?
@@ -95,32 +89,29 @@ Present this reasoning to the user before drafting. Do not silently choose a pat
 
 ## Existence and Mutability
 
-These are required for every entity. They directly drive compiler output — do not
-omit them or leave them as defaults without a conscious decision.
+These should be defined for every entity. They directly drive compiler output — do not omit them or leave them as defaults without a conscious decision that the user will never want to generate schemas.
 
 **Existence** (what is this entity's independence?)
 
-| Value | Use when | Compiler hint |
-|---|---|---|
-| `independent` | Meaningful on its own | Candidate dimension |
-| `dependent` | Only meaningful in context of other entities | Candidate fact |
-| `associative` | Resolves a many-to-many; carries relationship attributes | Bridge table |
+Value | Use when | Compiler hint
+--- | --- | ---
+`independent` | Meaningful on its own | Candidate dimension
+`dependent` | Only meaningful in context of other entities | Candidate fact
+`associative` | Resolves a many-to-many; carries relationship attributes | Bridge table
 
 **Mutability** (how does this entity's data change?)
 
-| Value | Use when | Compiler hint |
-|---|---|---|
-| `immutable` | Once written, never changes | Ledger / event store |
-| `append_only` | New rows added; existing rows never updated | Log / transaction |
-| `slowly_changing` | Changes occasionally; history may matter | SCD Type 2 |
-| `frequently_changing` | Changes often; current value is what matters | Overwrite |
-| `reference` | Essentially static; admin-managed | Small lookup table |
+Value | Use when | Compiler hint
+--- | --- | ---
+`immutable` | Once written, never changes | Ledger / event store
+`append_only` | New rows added; existing rows never updated | Log / transaction
+`slowly_changing` | Changes occasionally; history may matter | SCD Type 2
+`frequently_changing` | Changes often; current value is what matters | Overwrite
+`reference` | Essentially static; admin-managed | Small lookup table
 
-Ask the user explicitly if these are not obvious. A wrong existence value produces
-a wrong dimensional model.
+Ask the user explicitly if these are not obvious. A wrong existence value produces a wrong dimensional model.
 
-When relationship cardinality/ownership materially affects dimensional realization,
-apply `conceptual-to-physical-realisation.md` before finalizing `existence`.
+When relationship cardinality/ownership materially affects dimensional realization, apply `conceptual-to-physical-realisation.md` before finalizing `existence`.
 
 ---
 

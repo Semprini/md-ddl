@@ -242,7 +242,7 @@ The Entities table summarizes the core concepts of the domain.
 
 #### **Enums Table**
 
-Summarizes the discrete value sets used within the domain.
+Summarizes the discrete value sets used within the domain. Enums should be named as a plural - E.g. Customer Types.
 
 Column | Purpose
 --- | ---

@@ -63,14 +63,14 @@ added to the spec (if it's a genuine standard) or removed from the prompt (if it
 
 Each spec section owns a distinct layer of the language:
 
-| File | Owns |
-|---|---|
-| `1-Foundation.md` | Principles, document structure, two-layer model |
-| `2-Domains.md` | Domain file format, metadata schema, diagram rules, summary tables |
-| `3-Entities.md` | Entity YAML, attribute types, constraints, diagrams, inheritance |
-| `4-Enumerations.md` | Enum formats, naming, dictionary vs. simple list |
-| `5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax |
-| `6-Events.md` | Event structure, payload design, temporal priority, actor/entity |
+File | Owns
+--- | ---
+`1-Foundation.md` | Principles, document structure, two-layer model
+`2-Domains.md` | Domain file format, metadata schema, diagram rules, summary tables
+`3-Entities.md` | Entity YAML, attribute types, constraints, diagrams, inheritance
+`4-Enumerations.md` | Enum formats, naming, dictionary vs. simple list
+`5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax
+`6-Events.md` | Event structure, payload design, temporal priority, actor/entity
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
@@ -111,10 +111,10 @@ Reference files in `skills/*/references/` are stubs that point to the canonical 
 
 Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent that belong to another agent's stage.
 
-| Agent | Lifecycle stage | Owns |
-|---|---|---|
-| `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring |
-| `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation |
+Agent | Lifecycle stage | Owns
+--- | --- | ---
+`agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring
+`agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation
 
 **Boundary rule:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
 (ongoing assurance). If a compliance gap requires a structural model change — a new entity, attribute, or relationship — Agent Regulation flags it and
@@ -149,6 +149,18 @@ Before adding a new agent, confirm it occupies a distinct lifecycle stage not al
 - Behaviour modes (Interview / Drafting / Refinement)
 
 None of these are rules of the language. They are guidance for applying the language.
+
+---
+
+## Table formatting in markdown
+
+When writing tables in markdown, use pipe (`|`) syntax without leading and trailing pipes with a header row and separator line. For example:
+
+```markdown
+Column 1 | Column 2 | Column 3
+--- | --- | ---
+Value 1 | Value 2 | Value 3
+```
 
 ---
 

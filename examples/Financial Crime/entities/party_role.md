@@ -4,23 +4,11 @@
 
 ### Party Role
 
-A Party Role represents the specific capacity or context in which a Party
-participates in a business relationship with the institution. Aligned to the
-BIAN BOM, Party Role is the abstract concept that separates *who* a party is
-(the Party) from *what they do* in a given context (the Role). The same Party
-may hold multiple Party Roles simultaneously — a natural person may be a
-Customer on a home loan, a Payer on a standing order, and a Beneficial Owner
-of a company that holds a business account, all at the same time.
+A Party Role represents the specific capacity or context in which a Party participates in a business relationship with the institution. Aligned to the BIAN BOM, Party Role is the abstract concept that separates *who* a party is (the Party) from *what they do* in a given context (the Role). The same Party may hold multiple Party Roles simultaneously — a natural person may be a Customer on a home loan, a Payer on a standing order, and a Beneficial Owner of a company that holds a business account, all at the same time.
 
-In the Financial Crime domain, Party Role is significant because AML/CTF
-obligations attach to roles, not parties in isolation. The due diligence
-required for a Beneficial Owner differs from that required for an Account
-Holder, and the same individual may require different levels of scrutiny
-depending on which role they are assessed in.
+In the Financial Crime domain, Party Role is significant because AML/CTF obligations attach to roles, not parties in isolation. The due diligence required for a Beneficial Owner differs from that required for an Account Holder, and the same individual may require different levels of scrutiny depending on which role they are assessed in.
 
-Party Role is abstract — it is never instantiated directly. All roles are
-expressed through specialisations: Customer, Merchant, Payer, Payee, Teller,
-Instructing Agent, and others defined in the domain.
+Party Role is abstract — it is never instantiated directly. All roles are expressed through specialisations: Customer, Merchant, Payer, Payee, Teller, Instructing Agent, and others defined in the domain.
 
 ```mermaid
 ---

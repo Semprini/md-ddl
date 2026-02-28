@@ -4,16 +4,9 @@
 
 ### Individual
 
-An Individual is a natural person who has, or may have, a financial
-relationship with the institution. Individual specialises Party, inheriting
-all universal party attributes and adding those that are specific to a
-natural person — including identity verification details, biographic
-attributes, and PEP status.
+An Individual is a natural person who has, or may have, a financial relationship with the institution. Individual specialises Party, inheriting all universal party attributes and adding those that are specific to a natural person — including identity verification details, biographic attributes, and PEP status.
 
-Under the AUSTRAC AML/CTF Act 2006 and RBNZ AML/CFT Act 2009, the
-identification and verification requirements for individuals differ
-materially from those for legal entities, making Individual a distinct
-and necessary specialisation.
+Under the AUSTRAC AML/CTF Act 2006 and RBNZ AML/CFT Act 2009, the identification and verification requirements for individuals differ materially from those for legal entities, making Individual a distinct and necessary specialisation.
 
 ```mermaid
 ---

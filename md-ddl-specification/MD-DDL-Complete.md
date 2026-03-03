@@ -531,7 +531,7 @@ The entity being defined is the **subject class**. It is always written as a ful
 
 #### **Related Classes**
 
-All other classes that appear in the diagram — parents, children, and related entities — are **reference classes**. They are never defined with attribute blocks. Instead they use the linked class syntax:
+All other classes that appear in the diagram — parents, children, related entities, and referenced enums — are **reference classes** unless they are enums detailed in the same file. Reference classes are never defined with attribute blocks. Instead they use the linked class syntax:
 
 ```text
   class Party["<a href='party.md'>Party</a>"]
@@ -545,6 +545,37 @@ All other classes that appear in the diagram — parents, children, and related 
 - Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
 - All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
 - If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
+
+#### **Enum Classes in Entity Diagrams**
+
+Any enum used by the subject class attributes must appear in the class diagram.
+
+Use one of two patterns:
+
+1. **Referenced enum (detail in another file)** — show as a linked reference class:
+
+```text
+  class PartyStatus["<a href='../enums/party_status.md'>Party Status</a>"]
+```
+
+1. **Co-located enum (detail in the same file)** — show as an expanded enum class with values:
+
+```text
+  class PartyStatus{
+    <<enumeration>>
+    Active
+    Inactive
+    Under Review
+  }
+```
+
+**Rules for enum classes:**
+
+- Every enum type referenced in the subject class (for example `enum~PartyStatus~`) must appear exactly once in the diagram
+- If the enum is defined in the same detail file under `## Enums`, render it as an expanded enum class with its values and include `<<enumeration>>`
+- If the enum is defined elsewhere, render it as a linked reference class to its enum detail file and include only the `<<enumeration>>` tag in the class detail.
+- Use PascalCase class names for enum class identifiers (for example `PartyStatus`, `CountryCode`)
+- Display names in links use natural language (for example `Party Status`, `Country Code`)
 
 #### **Inheritance**
 
@@ -601,7 +632,8 @@ To keep diagrams readable and consistent, follow this ordering:
 2. Specialisation child classes (bare or linked, one per line)
 3. Inheritance arrows (`--|>`)
 4. Relationship lines (`-->` with cardinality and label)
-5. All reference class definitions (`class Foo["<a href='...'>...</a>"]`)
+5. Enum classes (expanded if co-located; linked reference if external)
+6. All remaining reference class definitions (`class Foo["<a href='...'>...</a>"]`)
 
 #### **Example**
 
@@ -626,10 +658,35 @@ classDiagram
   Party "1" --> "0..*" PartyRole
   Party "1" --> "0..*" ContactAddress
 
+  class FinancialCrimeRiskRating["<a href='../enums/financial_crime_risk_rating.md'>Financial Crime Risk Rating</a>"]
+
   class Individual["<a href='individual.md'>Individual</a>"]
   class Company["<a href='company.md'>Company</a>"]
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
   class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
+```
+````
+
+**Entity with co-located enum values (example):**
+
+````markdown
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  class CustomerPreferences{
+    * Preference Identifier : string
+    Contact Method Preference : enum~ContactMethodPreference~
+  }
+
+  class ContactMethodPreference{
+    <<enumeration>>
+    Email
+    SMS
+    Phone
+  }
 ```
 ````
 
@@ -652,7 +709,8 @@ attributes:
   Email Address:
     type: string
     pii: true
-
+  Full Name:
+    type: string
   Balance:
     type: Decimal
 ```
@@ -1320,7 +1378,7 @@ The entity name must match an entity declared in the canonical domain model. The
 #### Transformation types
 
 Transform files use the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
-syntax is unchanged. The only differences from Section 7's syntax are:
+syntax is unchanged. The only differences from Section 8's syntax are:
 
 - `system:` is omitted from all `source:` blocks (implicit from file location)
 - `target:` uses `Entity · Attribute` notation instead of bare attribute name
@@ -1519,8 +1577,6 @@ source:
 4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
 5. **The Canonical Feeds table is the manifest's authority.** If an attribute is listed in Canonical Feeds but has no corresponding transformation in the transform file, the compiler raises an error. If a transformation exists in a transform file but the entity is not listed in Canonical Feeds, the compiler raises a warning.
-
-6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, the compiler can generate event subscription logic. This linkage is by name — no explicit reference key is required.
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 

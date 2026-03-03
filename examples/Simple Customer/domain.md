@@ -1,15 +1,15 @@
 # Customer Domain
 
-The Customer domain contains all concepts related to customer identity, profiles, preferences, and lifecycle.
+The Customer domain contains concepts related to customer identity, customer preferences, and customer lifecycle interactions.
 
 ## Metadata
 
 ```yaml
 # Accountability
 owners:
-  - financial.crime@org.com
+  - customer.domain@org.com
 stewards:
-  - compliance.officer@org.com
+  - customer.data.steward@org.com
 technical_leads:
   - data.architecture@org.com
 
@@ -25,8 +25,10 @@ status: "Production"
 version: "1.0.0"
 tags:
   - Core
+  - Customer
 source_systems:
   - "Core System"
+  - "CRM"
 ```
 
 ### Customer Overview Diagram
@@ -38,28 +40,36 @@ config:
 ---
 graph TD
 
-  Individual --> |is a|Party
+  Customer --> |is a|PartyRole
+  Customer --> |has|CustomerPreference
 
-  Party <--> |related to|Party
-  Party --> |assumes|PartyRole
-
-  Customer --> |is a|PartyRole    
+  PartyRole["<a href='details.md#party-role'>Party Role</a>"]
+  Customer["<a href='details.md#customer'>Customer</a>"]
+  CustomerPreference["<a href='details.md#customer-preference'>Customer Preference</a>"]
 ```
 
 ## Entities
 
-name | specializes | description | reference
----- | ----- | ---- | ----
-[Customer](./details.md#customer) | [PartyRole](./details.md#PartyRole) | A customer is an individual who has a relationship with the organisation. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
+Name | Specializes | Description | Reference
+--- | --- | --- | ---
+[Party Role](details.md#party-role) | | Abstract representation of a party's role in a business context. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
+[Customer](details.md#customer) | [Party Role](details.md#party-role) | A customer who has an active relationship with the organisation. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
+[Customer Preference](details.md#customer-preference) | | Customer-specific interaction and communication preferences. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
 
 ## Enums
 
-name | description | reference
----- | ----- | ----
-[Loyalty Tier](./details.md#loyalty-tier) | A structured level within a loyalty program that offers different benefits and rewards based on engagement or spending. | [BIAN BOM - Loyalty Tier](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LoyaltyTier)
+Name | Description | Reference
+--- | --- | ---
+[Loyalty Tier](details.md#loyalty-tier) | Tier classification used to segment customers by engagement or value. | -
 
 ## Relationships
 
-name | description | reference
----- | ----- | ----
-[Customer Has Preferences](./details.md#customer-has-preferences) | Customers can have zero or more preferences, and preferences are owned by a customer. | [BIAN BOM - Customer Has Preferences](https://bian-modelapi-v4.azurewebsites)
+Name | Description | Reference
+--- | --- | ---
+[Customer Has Preferences](details.md#customer-has-preferences) | A customer can own zero or more preference records. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
+
+## Events
+
+Name | Actor | Entity | Description
+--- | --- | --- | ---
+[Preference Updated](details.md#preference-updated) | Customer | Customer Preference | Emitted when a customer preference value is created or changed.

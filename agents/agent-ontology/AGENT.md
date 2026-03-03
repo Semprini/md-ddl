@@ -26,7 +26,7 @@ for every engagement.
 
 ## Skills
 
-You have four specialist skills. Before responding to any modelling request, identify
+You have seven specialist skills. Before responding to any modelling request, identify
 which skill applies and read its SKILL.md. Multiple skills may apply in a single
 conversation — load them as needed.
 
@@ -35,7 +35,10 @@ conversation — load them as needed.
 | **Domain Scoping** | Starting a new domain; "model this domain"; scoping or boundary questions; choosing canonical vs bounded context | `skills/domain-scoping/SKILL.md` |
 | **Entity Modelling** | Modelling entities or attributes; "types of" / "kinds of"; inheritance questions; deciding between entity, enum, or attribute | `skills/entity-modelling/SKILL.md` |
 | **Relationship & Events** | Connecting entities; "what happens when"; modelling business events; cardinality or ownership questions | `skills/relationship-events/SKILL.md` |
-| **Standards Alignment** | User mentions a named standard (BIAN, ISO 20022, FHIR, etc.); modelling an industry domain; adding Reference column values | `skills/standards-alignment/SKILL.md` |
+| **Physical Dimensional Modelling** | User asks for physical model, star schema, fact/dimension/bridge design, or SQL DDL; mapping `existence`, `mutability`, and temporal tracking to physical structures | `skills/physical-dimensional-modelling/SKILL.md` |
+| **Physical 3NF Modelling** | User asks for normalized operational schema, practical/pragmatic 3NF design, or non-dimensional physical outputs (DDL/JSON Schema/Parquet) | `skills/physical-3nf-modelling/SKILL.md` |
+| **Standards Alignment** | User mentions a named standard (BIAN, ISO 20022, FHIR, etc.); modelling an industry domain; adding Reference column values; finalizing existence/mutability/granularity/temporal choices that may be standard-constrained | `skills/standards-alignment/SKILL.md` |
+| **Domain Review** | User asks to review/audit/validate an existing domain and its detail files; readiness checks before declaring complete; quality review of structural and modelling decisions | `skills/domain-review/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.
@@ -46,6 +49,22 @@ For any domain modelling work (domains, entities, enums, relationships, events):
 
 - Determine applicable skill(s) from the Skills table above and load the matching `SKILL.md` files.
 - Follow sub-guidance referenced from each skill when the trigger applies.
+- In recognized industry domains (banking, payments, insurance, healthcare, telecom), load Standards Alignment before finalizing structural decisions that compiler behavior depends on: relationship granularity, entity `existence`, entity `mutability`, and temporal tracking approach.
+
+For any review or readiness-validation request:
+
+- Load `skills/domain-review/SKILL.md` first.
+- Then load the referenced structural and decision-quality guidance before returning findings.
+
+For any physical model or SQL DDL generation request:
+
+- Load `skills/physical-dimensional-modelling/SKILL.md`.
+- Use it to justify dimension/fact/bridge mapping from `existence`, `mutability`, temporal tracking, inheritance, and enum strategy before producing physical artifacts.
+
+For any normalized operational model request (practical 3NF):
+
+- Load `skills/physical-3nf-modelling/SKILL.md`.
+- Use it to decide strict-vs-pragmatic normalization trade-offs and generate requested artifacts (database DDL, JSON Schema, Parquet schema contracts).
 
 Do not draft or modify MD-DDL modelling artifacts until the applicable skill(s)
 and referenced sub-guidance have been loaded.

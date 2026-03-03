@@ -8,7 +8,7 @@ A Party is any individual or legal entity that has, or may have, a financial rel
 
 In the Financial Crime domain a Party represents any subject that may be assessed for risk, screened against watchlists, investigated, or reported to a regulatory authority. A Party does not hold relationships directly — it participates through a Party Role (e.g., Account Holder, Beneficial Owner, Signatory). The same Party may hold multiple roles across multiple products simultaneously.
 
-Specialisations of Party — Individual and Legal Entity — carry the attributes that are specific to a natural person or an incorporated body respectively.
+Specialisations of Party — Person and Legal Entity — carry the attributes that are specific to a natural person or an incorporated body respectively.
 
 ```mermaid
 ---
@@ -27,20 +27,26 @@ classDiagram
     Next Review Date : date
   }
 
-  class Individual
+  class Person
 
   class Company{
   }
 
-  Individual --|> Party
+  Person --|> Party
   Company --|> Party
   Party "1" --> "0..*" PartyRole
   Party "1" --> "0..*" ContactAddress
+
+  class PartyStatus["<a href='../enums.md#party-status'>Party Status</a>"]{<<enumeration>>}
+  class FinancialCrimeRiskRating["<a href='../enums.md#financial-crime-risk-rating'>Financial Crime Risk Rating</a>"]{<<enumeration>>}
+  class SanctionsScreenStatus["<a href='../enums.md#sanctions-screen-status'>Sanctions Screen Status</a>"]{<<enumeration>>}
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
 ```
 
 ```yaml
+existence: independent
+mutability: slowly_changing
 temporal:
   tracking: bitemporal
   description: >
@@ -110,7 +116,8 @@ constraints:
 governance:
   pii: true
   classification: Highly Confidential
-  retention: 7 years
+  retention: 10 years
+  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
     Minimum 7-year retention from the end of the business relationship, aligned to AUSTRAC record-keeping obligations under the AML/CTF Act 2006 and RBNZ AML/CFT Act 2009 section 58.
   access_role:
@@ -128,4 +135,32 @@ governance:
     - Suspicious Transaction Report (STR) — RBNZ
     - Threshold Transaction Report (TTR) — AUSTRAC
     - International Funds Transfer Instruction (IFTI) — AUSTRAC
+```
+
+## Relationships
+
+### Party Assumes Roles
+
+A Party can assume one or more Party Roles across different business contexts.
+
+```yaml
+source: Party
+type: has
+target: Party Role
+cardinality: one-to-many
+granularity: atomic
+ownership: Party
+```
+
+### Party Has Contact Addresses
+
+A Party can have one or more contact addresses for communication and verification.
+
+```yaml
+source: Party
+type: has
+target: Contact Address
+cardinality: one-to-many
+granularity: atomic
+ownership: Party
 ```

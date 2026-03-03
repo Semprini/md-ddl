@@ -43,12 +43,17 @@ classDiagram
   PartyRole "0..*" --> "0..*" ContactAddress : uses
   PartyRole "0..*" --> "0..1" Agreement : governed by
 
+  class PartyRoleStatus["<a href='../enums.md#party-role-status'>Party Role Status</a>"]{<<enumeration>>}
+  class DDStatus["<a href='../enums.md#due-diligence-status'>Due Diligence Status</a>"]{<<enumeration>>}
+
   class Party["<a href='party.md'>Party</a>"]
   class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
   class Agreement["<a href='agreement.md'>Agreement</a>"]
 ```
 
 ```yaml
+existence: independent
+mutability: slowly_changing
 temporal:
   tracking: valid_time
   description: >
@@ -129,7 +134,8 @@ constraints:
 governance:
   pii: false
   classification: Confidential
-  retention: 7 years
+  retention: 10 years
+  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
     Role records must be retained for 7 years from Role End Date, aligned
     to AUSTRAC and RBNZ record-keeping obligations. Roles must never be
@@ -145,4 +151,32 @@ governance:
     - AUSTRAC AML/CTF Amendment Act 2024
     - RBNZ AML/CFT Act 2009
     - FATF Recommendation 10 — Customer Due Diligence
+```
+
+## Relationships
+
+### Party Role Uses Contact Addresses
+
+A Party Role may use one or more Contact Addresses owned by the underlying Party.
+
+```yaml
+source: Party Role
+type: associates_with
+target: Contact Address
+cardinality: many-to-many
+granularity: atomic
+ownership: Party Role
+```
+
+### Party Role Governed By Agreement
+
+A Party Role may be governed by a specific Agreement that defines obligations and permissions.
+
+```yaml
+source: Party Role
+type: references
+target: Agreement
+cardinality: many-to-one
+granularity: atomic
+ownership: Party Role
 ```

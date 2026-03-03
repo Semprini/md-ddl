@@ -1,4 +1,4 @@
-# [Customer Domain](../domain.md)
+# [Customer Domain](domain.md)
 
 *Note: this example uses a single detail file for entities, enums, relationships,
 and events. This is for brevity and to demonstrate how cross-section linking works
@@ -8,11 +8,76 @@ originating relationships co-located.*
 
 ## Entities
 
+### Party Role
+
+Abstract representation of a party's participation in a business context.
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  class PartyRole{
+    <<abstract>>
+    * Role Identifier : string
+    Role Status : string
+  }
+
+  Customer --|> PartyRole
+
+  class Customer["<a href='details.md#customer'>Customer</a>"]
+```
+
+```yaml
+existence: independent
+mutability: slowly_changing
+temporal:
+  tracking: valid_time
+  description: Party role records are valid for a period of business activity.
+attributes:
+  Role Identifier:
+    type: string
+    identifier: primary
+  Role Status:
+    type: string
+```
+
+---
+
 ### Customer
 
 The primary representation of a customer in the organisation. A Customer is a
 specialisation of Party Role — any party that holds an account, uses a product
 or service, or has an active relationship with the institution.
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  class Customer{
+    * Customer Id : string
+    Email Address : string
+    Loyalty Tier : enum~LoyaltyTier~
+    Balance : decimal
+  }
+
+  Customer --|> PartyRole
+  Customer "1" --> "0..*" CustomerPreference : has
+
+  class LoyaltyTier{
+    <<enumeration>>
+    Bronze
+    Silver
+    Gold
+    Platinum
+  }
+
+  class PartyRole["<a href='details.md#party-role'>Party Role</a>"]
+  class CustomerPreference["<a href='details.md#customer-preference'>Customer Preference</a>"]
+```
 
 ```yaml
 extends: Party Role
@@ -60,6 +125,25 @@ governance:
 Represents customer-specific settings and preferences for communication,
 privacy, and interaction. A preference cannot exist without a Customer —
 its lifecycle is bound to the Customer relationship.
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  class CustomerPreference{
+    * Preference Id : string
+    Preference Name : string
+    Value : string
+    Effective Date : date
+    End Date : date
+  }
+
+  Customer "1" --> "0..*" CustomerPreference : owns
+
+  class Customer["<a href='details.md#customer'>Customer</a>"]
+```
 
 ```yaml
 existence: dependent
@@ -138,4 +222,28 @@ constraints:
   Active Customer Preference Only:
     check: "Customer.Status == 'Active' OR Customer Preference.Effective Date <= today()"
     description: A customer cannot have active preferences if their account is not active
+```
+
+---
+
+## Events
+
+### Preference Updated
+
+Emitted when a customer preference is created or updated.
+
+```yaml
+actor: Customer
+entity: Customer Preference
+emitted_on:
+  - create
+  - update
+business_meaning: Customer interaction or communication preferences have changed
+downstream_impact:
+  - Customer communication settings are recalculated
+  - Consent-aware workflows consume the latest preference state
+attributes:
+  - event timestamp:
+      type: datetime
+      description: Time the preference update occurred
 ```

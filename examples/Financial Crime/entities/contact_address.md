@@ -8,7 +8,7 @@ A Contact Address is the association between a Party and a physical Address, qua
 
 This separation supports two critical financial crime capabilities. First, deduplication: if two parties share the same physical address, a single Address record exists and both Contact Address records point to it, enabling network analysis queries such as "which other parties are associated with this address". Second, temporal accuracy: the valid time period on Contact Address allows point-in-time queries — "what address did this party use at the time of this transaction" — which is essential for regulatory audit and SAR evidence.
 
-A Party *has* Contact Addresses — it owns the association. A Party Role *uses* Contact Addresses — a role references which of the party's addresses applies for the specific purpose of that role. For example, the same Individual may have a residential address used for identification and a mailing address used by their Customer role for correspondence.
+A Party *has* Contact Addresses — it owns the association. A Party Role *uses* Contact Addresses — a role references which of the party's addresses applies for the specific purpose of that role. For example, the same Person may have a residential address used for identification and a mailing address used by their Customer role for correspondence.
 
 ```mermaid
 ---
@@ -31,12 +31,18 @@ classDiagram
   PartyRole "0..*" --> "0..*" ContactAddress : uses
   ContactAddress "0..*" --> "1" Address : references
 
+  class AddressPurpose["<a href='../enums.md#address-purpose'>Address Purpose</a>"]{<<enumeration>>}
+  class AddressVerificationStatus["<a href='../enums.md#address-verification-status'>Address Verification Status</a>"]{<<enumeration>>}
+  class VerificationMethod["<a href='../enums.md#verification-method'>Verification Method</a>"]{<<enumeration>>}
+
   class Party["<a href='party.md'>Party</a>"]
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
   class Address["<a href='address.md'>Address</a>"]
 ```
 
 ```yaml
+existence: associative
+mutability: slowly_changing
 temporal:
   tracking: valid_time
   description: >
@@ -126,7 +132,8 @@ constraints:
 governance:
   pii: true
   classification: Highly Confidential
-  retention: 7 years
+  retention: 10 years
+  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
     Address association records must be retained for 7 years from Valid To
     date, aligned to AUSTRAC and RBNZ record-keeping obligations. Records
@@ -142,4 +149,19 @@ governance:
     - AUSTRAC AML/CTF Amendment Act 2024
     - RBNZ AML/CFT Act 2009 — section 14
     - FATF Recommendation 10 — Customer Due Diligence
+```
+
+## Relationships
+
+### Contact Address References Address
+
+Each Contact Address references exactly one canonical Address record.
+
+```yaml
+source: Contact Address
+type: references
+target: Address
+cardinality: many-to-one
+granularity: atomic
+ownership: Contact Address
 ```

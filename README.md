@@ -2,7 +2,7 @@
 
 # Markdown Data Definition Language (md-ddl)
 
-> **Version 0.7.1** (Latest)
+> **Version 0.7.2** (Latest)
 
 **A data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
 
@@ -65,7 +65,7 @@ This creates a data ecosystem that is **business‑friendly**, **steward‑frien
 
 ### **AI Agents as Collaborative Partners**
 
-MD-DDL ships with two purpose-built AI agents covering the full data management lifecycle.
+MD-DDL ships with purpose-built AI agents covering the full data management lifecycle.
 
 **[Agent Ontology](./agents/agent-ontology/AGENT.md)** is the primary authoring interface. Describe a business process and Agent Ontology drives the conversation — interviewing subject matter experts, checking applicable industry standards, reasoning through modelling trade-offs, and producing a draft domain model with summary tables first and detail files only after human review. It also guides source mapping, helping source system SMEs author manifests and transform files that feed the canonical model.
 
@@ -106,44 +106,16 @@ Generated schemas | Data product output ports (3NF, dimensional, messaging)
 
 ---
 
-## 🛠 How it Works
-
-### 1. Discover
-
-Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events — checking applicable industry standards and surfacing modelling trade-offs before writing a line of MD-DDL.
-
-### 2. Model
-
-Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, containing entity definitions, constraints, governance metadata, and diagrams.
-
-### 3. Map
-
-Source system SMEs author **Source Manifests** declaring what their system produces and how it generates change. **Transform Files** map source fields to canonical attributes — encoding source-specific logic (type casts, null handling, derivations, lookups, multi-source reconciliation) in the source layer where it belongs. The canonical model stays pure.
-
-### 4. Generate
-
-Point any LLM at your MD-DDL files and instruct it to generate artefacts — no custom tooling required:
-
-- **Knowledge Graph** — a queryable semantic web with end-to-end lineage from source field to canonical attribute
-- **Schemas** — 3rd Normal Form, dimensional models, columnar layouts, and messaging schemas
-- **ETL/ELT logic** — source-to-canonical pipelines derived directly from transform files
-- **Governance artefacts** — data quality rules, lineage maps, and regulatory reports
-
-### 5. Govern
-
-Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps — running continuously against the living model.
-
----
-
 ## 🔌 Integrating md-ddl into your project
 
-MD-DDL is a **dependency** of your modelling project, not an artifact of it. Your domain and source files are the artifacts — the spec and agents are the tools you use to create and govern them.
+MD-DDL is a **dependency** of your modelling project, not an artifact of it. Your domain and source files are the artifacts — the spec and agents are the tools you use to create and govern them but there does need to be some small wrappers to configure your VS/Claude Code to use the agents.
 
 The recommended approach is a **git submodule** — the closest equivalent to `pip install` for a Markdown-based standard: pinned to a version, updated independently of your model files, never duplicated.
 
 ### Step 1 — Add md-ddl as a submodule
 
 ```bash
+git init # If new project folder without git repo
 git submodule add https://github.com/[org]/md-ddl .md-ddl
 git submodule update --init
 ```
@@ -165,9 +137,7 @@ This project uses MD-DDL for data modelling. The standard and agents are in `.md
 - Agent Ontology (discovery, design, source mapping): `.md-ddl/agents/agent-ontology/AGENT.md`
 - Agent Regulation (compliance and audit): `.md-ddl/agents/agent-regulation/AGENT.md`
 
-When working on domain, entity, or source files, read the relevant agent prompt and
-spec sections before making changes. Draft domain summary tables before detail files.
-Canonical entity files contain no source references — source mappings live in sources/.
+When working on domain, entity, or source files, read the relevant agent prompt and spec sections before making changes. Draft domain summary tables before detail files. Canonical entity files contain no source references — source mappings live in sources/.
 ```
 
 Create custom-agent wrappers in `.github/agents/` (entrypoints for Copilot):
@@ -254,6 +224,35 @@ your-project/
 ```
 
 The `.md-ddl/` directory is a read-only dependency. Your modelling work lives entirely outside it.
+
+---
+
+## 🛠 How it Works
+
+### 1. Discover
+
+Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events — checking applicable industry standards and surfacing modelling trade-offs before writing a line of MD-DDL.
+
+### 2. Model
+
+Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, containing entity definitions, constraints, governance metadata, and diagrams.
+
+### 3. Map
+
+Source system SMEs author **Source Manifests** declaring what their system produces and how it generates change. **Transform Files** map source fields to canonical attributes — encoding source-specific logic (type casts, null handling, derivations, lookups, multi-source reconciliation) in the source layer where it belongs. The canonical model stays pure.
+
+### 4. Generate
+
+Point any LLM at your MD-DDL files and instruct it to generate artefacts — no custom tooling required:
+
+- **Knowledge Graph** — a queryable semantic web with end-to-end lineage from source field to canonical attribute
+- **Schemas** — 3rd Normal Form, dimensional models, columnar layouts, and messaging schemas
+- **ETL/ELT logic** — source-to-canonical pipelines derived directly from transform files
+- **Governance artefacts** — data quality rules, lineage maps, and regulatory reports
+
+### 5. Govern
+
+Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps — running continuously against the living model.
 
 ---
 

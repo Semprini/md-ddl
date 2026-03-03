@@ -34,7 +34,9 @@ in the `Reference` column of domain summary tables and in entity YAML.
 Do not silently map a concept to a standard if the fit is approximate. Check that
 the standard actually defines a counterpart to the entity or attribute being modelled.
 
-For BIAN BOM, use: `https://bian-modelapi-v4.azurewebsites.net/BOClassByName/{EntityName}`
+For BIAN BOM, use the dedicated guidance in [BIAN standard guidance](./standards/bian.md).
+It defines the deterministic lookup sequence, candidate disambiguation rules,
+version parameters, and no-guess policy.
 
 For ISO 20022, consult the message definition catalogue for the relevant message type.
 
@@ -80,6 +82,8 @@ regulatory_scope:
 
 **Never fabricate a reference URL** to make the model look more aligned than it is.
 A missing reference is honest; a wrong one is harmful.
+
+For BIAN specifics (including endpoint order and exact-name resolution), follow [BIAN standard guidance](./standards/bian.md).
 
 ---
 

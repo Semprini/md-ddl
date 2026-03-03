@@ -11,6 +11,10 @@ This guidance is especially important for:
 - ownership vs lifecycle confusion
 - `existence` value selection (`independent`, `dependent`, `associative`)
 
+In recognized industry domains (banking, payments, insurance, healthcare, telecom),
+apply this guidance alongside `../standards-alignment/SKILL.md` before finalizing
+relationship granularity, `existence`, `mutability`, or temporal tracking choices.
+
 ---
 
 ## Three-Layer Thinking Pattern
@@ -139,5 +143,6 @@ When cardinality or ownership is discussed, the agent must explicitly ask or sta
 2. Logical source/ownership
 3. Expected physical dimensional realisation (dimension/fact/bridge)
 4. Whether `existence` still matches that physical target
+5. Whether a standards constraint (if applicable) changes or narrows the preferred choice
 
 If mismatch is found, explain and correct before finalising the entity YAML.

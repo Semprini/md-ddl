@@ -202,6 +202,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Generated Financial Crime physical model outputs
+examples/Financial Crime/generated/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

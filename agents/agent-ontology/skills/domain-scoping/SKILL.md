@@ -1,11 +1,6 @@
 ---
 name: domain-scoping
-description: >
-  Use this skill when starting a new domain model, when the user says "model this
-  domain" or describes a business area from scratch, when scoping or boundary
-  questions arise, or when choosing between canonical and domain-driven modelling
-  strategies. Also use when the user asks who should own a concept or whether two
-  concepts are the same thing across different domains.
+description: Use this skill when starting a new domain model, when the user says "model this domain" or describes a business area from scratch, when scoping or boundary questions arise, or when choosing between canonical and domain-driven modelling strategies. Also use when the user asks who should own a concept or whether two concepts are the same thing across different domains.
 ---
 
 # Skill: Domain Scoping
@@ -20,10 +15,8 @@ drafting any domain file. Key sections to apply:
 
 - **Domain Declaration and Description** — H1 heading, free-text before H2
 - **Domain Metadata** — YAML block under `## Metadata`, fields and categories
-- **Domain Overview Diagram** — required Mermaid graph, ELK engine, rules for what
-  to include and exclude
-- **Domain Structure** — the four summary tables (Entities, Enums, Relationships,
-  Events) and the rules that govern them
+- **Domain Overview Diagram** — required Mermaid graph, ELK engine, rules for what to include and exclude
+- **Domain Structure** — the four summary tables (Entities, Enums, Relationships, Events) and the rules that govern them
 
 ---
 

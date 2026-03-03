@@ -15,6 +15,16 @@ Covers concept realisation decisions, inheritance hierarchies, entity YAML struc
   (source: `md-ddl-specification/4-Enumerations.md`)
 - Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
   (use for ownership/cardinality decisions, dimensional implementation reasoning, and final `existence` value selection)
+- Entity-vs-enum classification deep guidance: `guidance.md`
+  (use when concept boundaries are ambiguous or multiple structures are plausible)
+- Inheritance pattern deep guidance: `inheritance-patterns.md`
+  (use when evaluating subtype hierarchies, abstract parents, and discriminator alternatives)
+- Physical realization guidance: `../physical-dimensional-modelling/SKILL.md`
+  (load when user asks for dimensional/star-schema design or SQL DDL outputs)
+- Practical normalized guidance: `../physical-3nf-modelling/SKILL.md`
+  (load when user asks for pragmatic/practical 3NF outputs, operational schemas, or non-dimensional physical artifacts)
+- Cross-skill standards guidance: `../standards-alignment/SKILL.md`
+  (load before locking entity structure in industry-standard domains)
 
 Read the relevant reference before drafting any entity or enum. Key sections:
 
@@ -23,6 +33,13 @@ Key-as-Name principle, Attribute Properties, Type System, Constraint Definition,
 
 **Enumerations spec:** Enum Declaration, Simple vs. Dictionary format,
 Naming Rules (natural language values).
+
+If modelling in a recognized industry domain (banking, payments, insurance,
+healthcare, telecom), load `../standards-alignment/SKILL.md` before finalizing:
+- entity boundary (entity vs enum vs relationship attribute)
+- `existence`
+- `mutability`
+- temporal tracking strategy
 
 ---
 
@@ -88,6 +105,10 @@ Present this reasoning to the user before drafting. Do not silently choose a pat
 ---
 
 ## Existence and Mutability
+
+Before finalizing these in an industry-standard domain, confirm Standards Alignment
+has been loaded so the decision reflects standard semantics (for example, BIAN role
+abstractions, ISO payment concepts, or FHIR resource boundaries).
 
 These should be defined for every entity. They directly drive compiler output — do not omit them or leave them as defaults without a conscious decision that the user will never want to generate schemas.
 

@@ -25,15 +25,19 @@ classDiagram
     City : string
     State Or Region : string
     Postcode : string
-    Country : enum~CountryCode~
+    Country : string
   }
 
   ContactAddress "0..*" --> "1" Address : references
+
+  class AddressType["<a href='../enums.md#address-type'>Address Type</a>"]{<<enumeration>>}
 
   class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
 ```
 
 ```yaml
+existence: independent
+mutability: reference
 attributes:
   Address Identifier:
     type: string
@@ -77,7 +81,7 @@ attributes:
       The postal code. Stored as a string to preserve leading zeros and support international formats.
 
   Country:
-    type: enum:Country Code
+    type: string
     description: >
       The country in which the address is located, as an ISO 3166-1 alpha-2 country code. Mandatory for all address types.
 ```
@@ -102,7 +106,8 @@ constraints:
 governance:
   pii: false
   classification: Confidential
-  retention: 7 years
+  retention: 10 years
+  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
     Address records must be retained for 7 years from the date the last Contact Address referencing this record is closed. Address records must not be modified or deleted — they are immutable reference data.
     Changes to an address (e.g., a street renamed) should result in a new Address record; existing Contact Address records are not retrospectively updated so that historical point-in-time queries remain accurate.
@@ -115,3 +120,7 @@ governance:
     - AUSTRAC AML/CTF Act 2006 — Part B address record-keeping
     - RBNZ AML/CFT Act 2009 — section 58
 ```
+
+## Relationships
+
+No relationships are sourced directly from Address in the current domain model.

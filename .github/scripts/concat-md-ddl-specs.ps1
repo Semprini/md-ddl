@@ -3,7 +3,7 @@ param(
     [string]$OutputFileName = "MD-DDL-Complete.md"
 )
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\.." )).Path
 $specPath = Join-Path $repoRoot $SpecDir
 $outputPath = Join-Path $specPath $OutputFileName
 

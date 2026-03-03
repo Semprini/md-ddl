@@ -18,6 +18,8 @@ business events and technical mechanics.
 - Cross-skill conceptual/physical guidance: `../entity-modelling/conceptual-to-physical-realisation.md`
   (use when cardinality/ownership decisions affect dimensional realization and
   `existence` interpretation)
+- Cross-skill standards guidance: `../standards-alignment/SKILL.md`
+  (load before finalizing granularity and temporal choices in industry-standard domains)
 
 Read the relevant reference before drafting. Key sections:
 
@@ -26,6 +28,12 @@ Types, Granularity table, Relationship Rules, Naming Rules.
 
 **Events spec:** Event Declaration, Event Description, Event Definition (YAML),
 Event Rules, Contextual Payloads, Temporal Priority.
+
+If modelling in a recognized industry domain (banking, payments, insurance,
+healthcare, telecom), load `../standards-alignment/SKILL.md` before finalizing:
+- relationship granularity
+- relationship ownership semantics tied to standard abstractions
+- event temporal tracking shape (timestamp/sequence expectations)
 
 ---
 
@@ -54,6 +62,10 @@ cascade → `owns`.
 ### Granularity Decision
 
 Granularity is easy to miss but critical for compiler output. Ask explicitly.
+
+In industry-standard domains, confirm Standards Alignment has been loaded before
+locking granularity, because standard definitions may constrain whether the
+relationship is atomic, grouped, or period-based.
 
 | Value | When to use | Compiler output |
 |---|---|---|

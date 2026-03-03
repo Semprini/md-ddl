@@ -4,6 +4,12 @@
 
 This repo is the **source of the MD-DDL standard** — its specification, agent prompts, skills, and worked examples. It is not a runtime application and not a domain modelling workspace.
 
+### Purpose boundary
+
+- `copilot-instructions.md` governs **contributor behaviour in this repository** (maintaining the spec, agent prompts/skills, examples, and tooling).
+- Custom agents govern **modelling behaviour when applying MD-DDL** to user domains.
+- Keep these concerns separate: repository maintenance guidance belongs here; end-user modelling workflow guidance belongs in agent prompts/skills.
+
 Contributors here are working on one of four things:
 
 1. **The specification** — the normative rules of the MD-DDL language
@@ -42,6 +48,12 @@ agents/
       regulatory-compliance/  Jurisdiction mapping + regulator file loader (shared with agent-ontology)
         regulators/           Per-regulator guidance files (apra.md, gdpr.md, fatf.md, etc.)
       compliance-audit/       Three-level audit protocol, gap report format, severity rules
+
+.github/
+  agents/                     Copilot custom-agent entrypoints (wrappers)
+    agent-ontology.agent.md   Frontmatter + include of canonical `agents/agent-ontology/AGENT.md`
+    agent-regulation.agent.md Frontmatter + include of canonical `agents/agent-regulation/AGENT.md`
+  copilot-instructions.md     Repo-wide contributor and modelling guidance
 
 examples/
   Financial Crime/            Primary reference example (most current)
@@ -85,6 +97,23 @@ The spec uses semantic versioning in the H1 heading of each file. A version bump
 ---
 
 ## Working on agents and skills
+
+### Canonical vs wrapper locations
+
+Use `agents/` as the canonical source of agent behaviour and skill content.
+
+Use `.github/agents/` for Copilot custom-agent wrapper files only. Wrapper files should contain:
+- Custom-agent frontmatter (`name`, `description`, `argument-hint`, optional `tools`)
+- A single include to the canonical prompt in `agents/.../AGENT.md`
+
+Do not duplicate full agent prompts in both locations. Update canonical files in `agents/` and keep wrappers minimal.
+
+### Responsibility split: repo guidance vs modelling guidance
+
+- Put repository authoring/maintenance rules in `copilot-instructions.md`.
+- Put modelling interview, drafting, refinement, and compliance execution rules in agent prompts/skills.
+- If guidance controls how an agent models a business domain, it belongs under `agents/`.
+- If guidance controls how contributors edit this repo's assets, it belongs here.
 
 ### The agent/spec relationship
 

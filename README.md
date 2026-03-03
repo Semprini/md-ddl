@@ -109,22 +109,28 @@ Generated schemas | Data product output ports (3NF, dimensional, messaging)
 ## 🛠 How it Works
 
 ### 1. Discover
+
 Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events — checking applicable industry standards and surfacing modelling trade-offs before writing a line of MD-DDL.
 
 ### 2. Model
+
 Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, containing entity definitions, constraints, governance metadata, and diagrams.
 
 ### 3. Map
+
 Source system SMEs author **Source Manifests** declaring what their system produces and how it generates change. **Transform Files** map source fields to canonical attributes — encoding source-specific logic (type casts, null handling, derivations, lookups, multi-source reconciliation) in the source layer where it belongs. The canonical model stays pure.
 
 ### 4. Generate
+
 Point any LLM at your MD-DDL files and instruct it to generate artefacts — no custom tooling required:
+
 - **Knowledge Graph** — a queryable semantic web with end-to-end lineage from source field to canonical attribute
 - **Schemas** — 3rd Normal Form, dimensional models, columnar layouts, and messaging schemas
 - **ETL/ELT logic** — source-to-canonical pipelines derived directly from transform files
 - **Governance artefacts** — data quality rules, lineage maps, and regulatory reports
 
 ### 5. Govern
+
 Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps — running continuously against the living model.
 
 ---
@@ -164,6 +170,36 @@ spec sections before making changes. Draft domain summary tables before detail f
 Canonical entity files contain no source references — source mappings live in sources/.
 ```
 
+Create custom-agent wrappers in `.github/agents/` (entrypoints for Copilot):
+
+`.github/agents/agent-ontology.agent.md`
+
+```chatmode
+---
+name: agent-ontology
+description: MD-DDL ontology modeller for domain discovery, entity design, and relationship/event authoring.
+argument-hint: A business domain to model, refine, or review.
+---
+{{INCLUDE: .md-ddl/agents/agent-ontology/AGENT.md}}
+```
+
+`.github/agents/agent-regulation.agent.md`
+
+```chatmode
+---
+name: agent-regulation
+description: MD-DDL compliance auditor for governance metadata, monitoring, and remediation.
+argument-hint: A domain/corpus to audit, monitor, or remediate for compliance.
+---
+{{INCLUDE: .md-ddl/agents/agent-regulation/AGENT.md}}
+```
+
+Why this pattern:
+
+- Copilot discovers custom agents from `.github/agents/` in the project.
+- Prompt content stays canonical in `.md-ddl/agents/...`, so `git submodule update --remote .md-ddl` updates agent behaviour without copying full prompts into your project.
+- Project-local wrapper files stay tiny and stable.
+
 #### Claude Code
 
 Create `CLAUDE.md` in your project root:
@@ -184,6 +220,7 @@ Canonical entity files contain no source references — source mappings live in 
 #### Claude.ai Projects
 
 Add to your Project Knowledge:
+
 1. `MD-DDL-Complete.md` — the full specification
 2. `agents/agent-ontology/AGENT.md` — for modelling and source mapping
 3. `agents/agent-regulation/AGENT.md` — for compliance auditing
@@ -223,6 +260,7 @@ The `.md-ddl/` directory is a read-only dependency. Your modelling work lives en
 ## 📐 What MD‑DDL defines
 
 **Domain layer** — *what the business means*
+
 - **Domains** — the highest level of organisation and the unit of a data product. A canonical domain is a foundational data product.
 - **Entities** — the persistent nouns of your business (Customer, Account, Product)
 - **Relationships** — semantic connections between entities (Customer Holds Account)
@@ -235,10 +273,12 @@ The `.md-ddl/` directory is a read-only dependency. Your modelling work lives en
 - **Existence & Mutability** — entity-level declarations that drive compiler output for dimensional modelling
 
 **Source layer** — *where data comes from*
+
 - **Source Manifests** — declare what a source system produces, how it generates change, and which canonical entities it contributes to
 - **Transform Files** — map source fields to canonical attributes using a typed vocabulary: direct, derived, lookup, reconciliation, conditional, and aggregation. Source idiosyncrasies stay here, away from the canonical model.
 
 **Governance layer** — *how data is protected*
+
 - **Data Governance** — PII, classification, retention, residency, and breach notification embedded on the entities they govern
 - **Regulatory Scope** — every domain and entity declares which frameworks apply
 - **Ownership & Lineage** — data owners, stewards, and the full lineage graph from source field to canonical attribute

@@ -101,8 +101,6 @@ attributes:
 
 ```yaml
 constraints:
-  Valid Date Range:
-    check: "End Date > Start Date"
   Positive Liquidity:
     check: "Balance > 0"
 ```
@@ -110,11 +108,10 @@ constraints:
 ```yaml
 governance:
   classification: Confidential
-  pii: true
   pii_fields:
     - Email Address
-  retention: 7 years
-  retention_basis: Regulatory record-keeping requirements
+  retention: 10 years
+  retention_basis: Aligned to domain default retention policy
   access_role: CUSTOMER_SERVICE
 ```
 
@@ -167,10 +164,8 @@ attributes:
 
 ```yaml
 governance:
-  classification: Confidential
-  pii: false
-  retention: 7 years
-  retention_basis: Inherited from Customer domain — retained for audit trail of consent and preference changes
+  retention: 10 years
+  retention_basis: Aligned to domain default retention policy
 ```
 
 ---
@@ -220,8 +215,8 @@ ownership: Customer
 ```yaml
 constraints:
   Active Customer Preference Only:
-    check: "Customer.Status == 'Active' OR Customer Preference.Effective Date <= today()"
-    description: A customer cannot have active preferences if their account is not active
+    check: "Customer Preference.End Date IS NULL OR Customer Preference.End Date > Customer Preference.Effective Date"
+    description: Preference validity period must end after it begins when End Date is provided
 ```
 
 ---

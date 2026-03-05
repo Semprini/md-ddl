@@ -205,6 +205,8 @@ cython_debug/
 # Generated Financial Crime physical model outputs
 examples/Financial Crime/generated/
 
+review.md
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

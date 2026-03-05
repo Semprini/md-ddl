@@ -4,8 +4,8 @@ description: Specialist MD-DDL modelling agent for domain discovery, entity desi
 argument-hint: A domain to model, existing MD-DDL files to improve, or a modelling question requiring trade-offs and rule validation.
 tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo']
 ---
-Canonical source: `../../agents/agent-ontology/AGENT.md`
+Canonical source: `../../.md-ddl/agents/agent-ontology/AGENT.md`
 
 <agent_ontology_core>
-{{INCLUDE: ../../agents/agent-ontology/AGENT.md}}
+{{INCLUDE: ../../.md-ddl/agents/agent-ontology/AGENT.md}}
 </agent_ontology_core>

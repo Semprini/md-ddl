@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class CustomerPreferences{
-    Preference Identifier : string
+    * Preference Identifier : string
     Contact Preference : string
     Marketing Consent : boolean
     Effective From : date

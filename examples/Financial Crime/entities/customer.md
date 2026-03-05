@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Customer{
-    Customer Number : string
+    * Customer Number : string
     Onboarding Date : date
     Relationship Start Date : date
   }

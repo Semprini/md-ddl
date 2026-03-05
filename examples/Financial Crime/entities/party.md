@@ -42,6 +42,7 @@ classDiagram
   class SanctionsScreenStatus["<a href='../enums.md#sanctions-screen-status'>Sanctions Screen Status</a>"]{<<enumeration>>}
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
+  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
 ```
 
 ```yaml

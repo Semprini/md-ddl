@@ -1,4 +1,4 @@
-# MD-DDL
+# MD‑DDL Specification (Draft 0.7)
 
 ## **Enumerations**
 

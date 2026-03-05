@@ -1,4 +1,4 @@
-# **MD‑DDL Specification (Draft 0.7)**  
+# MD‑DDL Specification (Draft 0.7)
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -23,7 +23,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 1. **Source of Truth**  
    Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
 
-   This principle extends to source mappings. A source transform file is the single authoritative definition of how a source system's fields map to canonical domain attributes. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
+   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `transforms/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
 
 2. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
@@ -49,8 +49,8 @@ MD‑DDL is composed of several logical components:
 - [Domains](./2-Domains.md)
 - [Entities](./3-Entities.md)
 - [Enumerations](./4-Enumerations.md)
-- [Relationships](./5.Relationships.md)
-- [Events](./6.Events.md)
+- [Relationships](./5-Relationships.md)
+- [Events](./6-Events.md)
 - [Sources](./7-Sources.md)
 - [Transformations](./8-Transformations.md)
 
@@ -74,14 +74,14 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-sources/salesforce/manifest.md
-sources/salesforce/transforms/customer.md
-sources/salesforce/transforms/contact-address.md
-sources/sap/manifest.md
-sources/sap/transforms/customer.md
+Financial Crime/transforms/salesforce-crm/source.md
+Financial Crime/transforms/salesforce-crm/customer.md
+Financial Crime/transforms/salesforce-crm/contact-address.md
+Financial Crime/transforms/sap-fraud-management/source.md
+Financial Crime/transforms/temenos-payment/source.md
 ```
 
-Domain files and source files are sibling structures at the project level. Domain files define meaning. Source files define origin and transformation logic. Neither references the other's internals — they are linked only through the `target: Entity · Attribute` notation in transform files and the Canonical Feeds table in the source manifest.
+Domain files and source files are co-located at the domain level. Domain files define meaning. Source folders define operational origin and mapping logic for that specific domain context.
 
 ---
 
@@ -114,7 +114,7 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships.
 The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
 
-Source transform files follow the same two-layer pattern but are scoped to a source system rather than a domain. They begin with a level-1 heading linking back to the source manifest, followed by level-2 headings for each canonical entity being populated.
+Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
 
 ## **Domains**
 
@@ -151,7 +151,7 @@ Category|Metadata Keys|Purpose
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
 Governance & Security|classification, confidentiality, pii|The default security posture for the entire domain.
 Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frameworks governing this data.
-Lifecycle|status (Draft/Live), version, source_systems|The maturity and origin of the data domain.
+Lifecycle|status (Draft/Live), version|The maturity of the data domain.
 Discovery|tags|Searchability
 
 #### **Metadata Format**
@@ -185,10 +185,30 @@ tags:
   - Core
   - MasterData
   - B2C
-source_systems:
-  - "Salesforce CRM"
-  - "SAP ERP"
 ```
+````
+
+### **Source Systems**
+
+Source systems are first-class domain summary objects and must be declared under a level‑2 heading immediately after `## Metadata`.
+
+Use a Markdown table with the following columns:
+
+Column | Purpose
+--- | ---
+**Business Application** | Source application or product name, expressed as a Markdown link to the source markdown file.
+**Platform** | Technology platform or deployment model.
+**Capability Domain** | Business capability or functional area served by the source.
+
+Example:
+
+````markdown
+## Source Systems
+
+Business Application | Platform | Capability Domain
+--- | --- | ---
+[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
 ````
 
 #### **Diagrams**
@@ -330,7 +350,7 @@ The classDiagram is not required to mirror the domain graph one-for-one. Modelle
 
 ### **Domain Structure**
 
-Below the metadata section, the Domain file organizes concepts into four primary sections using level‑2 headings: `## Entities`, `## Enums`, `## Relationships`, and `## Events`.
+Below the metadata section, the Domain file organizes concepts into five primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, and `## Events`.
 
 In the Domain file, these sections **must use Markdown tables** for high-level summaries. This ensures the domain file acts as a compact "Router" for the knowledge graph.
 
@@ -341,7 +361,21 @@ domain.md
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
+transforms/temenos-payment/source.md
+transforms/sap-fraud-management/source.md
 ```
+
+#### **Source Systems Table**
+
+Summarizes operational source applications relevant to the domain.
+
+Column | Purpose
+--- | ---
+**Application** | Markdown link to the source markdown file.
+**Platform** | Technology platform or deployment model.
+**Capability Domain** | Business capability or functional area served by the source.
+
+---
 
 #### **Entities Table**
 
@@ -416,6 +450,12 @@ Domain description...
 
 ## Metadata
 Formal JSON/YAML block and diagrams...
+
+## Source Systems
+
+Business Application | Platform | Capability Domain
+--- | --- | ---
+[Customer CRM](transforms/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
 
 ### Domain Overview Diagram
 
@@ -855,7 +895,7 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 **No Source References in Entity Files:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared exclusively in source transform files under `sources/`. See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared under domain-local source folders (for example `transforms/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
@@ -863,7 +903,7 @@ Entity YAML contains no `source:` keys, no source field names, and no references
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
 - Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, the MD‑DDL compiler automatically handles the normalisation (e.g., conversion to snake_case) for physical system generation.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source transform files, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `transforms/<system>/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ---
 
@@ -1144,7 +1184,7 @@ attributes:
 
 A Source in MD-DDL represents a system that generates operational change — a CRM, a core banking system, a payment platform, an ERP. Sources are not owners of data. They are systems of change whose outputs feed canonical data products.
 
-The canonical domain model defines meaning. Sources define operational reality. The Source Manifest is the contract that translates between them.
+The canonical domain model defines meaning. Sources define operational reality. The Source File is the contract that translates between them.
 
 This separation is deliberate and load-bearing:
 
@@ -1152,56 +1192,64 @@ This separation is deliberate and load-bearing:
 - Source system SMEs define field-level mappings and encode source idiosyncrasies without needing to understand the canonical model's governance posture.
 - Integration engineers own transform files that connect the two worlds.
 
-**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to the rules declared in source transform files.
+**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to rules declared in source-folder transform files.
 
 ---
 
 ### **Source Structure**
 
-Sources follow the same two-layer pattern as Domains.
+Sources are self-contained within each domain. Each source system has a folder under `transforms/` containing a `source.md` router file and optional transform detail files.
 
 ```text
-sources/
-  <source-id>/
-    manifest.md             ← router: metadata + canonical feed summary
-    transforms/
-      <entity-name>.md      ← detail: field mappings for one canonical entity
-      <entity-name>.md
+Financial Crime/
+  domain.md
+  entities/
+  transforms/
+    salesforce-crm/
+      source.md             ← source metadata + domain feed table
+      table_account.md
+      table_contact_point.md
+    sap-fraud-management/
+      source.md
+      table_alert_case.md
+    temenos-payment/
+      source.md
+      table_account_ref.md
 ```
 
-The manifest is the router — it declares what the source system is, how it generates change, and which canonical entities it contributes to. Transform files are the detail layer — they declare the field-level mappings using the transformation types defined in Section 8.
+The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
+
+Transform file names are based on the source table and must follow this pattern:
+
+`table_<source-table>.md`
+
+Examples: `table_account.md`, `table_contact_point.md`, `table_payment_event.md`.
+
+If multiple canonical entities map from the same source table, they should be grouped in the same transform file under separate level-2 entity headings.
 
 #### File Organisation
 
-A source may split transform definitions across as many files as needed. The natural split is one transform file per canonical entity being populated. For large, complex source systems, transform files may be further subdivided by functional area. The only structural requirement is that every transform file begins with a level-1 heading linking back to the manifest.
+A source may split transform definitions across as many files as needed. The natural split is one transform file per canonical entity being populated. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored alongside `source.md` in the source folder and every transform file must begin with a level-1 heading linking back to `./source.md`.
 
 ```text
-sources/
-  salesforce/
-    manifest.md
-    transforms/
-      customer.md           ← all Salesforce → Customer mappings
-      contact-address.md    ← all Salesforce → Contact Address mappings
-  sap/
-    manifest.md
-    transforms/
-      customer.md           ← SAP's distinct contribution to Customer
-      account.md
-  core-banking/
-    manifest.md
-    transforms/
-      account.md
-      transaction.md
-      product.md
+Financial Crime/
+  transforms/
+    salesforce-crm/
+      source.md
+      table_account.md         ← Account table mappings for Party/Company/Customer
+      table_contact_point.md
+    sap-fraud-management/
+      source.md
+      table_alert_case.md
 ```
 
 ---
 
-### **Source Manifest**
+### **Source File**
 
 #### Declaration
 
-A source manifest is declared using a level-1 Markdown heading:
+A source file is declared using a level-1 Markdown heading:
 
 ```markdown
 # Salesforce CRM
@@ -1233,12 +1281,6 @@ change_events:
   - Contact Created
   - Account Merged
   - Account Deactivated
-
-# What canonical entities this source feeds
-canonical_scope:
-  - Customer
-  - Contact Address
-  - Customer Preferences
 
 # Operational characteristics
 update_frequency: real-time
@@ -1284,26 +1326,31 @@ The tier does not prevent a source from contributing to canonical entities. It s
 
 ---
 
-#### Canonical Feeds Table
+#### Domain Feed Sections
 
-Below the metadata block, the manifest declares which canonical entities this source contributes to, using a summary table under a level-2 heading:
+Below the metadata block, a source file declares the feed table for its owning domain using this heading pattern:
 
 ```markdown
-## Canonical Feeds
+## [<Domain Name>](../../domain.md) Feeds
 ```
+
+Example domain feed section:
+
+```markdown
+## [Financial Crime](../../domain.md) Feeds
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Customer](../../domains/customer/entities/customer.md) | [transforms/customer.md](transforms/customer.md) | Customer Number, Email Address, Full Name, Preferred Language | real-time-cdc
-[Contact Address](../../domains/customer/entities/contact-address.md) | [transforms/contact-address.md](transforms/contact-address.md) | Street, City, Postal Code, Country Code | real-time-cdc
-[Customer Preferences](../../domains/customer/entities/customer-preferences.md) | [transforms/customer-preferences.md](transforms/customer-preferences.md) | Preferred Channel, Marketing Opt-In | event-driven
+[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
+```
 
-**Canonical Feeds table columns:**
+**Domain feed table columns:**
 
 Column | Purpose
 --- | ---
-**Canonical Entity** | Link to the entity in the domain model this source contributes to.
-**Transform File** | Link to the transform detail file for this entity.
+**Canonical Entity** | Link to the entity in the target domain this source contributes to.
+**Transform File** | Link to a `table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
 **Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
 **Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
 
@@ -1311,7 +1358,7 @@ Column | Purpose
 
 #### Source Overview Diagram
 
-A manifest should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
+A source file should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
 
 ````markdown
 ### Source Overview Diagram
@@ -1338,21 +1385,43 @@ graph LR
 
 #### Transform Files Declaration
 
-Every transform file begins with a level-1 heading that names the source system and links back to the manifest:
+Every transform file begins with a level-1 heading that names the source system and links back to `source.md` in the same folder:
 
 ```markdown
-# [Salesforce CRM](../manifest.md)
+# [Salesforce CRM](./source.md)
 ```
 
 #### Structure
 
-Transform files use level-2 headings for each canonical entity being populated:
+Transform files are source-table documents. Each file begins with a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
+
+Required source schema table columns:
+
+Column | Purpose
+--- | ---
+**Pos** | Column ordinal from the source table.
+**Column Name** | Physical source column name.
+**Data Type** | Source system type.
+**Max Len** | Maximum length for string-like columns.
+**Precision** | Numeric precision when applicable.
+**Scale** | Numeric scale when applicable.
+**Nulls** | Whether source column allows nulls.
+**Comment** | Source-system context or business notes.
+**Destination** | Canonical destination mapping (`Entity.Attribute`) or a same-file link to a rule section for non-direct mappings.
+
+When mapping is direct, the `Destination` cell is sufficient and no additional YAML rule is required. Use a level-3 rule section only for non-direct mappings such as `conditional`, `derived`, `lookup`, `reconciliation`, or `aggregation`.
+
+Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column must point to anchors in the same file (for example `[Map Party Status](#map-party-status)`).
+
+Transform files may include multiple canonical entities when mappings originate from the same source table.
+
+Example level-2 heading:
 
 ```markdown
-## Customer
+## Account
 ```
 
-Each transformation within that entity uses a level-3 heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the source.
+For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the transform file.
 
 #### Source field references
 
@@ -1363,7 +1432,7 @@ source:
   field: Contact.Email
 ```
 
-This keeps transform files clean and makes them portable if a source system is renamed. The manifest's `id` field is the authoritative system identifier.
+This keeps transform files clean and makes them portable if a source system is renamed. The source file's `id` field is the authoritative system identifier.
 
 #### Target notation
 
@@ -1434,7 +1503,7 @@ These annotations belong in the transform file, not in the canonical entity defi
 
 ### **Complete Example**
 
-#### Manifest
+#### Source file
 
 ````markdown
 # Salesforce CRM
@@ -1453,10 +1522,6 @@ change_events:
   - Customer Updated
   - Contact Updated
   - Account Deactivated
-canonical_scope:
-  - Customer
-  - Contact Address
-  - Customer Preferences
 data_quality_tier: 1
 status: Production
 version: "2.1.0"
@@ -1483,18 +1548,19 @@ graph LR
   CustomerPreferences["<a href='../../domains/customer/entities/customer_preferences.md'>Customer Preferences</a>"]
 ```
 
-## Canonical Feeds
+## [Financial Crime](../../domain.md) Feeds
 
-| Canonical Entity | Transform File | Attributes Contributed | Change Model |
-|---|---|---|---|
-| [Customer](../../domains/customer/entities/customer.md) | [transforms/customer.md](transforms/customer.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc |
-| [Contact Address](../../domains/customer/entities/contact-address.md) | [transforms/contact-address.md](transforms/contact-address.md) | Street, City, Postal Code, Country Code | real-time-cdc |
+Canonical Entity | Transform File | Attributes Contributed | Change Model
+--- | --- | --- | ---
+[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
 ````
 
-#### Transform file — `transforms/customer.md`
+#### Transform file — `transforms/salesforce-crm/table_contact.md`
 
 ````markdown
-# [Salesforce CRM](../manifest.md)
+# [Salesforce CRM](./source.md)
 
 ## Customer
 
@@ -1568,15 +1634,15 @@ source:
 
 ### **Source Rules**
 
-1. **Source identity is stable.** The `id` in the manifest metadata is a breaking-change identifier. All transform file field references and all domain-level `source_systems` registry entries use it. Renaming requires a coordinated update across all referencing files.
+1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
 
 2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is non-negotiable.
 
-3. **Transform files are source-scoped.** A transform file belongs to exactly one source. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a single source's transform file, listing the contributing sources explicitly.
+3. **Transform files are source-folder scoped.** A transform file belongs to exactly one source folder and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a transform file, listing the contributing sources explicitly.
 
 4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
-5. **The Canonical Feeds table is the manifest's authority.** If an attribute is listed in Canonical Feeds but has no corresponding transformation in the transform file, the compiler raises an error. If a transformation exists in a transform file but the entity is not listed in Canonical Feeds, the compiler raises a warning.
+5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, the compiler raises an error. If a transformation exists in the source folder but the entity is not listed in the feed table, the compiler raises a warning.
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -1588,7 +1654,7 @@ Each file must declare which domain it is part of by starting with a Level 1 hea
 
 Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and compilable.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source transform files (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `transforms/<system>/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -1604,19 +1670,31 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source transform files under a level-2 heading for the canonical entity being populated:
+Transformations are declared in source-table transform files. Each file uses a level-2 heading for the source table and a source schema table that maps columns to destinations:
 
 ```markdown
-## Customer
+## Account
+
+Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Comment | Destination
+--- | --- | --- | --- | --- | --- | --- | --- | ---
+1 | ExternalPartyId | Text | 40 | | | no | Account-scoped party id | Party.Party Identifier
+2 | RecordStatus | Text | 20 | | | yes | Record lifecycle status | [Map Party Status](#map-party-status)
 ```
 
-Each transformation within that entity section uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
+Each non-direct transformation in that file uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
 ```markdown
 ### Concatenate Name Parts
 ```
 
 A short prose description of the business intent follows the heading, before the YAML block. See [Section 7 — Sources](./7-Sources.md) for the full transform file structure.
+
+Transform files must be named for the source table using the `table_<source-table>.md` pattern. If multiple canonical entities are mapped from the same source table, they can coexist in one file.
+
+The `Destination` column controls rule verbosity:
+
+- Direct mapping: use `Entity.Attribute` directly in the `Destination` cell.
+- Non-direct mapping: link to a same-file rule section (for example `[Map Party Status](#map-party-status)`) and define the YAML rule under that heading.
 
 ---
 
@@ -1633,7 +1711,7 @@ target: Entity · Attribute
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under the source directory. Only the field path within the source system is declared:
+Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `transforms/<system>/`. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -1841,19 +1919,19 @@ grain:
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the source and is the authoritative name used in lineage tracing and compiler output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and compiler output.
 
 2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. The compiler validates both the entity name and the attribute name.
 
 3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
-4. **One transformation per canonical attribute per source:** A single source may populate a canonical attribute only once. If a source contributes to an attribute through multiple source fields, use a `derived` or `reconciliation` transformation to express the logic. Multiple sources may each contribute to the same canonical attribute — this is expected and governed by the canonical domain's lineage graph.
+4. **One mapping path per canonical attribute per source table:** Use exactly one `Destination` entry per target attribute from a given source table. If mapping is non-direct, the `Destination` entry must link to a single rule section that defines the logic.
 
 5. **No transformation logic in constraints:** Constraints validate; they do not transform. The transformation defines the inbound mapping; the constraint defines the validation rule on the result.
 
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Transformations are optional:** A source manifest may exist without transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
+7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
 
 ---
 
@@ -1873,7 +1951,7 @@ The compiler uses transformation definitions to generate:
 See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
 
 ````markdown
-# [Salesforce CRM](../manifest.md)
+# [Salesforce CRM](./source.md)
 
 ## Customer
 

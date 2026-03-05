@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Payer{
-    Payer Identifier : string
+    * Payer Identifier : string
     Funding Source Reference : string
   }
 

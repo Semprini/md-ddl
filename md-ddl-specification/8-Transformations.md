@@ -1,4 +1,4 @@
-# MD‑DDL Specification — Section 8: Transformations
+# MD‑DDL Specification (Draft 0.7)
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -10,7 +10,7 @@ Each file must declare which domain it is part of by starting with a Level 1 hea
 
 Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and compilable.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source transform files (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `transforms/<system>/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -26,19 +26,31 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source transform files under a level-2 heading for the canonical entity being populated:
+Transformations are declared in source-table transform files. Each file uses a level-2 heading for the source table and a source schema table that maps columns to destinations:
 
 ```markdown
-## Customer
+## Account
+
+Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Comment | Destination
+--- | --- | --- | --- | --- | --- | --- | --- | ---
+1 | ExternalPartyId | Text | 40 | | | no | Account-scoped party id | Party.Party Identifier
+2 | RecordStatus | Text | 20 | | | yes | Record lifecycle status | [Map Party Status](#map-party-status)
 ```
 
-Each transformation within that entity section uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
+Each non-direct transformation in that file uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
 ```markdown
 ### Concatenate Name Parts
 ```
 
 A short prose description of the business intent follows the heading, before the YAML block. See [Section 7 — Sources](./7-Sources.md) for the full transform file structure.
+
+Transform files must be named for the source table using the `table_<source-table>.md` pattern. If multiple canonical entities are mapped from the same source table, they can coexist in one file.
+
+The `Destination` column controls rule verbosity:
+
+- Direct mapping: use `Entity.Attribute` directly in the `Destination` cell.
+- Non-direct mapping: link to a same-file rule section (for example `[Map Party Status](#map-party-status)`) and define the YAML rule under that heading.
 
 ---
 
@@ -55,7 +67,7 @@ target: Entity · Attribute
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under the source directory. Only the field path within the source system is declared:
+Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `transforms/<system>/`. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -263,19 +275,19 @@ grain:
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the source and is the authoritative name used in lineage tracing and compiler output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and compiler output.
 
 2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. The compiler validates both the entity name and the attribute name.
 
 3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
-4. **One transformation per canonical attribute per source:** A single source may populate a canonical attribute only once. If a source contributes to an attribute through multiple source fields, use a `derived` or `reconciliation` transformation to express the logic. Multiple sources may each contribute to the same canonical attribute — this is expected and governed by the canonical domain's lineage graph.
+4. **One mapping path per canonical attribute per source table:** Use exactly one `Destination` entry per target attribute from a given source table. If mapping is non-direct, the `Destination` entry must link to a single rule section that defines the logic.
 
 5. **No transformation logic in constraints:** Constraints validate; they do not transform. The transformation defines the inbound mapping; the constraint defines the validation rule on the result.
 
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Transformations are optional:** A source manifest may exist without transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
+7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
 
 ---
 
@@ -295,7 +307,7 @@ The compiler uses transformation definitions to generate:
 See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
 
 ````markdown
-# [Salesforce CRM](../manifest.md)
+# [Salesforce CRM](./source.md)
 
 ## Customer
 

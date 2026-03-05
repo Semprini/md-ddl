@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class ExchangeRate{
-    Exchange Rate Identifier : string
+    * Exchange Rate Identifier : string
     Rate Value : decimal
     Effective Date Time : datetime
   }

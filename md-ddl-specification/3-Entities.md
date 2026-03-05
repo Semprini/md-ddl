@@ -1,4 +1,4 @@
-# MD-DDL
+# MD‑DDL Specification (Draft 0.7)
 
 ## **Entities**
 
@@ -398,7 +398,7 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 **No Source References in Entity Files:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared exclusively in source transform files under `sources/`. See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared under domain-local source folders (for example `transforms/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
@@ -406,7 +406,7 @@ Entity YAML contains no `source:` keys, no source field names, and no references
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
 - Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, the MD‑DDL compiler automatically handles the normalisation (e.g., conversion to snake_case) for physical system generation.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source transform files, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `transforms/<system>/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ---
 

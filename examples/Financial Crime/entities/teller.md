@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Teller{
-    Teller Identifier : string
+    * Teller Identifier : string
     Employee Number : string
     Assigned Branch Identifier : string
   }

@@ -18,6 +18,8 @@ drafting any domain file. Key sections to apply:
 - **Domain Overview Diagram** — required Mermaid graph, ELK engine, rules for what to include and exclude
 - **Domain Structure** — the four summary tables (Entities, Enums, Relationships, Events) and the rules that govern them
 
+For canonical-vs-bounded-context boundary decisions, also load `domain-boundaries.md`.
+
 ---
 
 ## Interview Protocol

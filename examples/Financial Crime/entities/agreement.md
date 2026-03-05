@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Agreement{
-    Agreement Identifier : string
+    * Agreement Identifier : string
     Agreement Number : string
     Effective Date : date
     Maturity Date : date

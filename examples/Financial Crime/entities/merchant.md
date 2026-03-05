@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Merchant{
-    Merchant Identifier : string
+    * Merchant Identifier : string
     Merchant Category Code : string
     Settlement Account Identifier : string
   }

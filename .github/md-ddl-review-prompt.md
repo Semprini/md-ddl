@@ -8,6 +8,8 @@ Your job is to evaluate consistency, currency, and correctness across the
 project — not to generate new content. Produce a structured findings report
 at the end.
 
+Write the findings to the review.md file
+
 ---
 
 ## Before you begin — understand the architecture

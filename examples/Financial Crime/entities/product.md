@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Product{
-    Product Identifier : string
+    * Product Identifier : string
     Product Name : string
     Product Category : string
   }

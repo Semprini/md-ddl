@@ -1,306 +1,103 @@
-[![CC BY 4.0][cc-by-shield]][cc-by]
-
 # Markdown Data Definition Language (md-ddl)
 
-> **Version 0.7.2** (Latest)
+[![CC BY 4.0][cc-by-shield]][cc-by]
 
-**A data modelling language that bridges between human business intent, AI reasoning, and technical implementation.**
+> **Version 0.7.3** (Latest)
 
-MD-DDL is a Markdown-native standard for defining not just *what* data is, but *what it means*, *where it comes from*, and *how it is governed* — in a format that humans, AI agents, and compilers all work with directly.
+**Model once. Reuse everywhere.**
 
-The specification is at [1-Foundation.md](./md-ddl-specification/1-Foundation.md), or point your AI at the single-file version: [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md).
+MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — in one format for humans, AI agents, and compilers.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
-```mermaid
----
-config:
-  layout: elk
----
-flowchart TD
-    SME[Subject Matter Experts]
-    Stewards[Data Stewards & Architects]
-
-    subgraph Sources["Source Layer"]
-        SM[Source Manifests]
-        TF[Transform Files]
-        SM --> TF
-    end
-
-    subgraph Model["Domain Layer"]
-        D[Domain Files<br/>Summary Tables + Diagrams]
-        E[Detail Files<br/>Entities · Relationships · Events]
-        D --> E
-    end
-
-    subgraph Agents["AI Agents"]
-        AO["Agent Ontology<br/>Discover · Design · Author"]
-        AR["Agent Regulation<br/>Audit · Monitor · Remediate"]
-    end
-
-    subgraph Outputs["Generated Artefacts"]
-        KG[Knowledge Graph & Lineage]
-        SC[Schemas<br/>3NF · Dimensional · Messaging]
-        GV[ETL/ELT Logic<br/>& Governance Rules]
-    end
-
-    Sources --> Model
-    Model --> Outputs
-    AO --> Model
-    AO --> Sources
-    AR --> Model
-    SME --> Agents
-    SME --> Model
-    SME --> Sources
-    Stewards --> Agents
-    Stewards --> Model
-    Outputs --> Agents
-```
-
-This creates a data ecosystem that is **business‑friendly**, **steward‑friendly**, **tech‑friendly**, and **AI‑friendly**.
-
----
-
-## 🌟 Why use md-ddl?
-
-### **AI Agents as Collaborative Partners**
-
-MD-DDL ships with purpose-built AI agents covering the full data management lifecycle.
-
-**[Agent Ontology](./agents/agent-ontology/AGENT.md)** is the primary authoring interface. Describe a business process and Agent Ontology drives the conversation — interviewing subject matter experts, checking applicable industry standards, reasoning through modelling trade-offs, and producing a draft domain model with summary tables first and detail files only after human review. It also guides source mapping, helping source system SMEs author manifests and transform files that feed the canonical model.
-
-**[Agent Regulation](./agents/agent-regulation/AGENT.md)** is the ongoing compliance layer. It audits domain and entity files against loaded regulatory frameworks (APRA, GDPR, Basel, FATF, and more), monitors for regulatory change, and produces structured gap reports with prioritised remediation across all three governance levels — domain metadata, entity governance blocks, and attribute-level PII flags.
-
-MD‑DDL's plain Markdown and structured YAML acts as a shared language for these agents and for any LLM you point at the spec — agents can reason over the model, walk relationships to find logic gaps, and generate technical artefacts from the same files your business stakeholders review.
-
-### **Standards are a superpower**
-
-Don't model from scratch. MD-DDL aligns with global industry standards out of the box — native patterns for **BIAN** and **ISO 20022**, built-in compliance guidance for **Basel (BCBS)**, **APRA**, **RBNZ**, and **GDPR**, and direct traceability from every entity and attribute to the standard or regulatory requirement that defines it.
-
-### **Governance built into the model**
-
-Regulatory requirements and business rules are embedded in the data definition itself, not bolted on after the fact. PII classification, retention obligations, and breach notification requirements sit directly on the entities they govern. Business rules like "balance can never be less than zero" become visible **Constraints** that compile into automated data quality checks. The domain and relationship structure automatically maps how sensitive data flows, making impact analysis and breach notification (e.g., CPS 234) traceable by default.
-
-### **From source to canonical — with full lineage**
-
-MD-DDL separates the operational reality of source systems from the governed meaning of canonical data. **Source Manifests** declare what each source system produces and how it generates change. **Transform Files** map source fields to canonical attributes using a typed transformation vocabulary — direct maps, derivations, lookups, multi-source reconciliation, and conditional logic — encoding source idiosyncrasies where they belong, in the source layer, not the canonical model. The result is end-to-end lineage from raw source field to governed domain attribute, compilable into ETL/ELT logic without custom tooling.
-
-### **Domains as Data Products**
-
-An MD-DDL domain is a complete data product definition. The effort of modelling a domain is the effort of defining the data product — one document, not two. When you apply a **Canonical** modelling strategy, the domain becomes a **Foundational Data Product** — a governed, reusable asset that other teams and systems consume without redefining.
-
-MD-DDL | Data Product concept
---- | ---
-Domain | Data product definition
-Canonical domain | Foundational / platform data product
-Bounded context domain | Team-owned data product
-Entities + relationships | Data product schema / semantic model
-Events | Output port change events
-Source manifests | Source-aligned input contracts
-Transform files | Integration logic — source fields to canonical attributes
-Governance metadata | Data product SLA — classification, retention, PII, residency
-Owners + stewards | Data product owner and domain team
-Generated schemas | Data product output ports (3NF, dimensional, messaging)
-
-> **Looking ahead to v0.8:** The spec will formalise inter-domain consumption contracts and explicit output port declarations, making domain-to-domain data product relationships as governed as source-to-canonical ones.
+Start with [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or load [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md) for single-file AI context.
 
 ---
 
 ## 🔌 Integrating md-ddl into your project
 
-MD-DDL is a **dependency** of your modelling project, not an artifact of it. Your domain and source files are the artifacts — the spec and agents are the tools you use to create and govern them but there does need to be some small wrappers to configure your VS/Claude Code to use the agents.
+Use md-ddl as a dependency (recommended: git submodule), and keep your own model files outside `.md-ddl/`.
 
-The recommended approach is a **git submodule** — the closest equivalent to `pip install` for a Markdown-based standard: pinned to a version, updated independently of your model files, never duplicated.
-
-### Step 1 — Add md-ddl as a submodule
+### 1) Add/update md-ddl
 
 ```bash
-git init # If new project folder without git repo
 git submodule add https://github.com/[org]/md-ddl .md-ddl
 git submodule update --init
 ```
 
-To update to a new version later: `git submodule update --remote .md-ddl`
+Update later with:
 
-### Step 2 — Configure your AI tooling
-
-#### GitHub Copilot in VS Code
-
-Create `.github/copilot-instructions.md` in your project root:
-
-```markdown
-## MD-DDL Standard
-
-This project uses MD-DDL for data modelling. The standard and agents are in `.md-ddl/`.
-
-- Full specification: `.md-ddl/md-ddl-specification/MD-DDL-Complete.md`
-- Agent Ontology (discovery, design, source mapping): `.md-ddl/agents/agent-ontology/AGENT.md`
-- Agent Regulation (compliance and audit): `.md-ddl/agents/agent-regulation/AGENT.md`
-
-When working on domain, entity, or source files, read the relevant agent prompt and spec sections before making changes. Draft domain summary tables before detail files. Canonical entity files contain no source references — source mappings live in sources/.
+```bash
+git submodule update --remote .md-ddl
 ```
 
-Create custom-agent wrappers in `.github/agents/` (entrypoints for Copilot):
+### 2) Copy integration files into your project `.github`
 
-`.github/agents/agent-ontology.agent.md`
+Copy these files from `.md-ddl` into your repository (same relative paths):
 
-```chatmode
----
-name: agent-ontology
-description: MD-DDL ontology modeller for domain discovery, entity design, and relationship/event authoring.
-argument-hint: A business domain to model, refine, or review.
----
-{{INCLUDE: .md-ddl/agents/agent-ontology/AGENT.md}}
-```
+- `.md-ddl/.github/copilot-instructions.md` → `.github/copilot-instructions.md`
+- `.md-ddl/.github/agents/agent-ontology.agent.md` → `.github/agents/agent-ontology.agent.md`
+- `.md-ddl/.github/agents/agent-regulation.agent.md` → `.github/agents/agent-regulation.agent.md`
 
-`.github/agents/agent-regulation.agent.md`
+This keeps setup simple and lets you refresh from upstream when md-ddl updates.
 
-```chatmode
----
-name: agent-regulation
-description: MD-DDL compliance auditor for governance metadata, monitoring, and remediation.
-argument-hint: A domain/corpus to audit, monitor, or remediate for compliance.
----
-{{INCLUDE: .md-ddl/agents/agent-regulation/AGENT.md}}
-```
+> Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 
-Why this pattern:
-
-- Copilot discovers custom agents from `.github/agents/` in the project.
-- Prompt content stays canonical in `.md-ddl/agents/...`, so `git submodule update --remote .md-ddl` updates agent behaviour without copying full prompts into your project.
-- Project-local wrapper files stay tiny and stable.
-
-#### Claude Code
-
-Create `CLAUDE.md` in your project root:
-
-```markdown
-## MD-DDL Standard
-
-This project uses MD-DDL for data modelling. The standard and agents are in `.md-ddl/`.
-
-- Full specification: `.md-ddl/md-ddl-specification/MD-DDL-Complete.md`
-- Agent Ontology (discovery, design, source mapping): `.md-ddl/agents/agent-ontology/AGENT.md`
-- Agent Regulation (compliance and audit): `.md-ddl/agents/agent-regulation/AGENT.md`
-
-When working on domain, entity, or source files, load the relevant agent prompt first.
-Canonical entity files contain no source references — source mappings live in sources/.
-```
-
-#### Claude.ai Projects
-
-Add to your Project Knowledge:
-
-1. `MD-DDL-Complete.md` — the full specification
-2. `agents/agent-ontology/AGENT.md` — for modelling and source mapping
-3. `agents/agent-regulation/AGENT.md` — for compliance auditing
-
-No submodule needed, but re-upload when moving to a newer version of the standard.
-
-### Your project structure
+### 3) Keep your model files in your project
 
 ```text
 your-project/
-  .md-ddl/                      ← submodule — the standard (not yours to edit)
-  .github/
-    copilot-instructions.md     ← or CLAUDE.md
+  .md-ddl/                 ← dependency
+  .github/                 ← copied wrapper/instruction files
   domains/
     customer/
-      domain.md                 ← canonical model
-      entities/
-        customer.md
-        account.md
-    payments/
       domain.md
-  sources/
-    salesforce/
-      manifest.md               ← what Salesforce produces + change model
-      transforms/
-        customer.md             ← Salesforce → Customer field mappings
-    sap/
-      manifest.md
-      transforms/
-        customer.md             ← SAP's contribution to Customer
+      entities/
+  transforms/
+    salesforce-crm/
+      source.md
+      table_account.md
 ```
 
-The `.md-ddl/` directory is a read-only dependency. Your modelling work lives entirely outside it.
+---
+
+## 🌟 Why md-ddl
+
+- **AI + human collaboration:** one shared language for SMEs, architects, and agents.
+- **Standards-aligned:** practical patterns for BIAN, ISO 20022, and regulatory mapping.
+- **Governance in-model:** classification, PII, retention, lineage, and ownership live with definitions.
+- **Source-to-canonical clarity:** source files + table transforms make mapping explicit and auditable.
 
 ---
 
-## 🛠 How it Works
+## 🛠 Workflow
 
-### 1. Discover
-
-Agent Ontology interviews your subject matter experts and proposes candidate entities, relationships, and events — checking applicable industry standards and surfacing modelling trade-offs before writing a line of MD-DDL.
-
-### 2. Model
-
-Agent Ontology drafts domain summary tables first — a compact index of every concept in the domain. Detail files follow after human review, containing entity definitions, constraints, governance metadata, and diagrams.
-
-### 3. Map
-
-Source system SMEs author **Source Manifests** declaring what their system produces and how it generates change. **Transform Files** map source fields to canonical attributes — encoding source-specific logic (type casts, null handling, derivations, lookups, multi-source reconciliation) in the source layer where it belongs. The canonical model stays pure.
-
-### 4. Generate
-
-Point any LLM at your MD-DDL files and instruct it to generate artefacts — no custom tooling required:
-
-- **Knowledge Graph** — a queryable semantic web with end-to-end lineage from source field to canonical attribute
-- **Schemas** — 3rd Normal Form, dimensional models, columnar layouts, and messaging schemas
-- **ETL/ELT logic** — source-to-canonical pipelines derived directly from transform files
-- **Governance artefacts** — data quality rules, lineage maps, and regulatory reports
-
-### 5. Govern
-
-Agent Regulation audits your model against applicable regulatory frameworks, monitors for regulatory change, and produces gap reports with specific remediation steps — running continuously against the living model.
+1. **Discover** with Agent Ontology
+2. **Model** domains/entities/relationships/events
+3. **Map** sources in `transforms/<system>/source.md` + `table_<source-table>.md`
+4. **Generate** schemas, lineage, and pipeline artefacts
+5. **Govern** continuously with Agent Regulation
 
 ---
 
-## 📐 What MD‑DDL defines
+## 📐 Scope
 
-**Domain layer** — *what the business means*
-
-- **Domains** — the highest level of organisation and the unit of a data product. A canonical domain is a foundational data product.
-- **Entities** — the persistent nouns of your business (Customer, Account, Product)
-- **Relationships** — semantic connections between entities (Customer Holds Account)
-- **Events** — point-in-time business occurrences (Customer Onboarded, Transaction Executed)
-- **Enumerations** — controlled vocabularies (Country Code, Loyalty Tier)
-- **Attributes** — field definitions: data types, identifiers, PII flags
-- **Semantic Inheritance** — specialised concepts inherit logic and governance from parents
-- **Constraints** — formalised business rules that compile into data quality checks
-- **Temporal Tracking** — how each entity changes over time: immutable, append-only, slowly changing, or bitemporal
-- **Existence & Mutability** — entity-level declarations that drive compiler output for dimensional modelling
-
-**Source layer** — *where data comes from*
-
-- **Source Manifests** — declare what a source system produces, how it generates change, and which canonical entities it contributes to
-- **Transform Files** — map source fields to canonical attributes using a typed vocabulary: direct, derived, lookup, reconciliation, conditional, and aggregation. Source idiosyncrasies stay here, away from the canonical model.
-
-**Governance layer** — *how data is protected*
-
-- **Data Governance** — PII, classification, retention, residency, and breach notification embedded on the entities they govern
-- **Regulatory Scope** — every domain and entity declares which frameworks apply
-- **Ownership & Lineage** — data owners, stewards, and the full lineage graph from source field to canonical attribute
-
-Native diagramming via embedded Mermaid — domain overview graphs and entity class diagrams live directly alongside the definitions they represent, not in a separate tool.
+- **Domain layer:** domains, entities, enums, relationships, events, constraints
+- **Source layer:** source files and transformation rules (direct, derived, lookup, reconciliation, conditional, aggregation)
+- **Governance layer:** ownership, classification, PII, retention, regulatory scope, lineage
 
 ---
 
 ## 📁 Repository layout
 
 ```text
-md-ddl-specification/         The normative standard
-  1-Foundation.md             Core principles and document structure
-  MD-DDL-Complete.md          Single-file version for AI context loading
-  ...                         Individual section files (2–8)
+md-ddl-specification/         Normative standard
+  1-Foundation.md
+  ...                         Sections 2–8
+  MD-DDL-Complete.md
 
-agents/
-  agent-ontology/             Discovery, design, and source mapping agent
-  agent-regulation/           Regulatory compliance and audit agent
-
-examples/
-  Financial Crime/            Reference-quality domain with full entity detail files
-  Simple Customer/            Minimal example — single detail file, good starting point
+agents/                       Canonical agent prompts and skills
+examples/                     Reference examples
 ```
 
 ---

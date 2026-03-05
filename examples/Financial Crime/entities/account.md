@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Account{
-    Account Identifier : string
+    * Account Identifier : string
     Account Number : string
     Opened Date : date
     Closed Date : date

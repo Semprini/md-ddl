@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class PaymentInitiator{
-    Payment Initiator Identifier : string
+    * Payment Initiator Identifier : string
     Initiation Channel : string
   }
 

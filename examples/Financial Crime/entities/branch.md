@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Branch{
-    Branch Identifier : string
+    * Branch Identifier : string
     Branch Code : string
     Branch Name : string
   }

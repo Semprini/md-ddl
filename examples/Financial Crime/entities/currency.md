@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Currency{
-    Currency Code : string
+    * Currency Code : string
     Currency Name : string
     Minor Unit : integer
   }

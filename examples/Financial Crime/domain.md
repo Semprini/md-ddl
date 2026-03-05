@@ -36,11 +36,6 @@ tags:
   - Risk
   - Regulatory
   - Core
-source_systems:
-  - "Core Banking System"
-  - "Transaction Monitoring System"
-  - "CRM"
-  - "Payment Systems"
 ```
 
 ### Domain Overview Diagram
@@ -95,6 +90,14 @@ graph TD
   Address["<a href='entities/address.md'>Address</a>"]
   ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
 ```
+
+## Source Systems
+
+Business Application | Platform | Capability Domain
+--- | --- | ---
+[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
+[Salesforce CRM](transforms/salesforce-crm/source.md) | Salesforce | Customer Relationship Management
 
 ## Entities
 

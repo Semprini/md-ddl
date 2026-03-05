@@ -1,4 +1,4 @@
-# MD-DDL
+# MD‑DDL Specification (Draft 0.7)
 
 ## **Domains**
 
@@ -35,7 +35,7 @@ Category|Metadata Keys|Purpose
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
 Governance & Security|classification, confidentiality, pii|The default security posture for the entire domain.
 Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frameworks governing this data.
-Lifecycle|status (Draft/Live), version, source_systems|The maturity and origin of the data domain.
+Lifecycle|status (Draft/Live), version|The maturity of the data domain.
 Discovery|tags|Searchability
 
 #### **Metadata Format**
@@ -69,10 +69,30 @@ tags:
   - Core
   - MasterData
   - B2C
-source_systems:
-  - "Salesforce CRM"
-  - "SAP ERP"
 ```
+````
+
+### **Source Systems**
+
+Source systems are first-class domain summary objects and must be declared under a level‑2 heading immediately after `## Metadata`.
+
+Use a Markdown table with the following columns:
+
+Column | Purpose
+--- | ---
+**Business Application** | Source application or product name, expressed as a Markdown link to the source markdown file.
+**Platform** | Technology platform or deployment model.
+**Capability Domain** | Business capability or functional area served by the source.
+
+Example:
+
+````markdown
+## Source Systems
+
+Business Application | Platform | Capability Domain
+--- | --- | ---
+[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
 ````
 
 #### **Diagrams**
@@ -214,7 +234,7 @@ The classDiagram is not required to mirror the domain graph one-for-one. Modelle
 
 ### **Domain Structure**
 
-Below the metadata section, the Domain file organizes concepts into four primary sections using level‑2 headings: `## Entities`, `## Enums`, `## Relationships`, and `## Events`.
+Below the metadata section, the Domain file organizes concepts into five primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, and `## Events`.
 
 In the Domain file, these sections **must use Markdown tables** for high-level summaries. This ensures the domain file acts as a compact "Router" for the knowledge graph.
 
@@ -225,7 +245,21 @@ domain.md
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
+transforms/temenos-payment/source.md
+transforms/sap-fraud-management/source.md
 ```
+
+#### **Source Systems Table**
+
+Summarizes operational source applications relevant to the domain.
+
+Column | Purpose
+--- | ---
+**Application** | Markdown link to the source markdown file.
+**Platform** | Technology platform or deployment model.
+**Capability Domain** | Business capability or functional area served by the source.
+
+---
 
 #### **Entities Table**
 
@@ -300,6 +334,12 @@ Domain description...
 
 ## Metadata
 Formal JSON/YAML block and diagrams...
+
+## Source Systems
+
+Business Application | Platform | Capability Domain
+--- | --- | ---
+[Customer CRM](transforms/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
 
 ### Domain Overview Diagram
 

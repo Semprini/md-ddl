@@ -31,6 +31,8 @@ md-ddl-specification/         Normative spec — source of truth for all rules
   4-Enumerations.md           Enum structure and naming
   5-Relationships.md          Relationship semantics and YAML
   6-Events.md                 Event structure and temporal rules
+  7-Sources.md                Source system declarations and source-layer structure
+  8-Transformations.md        Transformation vocabulary and mapping types
   MD-DDL-Complete.md          Concatenated single-file version (generated)
 
 agents/
@@ -83,12 +85,16 @@ File | Owns
 `4-Enumerations.md` | Enum formats, naming, dictionary vs. simple list
 `5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax
 `6-Events.md` | Event structure, payload design, temporal priority, actor/entity
+`7-Sources.md` | Source file format, change models, domain feed tables, source-layer rules
+`8-Transformations.md` | Transformation types, YAML syntax, expression language, compiler behavior
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
 ### MD-DDL-Complete.md
 
-This is a generated file — a concatenation of sections 1–6 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a url link to the next file.
+Never edit the `MD-DDL-Complete.md` directly, as we will join this from the individual spec files when we are about to push to github.
+
+This is a generated file — a concatenation of sections 1–8 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a URL link to the next file (where present).
 
 ### Versioning
 
@@ -135,6 +141,8 @@ The `SKILL.md` body should stay under 500 lines. Heavy spec content belongs in `
 ### The spec reference stub pattern
 
 Reference files in `skills/*/references/` are stubs that point to the canonical spec file — they do not duplicate content. This means a spec update propagates automatically without touching agent files. When adding a new spec reference, create the stub and point it at the correct `md-ddl-specification/` file.
+
+Use file-relative paths in both Markdown links and `{{INCLUDE: ...}}` directives inside reference stubs. Do not use workspace-root paths (for example `md-ddl-specification/...`) because this repo is commonly consumed as a `.md-ddl` submodule and root-based paths break in consumer projects.
 
 ### Agent responsibilities and boundaries
 
@@ -201,7 +209,7 @@ Examples serve two purposes: they demonstrate correct spec application for human
 
 ### The current reference example
 
-`examples/Financial Crime/` is the highest-quality example in the repo. When in doubt about what correct MD-DDL looks like, this is the reference. The domain file uses v0.6 table format; the entity files use current classDiagram and YAML patterns.
+`examples/Financial Crime/` is the highest-quality example in the repo. When in doubt about what correct MD-DDL looks like, this is the reference. The domain file uses the current table format; the entity files use current classDiagram and YAML patterns.
 
 ### Adding or updating examples
 

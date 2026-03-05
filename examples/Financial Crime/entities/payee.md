@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Payee{
-    Payee Identifier : string
+    * Payee Identifier : string
     Beneficiary Reference : string
   }
 

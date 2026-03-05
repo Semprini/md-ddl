@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Transaction{
-    Transaction Identifier : string
+    * Transaction Identifier : string
     Transaction Date Time : datetime
     Amount : decimal
     Reference : string

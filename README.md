@@ -35,13 +35,10 @@ git submodule update --remote .md-ddl
 
 Copy these files from `.md-ddl` into your repository (same relative paths):
 
-- `.md-ddl/.github/copilot-instructions.md` → `.github/copilot-instructions.md`
 - `.md-ddl/.github/agents/agent-ontology.agent.md` → `.github/agents/agent-ontology.agent.md`
 - `.md-ddl/.github/agents/agent-regulation.agent.md` → `.github/agents/agent-regulation.agent.md`
 
 This keeps setup simple and lets you refresh from upstream when md-ddl updates.
-
-> Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 
 ### 3) Keep your model files in your project
 
@@ -99,6 +96,8 @@ md-ddl-specification/         Normative standard
 agents/                       Canonical agent prompts and skills
 examples/                     Reference examples
 ```
+
+> Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 
 ---
 

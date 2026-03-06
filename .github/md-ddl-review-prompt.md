@@ -121,7 +121,7 @@ product framing. It is read by people deciding whether to adopt md-ddl.
   current for VS Code Copilot, Claude Code, and Claude.ai Projects?
 - Does the Domains as Data Products section accurately reflect the current mapping
   between MD-DDL concepts and data product concepts?
-- Is the v0.7 forward signal (output port declarations, inter-domain contracts)
+- Is the v0.8.0 forward signal (output port declarations, inter-domain contracts)
   still the right framing, or has any spec work begun that should update it?
 - Are there any capability claims in the README that are not yet supported by
   the spec or agents (promises without implementation)?

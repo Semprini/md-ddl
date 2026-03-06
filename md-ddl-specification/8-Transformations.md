@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.7)
+# MD‑DDL Specification (Draft 0.8.0)
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -97,6 +97,8 @@ source:
   cast: string
 ```
 ````
+
+---
 
 `cast` is optional. Valid values match the MD-DDL type system:
 `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`.
@@ -209,6 +211,8 @@ fallback: null
 ```
 ````
 
+---
+
 `reference` must name a domain Enum or Entity defined in the same model. `match_on` and `return` must be valid attribute or value names within that reference. `fallback` declares what to do when no match is found: `null`, `reject` (fail the record), or a literal default value.
 
 ---
@@ -237,6 +241,8 @@ cases:
 fallback: null
 ```
 ````
+
+---
 
 Case keys must be valid values of the attribute's declared type. If `target` is an `enum:` type, case keys must be valid enum values. `fallback` behaves identically to the lookup type.
 
@@ -337,3 +343,7 @@ lookup:
 fallback: null
 ```
 ````
+
+---
+
+...next: [Data Products](9-Data-Products.md)

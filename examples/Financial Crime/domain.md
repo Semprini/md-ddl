@@ -173,4 +173,12 @@ Name | Actor | Entity | Description
 [Agreement Activated](events/agreement-activated.md#agreement-activated) | Party Role | Agreement | Emitted when an agreement becomes active and enforceable.
 [KYC Status Updated](events/kyc-status-updated.md#kyc-status-updated) | Compliance Officer | Party | Emitted when a Party's KYC status is updated.
 
+## Data Products
+
+Name | Class | Consumers | Status
+--- | --- | --- | ---
+[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Production
+[Transaction Risk Summary](products/analytics.md#transaction-risk-summary) | consumer-aligned | Financial Crime Analytics | Production
+[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Production
+
 ---

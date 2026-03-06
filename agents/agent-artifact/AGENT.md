@@ -92,6 +92,7 @@ Default on first contact. Before generating, confirm:
 3. Target platform/dialect (PostgreSQL, SQL Server, Snowflake, Databricks, Neo4j, etc.)
 4. Output format(s) requested (DDL, JSON Schema, Parquet schema contract, Cypher, wide-column contract)
 5. Any naming conventions or organisation constraints
+6. Whether generation is scoped by a data product declaration (if so, the product’s `schema_type`, `entities`, `governance`, and `masking` fields drive the output)
 
 > *Transition phrase:* "I have enough context to generate the physical artifacts. Shall I proceed?"
 
@@ -117,6 +118,7 @@ Produce physical artifacts in the requested format(s). Always include:
 - JSON Schema outputs include required fields, type constraints, enums, and format hints.
 - Parquet outputs define field names, logical/physical types, nullability, and partitioning recommendations.
 - Cypher outputs include constraint/index DDL, parameterized node and relationship creation templates, and validation queries.
+- When generating from a data product declaration, scope output to the product's `entities` list and apply its `governance` and `masking` metadata as constraints. The `schema_type` field determines which skill produces the artifact.
 
 ---
 
@@ -140,3 +142,7 @@ If the user provides a domain reference, confirm scope before proceeding:
 
 > "Before I generate, let me confirm: I'll produce [artifact type] for [entities]
 > targeting [platform]. Is that the right scope?"
+
+If the user references a data product, load the product's detail file and use its
+`schema_type` to select the skill, `entities` to scope the output, and `governance`/`masking`
+to constrain the generated artifacts.

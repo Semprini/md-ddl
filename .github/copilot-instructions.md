@@ -33,6 +33,7 @@ md-ddl-specification/         Normative spec — source of truth for all rules
   6-Events.md                 Event structure and temporal rules
   7-Sources.md                Source system declarations and source-layer structure
   8-Transformations.md        Transformation vocabulary and mapping types
+  9-Data-Products.md          Data product classes, declaration, and generation rules
   MD-DDL-Complete.md          Concatenated single-file version (generated)
 
 agents/
@@ -96,6 +97,7 @@ File | Owns
 `6-Events.md` | Event structure, payload design, temporal priority, actor/entity
 `7-Sources.md` | Source file format, change models, domain feed tables, source-layer rules
 `8-Transformations.md` | Transformation types, YAML syntax, expression language, generation behaviour
+`9-Data-Products.md` | Data product classes, declaration syntax, governance, masking, product-driven generation
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
@@ -103,7 +105,7 @@ When adding or changing a rule, edit the owning section only. Do not duplicate r
 
 Never edit the `MD-DDL-Complete.md` directly, as we will join this from the individual spec files when we are about to push to github.
 
-This is a generated file — a concatenation of sections 1–8 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a URL link to the next file (where present).
+This is a generated file — a concatenation of sections 1–9 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a URL link to the next file (where present).
 
 ### Versioning
 

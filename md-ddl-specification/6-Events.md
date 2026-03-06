@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.7)
+# MD‑DDL Specification (Draft 0.8.0)
 
 ## **Events**
 
@@ -131,3 +131,5 @@ attributes:
 ````
 
 ---
+
+...next: [Sources](7-Sources.md)

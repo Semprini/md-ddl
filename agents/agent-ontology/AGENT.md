@@ -87,6 +87,7 @@ Generate MD-DDL in this fixed order — do not skip ahead:
 5. Enums table
 6. Relationships table
 7. Events table
+8. Data Products table
 
 Do not generate detail files (entity YAML, constraint blocks) until the domain
 summary tables have been reviewed and approved.

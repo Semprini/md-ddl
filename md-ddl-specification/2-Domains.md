@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.7)
+# MD‑DDL Specification (Draft 0.8.0)
 
 ## **Domains**
 
@@ -234,7 +234,7 @@ The classDiagram is not required to mirror the domain graph one-for-one. Modelle
 
 ### **Domain Structure**
 
-Below the metadata section, the Domain file organizes concepts into five primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, and `## Events`.
+Below the metadata section, the Domain file organizes concepts into six primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, `## Events`, and `## Data Products`.
 
 In the Domain file, these sections **must use Markdown tables** for high-level summaries. This ensures the domain file acts as a compact "Router" for the knowledge graph.
 
@@ -245,6 +245,8 @@ domain.md
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
+products/analytics.md    ← Consumer-aligned data products
+products/canonical.md    ← Domain-aligned data products
 sources/temenos-payment/source.md
 sources/sap-fraud-management/source.md
 ```
@@ -308,6 +310,19 @@ Column | Purpose
 **Actor** | The primary entity or role that initiates the event.
 **Entity** | The primary entity affected by the event.
 **Description** | The business trigger for this event.
+
+---
+
+#### **Data Products Table**
+
+Summarizes the data products published by the domain.
+
+Column | Purpose
+--- | ---
+**Name** | The product name, linked to its detail definition.
+**Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
+**Consumers** | Primary consumers of this product.
+**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`.
 
 ---
 
@@ -376,6 +391,12 @@ Name | Description | Reference
 Name | Actor | Entity | Description
 --- | --- | --- | ---
 [Preference Updated](./details.md#preference-updated) | Customer | Customer Preference | Emitted when interaction settings are modified.
+
+## Data Products
+
+Name | Class | Consumers | Status
+--- | --- | --- | ---
+[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
 
 ````
 

@@ -1,8 +1,8 @@
-# Markdown Data Definition Language (md-ddl)
+﻿# Markdown Data Definition Language (md-ddl)
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.7.4** (Latest)
+> **Version 0.8.0** (Latest)
 
 **Model once. Reuse everywhere.**
 
@@ -64,6 +64,7 @@ your-project/
 - **Standards-aligned:** practical patterns for BIAN, ISO 20022, and regulatory mapping.
 - **Governance in-model:** classification, PII, retention, lineage, and ownership live with definitions.
 - **Source-to-canonical clarity:** source files + table transforms make mapping explicit and auditable.
+- **Data products built in:** declare what you publish, for whom, in what shape, under what governance — right next to the model.
 
 ---
 
@@ -72,8 +73,9 @@ your-project/
 1. **Discover** with Agent Ontology
 2. **Model** domains/entities/relationships/events
 3. **Map** sources in `sources/<system>/source.md` + `sources/<system>/transforms/table_<source-table>.md`
-4. **Generate** schemas, lineage, and pipeline artefacts
-5. **Govern** continuously with Agent Regulation
+4. **Publish** data products — source-aligned, domain-aligned, or consumer-aligned
+5. **Generate** schemas, lineage, and pipeline artefacts
+6. **Govern** continuously with Agent Regulation
 
 ---
 
@@ -81,6 +83,7 @@ your-project/
 
 - **Domain layer:** domains, entities, enums, relationships, events, constraints
 - **Source layer:** source files and transformation rules (direct, derived, lookup, reconciliation, conditional, aggregation)
+- **Data products:** three classes (source-aligned, domain-aligned, consumer-aligned) declare publication scope, shape, audience, SLA, and masking — driving automated artifact generation
 - **Governance layer:** ownership, classification, PII, retention, regulatory scope, lineage
 
 ---
@@ -90,7 +93,7 @@ your-project/
 ```text
 md-ddl-specification/         Normative standard
   1-Foundation.md
-  ...                         Sections 2–8
+  ...                         Sections 2–9
   MD-DDL-Complete.md
 
 agents/                       Canonical agent prompts and skills

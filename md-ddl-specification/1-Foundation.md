@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.7)
+# MD‑DDL Specification (Draft 0.8.0)
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -6,7 +6,7 @@
 
 ## **Overview**
 
-MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, and source mappings. It is designed to be readable by humans, generatable by AI, and transformable into:
+MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, source mappings, and data products. It is designed to be readable by humans, generatable by AI, and transformable into:
 
 - Data catalogs
 - Knowledge graphs
@@ -53,8 +53,9 @@ MD‑DDL is composed of several logical components:
 - [Events](./6-Events.md)
 - [Sources](./7-Sources.md)
 - [Transformations](./8-Transformations.md)
+- [Data Products](./9-Data-Products.md)
 
-MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, and Events:
+MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
 1. A **summary definition** in the domain file  
 2. A **detailed definition** in a separate file  
@@ -68,6 +69,7 @@ domains/customer/domain.md
 domains/customer/entities/customer.md
 domains/customer/entities/customer-preference.md
 domains/customer/relationships/customer-has-preferences.md
+domains/customer/products/analytics.md
 domains/customer/diagrams/overview.md
 ```
 
@@ -112,8 +114,10 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 #### Detail File Flexibility
 
 Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships.
-The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
+The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events, ## Data Products) containing the relevant definitions.
 
 Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
 
 ---
+
+...next: [Domains](2-Domains.md)

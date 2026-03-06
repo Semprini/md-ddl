@@ -31,6 +31,6 @@ tags:
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Transaction](../../entities/transaction.md#transaction) | [table_alert_case](table_alert_case.md) | Financial Crime Risk Score, Monitoring Outcome, Alert Reference | event-driven
-[Party](../../entities/party.md#party) | [table_sanctions_screening](table_sanctions_screening.md) | Sanctions Screen Status, Watchlist Match Indicator | batch-intraday
-[Customer](../../entities/customer.md#customer) | [table_customer_risk_profile](table_customer_risk_profile.md) | Risk Review Flag, Enhanced Due Diligence Trigger | event-driven
+[Transaction](../../entities/transaction.md#transaction) | [table_alert_case](transforms/table_alert_case.md) | Financial Crime Risk Score, Monitoring Outcome, Alert Reference | event-driven
+[Party](../../entities/party.md#party) | [table_sanctions_screening](transforms/table_sanctions_screening.md) | Sanctions Screen Status, Watchlist Match Indicator | batch-intraday
+[Customer](../../entities/customer.md#customer) | [table_customer_risk_profile](transforms/table_customer_risk_profile.md) | Risk Review Flag, Enhanced Due Diligence Trigger | event-driven

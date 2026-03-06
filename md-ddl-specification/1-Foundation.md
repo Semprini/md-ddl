@@ -6,15 +6,15 @@
 
 ## **Overview**
 
-MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, and source mappings. It is designed to be readable by humans, generatable by AI, and compilable into:
+MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, and source mappings. It is designed to be readable by humans, generatable by AI, and transformable into:
 
 - Data catalogs
 - Knowledge graphs
 - Data product definitions
-- Schemas and technical artifacts
+- Schemas and technical artifacts (DDL, JSON Schema, Parquet contracts)
 - ETL/ELT logic and source-to-domain lineage
 
-MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks for structured definitions and Mermaid or PlantUML for diagramming. Structural consistency is enforced by the compiler and supported by companion AI agents.
+MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks for structured definitions and Mermaid or PlantUML for diagramming. Structural consistency is enforced by AI agents that validate, generate, and maintain model artifacts.
 
 ---
 
@@ -23,7 +23,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 1. **Source of Truth**  
    Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
 
-   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `transforms/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
+   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `sources/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
 
 2. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
@@ -31,8 +31,8 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 3. **AI‑Friendly**  
    No redundant fields. No manually maintained lists. Minimal boilerplate.
 
-4. **Compiler‑Driven**  
-   The compiler infers domain membership, indexes entities, and validates relationships.
+4. **Agent‑Driven**  
+   AI agents infer domain membership, index entities, validate relationships, and generate physical artifacts from the model.
 
 5. **Graph‑Powered**  
    The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
@@ -74,11 +74,11 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-Financial Crime/transforms/salesforce-crm/source.md
-Financial Crime/transforms/salesforce-crm/customer.md
-Financial Crime/transforms/salesforce-crm/contact-address.md
-Financial Crime/transforms/sap-fraud-management/source.md
-Financial Crime/transforms/temenos-payment/source.md
+Financial Crime/sources/salesforce-crm/source.md
+Financial Crime/sources/salesforce-crm/transforms/table_account.md
+Financial Crime/sources/salesforce-crm/transforms/table_contact_point.md
+Financial Crime/sources/sap-fraud-management/source.md
+Financial Crime/sources/temenos-payment/source.md
 ```
 
 Domain files and source files are co-located at the domain level. Domain files define meaning. Source folders define operational origin and mapping logic for that specific domain context.
@@ -104,9 +104,9 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 - The domain file becomes a clean, navigable table of contents.  
 - Detail files remain focused, concise, and free from clutter.
 
-#### **Compiler Simplicity**
+#### **Structural Predictability**
 
-- The compiler knows exactly where to find summaries and details.  
+- AI agents know exactly where to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
 #### Detail File Flexibility

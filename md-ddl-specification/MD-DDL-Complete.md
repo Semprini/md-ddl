@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.7)
+﻿# MD-DDL Specification (Draft 0.7) - Complete
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -6,15 +6,15 @@
 
 ## **Overview**
 
-MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, and source mappings. It is designed to be readable by humans, generatable by AI, and compilable into:
+MD‑DDL is a **Markdown‑first**, **AI‑friendly** standard for defining domains, entities, attributes, enums, relationships, events, and source mappings. It is designed to be readable by humans, generatable by AI, and transformable into:
 
 - Data catalogs
 - Knowledge graphs
 - Data product definitions
-- Schemas and technical artifacts
+- Schemas and technical artifacts (DDL, JSON Schema, Parquet contracts)
 - ETL/ELT logic and source-to-domain lineage
 
-MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks for structured definitions and Mermaid or PlantUML for diagramming. Structural consistency is enforced by the compiler and supported by companion AI agents.
+MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks for structured definitions and Mermaid or PlantUML for diagramming. Structural consistency is enforced by AI agents that validate, generate, and maintain model artifacts.
 
 ---
 
@@ -23,7 +23,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 1. **Source of Truth**  
    Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
 
-   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `transforms/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
+   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `sources/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
 
 2. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
@@ -31,8 +31,8 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 3. **AI‑Friendly**  
    No redundant fields. No manually maintained lists. Minimal boilerplate.
 
-4. **Compiler‑Driven**  
-   The compiler infers domain membership, indexes entities, and validates relationships.
+4. **Agent‑Driven**  
+   AI agents infer domain membership, index entities, validate relationships, and generate physical artifacts from the model.
 
 5. **Graph‑Powered**  
    The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
@@ -74,11 +74,11 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-Financial Crime/transforms/salesforce-crm/source.md
-Financial Crime/transforms/salesforce-crm/customer.md
-Financial Crime/transforms/salesforce-crm/contact-address.md
-Financial Crime/transforms/sap-fraud-management/source.md
-Financial Crime/transforms/temenos-payment/source.md
+Financial Crime/sources/salesforce-crm/source.md
+Financial Crime/sources/salesforce-crm/transforms/table_account.md
+Financial Crime/sources/salesforce-crm/transforms/table_contact_point.md
+Financial Crime/sources/sap-fraud-management/source.md
+Financial Crime/sources/temenos-payment/source.md
 ```
 
 Domain files and source files are co-located at the domain level. Domain files define meaning. Source folders define operational origin and mapping logic for that specific domain context.
@@ -104,9 +104,9 @@ This mirrors Anthropic’s "skills" concept but improves on it by:
 - The domain file becomes a clean, navigable table of contents.  
 - Detail files remain focused, concise, and free from clutter.
 
-#### **Compiler Simplicity**
+#### **Structural Predictability**
 
-- The compiler knows exactly where to find summaries and details.  
+- AI agents know exactly where to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
 #### Detail File Flexibility
@@ -115,6 +115,8 @@ Detail files are not restricted to a single entity. Authors may organise detail 
 The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events) containing the relevant definitions.
 
 Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
+
+---
 
 ## **Domains**
 
@@ -207,8 +209,8 @@ Example:
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
+[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
 ````
 
 #### **Diagrams**
@@ -361,8 +363,8 @@ domain.md
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
-transforms/temenos-payment/source.md
-transforms/sap-fraud-management/source.md
+sources/temenos-payment/source.md
+sources/sap-fraud-management/source.md
 ```
 
 #### **Source Systems Table**
@@ -455,7 +457,7 @@ Formal JSON/YAML block and diagrams...
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Customer CRM](transforms/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
+[Customer CRM](sources/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
 
 ### Domain Overview Diagram
 
@@ -784,8 +786,8 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 
 This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
-Type|Description|Compiler Behavior
-----|-----------|------------------
+Type|Description|Generation Guidance
+----|-----------|-------------------
 `valid_time`|Business time - when is this true in the real world?|Adds effective/expiration date columns, supports point-in-time queries
 `transaction_time`|System time - when was this recorded?|Adds created/superseded timestamps, immutable records
 `bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
@@ -799,7 +801,7 @@ This optional section defines if this entity can exist independently.
 - dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
 - associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
 
-The compiler uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
+The generating agent uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
 
 ### Mutability
 
@@ -811,7 +813,7 @@ This optional section defines how the data changes over time.
 - frequently_changing — changes often, current value is what matters (account balance, inventory level)
 - reference — essentially static, managed by a small number of administrators (country codes, currency codes)
 
-The compiler sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+The generating agent sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
 
 ---
 
@@ -895,15 +897,15 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 **No Source References in Entity Files:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared under domain-local source folders (for example `transforms/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced structurally — source mappings are declared under domain-local source folders (for example `sources/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
 - Natural Language Priority: Entity and attribute names must use natural language (e.g., Email Address, not email_addr).
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
-- Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, the MD‑DDL compiler automatically handles the normalisation (e.g., conversion to snake_case) for physical system generation.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `transforms/<system>/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, physical artifact generation automatically handles the normalisation (e.g., conversion to snake_case) for target systems.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `sources/<system>/transforms/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ---
 
@@ -953,7 +955,7 @@ values:
 ### Naming Rules
 
 - Natural Language: Values should use business-friendly names (e.g., Part Time, not PT).
-- Normalization: The compiler will handle the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target physical system.
+- Normalization: Physical artifact generation handles the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target system.
 - Global Reference: Once defined in a Domain, an Enum can be referenced by any Entity or Event using the enum:Enum Name type syntax.
 
 ---
@@ -1023,19 +1025,19 @@ governance:
 
 Describes the resolution at which a relationship operates relative to the entities it connects.
 
-Type|Description|Compiler Behavior
-----|-----------|-----------------
-atomic|The relationship holds at the finest level of detail — one instance on each side participates individually.|The compiler treats this as a direct join at full grain.
-group|the related entity represents a collection or summary of instances on the other side (e.g. a monthly budget linked to individual daily transactions).|The compiler will generate aggregation logic to bridge the difference.
-period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|The compiler will emit snapshot or point-in-time join logic accordingly.
+Type|Description|Generation Guidance
+----|-----------|--------------------
+atomic|The relationship holds at the finest level of detail — one instance on each side participates individually.|Treated as a direct join at full grain.
+group|the related entity represents a collection or summary of instances on the other side (e.g. a monthly budget linked to individual daily transactions).|Generates aggregation logic to bridge the difference.
+period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|Emits snapshot or point-in-time join logic accordingly.
 
-If not specified, the compiler defaults to atomic.
+If not specified, the default is atomic.
 
 ### Relationship Rules
 
 - First-Class Identity: Every relationship is a distinct node in the graph. It can hold its own metadata, constraints, and versioning.
 - Directional Logic: The source is the origin of the relationship, and the target is the destination.
-- Inverse Inference: The compiler automatically generates the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
+- Inverse Inference: The generating agent automatically produces the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
 - Constraint Awareness: Constraints in a relationship can reference attributes from both the source and the target entities using the Entity.Attribute syntax.
 - Governance Inheritance: Relationships inherit governance/compliance metadata from the domain. Include `governance:` only when overriding inherited values.
 
@@ -1139,7 +1141,7 @@ governance:
    Events should not reference CDC, SQL operations, or ETL logic.
 
 5. **Events may appear in any file**  
-   As long as the file begins with the domain's level‑1 heading, the compiler will assemble them.
+   As long as the file begins with the domain's level‑1 heading, they will be discovered and assembled.
 
 6. **Events may be linked to entities and relationships**  
    Through `actor`, `entity`, and optional `relationships`.
@@ -1176,6 +1178,8 @@ attributes:
 ```
 ````
 
+---
+
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
 ---
@@ -1198,23 +1202,26 @@ This separation is deliberate and load-bearing:
 
 ### **Source Structure**
 
-Sources are self-contained within each domain. Each source system has a folder under `transforms/` containing a `source.md` router file and optional transform detail files.
+Sources are self-contained within each domain. Each source system has a folder under `sources/` containing a `source.md` router file and a `transforms/` subfolder for optional transform detail files.
 
 ```text
 Financial Crime/
   domain.md
   entities/
-  transforms/
+  sources/
     salesforce-crm/
       source.md             ← source metadata + domain feed table
-      table_account.md
-      table_contact_point.md
+      transforms/
+        table_account.md
+        table_contact_point.md
     sap-fraud-management/
       source.md
-      table_alert_case.md
+      transforms/
+        table_alert_case.md
     temenos-payment/
       source.md
-      table_account_ref.md
+      transforms/
+        table_account_ref.md
 ```
 
 The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
@@ -1229,18 +1236,20 @@ If multiple canonical entities map from the same source table, they should be gr
 
 #### File Organisation
 
-A source may split transform definitions across as many files as needed. The natural split is one transform file per canonical entity being populated. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored alongside `source.md` in the source folder and every transform file must begin with a level-1 heading linking back to `./source.md`.
+A source may split transform definitions across as many files as needed. The natural split is one transform file per source table. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored under the source folder's `transforms/` subfolder and every transform file must begin with a level-1 heading linking back to `../source.md`.
 
 ```text
 Financial Crime/
-  transforms/
+  sources/
     salesforce-crm/
       source.md
-      table_account.md         ← Account table mappings for Party/Company/Customer
-      table_contact_point.md
+      transforms/
+        table_account.md       ← Account table mappings for Party/Company/Customer
+        table_contact_point.md
     sap-fraud-management/
       source.md
-      table_alert_case.md
+      transforms/
+        table_alert_case.md
 ```
 
 ---
@@ -1297,9 +1306,9 @@ tags:
 ##### Change Models
 
 The `change_model` field declares how change flows out of the source system.
-The compiler uses this to determine the pipeline pattern to generate.
+This guides the pipeline pattern to generate.
 
-Value | Description | Compiler output
+Value | Description | Generated pipeline pattern
 --- | --- | ---
 `real-time-cdc` | Change Data Capture — row-level changes streamed in real time | Streaming pipeline
 `event-driven` | Source publishes business events (not raw CDC) | Event consumer
@@ -1310,7 +1319,7 @@ Value | Description | Compiler output
 
 ##### Change Events
 
-`change_events` lists the business-level change events this source emits. These are natural-language names that may correspond to Events declared in the canonical domain. The compiler can use these to generate event subscription logic and to link source changes to downstream domain Events.
+`change_events` lists the business-level change events this source emits. These are natural-language names that may correspond to Events declared in the canonical domain. They can be used to generate event subscription logic and to link source changes to downstream domain Events.
 
 ##### Data Quality Tier
 
@@ -1341,8 +1350,8 @@ Example domain feed section:
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
+[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
 ```
 
 **Domain feed table columns:**
@@ -1350,7 +1359,7 @@ Canonical Entity | Transform File | Attributes Contributed | Change Model
 Column | Purpose
 --- | ---
 **Canonical Entity** | Link to the entity in the target domain this source contributes to.
-**Transform File** | Link to a `table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
+**Transform File** | Link to a `transforms/table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
 **Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
 **Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
 
@@ -1385,10 +1394,10 @@ graph LR
 
 #### Transform Files Declaration
 
-Every transform file begins with a level-1 heading that names the source system and links back to `source.md` in the same folder:
+Every transform file begins with a level-1 heading that names the source system and links back to `../source.md`:
 
 ```markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 ```
 
 #### Structure
@@ -1442,7 +1451,7 @@ The `target` field uses `Entity · Attribute` notation to identify the canonical
 target: Customer · Email Address
 ```
 
-The entity name must match an entity declared in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
+The entity name must match an entity declared in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
 #### Transformation types
 
@@ -1461,7 +1470,7 @@ Transform files are the right place to encode source-specific data quality chara
 
 ##### Null representations
 
-Many source systems represent null as a non-null value (`"N/A"`, `"0"`, `"UNKNOWN"`). Declare this on the source block so the compiler generates appropriate null normalisation logic:
+Many source systems represent null as a non-null value (`"N/A"`, `"0"`, `"UNKNOWN"`). Declare this on the source block so that appropriate null normalisation logic is generated:
 
 ```yaml
 source:
@@ -1494,7 +1503,7 @@ source:
 source:
   field: Account.OpenDate
   format: "DD/MM/YYYY"        # source uses non-ISO date format
-  cast: date                  # compiler generates format-aware cast
+  cast: date                  # generates format-aware cast
 ```
 
 These annotations belong in the transform file, not in the canonical entity definition. The canonical model defines what the attribute means; the transform file handles the operational reality of getting clean data there.
@@ -1552,15 +1561,15 @@ graph LR
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
-[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
+[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](transforms/table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
 ````
 
-#### Transform file — `transforms/salesforce-crm/table_contact.md`
+#### Transform file — `sources/salesforce-crm/transforms/table_contact.md`
 
 ````markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 
 ## Customer
 
@@ -1618,7 +1627,7 @@ fallback: null
 ```
 
 ### Map Date of Birth
-Salesforce uses DD/MM/YYYY format for dates. The compiler generates a format-aware cast to the canonical date type.
+Salesforce uses DD/MM/YYYY format for dates. Generation produces a format-aware cast to the canonical date type.
 
 ```yaml
 type: direct
@@ -1642,7 +1651,9 @@ source:
 
 4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
-5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, the compiler raises an error. If a transformation exists in the source folder but the entity is not listed in the feed table, the compiler raises a warning.
+5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, this is a validation error. If a transformation exists in the source folder but the entity is not listed in the feed table, this is a warning.
+
+6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -1652,9 +1663,9 @@ source:
 
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
 
-Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and compilable.
+Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and actionable by AI agents.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `transforms/<system>/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `sources/<system>/transforms/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -1663,7 +1674,7 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 ### **What Transformations are not**
 
 - **Not constraints.** A constraint defines what valid data looks like once it arrives in the domain. A transformation defines how data gets there. Keep them separate.
-- **Not orchestration.** When a transformation runs, in what order, triggered by which event — that is a pipeline concern. MD-DDL declares the logic; the compiler generates the pipeline artefact.
+- **Not orchestration.** When a transformation runs, in what order, triggered by which event — that is a pipeline concern. MD-DDL declares the logic; the generating agent produces the pipeline artefact.
 - **Not documentation of existing pipelines.** Transformations define the *intended* mapping as the source of truth. Existing pipelines should be aligned to the model, not the other way around.
 
 ---
@@ -1709,9 +1720,9 @@ target: Entity · Attribute
 
 `type` and `target` are always required. Everything else depends on the type.
 
-`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
+`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `transforms/<system>/`. Only the field path within the source system is declared:
+Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `sources/<system>/transforms/`. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -1782,7 +1793,7 @@ String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)` | `
 Date functions | `today()`, `date_diff(a, b, unit)`, `date_add(d, n, unit)` | `"date_diff(End Date, Start Date, 'days')"`
 Null handling | `coalesce(a, b)` | `"coalesce(Preferred Name, First Name)"`
 
-The compiler is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
+The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
 
 ---
 
@@ -1919,9 +1930,9 @@ grain:
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and compiler output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and generated output.
 
-2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. The compiler validates both the entity name and the attribute name.
+2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. Both the entity name and the attribute name are validated during generation.
 
 3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
@@ -1935,9 +1946,9 @@ grain:
 
 ---
 
-### **Compiler Behaviour**
+### **Generation Behaviour**
 
-The compiler uses transformation definitions to generate:
+AI agents use transformation definitions to generate:
 
 - **ETL / ELT logic** — SQL `SELECT` statements, dbt models, or Spark transformations depending on the target platform
 - **Lineage graph edges** — source field → transformation → domain attribute nodes in the Knowledge Graph
@@ -1951,7 +1962,7 @@ The compiler uses transformation definitions to generate:
 See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
 
 ````markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 
 ## Customer
 
@@ -1979,3 +1990,6 @@ lookup:
   match_on: Abbreviation
   return: ISO Code
 fallback: null
+```
+````
+

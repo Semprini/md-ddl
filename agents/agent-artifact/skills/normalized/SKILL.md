@@ -1,5 +1,5 @@
 ---
-name: physical-3nf-modelling
+name: normalized
 description: Use this skill when the user asks for a normalized operational model, practical/pragmatic 3NF, OLTP schema design, or non-dimensional physical outputs. Also use when producing database DDL, JSON Schema, or Parquet-oriented schema contracts from MD-DDL.
 ---
 
@@ -15,10 +15,10 @@ This is **pragmatic/practical 3NF**:
 
 ## Load First
 
-- `../entity-modelling/SKILL.md`
-- `../entity-modelling/conceptual-to-physical-realisation.md`
-- `../relationship-events/SKILL.md`
-- `../standards-alignment/SKILL.md` (mandatory in recognized industry domains)
+- `../../agent-ontology/skills/entity-modelling/SKILL.md`
+- `../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
+- `../../agent-ontology/skills/relationship-events/SKILL.md`
+- `../../agent-ontology/skills/standards-alignment/SKILL.md` (mandatory in recognized industry domains)
 
 ---
 

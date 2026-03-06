@@ -1,5 +1,5 @@
 ---
-name: physical-dimensional-modelling
+name: dimensional
 description: Use this skill when the user asks for a physical dimensional model, star schema, fact/dimension design, bridge strategy. Also use when deciding how `existence`, `mutability`, and temporal tracking should influence physical realization.
 ---
 
@@ -7,14 +7,14 @@ description: Use this skill when the user asks for a physical dimensional model,
 
 Covers how to translate MD-DDL conceptual/logical definitions into dimensional physical design choices (dimension, fact, bridge), including SQL-shape guidance and decision quality checks.
 
-For normalized operational physical designs, use `../physical-3nf-modelling/SKILL.md`.
+For normalized operational physical designs, use `../normalized/SKILL.md`.
 
 ## Load First
 
-- `../entity-modelling/conceptual-to-physical-realisation.md`
-- `../entity-modelling/SKILL.md`
-- `../relationship-events/SKILL.md`
-- `../standards-alignment/SKILL.md` (mandatory for industry-standard domains)
+- `../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
+- `../../agent-ontology/skills/entity-modelling/SKILL.md`
+- `../../agent-ontology/skills/relationship-events/SKILL.md`
+- `../../agent-ontology/skills/standards-alignment/SKILL.md` (mandatory for industry-standard domains)
 
 Use this skill only after domain-level conceptual structure is stable enough to map.
 

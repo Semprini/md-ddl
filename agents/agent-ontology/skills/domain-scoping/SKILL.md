@@ -101,7 +101,7 @@ business contexts, or teams need autonomous ownership.
 
 **Implications:**
 - The same real-world thing may appear as different entities in different domains
-- The compiler maps them at integration time; each domain owns its version
+- They are mapped at integration time; each domain owns its version
 - Lower governance overhead; higher integration complexity
 - Tag: `BoundedContext`
 

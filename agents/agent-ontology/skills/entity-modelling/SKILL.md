@@ -19,10 +19,8 @@ Covers concept realisation decisions, inheritance hierarchies, entity YAML struc
   (use when concept boundaries are ambiguous or multiple structures are plausible)
 - Inheritance pattern deep guidance: `inheritance-patterns.md`
   (use when evaluating subtype hierarchies, abstract parents, and discriminator alternatives)
-- Physical realization guidance: `../physical-dimensional-modelling/SKILL.md`
-  (load when user asks for dimensional/star-schema design or SQL DDL outputs)
-- Practical normalized guidance: `../physical-3nf-modelling/SKILL.md`
-  (load when user asks for pragmatic/practical 3NF outputs, operational schemas, or non-dimensional physical artifacts)
+- Physical realization guidance: defer to **Agent Artifact**
+  (when user asks for dimensional/star-schema design, SQL DDL, 3NF outputs, or non-dimensional physical artifacts)
 - Cross-skill standards guidance: `../standards-alignment/SKILL.md`
   (load before locking entity structure in industry-standard domains)
 
@@ -110,11 +108,11 @@ Before finalizing these in an industry-standard domain, confirm Standards Alignm
 has been loaded so the decision reflects standard semantics (for example, BIAN role
 abstractions, ISO payment concepts, or FHIR resource boundaries).
 
-These should be defined for every entity. They directly drive compiler output — do not omit them or leave them as defaults without a conscious decision that the user will never want to generate schemas.
+These should be defined for every entity. They directly drive physical artifact generation — do not omit them or leave them as defaults without a conscious decision that the user will never want to generate schemas.
 
 **Existence** (what is this entity's independence?)
 
-Value | Use when | Compiler hint
+Value | Use when | Generation hint
 --- | --- | ---
 `independent` | Meaningful on its own | Candidate dimension
 `dependent` | Only meaningful in context of other entities | Candidate fact
@@ -122,7 +120,7 @@ Value | Use when | Compiler hint
 
 **Mutability** (how does this entity's data change?)
 
-Value | Use when | Compiler hint
+Value | Use when | Generation hint
 --- | --- | ---
 `immutable` | Once written, never changes | Ledger / event store
 `append_only` | New rows added; existing rows never updated | Log / transaction

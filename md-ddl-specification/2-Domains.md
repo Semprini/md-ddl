@@ -91,8 +91,8 @@ Example:
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
+[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
 ````
 
 #### **Diagrams**
@@ -245,8 +245,8 @@ domain.md
 entities/party.md        ← Party entity + Party Has Role + Party Has Contact Address
 entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
-transforms/temenos-payment/source.md
-transforms/sap-fraud-management/source.md
+sources/temenos-payment/source.md
+sources/sap-fraud-management/source.md
 ```
 
 #### **Source Systems Table**
@@ -339,7 +339,7 @@ Formal JSON/YAML block and diagrams...
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Customer CRM](transforms/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
+[Customer CRM](sources/salesforce-crm/source.md) | Salesforce SaaS | Customer Relationship Management
 
 ### Domain Overview Diagram
 

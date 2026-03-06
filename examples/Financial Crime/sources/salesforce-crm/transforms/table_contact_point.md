@@ -1,4 +1,4 @@
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 
 ## ContactPoint
 

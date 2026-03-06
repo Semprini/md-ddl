@@ -61,17 +61,17 @@ cascade → `owns`.
 
 ### Granularity Decision
 
-Granularity is easy to miss but critical for compiler output. Ask explicitly.
+Granularity is easy to miss but critical for physical artifact generation. Ask explicitly.
 
 In industry-standard domains, confirm Standards Alignment has been loaded before
 locking granularity, because standard definitions may constrain whether the
 relationship is atomic, grouped, or period-based.
 
-| Value | When to use | Compiler output |
-|---|---|---|
-| `atomic` | One instance on each side participates directly | Direct join at full grain |
-| `group` | One side represents a collection or summary of the other | Aggregation logic |
-| `period` | Captures state as it stood at a point in time | Point-in-time join / snapshot |
+Value | When to use | Generated output
+--- | --- | ---
+`atomic` | One instance on each side participates directly | Direct join at full grain
+`group` | One side represents a collection or summary of the other | Aggregation logic
+`period` | Captures state as it stood at a point in time | Point-in-time join / snapshot
 
 Default is `atomic` if not specified — but confirm this with the user rather than
 silently defaulting when the domain has temporal or aggregation patterns.

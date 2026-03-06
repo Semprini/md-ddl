@@ -1,4 +1,4 @@
-# [SAP Fraud Management](./source.md)
+# [SAP Fraud Management](../source.md)
 
 ## AlertCase
 

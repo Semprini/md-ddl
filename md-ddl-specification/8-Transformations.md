@@ -8,9 +8,9 @@
 
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
 
-Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and compilable.
+Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and actionable by AI agents.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `transforms/<system>/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `sources/<system>/transforms/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -19,7 +19,7 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 ### **What Transformations are not**
 
 - **Not constraints.** A constraint defines what valid data looks like once it arrives in the domain. A transformation defines how data gets there. Keep them separate.
-- **Not orchestration.** When a transformation runs, in what order, triggered by which event — that is a pipeline concern. MD-DDL declares the logic; the compiler generates the pipeline artefact.
+- **Not orchestration.** When a transformation runs, in what order, triggered by which event — that is a pipeline concern. MD-DDL declares the logic; the generating agent produces the pipeline artefact.
 - **Not documentation of existing pipelines.** Transformations define the *intended* mapping as the source of truth. Existing pipelines should be aligned to the model, not the other way around.
 
 ---
@@ -65,9 +65,9 @@ target: Entity · Attribute
 
 `type` and `target` are always required. Everything else depends on the type.
 
-`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
+`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `transforms/<system>/`. Only the field path within the source system is declared:
+Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `sources/<system>/transforms/`. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -138,7 +138,7 @@ String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)` | `
 Date functions | `today()`, `date_diff(a, b, unit)`, `date_add(d, n, unit)` | `"date_diff(End Date, Start Date, 'days')"`
 Null handling | `coalesce(a, b)` | `"coalesce(Preferred Name, First Name)"`
 
-The compiler is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
+The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
 
 ---
 
@@ -275,9 +275,9 @@ grain:
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and compiler output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and generated output.
 
-2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. The compiler validates both the entity name and the attribute name.
+2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. Both the entity name and the attribute name are validated during generation.
 
 3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
@@ -291,9 +291,9 @@ grain:
 
 ---
 
-### **Compiler Behaviour**
+### **Generation Behaviour**
 
-The compiler uses transformation definitions to generate:
+AI agents use transformation definitions to generate:
 
 - **ETL / ELT logic** — SQL `SELECT` statements, dbt models, or Spark transformations depending on the target platform
 - **Lineage graph edges** — source field → transformation → domain attribute nodes in the Knowledge Graph
@@ -307,7 +307,7 @@ The compiler uses transformation definitions to generate:
 See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
 
 ````markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 
 ## Customer
 

@@ -22,23 +22,26 @@ This separation is deliberate and load-bearing:
 
 ### **Source Structure**
 
-Sources are self-contained within each domain. Each source system has a folder under `transforms/` containing a `source.md` router file and optional transform detail files.
+Sources are self-contained within each domain. Each source system has a folder under `sources/` containing a `source.md` router file and a `transforms/` subfolder for optional transform detail files.
 
 ```text
 Financial Crime/
   domain.md
   entities/
-  transforms/
+  sources/
     salesforce-crm/
       source.md             ← source metadata + domain feed table
-      table_account.md
-      table_contact_point.md
+      transforms/
+        table_account.md
+        table_contact_point.md
     sap-fraud-management/
       source.md
-      table_alert_case.md
+      transforms/
+        table_alert_case.md
     temenos-payment/
       source.md
-      table_account_ref.md
+      transforms/
+        table_account_ref.md
 ```
 
 The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
@@ -53,18 +56,20 @@ If multiple canonical entities map from the same source table, they should be gr
 
 #### File Organisation
 
-A source may split transform definitions across as many files as needed. The natural split is one transform file per canonical entity being populated. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored alongside `source.md` in the source folder and every transform file must begin with a level-1 heading linking back to `./source.md`.
+A source may split transform definitions across as many files as needed. The natural split is one transform file per source table. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored under the source folder's `transforms/` subfolder and every transform file must begin with a level-1 heading linking back to `../source.md`.
 
 ```text
 Financial Crime/
-  transforms/
+  sources/
     salesforce-crm/
       source.md
-      table_account.md         ← Account table mappings for Party/Company/Customer
-      table_contact_point.md
+      transforms/
+        table_account.md       ← Account table mappings for Party/Company/Customer
+        table_contact_point.md
     sap-fraud-management/
       source.md
-      table_alert_case.md
+      transforms/
+        table_alert_case.md
 ```
 
 ---
@@ -121,9 +126,9 @@ tags:
 ##### Change Models
 
 The `change_model` field declares how change flows out of the source system.
-The compiler uses this to determine the pipeline pattern to generate.
+This guides the pipeline pattern to generate.
 
-Value | Description | Compiler output
+Value | Description | Generated pipeline pattern
 --- | --- | ---
 `real-time-cdc` | Change Data Capture — row-level changes streamed in real time | Streaming pipeline
 `event-driven` | Source publishes business events (not raw CDC) | Event consumer
@@ -134,7 +139,7 @@ Value | Description | Compiler output
 
 ##### Change Events
 
-`change_events` lists the business-level change events this source emits. These are natural-language names that may correspond to Events declared in the canonical domain. The compiler can use these to generate event subscription logic and to link source changes to downstream domain Events.
+`change_events` lists the business-level change events this source emits. These are natural-language names that may correspond to Events declared in the canonical domain. They can be used to generate event subscription logic and to link source changes to downstream domain Events.
 
 ##### Data Quality Tier
 
@@ -165,8 +170,8 @@ Example domain feed section:
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
+[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
 ```
 
 **Domain feed table columns:**
@@ -174,7 +179,7 @@ Canonical Entity | Transform File | Attributes Contributed | Change Model
 Column | Purpose
 --- | ---
 **Canonical Entity** | Link to the entity in the target domain this source contributes to.
-**Transform File** | Link to a `table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
+**Transform File** | Link to a `transforms/table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
 **Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
 **Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
 
@@ -209,10 +214,10 @@ graph LR
 
 #### Transform Files Declaration
 
-Every transform file begins with a level-1 heading that names the source system and links back to `source.md` in the same folder:
+Every transform file begins with a level-1 heading that names the source system and links back to `../source.md`:
 
 ```markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 ```
 
 #### Structure
@@ -266,7 +271,7 @@ The `target` field uses `Entity · Attribute` notation to identify the canonical
 target: Customer · Email Address
 ```
 
-The entity name must match an entity declared in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. The compiler validates both.
+The entity name must match an entity declared in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
 #### Transformation types
 
@@ -285,7 +290,7 @@ Transform files are the right place to encode source-specific data quality chara
 
 ##### Null representations
 
-Many source systems represent null as a non-null value (`"N/A"`, `"0"`, `"UNKNOWN"`). Declare this on the source block so the compiler generates appropriate null normalisation logic:
+Many source systems represent null as a non-null value (`"N/A"`, `"0"`, `"UNKNOWN"`). Declare this on the source block so that appropriate null normalisation logic is generated:
 
 ```yaml
 source:
@@ -318,7 +323,7 @@ source:
 source:
   field: Account.OpenDate
   format: "DD/MM/YYYY"        # source uses non-ISO date format
-  cast: date                  # compiler generates format-aware cast
+  cast: date                  # generates format-aware cast
 ```
 
 These annotations belong in the transform file, not in the canonical entity definition. The canonical model defines what the attribute means; the transform file handles the operational reality of getting clean data there.
@@ -376,15 +381,15 @@ graph LR
 
 Canonical Entity | Transform File | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
-[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
+[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
+[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](transforms/table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
 ````
 
-#### Transform file — `transforms/salesforce-crm/table_contact.md`
+#### Transform file — `sources/salesforce-crm/transforms/table_contact.md`
 
 ````markdown
-# [Salesforce CRM](./source.md)
+# [Salesforce CRM](../source.md)
 
 ## Customer
 
@@ -442,7 +447,7 @@ fallback: null
 ```
 
 ### Map Date of Birth
-Salesforce uses DD/MM/YYYY format for dates. The compiler generates a format-aware cast to the canonical date type.
+Salesforce uses DD/MM/YYYY format for dates. Generation produces a format-aware cast to the canonical date type.
 
 ```yaml
 type: direct
@@ -466,6 +471,6 @@ source:
 
 4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
-5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, the compiler raises an error. If a transformation exists in the source folder but the entity is not listed in the feed table, the compiler raises a warning.
+5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, this is a validation error. If a transformation exists in the source folder but the entity is not listed in the feed table, this is a warning.
 
-6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, the compiler can generate event subscription logic. This linkage is by name — no explicit reference key is required.
+6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.

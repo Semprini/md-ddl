@@ -2,11 +2,11 @@
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.7.3** (Latest)
+> **Version 0.7.4** (Latest)
 
 **Model once. Reuse everywhere.**
 
-MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — in one format for humans, AI agents, and compilers.
+MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — in one format for humans and AI agents.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
@@ -71,7 +71,7 @@ your-project/
 
 1. **Discover** with Agent Ontology
 2. **Model** domains/entities/relationships/events
-3. **Map** sources in `transforms/<system>/source.md` + `table_<source-table>.md`
+3. **Map** sources in `sources/<system>/source.md` + `sources/<system>/transforms/table_<source-table>.md`
 4. **Generate** schemas, lineage, and pipeline artefacts
 5. **Govern** continuously with Agent Regulation
 

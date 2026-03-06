@@ -95,9 +95,9 @@ graph TD
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](transforms/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](transforms/sap-fraud-management/source.md) | SAP | Fraud
-[Salesforce CRM](transforms/salesforce-crm/source.md) | Salesforce | Customer Relationship Management
+[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
+[Salesforce CRM](sources/salesforce-crm/source.md) | Salesforce | Customer Relationship Management
 
 ## Entities
 

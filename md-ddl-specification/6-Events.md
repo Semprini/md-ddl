@@ -93,7 +93,7 @@ governance:
    Events should not reference CDC, SQL operations, or ETL logic.
 
 5. **Events may appear in any file**  
-   As long as the file begins with the domain's level‑1 heading, the compiler will assemble them.
+   As long as the file begins with the domain's level‑1 heading, they will be discovered and assembled.
 
 6. **Events may be linked to entities and relationships**  
    Through `actor`, `entity`, and optional `relationships`.

@@ -1,4 +1,4 @@
-# [Temenos Payment](./source.md)
+# [Temenos Payment](../source.md)
 
 ## AccountRef
 

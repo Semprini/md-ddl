@@ -15,7 +15,7 @@ Contributors here are working on one of four things:
 1. **The specification** — the normative rules of the MD-DDL language
 2. **Agent prompts and skills** — the AI guidance layer built on top of the spec
 3. **Examples** — reference domain and entity files that demonstrate the spec
-4. **Tooling** — any compiler, validator, or utility that processes MD-DDL files
+4. **Tooling** — any validator or utility that processes MD-DDL files
 
 Understanding which of these you are working on determines everything about how to proceed.
 
@@ -44,6 +44,14 @@ agents/
       relationship-events/    Relationships + Events spec
       standards-alignment/    Industry standards mapping (self-contained)
 
+  agent-artifact/             Physical artifact generation agent
+    AGENT.md                  Core prompt — identity, modes, skill index
+    skills/
+      dimensional/                     Star schema, fact/dimension/bridge mapping
+      normalized/                      Normalized operational schema, DDL/JSON Schema/Parquet
+      wide-column/                     Denormalized wide-column reporting schemas
+      knowledge-graph/                 Knowledge graph schema, Neo4j Cypher DDL
+
   agent-regulation/           Regulatory compliance and audit agent
     AGENT.md                  Core prompt — identity, modes (Audit/Monitor/Remediate), skill index
     skills/
@@ -54,6 +62,7 @@ agents/
 .github/
   agents/                     Copilot custom-agent entrypoints (wrappers)
     agent-ontology.agent.md   Frontmatter + include of canonical `agents/agent-ontology/AGENT.md`
+    agent-artifact.agent.md   Frontmatter + include of canonical `agents/agent-artifact/AGENT.md`
     agent-regulation.agent.md Frontmatter + include of canonical `agents/agent-regulation/AGENT.md`
   copilot-instructions.md     Repo-wide contributor and modelling guidance
 
@@ -86,7 +95,7 @@ File | Owns
 `5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax
 `6-Events.md` | Event structure, payload design, temporal priority, actor/entity
 `7-Sources.md` | Source file format, change models, domain feed tables, source-layer rules
-`8-Transformations.md` | Transformation types, YAML syntax, expression language, compiler behavior
+`8-Transformations.md` | Transformation types, YAML syntax, expression language, generation behaviour
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
@@ -151,9 +160,12 @@ Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent 
 Agent | Lifecycle stage | Owns
 --- | --- | ---
 `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring
+`agent-artifact` | Physical artifact generation | Dimensional star schemas, normalized 3NF designs, wide-column reporting schemas, knowledge graph schemas, SQL DDL, JSON Schema, Cypher, Parquet schema contracts
 `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation
 
-**Boundary rule:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
+**Boundary rule — Ontology vs Artifact:** Agent Ontology produces conceptual and logical MD-DDL models. Agent Artifact consumes those models and generates physical artifacts (DDL, JSON Schema, Parquet). If Agent Artifact identifies a conceptual gap (missing entity, attribute, or relationship), it flags the gap and defers the structural change to Agent Ontology. Do not add physical generation capability to Agent Ontology or domain modelling capability to Agent Artifact.
+
+**Boundary rule — Ontology vs Regulation:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
 (ongoing assurance). If a compliance gap requires a structural model change — a new entity, attribute, or relationship — Agent Regulation flags it and
 defers the structural work to Agent Ontology. Do not add structural modelling capability to Agent Regulation.
 
@@ -232,4 +244,4 @@ When upgrading an example, update all patterns in the file in a single pass — 
 - **One source of truth per rule.** If a rule appears in multiple places, that's technical debt. Flag it.
 - **No invented content.** Do not fabricate standards references, regulatory requirements, or example data that is not verifiable.
 - **Validate Markdown structure** on any changed file: table/link integrity, Mermaid syntax, heading hierarchy, and YAML block correctness.
-- **No runtime assumptions.** There is no build system. Validation is structural and manual (or via a linter if one is added). Do not add code that assumes a compilation or test pipeline exists unless one has been defined.
+- **No runtime assumptions.** There is no build system. Validation is structural and manual (or via a linter if one is added). Do not add code that assumes a build or test pipeline exists unless one has been defined.

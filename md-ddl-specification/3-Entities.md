@@ -287,8 +287,8 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 
 This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
-Type|Description|Compiler Behavior
-----|-----------|------------------
+Type|Description|Generation Guidance
+----|-----------|-------------------
 `valid_time`|Business time - when is this true in the real world?|Adds effective/expiration date columns, supports point-in-time queries
 `transaction_time`|System time - when was this recorded?|Adds created/superseded timestamps, immutable records
 `bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
@@ -302,7 +302,7 @@ This optional section defines if this entity can exist independently.
 - dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
 - associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
 
-The compiler uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
+The generating agent uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
 
 ### Mutability
 
@@ -314,7 +314,7 @@ This optional section defines how the data changes over time.
 - frequently_changing — changes often, current value is what matters (account balance, inventory level)
 - reference — essentially static, managed by a small number of administrators (country codes, currency codes)
 
-The compiler sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+The generating agent sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
 
 ---
 
@@ -398,15 +398,15 @@ Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead
 
 **No Source References in Entity Files:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced by the compiler. Source mappings are declared under domain-local source folders (for example `transforms/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced structurally — source mappings are declared under domain-local source folders (for example `sources/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
 - Natural Language Priority: Entity and attribute names must use natural language (e.g., Email Address, not email_addr).
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
-- Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, the MD‑DDL compiler automatically handles the normalisation (e.g., conversion to snake_case) for physical system generation.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `transforms/<system>/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, physical artifact generation automatically handles the normalisation (e.g., conversion to snake_case) for target systems.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `sources/<system>/transforms/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ---
 

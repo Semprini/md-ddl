@@ -46,7 +46,7 @@ mutability: slowly_changing
 temporal:
   tracking: valid_time
   description: >
-    Valid time is carried explicitly as Valid From and Valid To attributes rather than relying on the compiler's temporal columns. This allows future-dated address changes (e.g. recording a new address before a customer moves) and supports point-in-time queries for regulatory audit.
+    Valid time is carried explicitly as Valid From and Valid To attributes rather than relying on generated temporal columns. This allows future-dated address changes (e.g. recording a new address before a customer moves) and supports point-in-time queries for regulatory audit.
 attributes:
   Contact Address Identifier:
     type: string

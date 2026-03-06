@@ -46,7 +46,7 @@ values:
 ### Naming Rules
 
 - Natural Language: Values should use business-friendly names (e.g., Part Time, not PT).
-- Normalization: The compiler will handle the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target physical system.
+- Normalization: Physical artifact generation handles the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target system.
 - Global Reference: Once defined in a Domain, an Enum can be referenced by any Entity or Event using the enum:Enum Name type syntax.
 
 ---

@@ -65,19 +65,19 @@ governance:
 
 Describes the resolution at which a relationship operates relative to the entities it connects.
 
-Type|Description|Compiler Behavior
-----|-----------|-----------------
-atomic|The relationship holds at the finest level of detail — one instance on each side participates individually.|The compiler treats this as a direct join at full grain.
-group|the related entity represents a collection or summary of instances on the other side (e.g. a monthly budget linked to individual daily transactions).|The compiler will generate aggregation logic to bridge the difference.
-period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|The compiler will emit snapshot or point-in-time join logic accordingly.
+Type|Description|Generation Guidance
+----|-----------|--------------------
+atomic|The relationship holds at the finest level of detail — one instance on each side participates individually.|Treated as a direct join at full grain.
+group|the related entity represents a collection or summary of instances on the other side (e.g. a monthly budget linked to individual daily transactions).|Generates aggregation logic to bridge the difference.
+period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|Emits snapshot or point-in-time join logic accordingly.
 
-If not specified, the compiler defaults to atomic.
+If not specified, the default is atomic.
 
 ### Relationship Rules
 
 - First-Class Identity: Every relationship is a distinct node in the graph. It can hold its own metadata, constraints, and versioning.
 - Directional Logic: The source is the origin of the relationship, and the target is the destination.
-- Inverse Inference: The compiler automatically generates the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
+- Inverse Inference: The generating agent automatically produces the inverse (e.g., if "Customer Has Preferences," it infers "Preferences Belong To Customer").
 - Constraint Awareness: Constraints in a relationship can reference attributes from both the source and the target entities using the Entity.Attribute syntax.
 - Governance Inheritance: Relationships inherit governance/compliance metadata from the domain. Include `governance:` only when overriding inherited values.
 

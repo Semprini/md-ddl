@@ -53,7 +53,7 @@ If the standard's definition differs from the user's intent, say so explicitly:
 Use the `Reference` column in summary tables and in entity descriptions:
 
 ```markdown
-| [Customer](entities/customer.md#customer) | [Party Role](entities/party-role.md#party-role) | A Party with an active product relationship. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole) |
+| `Customer` (`entities/customer.md#customer`) | `Party Role` (`entities/party_role.md#party-role`) | A Party with an active product relationship. | `BIAN BOM - Party Role` (`https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole`) |
 ```
 
 For multiple applicable standards, list the most specific first.

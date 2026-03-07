@@ -2,15 +2,17 @@
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.8.1** (Latest)
+> **Version 0.8.2** (Latest)
 
 **Model once. Reuse everywhere.**
 
-MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — in one format for humans and AI agents.
+MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — and generates the physical artifacts your processes need — all in one format for humans and AI agents.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
-Start with [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or load [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md) for single-file AI context.
+**Read the spec**: [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md) for single-file AI context.
+
+**Learn by conversation**: MD-DDL includes an AI learning companion. Set up md-ddl (below), then start **Agent Guide** (`@agent-guide` in VS Code Copilot, or via CLAUDE.md in Claude Code) — it adapts to your role and teaches the standard through discussion, not documentation.
 
 ---
 
@@ -35,8 +37,7 @@ git submodule update --remote .md-ddl
 
 Copy these files from `.md-ddl` into your repository (same relative paths):
 
-- `.md-ddl/.github/agents/agent-ontology.agent.md` → `.github/agents/agent-ontology.agent.md`
-- `.md-ddl/.github/agents/agent-regulation.agent.md` → `.github/agents/agent-regulation.agent.md`
+- `.md-ddl/.github/agents/*` → `.github/agents/*`
 
 This keeps setup simple and lets you refresh from upstream when md-ddl updates.
 
@@ -70,6 +71,7 @@ your-project/
 
 ## 🛠 Workflow
 
+0. **Orient** with Agent Guide — understand the standard, explore concepts, find the right agent
 1. **Discover** with Agent Ontology
 2. **Model** domains/entities/relationships/events
 3. **Map** sources in `sources/<system>/source.md` + `sources/<system>/transforms/table_<source-table>.md`

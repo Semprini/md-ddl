@@ -37,6 +37,14 @@ md-ddl-specification/         Normative spec — source of truth for all rules
   MD-DDL-Complete.md          Concatenated single-file version (generated)
 
 agents/
+  agent-guide/                Learning and navigation agent
+    AGENT.md                  Core prompt — identity, modes, user archetypes
+    skills/
+      orientation/             Role profiling, MD-DDL overview, workflow mapping
+      concept-explorer/        Interactive spec teaching with analogies
+      worked-examples/         Simple Customer + Financial Crime walkthroughs
+      platform-setup/          VS Code Copilot + Claude Code setup and workflow
+
   agent-ontology/             Discovery and design agent
     AGENT.md                  Core prompt — identity, modes, skill index
     skills/
@@ -69,6 +77,7 @@ agents/
 
 .github/
   agents/                     Copilot custom-agent entrypoints (wrappers)
+    agent-guide.agent.md      Frontmatter + include of canonical `agents/agent-guide/AGENT.md`
     agent-ontology.agent.md   Frontmatter + include of canonical `agents/agent-ontology/AGENT.md`
     agent-artifact.agent.md   Frontmatter + include of canonical `agents/agent-artifact/AGENT.md`
     agent-dataproduct.agent.md Frontmatter + include of canonical `agents/agent-dataproduct/AGENT.md`
@@ -169,10 +178,15 @@ Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent 
 
 Agent | Lifecycle stage | Owns
 --- | --- | ---
+`agent-guide` | Learning and navigation | Standard explanation, user orientation, concept teaching, worked example walkthroughs, platform setup, agent navigation and handoff
 `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring
 `agent-artifact` | Physical artifact generation | Dimensional star schemas, normalized 3NF designs, wide-column reporting schemas, knowledge graph schemas, SQL DDL, JSON Schema, Cypher, Parquet schema contracts
 `agent-dataproduct` | Data product design and publication | Data product class selection, entity scoping, governance overrides, masking strategies, ODPS manifest generation, external catalogue alignment
 `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation
+
+**Boundary rule — Guide vs All Specialists:** Agent Guide teaches concepts, walks through examples, helps with platform setup, and navigates users to the right specialist agent. It never creates production MD-DDL artifacts — domain files, entity details, data product declarations, physical schemas, or compliance audit reports. When a user is ready for production work, Agent Guide hands off explicitly to the appropriate specialist agent. Do not add production modelling, generation, product design, or compliance auditing to Agent Guide.
+
+**Boundary rule — Guide vs Ontology:** Agent Guide may sketch MD-DDL to illustrate concepts (clearly marked as demonstrations, not production artifacts). Agent Ontology creates production domain files, entity details, relationships, and events. If Agent Guide identifies that a user is ready to model, it hands off to Agent Ontology with a suggested opening prompt. Do not add production modelling capability to Agent Guide, and do not add tutorial or onboarding capability to Agent Ontology.
 
 **Boundary rule — Ontology vs Artifact:** Agent Ontology produces conceptual and logical MD-DDL models. Agent Artifact consumes those models and generates physical artifacts (DDL, JSON Schema, Parquet). If Agent Artifact identifies a conceptual gap (missing entity, attribute, or relationship), it flags the gap and defers the structural change to Agent Ontology. Do not add physical generation capability to Agent Ontology or domain modelling capability to Agent Artifact.
 

@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.1)
+# MD‑DDL Specification (Draft 0.8.2)
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 

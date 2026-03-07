@@ -52,7 +52,9 @@ confidence level explicitly.
 
 For ISO 20022, consult the message definition catalogue for the relevant message type.
 
-For HL7 FHIR, reference the resource definitions at `https://hl7.org/fhir/resourcelist.html`
+For HL7 FHIR, use the dedicated guidance in [FHIR standard guidance](./standards/fhir/README.md).
+It defines a deterministic lookup sequence using local cache files for resource
+and terminology mapping before falling back to live FHIR pages.
 
 ### Step 2 — Note material differences
 If the standard's definition differs from the user's intent, say so explicitly:
@@ -98,6 +100,7 @@ A missing reference is honest; a wrong one is harmful.
 For BIAN specifics (including local reference files, lookup order and exact-name resolution), follow [BIAN standard guidance](./standards/bian/README.md).
 For TM Forum SID specifics (including SID domain taxonomy and Party/Customer/Subscriber patterns), follow [TM Forum standard guidance](./standards/tmforum/README.md).
 For ACORD specifics (including insurance entity hierarchies and party role patterns), follow [ACORD standard guidance](./standards/acord/README.md).
+For FHIR specifics (including resource and terminology cache files and healthcare mapping patterns), follow [FHIR standard guidance](./standards/fhir/README.md).
 
 ---
 

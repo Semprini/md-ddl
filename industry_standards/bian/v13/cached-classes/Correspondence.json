@@ -1,0 +1,97 @@
+{
+  "isAbstract": false,
+  "name": "Correspondence",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "The rendering of a document to a medium and the transmission of the rendering via a communication channel.",
+  "bianId": "983b78e0-03c8-e911-8296-065c48f41faa",
+  "attributeList": [
+    {
+      "featureName": "CorrespondenceType",
+      "name": "CorrespondenceType",
+      "dataType": "Correspondencetypevalues",
+      "description": "The type of correspondence (e.g. confirmation note, mail shot)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Correspondencetypevalues"
+      }
+    },
+    {
+      "featureName": "CorrespondenceAddress",
+      "name": "CorrespondenceAddress",
+      "dataType": "Address",
+      "description": "The address for message delivery (needs to match channel selection)",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "CorrespondenceDateTime",
+      "name": "CorrespondenceDateTime",
+      "dataType": "Datetime",
+      "description": "Key dates used for the correspondence (e.g. generation date, mailing date, receipt confirmation date, re-send date)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "CorrespondenceContent",
+      "name": "CorrespondenceContent",
+      "dataType": "Text",
+      "description": "The message content (aligned to template as appropriate)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "CorrespondenceTemplate",
+      "name": "CorrespondenceTemplate",
+      "dataType": "Text",
+      "description": "Template used to assemble standard format correspondence (can be supplied with the correspondence or maintained within the Correspondence service domain as appropriate)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "CorrespondenceCommunicationMethod",
+      "name": "CorrespondenceCommunicationMethod",
+      "dataType": "Correspondencecommunicationmethodtypevalues",
+      "description": "Communication method used for the transmission of a correspondence. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Correspondencecommunicationmethodtypevalues"
+      }
+    },
+    {
+      "featureName": "CorrespondenceAddressType",
+      "name": "CorrespondenceAddressType",
+      "dataType": "Addresstypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Addresstypevalues"
+      }
+    },
+    {
+      "featureName": "CorrespondenceMedium",
+      "name": "CorrespondenceMedium",
+      "dataType": "Correspondencemediumtypevalues",
+      "description": "Medium through which the correspondence can be submitted such as paper, electronic or both.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Correspondencemediumtypevalues"
+      }
+    }
+  ]
+}

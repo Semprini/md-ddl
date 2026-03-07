@@ -1,0 +1,34 @@
+{
+  "isAbstract": false,
+  "name": "ProductFeature",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Lien Feature",
+  "status": "Updated",
+  "description": "A detailed characteristic of a product expressed in offered services and the terms and conditions applicable to the delivery of the services. ",
+  "bianId": "823053bb-a486-e911-823e-062687e6a904",
+  "attributeList": [
+    {
+      "featureName": "ProductFeatureType",
+      "name": "ProductFeatureType",
+      "dataType": "Productfeaturetypevalues",
+      "description": "The type or category of product/service features",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Productfeaturetypevalues"
+      }
+    },
+    {
+      "featureName": "ProductFeatureSpecification",
+      "name": "ProductFeatureSpecification",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    }
+  ]
+}

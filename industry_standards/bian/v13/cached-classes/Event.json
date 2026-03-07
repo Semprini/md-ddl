@@ -1,0 +1,116 @@
+{
+  "isAbstract": false,
+  "name": "Event",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Credit Alert",
+  "status": "Updated",
+  "description": "Something that happens, has happened, can happen or is planned to happen.",
+  "bianId": "66bab5d1-0056-e911-8237-060aad038e48",
+  "attributeList": [
+    {
+      "featureName": "EventType",
+      "name": "EventType",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "EventDateTime",
+      "name": "EventDateTime",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "EventDescription",
+      "name": "EventDescription",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "EventSource",
+      "name": "EventSource",
+      "dataType": "Object",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Object"
+      }
+    },
+    {
+      "featureName": "EventLocation",
+      "name": "EventLocation",
+      "dataType": "Location",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "EventAction",
+      "name": "EventAction",
+      "dataType": "Action",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "EventStatus",
+      "name": "EventStatus",
+      "dataType": "Status",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Status"
+      }
+    },
+    {
+      "featureName": "EventValue",
+      "name": "EventValue",
+      "dataType": "Value",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Value"
+      }
+    },
+    {
+      "featureName": "EventValidityPeriod",
+      "name": "EventValidityPeriod",
+      "dataType": "Datetimeperiod",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetimeperiod"
+      }
+    },
+    {
+      "featureName": "EventIdentification",
+      "name": "EventIdentification",
+      "dataType": "Identifier",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    }
+  ]
+}

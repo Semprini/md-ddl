@@ -1,0 +1,69 @@
+{
+  "isAbstract": false,
+  "name": "Plan",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Administrative Plan",
+  "status": "Updated",
+  "description": "A method for doing or achieving something, usually involving a series of actions or stages, or something you have arranged to do. (Cambridge Dictionary)\n\nA plan is a set of intended actions, through which one intends to achieve a goal.\n\n\"Course of action\" is a synonym for Plan. ",
+  "bianId": "6472836c-9c67-eb11-82f6-06f5e4900cbd",
+  "attributeList": [
+    {
+      "featureName": "PlanGoal",
+      "name": "PlanGoal",
+      "dataType": "Goal",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "PlanBudget",
+      "name": "PlanBudget",
+      "dataType": "Budgetarrangement",
+      "description": "An arrangement which is specifying an estimate of costs, revenues, and resources over a specified period, reflecting a reading of future financial conditions and goals. (adapted from Business Dictionary)",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "PlannedAction",
+      "name": "PlannedAction",
+      "dataType": "Plannedaction",
+      "description": "An action that is arranged in a plan for doing or achieving something ",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "PlanType",
+      "name": "PlanType",
+      "dataType": "Plantypevalues",
+      "description": "A Classification value that specifies the type of Plan",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Plantypevalues"
+      }
+    },
+    {
+      "featureName": "PlanValidityPeriod",
+      "name": "PlanValidityPeriod",
+      "dataType": "Datetimeperiod",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetimeperiod"
+      }
+    },
+    {
+      "featureName": "PlanDescription",
+      "name": "PlanDescription",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    }
+  ]
+}

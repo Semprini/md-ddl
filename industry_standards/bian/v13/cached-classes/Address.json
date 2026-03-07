@@ -1,0 +1,31 @@
+{
+  "isAbstract": false,
+  "name": "Address",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Phone Address",
+  "status": "Updated",
+  "description": "A specific designation or description of a location, typically used for specifying the location or destination of something or someone",
+  "bianId": "9b5941a1-f2b1-ec11-8382-0675e4f5ee11",
+  "attributeList": [
+    {
+      "featureName": "AddressType",
+      "name": "AddressType",
+      "dataType": "Addresstypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Addresstypevalues"
+      }
+    },
+    {
+      "featureName": "LocationReference",
+      "name": "LocationReference",
+      "dataType": "Location",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "isAbstract": false,
+  "name": "Channel",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "eBranch Channel",
+  "status": "Updated",
+  "description": "An interface through which parties can communicate or exchange goods or services.  \n\nComment: A channel can be internal or external.\nChannel identifies the different delivery and communications mechanisms through which products, and services are made available to parties and by which the parties communicate with each other. \n\nExamples: Shop, a web shop, email, television screens in the shops, servicedesk, e-mail, phone,  …",
+  "bianId": "153e71ae-c762-ea11-8290-0614a0f38526",
+  "attributeList": [
+    {
+      "featureName": "ChannelType",
+      "name": "ChannelType",
+      "dataType": "Channeltypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Channeltypevalues"
+      }
+    }
+  ]
+}

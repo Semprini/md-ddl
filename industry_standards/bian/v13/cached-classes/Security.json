@@ -1,0 +1,110 @@
+{
+  "isAbstract": false,
+  "name": "Security",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "Financial instruments representing a sum of rights of the investor vis-a-vis the issuer. (ISO20022)\n\n\nA fungible, negotiable financial instrument that holds some type of monetary value used to raise capital in public and private markets.\n\nThere are primarily three types of securities: equity - which provide ownership rights to holders, debt - which are essentially loans that are repaid with periodic payments, and hybrid - which combine aspects of debt and equity.\nhttps://www.investopedia.com/terms/s/security.asp\n\nFungibility is the ability of a good or asset to be interchanged with other individual goods or assets of the same type. \nhttps://www.investopedia.com/terms/f/fungibility.asp\n\nFinancing or investment instruments (some negotiable, others not) bought and sold in financial markets, such as bonds, debentures, notes, options, shares (stocks), and warrants. See also security.\n\nRead more: http://www.businessdictionary.com/definition/securities.html\n\n\nA security is a financial instrument issued by a business entity or government, which gives the buyer the right to either interest payments or a share of the earnings of the issuer. \nExamples of securities are stocks, bonds, options, and warrants. \nhttps://www.accountingtools.com/articles/2017/5/16/security?rq=security",
+  "bianId": "ffe016a6-7ba9-ea11-829f-06478228ed28",
+  "attributeList": [
+    {
+      "featureName": "SecurityAmount",
+      "name": "SecurityAmount",
+      "dataType": "Amount",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Amount"
+      }
+    },
+    {
+      "featureName": "SecurityPrice",
+      "name": "SecurityPrice",
+      "dataType": "Arrangement",
+      "description": "The prevailing bank buy/sell quote for the security.ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "SecurityIdentification",
+      "name": "SecurityIdentification",
+      "dataType": "Securityidentification",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Securityidentification"
+      }
+    },
+    {
+      "featureName": "SecurityBalance",
+      "name": "SecurityBalance",
+      "dataType": "Accountbalance",
+      "description": "Balance of the account which holds a specific security. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Accountbalance"
+      }
+    },
+    {
+      "featureName": "SecurityStatus",
+      "name": "SecurityStatus",
+      "dataType": "Securitystatus",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Securitystatus"
+      }
+    },
+    {
+      "featureName": "SecurityFees",
+      "name": "SecurityFees",
+      "dataType": "Feearrangement",
+      "description": "    \nFees related to securities.ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "SecurityDate",
+      "name": "SecurityDate",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "SecurityRate",
+      "name": "SecurityRate",
+      "dataType": "Rate",
+      "description": "Rating(s) of the security.ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Rate"
+      }
+    },
+    {
+      "featureName": "SecurityTax",
+      "name": "SecurityTax",
+      "dataType": "Taxarrangement",
+      "description": "    \nTax details of the security.ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "SecurityJurisdiction",
+      "name": "SecurityJurisdiction",
+      "dataType": "Jurisdiction",
+      "description": "Jurisdiction (country, county, state, province, city) in which the security is legally recorded for regulatory and/or tax purposes.ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "superType": null,
+  "bianId": "075e9516-f560-e911-8237-068e13695e26",
+  "ownerName": "BusinessObjectModel",
+  "name": "CardPaymentService",
+  "description": "A payment service to execute payment transactions through a payment card, including online payments. (Adapted from PSD)\n\nA service that offers customers the use of payment cards.",
+  "attributeList": [
+    {
+      "featureName": "CardPaymentServiceIdentifier",
+      "name": "CardPaymentServiceIdentifier",
+      "dataType": "Identifier",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "CardPaymentServiceType",
+      "name": "CardPaymentServiceType",
+      "dataType": "Cardpaymentservicetypevalues",
+      "description": "Type of payment card as a product.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Cardpaymentservicetypevalues"
+      }
+    },
+    {
+      "featureName": "CardPaymentServiceConfiguration",
+      "name": "CardPaymentServiceConfiguration",
+      "dataType": "Text",
+      "description": "Configuration specified for the payment card product.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    }
+  ],
+  "isAbstract": false,
+  "isRoot": false,
+  "status": "Updated"
+}

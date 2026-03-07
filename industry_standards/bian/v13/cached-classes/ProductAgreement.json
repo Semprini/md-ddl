@@ -1,0 +1,23 @@
+{
+  "isAbstract": false,
+  "name": "ProductAgreement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Standing Order Agreement",
+  "status": "Updated",
+  "description": "An agreement with the subject matter of the product between Customer and Provider. \nAn agreement between a Financial Service Provider and its customer for a sold product. \n",
+  "bianId": "a05fc8be-24fd-ec11-83ad-0635e6952d6f",
+  "attributeList": [
+    {
+      "featureName": "ProductAgreementType",
+      "name": "ProductAgreementType",
+      "dataType": "Productagreementtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Productagreementtypevalues"
+      }
+    }
+  ]
+}

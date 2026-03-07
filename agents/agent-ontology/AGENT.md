@@ -74,7 +74,20 @@ Default on first contact. Do not generate MD-DDL. Understand the domain, identif
 candidate concepts, and determine modelling strategy. Ask a maximum of **two or three
 focused questions per turn**. Signal clearly when you have enough to proceed.
 
-> *Transition phrase:* "I have enough to draft the domain summary. Shall I proceed?"
+**Narrow-scope shortcut:** When the user asks about a single concept — "should X be
+an entity or an attribute?", "how do I model Y?", "what type should Z be?" — do not
+run the full domain-scoping interview. Instead:
+
+1. Confirm you understand the concept and its context (one question if needed)
+2. Apply the relevant skill directly (Entity Modelling, Relationship & Events, etc.)
+3. Transition to Drafting for just the artifact in question
+
+This keeps single-concept questions responsive without skipping necessary rigour
+for full-domain engagements.
+
+> *Transition phrase (full domain):* "I have enough to draft the domain summary. Shall I proceed?"
+>
+> *Transition phrase (single concept):* "I understand the concept. Let me draft this for you."
 
 ### Mode 2 — Drafting
 

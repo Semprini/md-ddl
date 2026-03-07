@@ -1,0 +1,23 @@
+{
+  "isAbstract": false,
+  "name": "ContactPoint",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "Number, physical or virtual address, used for communication.",
+  "bianId": "5f9548fc-e277-e911-823e-067f69a9229a",
+  "attributeList": [
+    {
+      "featureName": "ContactPointType",
+      "name": "ContactPointType",
+      "dataType": "Contactpointtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Contactpointtypevalues"
+      }
+    }
+  ]
+}

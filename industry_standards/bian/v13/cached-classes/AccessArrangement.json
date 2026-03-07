@@ -1,0 +1,34 @@
+{
+  "isAbstract": false,
+  "name": "AccessArrangement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Device Access Arrangement",
+  "status": "Updated",
+  "description": "An arrangement that allows or restricts the access to a service or product, channel or device through a specific access point\n\nDescription:\nhttps://en.wikipedia.org/wiki/Access-control_list\n",
+  "bianId": "a2e59ac1-5d93-e911-823e-065576aa37f8",
+  "attributeList": [
+    {
+      "featureName": "PointOfAccessType",
+      "name": "PointOfAccessType",
+      "dataType": "Pointofaccesstypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Pointofaccesstypevalues"
+      }
+    },
+    {
+      "featureName": "AccessCredentialMethod",
+      "name": "AccessCredentialMethod",
+      "dataType": "Authenticationmethodtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Authenticationmethodtypevalues"
+      }
+    }
+  ]
+}

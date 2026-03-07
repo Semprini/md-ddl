@@ -1,0 +1,28 @@
+{
+  "superType": null,
+  "bianId": "4b8c8046-af9d-e911-827a-06c73ecc951a",
+  "ownerName": "BusinessObjectModel",
+  "name": "DateTime",
+  "description": "A point in time. \nCan be a period, a date or a more detailed time indication.",
+  "attributeList": [
+    {
+      "featureName": "TimeIndication",
+      "name": "TimeIndication",
+      "dataType": "String",
+      "description": "Expression of the point in time\n\nis expressed according to \"TimeIndicationType\"\ne.g. period, day, more detailed indication",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "TimeIndicationType",
+      "name": "TimeIndicationType",
+      "dataType": "String",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ],
+  "isAbstract": false,
+  "isRoot": false,
+  "status": "Updated"
+}

@@ -1,0 +1,39 @@
+{
+  "isAbstract": false,
+  "name": "Notification",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "A communication notifying or reporting a change in position or circumstance of mutual interest\n\nExamples:\nnotification of an overdue payment\nnotification of a coming due date\nnotification of a change in lifecycle status of a product agreement.\nnotification of acceptance or rejection of a product offer.",
+  "bianId": "92d3d130-d37e-e911-823e-0680d160e494",
+  "attributeList": [
+    {
+      "featureName": "NotificationReference",
+      "name": "NotificationReference",
+      "dataType": "Object",
+      "description": "An identifier that allows to uniquely refer to an instance of a notification.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Object"
+      }
+    },
+    {
+      "featureName": "NotificationType",
+      "name": "NotificationType",
+      "dataType": "String",
+      "description": "The attribute value of Notification Type, specifies the kind of Notification for this occurrence of Notification.\n\nThe concept \"Notification Type\" is A Classification Hierarchy that distinguishes between Notification according to distinguishing characteristics. \n\nCharacteristics can be\n·    Medium (letter, SMS, e-mail ...)\n·    Content Type (due date notification, overdue notification, price drop notification, ...)\n·    Involved Party (bank notification, a customer notification, ...)\n·    Urgency (high priority, medium, low)\n·    Commercial or legal \n·    etc.\nasset position",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "NotificationContent",
+      "name": "NotificationContent",
+      "dataType": "String",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

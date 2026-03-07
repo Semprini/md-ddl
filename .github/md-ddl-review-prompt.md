@@ -1,7 +1,7 @@
 # MD-DDL Periodic Review Prompt
 
 You are conducting a structured review of the md-ddl project. This is a
-Markdown-native data modelling standard with two AI agents, a set of skills,
+Markdown-native data modelling standard with four AI agents, a set of skills,
 worked examples, and supporting documentation.
 
 Your job is to evaluate consistency, currency, and correctness across the
@@ -18,8 +18,10 @@ Read these files first, in this order. Do not skip ahead.
 
 1. `md-ddl-specification/1-Foundation.md` — the core principles
 2. `agents/agent-ontology/AGENT.md` — identity, lifecycle stage, skill index
-3. `agents/agent-regulation/AGENT.md` — identity, lifecycle stage, skill index
-4. `README.md` — the public face and integration guide
+3. `agents/agent-artifact/AGENT.md` — identity, lifecycle stage, skill index
+4. `agents/agent-dataproduct/AGENT.md` — identity, lifecycle stage, skill index
+5. `agents/agent-regulation/AGENT.md` — identity, lifecycle stage, skill index
+6. `README.md` — the public face and integration guide
 
 This gives you the mental model you need to evaluate everything else correctly.
 
@@ -38,15 +40,17 @@ here. No other file has the right to define language rules.
 **Review lens:**
 
 - Are rules stated once, in the owning section, and nowhere else?
-- Is `MD-DDL-Complete.md` a faithful concatenation of sections 1–6 in order?
+- Is `MD-DDL-Complete.md` a faithful concatenation of sections 1–9 in order?
 - Is the version number consistent across all section files?
 - Are there rules implied by examples or agents that are missing from the spec?
 
 ### Agents (`agents/*/AGENT.md`)
 
 **Purpose:** Define the identity, lifecycle stage, behaviour modes, and skill index
-for each agent. Agent Ontology owns Discovery and Design. Agent Regulation owns
-Governance Assurance. These are distinct — they must not overlap.
+for each agent. Agent Ontology owns Discovery and Design. Agent Artifact owns
+Physical Artifact Generation. Agent Data Product owns Data Product Design and
+Publication. Agent Regulation owns Governance Assurance. These are distinct —
+they must not overlap.
 
 **Review lens:**
 
@@ -54,6 +58,10 @@ Governance Assurance. These are distinct — they must not overlap.
   ownership boundary?
 - Does Agent Regulation defer structural modelling to Agent Ontology?
 - Does Agent Ontology defer ongoing compliance assurance to Agent Regulation?
+- Does Agent Ontology defer physical generation to Agent Artifact?
+- Does Agent Data Product defer physical generation to Agent Artifact and
+  structural modelling to Agent Ontology?
+- Does Agent Artifact defer product design to Agent Data Product?
 - Does each skill index accurately describe the skills that exist on disk?
 - Do the non-negotiable output rules in each AGENT.md align with the spec?
 - Are behaviour modes clearly distinct and correctly triggered?

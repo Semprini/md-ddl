@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.0)
+# MD‑DDL Specification (Draft 0.8.1)
 
 ## **Entities**
 

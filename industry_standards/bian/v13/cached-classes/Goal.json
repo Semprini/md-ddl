@@ -1,0 +1,67 @@
+{
+  "isAbstract": false,
+  "name": "Goal",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Business Development Goal",
+  "status": "Updated",
+  "description": "A goal represents a high-level statement of intent, direction, or desired end state for an organization and its stakeholders. (ArchiMate 3.1)\n\nAn observable and measurable end result having one or more objectives to be achieved within a more or less fixed timeframe.\n\nRead more: http://www.businessdictionary.com/definition/goal.html",
+  "bianId": "8806b58b-fc94-ea11-8295-06c610ca3b44",
+  "attributeList": [
+    {
+      "featureName": "GoalType",
+      "name": "GoalType",
+      "dataType": "Goaltypevalues",
+      "description": "The classification of Goal",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Goaltypevalues"
+      }
+    },
+    {
+      "featureName": "GoalDefinition",
+      "name": "GoalDefinition",
+      "dataType": "Text",
+      "description": "The definition of Goal",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "GoalName",
+      "name": "GoalName",
+      "dataType": "Name",
+      "description": "The name of Goal",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "GoalDateAndTime",
+      "name": "GoalDateAndTime",
+      "dataType": "Goaldatetime",
+      "description": "The key dates and times of Goal like Setting Data, Planning Date, Start Date, Review Date, Completion Date.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Goaldatetime"
+      }
+    },
+    {
+      "featureName": "GoalStatus",
+      "name": "GoalStatus",
+      "dataType": "Goalstatus",
+      "description": "The lifecycle status of Goal like Goal Setting, Planning, Execution, Monitoring and Evaluation, Completion or Achievement, Maintenance or Sustainment, Closure or Renewal",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Goalstatus"
+      }
+    }
+  ]
+}

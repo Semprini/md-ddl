@@ -69,12 +69,14 @@ check all three — gaps at any level are compliance risks.
 Level 1: Domain Metadata          (domain.md → ## Metadata → YAML block)
 Level 2: Entity Governance Block  (entity detail file → ## Entities → ### Entity → governance: YAML)
 Level 3: Attribute-Level Flags    (entity detail file → attributes: → individual fields)
+Level 4: Product Governance       (products/*.md → ### Product → governance: + masking: YAML)
 ```
 
 **Inheritance rule:** Domain-level metadata sets the default posture. Entities
 inherit that posture unless they explicitly override it. An entity with no
 `governance:` block is not automatically compliant — it inherits the domain
-defaults, which may themselves be incomplete.
+defaults, which may themselves be incomplete. Products inherit domain governance
+and must justify any overrides.
 
 ---
 
@@ -308,6 +310,81 @@ AGENT.md), focus the audit scope on the specific changes identified:
 
 This keeps monitoring-triggered audits focused and actionable rather than
 producing noise by re-surfacing already-known gaps.
+
+---
+
+## Level 4 — Product Governance Audit
+
+Evaluate each data product declaration for governance adequacy. Product governance
+sits on top of domain and entity governance — a product may relax visibility
+(by design) but must not weaken protections below what regulations require.
+
+### When to run Level 4
+
+Level 4 is triggered by:
+
+- User asks "are the governance overrides appropriate for each product?"
+- User asks about product-level compliance or masking adequacy
+- Full corpus audit (always include Level 4 if product declarations exist)
+- After product design or modification (as a quality gate)
+
+### Product governance checklist
+
+For each product declaration (files under `products/`):
+
+Check | What to verify | Gap if failed
+--- | --- | ---
+**Classification override** | If product declares `classification` lower than domain default, is there a justified reason? | Unjustified classification downgrade
+**PII exposure** | If product includes entities where `pii: true`, does the product declare `masking` entries? | PII-bearing product with no masking strategy
+**Masking completeness** | Every attribute listed in included entities' `pii_fields` has a corresponding `masking` entry in the product | PII attribute exposed without masking
+**Masking strategy adequacy** | Masking strategy is appropriate for the attribute type and consumer context | Weak masking for high-sensitivity attribute
+**Source-aligned raw exposure** | Source-aligned products that expose raw PII: is retention constrained and access restricted? | Raw PII feed with permissive governance
+**Cross-domain governance** | For `cross_domain` references: does the product honour the governance posture of the owning domain? | External entity exposed with weaker controls than source domain
+**Governance override justification** | Every field in the product's `governance:` block that differs from domain default has a documented rationale | Override present without justification
+**Consumer appropriateness** | Are the declared `consumers` appropriate for the product's classification and PII posture? | Highly confidential product visible to broad audiences
+
+### Masking adequacy cross-reference
+
+This is the critical product-level check that connects entity PII declarations
+to product masking rules.
+
+For each product where `pii: true` applies (inherited or declared):
+
+1. Collect all entities in the product's `entities` list
+2. For each entity, read its `pii_fields` from the entity governance block
+3. Build a complete list of PII attributes exposed by this product
+4. Compare against the product's `masking` entries
+5. Flag gaps:
+
+Gap Type | Severity | Description
+--- | --- | ---
+PII attribute with no masking entry | Critical | Attribute is exposed unmasked to product consumers
+Masking strategy mismatch | Advisory | Strategy may be too weak (e.g., `truncate` for a government ID) or too strong (e.g., `redact` when joinability is needed)
+PII attribute not in `pii_fields` | Critical | Attribute appears to be PII but is not declared — escalate to Level 2/3
+
+### Source-aligned product controls
+
+Source-aligned products are inherently higher-risk because they expose raw or
+lightly cleansed data. Apply these checks:
+
+- `classification` should be at least as restrictive as any entity in the source feed
+- `retention` should be declared (raw data often has shorter retention than canonical)
+- `consumers` should be limited to data engineering and audit teams
+- If the source contains PII, the product should either declare `masking` or
+  document why raw PII access is justified (e.g., audit replay requirements)
+
+### Product governance gap report format
+
+Add a "Product Governance" section to the gap report:
+
+```markdown
+### Product Governance Gaps
+
+| Product | Gap | Severity | Recommended Fix |
+|---|---|---|---|
+| Transaction Risk Summary | `Date of Birth` in Customer entity not covered by `masking` entries | Critical | Add `masking: - attribute: "Date of Birth" strategy: year-only` |
+| Salesforce Raw Feed | Source-aligned product exposes raw PII with no masking | Advisory | Confirm audit-replay justification or add masking entries |
+```
 
 ---
 

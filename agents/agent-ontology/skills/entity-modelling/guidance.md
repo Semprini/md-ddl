@@ -3,6 +3,7 @@
 ## Overview
 
 The entity-or-enum decision is one of the most fundamental in data modeling. Getting it wrong leads to:
+
 - Inflexible models that can't accommodate business changes
 - Ownership confusion (who maintains this?)
 - Governance gaps (who ensures data quality?)
@@ -19,6 +20,7 @@ This guidance provides deep patterns across industries to help AI make informed 
 If different business teams own or are accountable for a concept, it should be an entity.
 
 **Why**: Different teams mean:
+
 - Different governance processes
 - Different approval workflows for changes
 - Different compliance requirements
@@ -26,16 +28,19 @@ If different business teams own or are accountable for a concept, it should be a
 - Different lifecycle management
 
 **Example - Banking**:
+
 - **Customer** (owned by Customer Management team)
 - **Merchant** (owned by Merchant Services team)
 - Even though both are "party roles," they're managed completely differently
 
 **Example - Insurance**:
+
 - **Policy Holder** (owned by Underwriting team)
 - **Claimant** (owned by Claims team)
 - Different teams, different processes, different entities
 
 **Example - Telecommunications**:
+
 - **Customer** (owned by Customer Care)
 - **Subscriber** (owned by Network Operations)
 - Customer pays bills, Subscriber uses network - different concepts
@@ -48,6 +53,7 @@ If a concept has >3 attributes that don't apply to other similar concepts, it's 
 
 **Example - Banking**:
 **Customer** has unique attributes:
+
 - KYC Status
 - Customer Segment
 - Relationship Manager
@@ -55,6 +61,7 @@ If a concept has >3 attributes that don't apply to other similar concepts, it's 
 - Credit Score
 
 **Merchant** has completely different attributes:
+
 - Merchant Category Code (MCC)
 - Payment Service Provider
 - Settlement Account
@@ -70,11 +77,13 @@ If a concept has different compliance, retention, or security requirements, it's
 **Why**: Governance is applied at the entity level in most systems.
 
 **Example - Healthcare**:
+
 - **Patient** (HIPAA protected, 7-year retention after last visit)
 - **Practitioner** (different credentialing requirements, different retention)
 - Can't use same governance rules, must be separate entities
 
 **Example - Banking**:
+
 - **Customer** (KYC/AML requirements, GDPR right to erasure)
 - **Teller** (employee data, different privacy rules, different retention)
 - Different regulatory frameworks, separate entities
@@ -86,6 +95,7 @@ If a concept is just a controlled list of values with minimal metadata, it's an 
 **Why**: Enums are simpler to manage, easier to validate, and don't need separate governance.
 
 **Characteristics of enums**:
+
 - ≤10 values typically
 - Values rarely change
 - No unique attributes per value (or just 1-2 simple ones)
@@ -93,6 +103,7 @@ If a concept is just a controlled list of values with minimal metadata, it's an 
 - Applied uniformly across the domain
 
 **Examples**:
+
 - Account Status: Active, Dormant, Frozen, Closed
 - Risk Rating: Low, Medium, High, Very High
 - Currency Code: USD, EUR, GBP, JPY
@@ -105,6 +116,7 @@ If a concept only makes sense in the context of a relationship, it's a relations
 **Why**: It's not a standalone concept - it describes HOW two entities relate.
 
 **Examples**:
+
 - "Role in Transaction" (Debtor, Creditor, Instructing Agent) - only meaningful in context of specific transaction
 - "Coverage Level" (Primary, Secondary) - only meaningful in context of specific policy-patient relationship
 - "Authorization Type" (Read, Write, Admin) - only meaningful in context of user-resource relationship
@@ -122,12 +134,14 @@ In BIAN, Party Role is an abstract concept representing involvement of a party i
 **Decision**: Should Customer, Merchant, Creditor, Debtor be entities or just enum values?
 
 **Analysis**:
+
 - **Customer**: Customer Management team owns, has KYC attributes, GDPR compliance → **Entity**
 - **Merchant**: Merchant Services team owns, has MCC codes, settlement rules → **Entity**
 - **Creditor**: Just a role in a transaction, no unique attributes → **Relationship Attribute**
 - **Debtor**: Just a role in a transaction, no unique attributes → **Relationship Attribute**
 
 **Result**:
+
 ```markdown
 # Entities
 ### Party Role
@@ -163,12 +177,14 @@ In ACORD, parties can be involved in policies and claims in various ways.
 **Decision**: Should Policy Holder, Insured, Claimant, Beneficiary be entities or enum values?
 
 **Analysis**:
+
 - **Policy Holder**: Policy Administration team owns, has payment history, billing address → **Entity**
 - **Insured**: Often same as Policy Holder, but can be different (e.g., parent insures child) → **Entity** (can reference Policy Holder)
 - **Claimant**: Claims team owns, has claim history, fraud scores → **Entity**
 - **Beneficiary**: Life insurance context, estate planning requirements → **Entity**
 
 **Result**:
+
 ```markdown
 # Entities
 ### Policy Holder
@@ -186,7 +202,7 @@ Party who receives benefits from an insurance policy.
 
 **Key Insight**: In insurance, different roles have very different attributes and processes. All are entities.
 
-**ACORD Reference**: Search "ACORD party roles" for standard definitions
+**ACORD Reference**: See [ACORD standard guidance](../standards-alignment/standards/acord/README.md) for party role definitions and insurance entity patterns.
 
 ---
 
@@ -199,25 +215,28 @@ In TM Forum, there's an important distinction between Customer and Subscriber.
 **Decision**: Should Customer, Subscriber, Account Holder be entities or the same entity?
 
 **Analysis**:
+
 - **Customer**: The business relationship (billing, payments, customer care) → **Entity**
 - **Subscriber**: The service user (network access, usage, technical profile) → **Entity**
 - **Account Holder**: Often same as Customer, but not always (corporate scenarios) → **Entity** or reference to Customer
 
 **Real-world scenario**:
+
 - Company X is the **Customer** (signs contract, pays bills)
 - Employee Y is the **Subscriber** (uses the mobile service, has SIM card)
 - Different teams, different attributes, different entities
 
 **Result**:
+
 ```markdown
 # Entities
 ### Customer
 The party that has a commercial relationship with the service provider.
-- references: [TM Forum SID - Customer](url)
+- references: [TM Forum SID - Customer](../standards-alignment/standards/tmforum/README.md)
 
 ### Subscriber
 The party that uses the services and has access to the network.
-- references: [TM Forum SID - Subscriber](url)
+- references: [TM Forum SID - Subscriber](../standards-alignment/standards/tmforum/README.md)
 
 # Relationships
 ### Customer Has Subscribers
@@ -226,7 +245,7 @@ A corporate customer can have many individual subscribers (employees).
 
 **Key Insight**: Telecom separates commercial relationship from service usage. Two entities.
 
-**TM Forum Reference**: Search "TM Forum SID Customer Subscriber" for standard definitions
+**TM Forum Reference**: See [TM Forum standard guidance](../standards-alignment/standards/tmforum/README.md) for the SID Customer vs Subscriber distinction.
 
 ---
 
@@ -239,11 +258,13 @@ In FHIR, Person is a general concept, but Patient and Practitioner are specific 
 **Decision**: Should Patient, Practitioner, RelatedPerson be entities or specializations?
 
 **Analysis**:
+
 - **Patient**: Subject of care, EMR team owns, HIPAA protected → **Entity**
 - **Practitioner**: Provides care, credentialing team owns, licensing requirements → **Entity**
 - **RelatedPerson**: Associated with patient (family, guardian), different privacy → **Entity**
 
 **Result**:
+
 ```markdown
 # Entities
 ### Party
@@ -277,7 +298,8 @@ A person related to a patient (family member, guardian, caregiver).
 
 **Question**: "Right now it's just a type, but we might add attributes later. Should it be an entity now?"
 
-**Answer**: 
+**Answer**:
+
 - If you're **certain** attributes will be added within 6 months → Entity
 - If it's **hypothetical** ("maybe someday") → Enum (can refactor later)
 - If different teams are **already discussing** ownership → Entity
@@ -289,6 +311,7 @@ A person related to a patient (family member, guardian, caregiver).
 **Question**: "Customer only has Customer ID and Name. Does it need to be an entity?"
 
 **Answer**:
+
 - Check ownership: Who maintains customer data? If distinct team → Entity
 - Check future: Will KYC, preferences, relationships be added? → Entity
 - Check governance: Different compliance rules? → Entity
@@ -301,11 +324,13 @@ A person related to a patient (family member, guardian, caregiver).
 **Question**: "We have 50+ product types. Should this still be an enum?"
 
 **Answer**:
+
 - If all 50+ types share the same attributes → Enum (large but still classification)
 - If different product types have different attributes → Entity hierarchy
 - If product types are actively managed by a Product team → Entity
 
 **Example - Telecom**:
+
 - 50+ service plan names → **Enum** (just names, all plans have same structure)
 - 5 product categories (Mobile, Broadband, TV, Landline, IoT) where each has unique technical attributes → **Entity hierarchy**
 
@@ -314,6 +339,7 @@ A person related to a patient (family member, guardian, caregiver).
 **Question**: "Our status values change over time (we add new statuses). Should it be an entity to track changes?"
 
 **Answer**:
+
 - Enum values changing over time (adding/removing values) is normal → Still Enum
 - Need to track **when** values were added/removed → Use enum with metadata in detail file
 - Need to track **which instances** had which values **when** → Entity with temporal tracking
@@ -329,6 +355,7 @@ A person related to a patient (family member, guardian, caregiver).
 **Problem**: Making every concept an entity "just in case"
 
 **Why it's wrong**:
+
 - Overcomplicated model
 - Governance burden (who owns Status as an entity?)
 - Integration complexity (50 entity types for simple classifications)
@@ -342,11 +369,13 @@ A person related to a patient (family member, guardian, caregiver).
 **Problem**: Using enums for concepts that clearly have business ownership
 
 **Why it's wrong**:
+
 - Can't model unique attributes
 - Can't apply distinct governance
 - Forces artificial constraints
 
 **Example - Wrong**:
+
 ```yaml
 attributes:
   Party Role Type:
@@ -354,6 +383,7 @@ attributes:
 ```
 
 **Example - Right**:
+
 ```markdown
 ### Customer
 First-class entity with KYC attributes
@@ -367,6 +397,7 @@ First-class entity with KYC attributes
 **Problem**: Creating both an entity AND an enum for the same concept
 
 **Example - Wrong**:
+
 ```markdown
 # Entity
 ### Customer Type
@@ -386,6 +417,7 @@ Retail, Corporate, Government...
 ## Decision Examples by Attribute Count
 
 ### 0-1 Attributes → Enum
+
 ```yaml
 # Account Status - just the value
 values:
@@ -396,6 +428,7 @@ values:
 ```
 
 ### 2-3 Attributes → Probably Enum (with metadata)
+
 ```yaml
 # Risk Rating - value plus score
 values:
@@ -411,6 +444,7 @@ values:
 ```
 
 ### 4+ Attributes → Probably Entity
+
 ```yaml
 # Customer - many unique attributes
 attributes:
@@ -436,11 +470,13 @@ attributes:
 ### Enum → Entity Migration
 
 When to refactor:
+
 - Business asks to add 4+ attributes
 - Different team takes ownership
 - Distinct governance requirements emerge
 
 **Process**:
+
 1. Create new entity detail file
 2. Add specialized attributes
 3. Update summary to declare as entity (not enum)
@@ -450,12 +486,14 @@ When to refactor:
 ### Entity → Enum Simplification
 
 When to refactor (rare):
+
 - Entity proves to be over-engineered
 - No team claims ownership
 - No unique attributes emerged
 - Just a classification after all
 
 **Process**:
+
 1. Create enum detail file
 2. Mark entity as deprecated
 3. Provide migration path for consumers
@@ -467,6 +505,7 @@ When to refactor (rare):
 Ask | Entity | Enum | Relationship Attribute
 ----|--------|------|----------------------
 Different owner? | ✅ Yes | ❌ No | ❌ No
+
 >3 unique attributes? | ✅ Yes | ❌ No | ❌ No
 Distinct governance? | ✅ Yes | ❌ No | ❌ No
 Just classification? | ❌ No | ✅ Yes | ❌ No

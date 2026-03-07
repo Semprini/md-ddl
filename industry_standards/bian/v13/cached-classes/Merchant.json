@@ -1,0 +1,31 @@
+{
+  "isAbstract": false,
+  "name": "Merchant",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "Party performing the card payment transaction. (ISO20022)",
+  "bianId": "469c9484-816a-e911-8237-061b75d0d318",
+  "attributeList": [
+    {
+      "featureName": "MerchantType",
+      "name": "MerchantType",
+      "dataType": "Merchanttypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Merchanttypevalues"
+      }
+    },
+    {
+      "featureName": "MerchantAddress",
+      "name": "MerchantAddress",
+      "dataType": "Address",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

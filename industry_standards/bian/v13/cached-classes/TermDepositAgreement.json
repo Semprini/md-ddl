@@ -1,0 +1,34 @@
+{
+  "isAbstract": false,
+  "name": "TermDepositAgreement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "An agreement concering an interest bearing deposit between the Bank and a corporate customer.\n\nA Term Deposit Agreement is a legal document or contract that outlines the terms and conditions governing a Term Deposit, also known as a Certificate of Deposit (CD) in some regions. This agreement is entered into between the account holder (the individual or entity depositing funds) and the financial institution (usually a bank or credit union) that is providing the Term Deposit service. The purpose of this agreement is to establish the rights and responsibilities of both parties throughout the duration of the Term Deposit.",
+  "bianId": "ca08a49e-0bd6-e911-8296-0612a84747f6",
+  "attributeList": [
+    {
+      "featureName": "TermDepositAgreementIdentification",
+      "name": "TermDepositAgreementIdentification",
+      "dataType": "Identifier",
+      "description": "The reference with which a Corporate Deposit Agreement is identified\n",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "TermDepositAgreementType",
+      "name": "TermDepositAgreementType",
+      "dataType": "Termdepositagreementtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Termdepositagreementtypevalues"
+      }
+    }
+  ]
+}

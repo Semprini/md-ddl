@@ -1,0 +1,11 @@
+{
+  "isAbstract": false,
+  "name": "Obligation",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "A duty that is specified in and imposed by an agreement. (FIBO)\n",
+  "bianId": "e5593d03-2694-e911-823e-069871e4ec9c",
+  "attributeList": null
+}

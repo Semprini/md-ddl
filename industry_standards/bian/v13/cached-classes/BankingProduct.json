@@ -1,0 +1,89 @@
+{
+  "isAbstract": false,
+  "name": "BankingProduct",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Merchant Service",
+  "status": "Updated",
+  "description": "A package of services and/or goods, accompanied by term and condition which is offered as a whole to (internal or external) customers.",
+  "bianId": "1aeced65-0b68-e911-8237-06dd5e24f7bc",
+  "attributeList": [
+    {
+      "featureName": "ProductIdentification",
+      "name": "ProductIdentification",
+      "dataType": "Productidentification",
+      "description": "The identifier of product e.g. ISIN Code.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Productidentification"
+      }
+    },
+    {
+      "featureName": "ProductType",
+      "name": "ProductType",
+      "dataType": "Bankingproducttypevalues",
+      "description": "Specifies the category/type/class of product like financial product. Product can be categorized according to different perspectives.  ",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Bankingproducttypevalues"
+      }
+    },
+    {
+      "featureName": "ProductLifecycleStatus",
+      "name": "ProductLifecycleStatus",
+      "dataType": "Productstatus",
+      "description": "Refers to the lifecycle of a product (e.g., initiated, announced, active, obsolete, withdrawn).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Productstatus"
+      }
+    },
+    {
+      "featureName": "ProductPriority",
+      "name": "ProductPriority",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "ProductDescription",
+      "name": "ProductDescription",
+      "dataType": "Text",
+      "description": "A detailed explanation or commentary of product.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "ProductVersion",
+      "name": "ProductVersion",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "ProductName",
+      "name": "ProductName",
+      "dataType": "Name",
+      "description": "The name of Product. \n\nOpen Banking: \nThe name of the product used for marketing purposes from a customer perspective. I.e. what the customer would recognise.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    }
+  ]
+}

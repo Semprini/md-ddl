@@ -1,0 +1,56 @@
+{
+  "isAbstract": false,
+  "name": "PartyRole",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Clearing Involvement",
+  "status": "Updated",
+  "description": "A specific role of a specific Party in the specific relationship.  ",
+  "bianId": "70959fdb-be56-e911-8237-06ecaacb4c68",
+  "attributeList": [
+    {
+      "featureName": "PartyRoleType",
+      "name": "PartyRoleType",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "PartyRoleName",
+      "name": "PartyRoleName",
+      "dataType": "Name",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "PartyRoleValidityPeriod",
+      "name": "PartyRoleValidityPeriod",
+      "dataType": "Datetimeperiod",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetimeperiod"
+      }
+    },
+    {
+      "featureName": "PartyInvolvementType",
+      "name": "PartyInvolvementType",
+      "dataType": "Partyinvolvementtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Partyinvolvementtypevalues"
+      }
+    }
+  ]
+}

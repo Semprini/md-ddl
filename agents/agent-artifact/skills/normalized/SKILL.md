@@ -87,6 +87,158 @@ Concrete table per subtype | rare; use only when subtypes are operationally inde
 
 Default preference: parent table + subtype extension tables for clear semantics and maintainability.
 
+### Inheritance DDL Patterns
+
+#### Pattern 1 — Single Table with Discriminator
+
+Use when subtypes differ only by a label or a handful of nullable attributes.
+All rows share the same table; a discriminator column identifies the subtype.
+
+**When the MD-DDL model has:**
+
+- `extends:` with subtypes that add ≤2 attributes each
+- Subtypes that are mostly labels (e.g., Individual vs Organisation with identical core fields)
+
+**DDL template:**
+
+```sql
+CREATE TABLE party (
+    party_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    party_bk       VARCHAR(50) NOT NULL,
+    party_type     VARCHAR(30) NOT NULL,  -- discriminator: 'Individual', 'Organisation'
+    -- shared attributes from parent
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    -- subtype-specific attributes (nullable for rows of other type)
+    date_of_birth  DATE,          -- Individual only
+    gender         VARCHAR(10),   -- Individual only
+    registration_number VARCHAR(50),  -- Organisation only
+    industry_code  VARCHAR(10),       -- Organisation only
+    -- temporal
+    valid_from     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to       TIMESTAMPTZ,
+    is_current     BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT chk_party_type CHECK (party_type IN ('Individual', 'Organisation'))
+);
+```
+
+**Rules:**
+
+- Discriminator column is NOT NULL with a CHECK constraint listing valid subtypes
+- Subtype-specific columns are nullable (they carry no value for other subtypes)
+- If null-bloat exceeds ~30% of columns, switch to class-table pattern
+
+#### Pattern 2 — Class-Table Inheritance (Parent + Child)
+
+Use when subtypes add meaningful attributes and constraints.
+Parent table carries shared attributes; child tables carry subtype-specific attributes
+with a FK back to the parent.
+
+**When the MD-DDL model has:**
+
+- `extends:` with subtypes adding ≥3 distinct attributes
+- Subtypes with different constraints or lifecycle
+- Entity YAML uses classDiagram `--|>` (inheritance arrow)
+
+**DDL template:**
+
+```sql
+-- Parent table: shared attributes and surrogate key
+CREATE TABLE party (
+    party_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    party_bk       VARCHAR(50) NOT NULL,
+    party_type     VARCHAR(30) NOT NULL,  -- discriminator
+    -- shared attributes
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    -- temporal
+    valid_from     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to       TIMESTAMPTZ,
+    is_current     BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT chk_party_type CHECK (party_type IN ('Individual', 'Organisation'))
+);
+
+-- Child table: Individual-specific attributes
+CREATE TABLE individual (
+    individual_id  BIGINT PRIMARY KEY REFERENCES party(party_id),
+    date_of_birth  DATE,
+    gender         VARCHAR(10),
+    nationality    VARCHAR(50),
+    marital_status VARCHAR(20)
+);
+
+-- Child table: Organisation-specific attributes
+CREATE TABLE organisation (
+    organisation_id BIGINT PRIMARY KEY REFERENCES party(party_id),
+    registration_number VARCHAR(50),
+    industry_code  VARCHAR(10),
+    incorporation_date DATE,
+    legal_form     VARCHAR(30)
+);
+```
+
+**Rules:**
+
+- Parent table PK is a surrogate key (identity/serial)
+- Child table PK is also a FK to the parent table PK (shared surrogate)
+- No child table has nullable columns for attributes of other subtypes
+- Child table column names do NOT repeat the parent's columns
+- Discriminator column on parent enables correct child table join without probing
+- Temporal columns (`valid_from`, `valid_to`, `is_current`) live on the parent only
+  unless child attributes change on a different cadence
+
+#### Pattern 3 — Concrete Table per Subtype
+
+Use only when subtypes are operationally independent — different teams, different
+SLAs, never queried together.
+
+**DDL template:**
+
+```sql
+-- No parent table — each subtype is self-contained
+CREATE TABLE individual (
+    individual_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    individual_bk  VARCHAR(50) NOT NULL,
+    -- repeated from parent concept
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    -- subtype-specific
+    date_of_birth  DATE,
+    gender         VARCHAR(10),
+    nationality    VARCHAR(50)
+);
+
+CREATE TABLE organisation (
+    organisation_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    organisation_bk VARCHAR(50) NOT NULL,
+    -- repeated from parent concept
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    -- subtype-specific
+    registration_number VARCHAR(50),
+    industry_code  VARCHAR(10)
+);
+```
+
+**Rules:**
+
+- Each table repeats all parent attributes (full denormalization)
+- No FK relationship between subtypes
+- Surrogate keys are independent per table
+- Use only when cross-subtype queries are not expected
+- If a downstream consumer needs a union view across subtypes, this pattern adds
+  complexity — prefer class-table instead
+
+### Inheritance Strategy Decision Table
+
+Signal | Strategy | Rationale
+--- | --- | ---
+Subtypes add ≤2 attributes | Single table + discriminator | Low null-bloat; simple queries
+Subtypes add ≥3 attributes each | Class-table (parent + child) | Clean separation; no nullable columns
+Subtypes have independent lifecycle | Concrete per subtype | Operational independence; no shared state
+Subtypes are operationally joined frequently | Class-table | Shared surrogate key enables efficient joins
+Mixed: some subtypes shallow, some deep | Class-table for deep subtypes; discriminator for shallow ones | Pragmatic hybrid
+
 ---
 
 ## Enum and Low-Cardinality Guidance

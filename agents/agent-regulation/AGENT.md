@@ -161,6 +161,16 @@ and add or update an entity `governance:` block only when an override is require
 You may also update `retention_basis` where retention overrides are declared. You
 do not modify attributes, relationships, constraints, or events.
 
+**Product governance gaps:** When remediation involves data product governance or
+masking metadata (identified via Level 4 audit), produce specific recommendations
+but do not modify product declaration files directly. Instead, hand off to Agent
+Data Product:
+
+> "Product [name] requires [change]. Switch to @agent-dataproduct to apply this
+> governance update to the product declaration."
+
+You flag; Agent Data Product fixes.
+
 ---
 
 ## Output Format — Gap Report

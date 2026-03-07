@@ -1,0 +1,163 @@
+{
+  "isAbstract": false,
+  "name": "Location",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "The definition of an addressable space/position both in real and virtual environments with associated uses and entitlements",
+  "bianId": "063a0dcf-0561-e911-8237-068e13695e26",
+  "attributeList": [
+    {
+      "featureName": "LocationDescription",
+      "name": "LocationDescription",
+      "dataType": "Text",
+      "description": "A description of the property, particularly if it has landmark characteristics.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationDateTime",
+      "name": "LocationDateTime",
+      "dataType": "Datetime",
+      "description": "Key dates associated with the directory entry (e.g. open date, refresh date).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "LocationStatus",
+      "name": "LocationStatus",
+      "dataType": "Status",
+      "description": "The tracked status (e.g. under construction or repair, inhabited, vacant).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Status"
+      }
+    },
+    {
+      "featureName": "LocationType",
+      "name": "LocationType",
+      "dataType": "Geographicalareatypevalues",
+      "description": "Type of location (e.g. building, point of interest, virtual location/device).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Geographicalareatypevalues"
+      }
+    },
+    {
+      "featureName": "LocationZoningType",
+      "name": "LocationZoningType",
+      "dataType": "Text",
+      "description": "The planning or zoning status (e.g. residential, commercial, industrial).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationNeighborhoodType",
+      "name": "LocationNeighborhoodType",
+      "dataType": "Text",
+      "description": "The general purpose and neighborhood of the property  (e.g. residential, industrial, commercial).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationConstructionType",
+      "name": "LocationConstructionType",
+      "dataType": "Text",
+      "description": "The construction approach for a property at the location (e.g. era and architecture as might be used in valuation).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationOccupancyType",
+      "name": "LocationOccupancyType",
+      "dataType": "Text",
+      "description": "The type of occupancy (e.g. residency, business, retail, entertainment).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationValue",
+      "name": "LocationValue",
+      "dataType": "Value",
+      "description": "The estimated (book) value of the property at the location - rental and purchase as appropriate.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Value"
+      }
+    },
+    {
+      "featureName": "LocationCapacity",
+      "name": "LocationCapacity",
+      "dataType": "Text",
+      "description": "An indication of the size or scale of the property where appropriate (e.g. 4 bedroom, 600 seat auditorium, 40 cover restaurant).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "LocationIdentification",
+      "name": "LocationIdentification",
+      "dataType": "Identifier",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "LocationAddress",
+      "name": "LocationAddress",
+      "dataType": "Address",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "LocationName",
+      "name": "LocationName",
+      "dataType": "Name",
+      "description": "Name (label) of the location. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "LocationTimeZone",
+      "name": "LocationTimeZone",
+      "dataType": "Text",
+      "description": "Local time zone.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "isAbstract": false,
+  "name": "Document",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Transaction Document",
+  "status": "Updated",
+  "description": "Something tangible that records something, such as a recording or a photograph, or a writing that can be used to furnish evidence or information (FIBO)\n\nDefinition: A physical or digital representation of something meaningful to the audience.\n\nComment: \n1.Technical: Manuals, instructions, tutorials, procedures, specifications, etc., that accompany a piece of equipment or software, and provide guidance for its proper use and maintenance.\n2.Trading: Preparation of a set of commercial and financial documents that record or support a business transaction. International trade documentations include air waybill, bill of exchange, bill of lading, certificate of inspection, certificate of insurance, certificate of origin, commercial invoice, and consular invoice.\n\n\nRead more: http://www.businessdictionary.com/definition/documentation.html#ixzz3EQGRGC4W\n",
+  "bianId": "ba9abd47-c656-e911-8237-06ecaacb4c68",
+  "attributeList": [
+    {
+      "featureName": "DocumentIdentification",
+      "name": "DocumentIdentification",
+      "dataType": "Identifier",
+      "description": "An identifier that allows to uniquely refer to an instance of a Document.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "DocumentVersion",
+      "name": "DocumentVersion",
+      "dataType": "Number",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Number"
+      }
+    },
+    {
+      "featureName": "DocumentType",
+      "name": "DocumentType",
+      "dataType": "Financialdocumenttypevalues",
+      "description": "Specifies the type of the document, for example commercial invoice. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Financialdocumenttypevalues"
+      }
+    },
+    {
+      "featureName": "DocumentStatus",
+      "name": "DocumentStatus",
+      "dataType": "Status",
+      "description": "Status of the document (e.g. delivered, paid, etc.). ISO20022",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Status"
+      }
+    },
+    {
+      "featureName": "DocumentDateTime",
+      "name": "DocumentDateTime",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "DocumentName",
+      "name": "DocumentName",
+      "dataType": "Name",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "DocumentDateTimeType",
+      "name": "DocumentDateTimeType",
+      "dataType": "Documentdatetimetypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Documentdatetimetypevalues"
+      }
+    },
+    {
+      "featureName": "DocumentPurpose",
+      "name": "DocumentPurpose",
+      "dataType": "Text",
+      "description": "Specifies the function of the document. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DocumentFormat",
+      "name": "DocumentFormat",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DocumentSubject",
+      "name": "DocumentSubject",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DocumentDescription",
+      "name": "DocumentDescription",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DocumentValidityPeriod",
+      "name": "DocumentValidityPeriod",
+      "dataType": "Datetimeperiod",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetimeperiod"
+      }
+    }
+  ]
+}

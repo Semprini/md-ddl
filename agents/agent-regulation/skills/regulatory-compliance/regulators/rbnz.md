@@ -3,6 +3,7 @@
 ## Overview
 
 RBNZ is the central bank and prudential regulator for New Zealand, regulating:
+
 - Registered banks
 - Non-bank deposit takers
 - Insurers
@@ -14,6 +15,7 @@ RBNZ is the central bank and prudential regulator for New Zealand, regulating:
 ### Banking Supervision Handbook
 
 **Impact on MD-DDL**:
+
 - Governance and risk management
 - Data quality for regulatory reporting
 - Outsourcing requirements
@@ -21,6 +23,7 @@ RBNZ is the central bank and prudential regulator for New Zealand, regulating:
 ### BS13 - Governance
 
 **Metadata to include**:
+
 ```yaml
 governance:
   board_oversight: true
@@ -30,10 +33,12 @@ governance:
 ### BS2B - Capital Adequacy
 
 **Entities affected**:
+
 - Loan (credit risk weighted assets)
 - Capital positions
 
 **Metadata to include**:
+
 ```yaml
 governance:
   capital_adequacy_reporting: true
@@ -45,6 +50,7 @@ governance:
 RBNZ requires certain data to be stored in New Zealand.
 
 **Metadata to include**:
+
 ```yaml
 governance:
   data_residency: ["New Zealand"]
@@ -56,6 +62,7 @@ governance:
 For NZ subsidiaries of Australian banks:
 
 **Both regulators apply**:
+
 ```yaml
 governance:
   regulatory_scope:
@@ -70,11 +77,13 @@ governance:
 ## RBNZ Reporting
 
 **Key reporting requirements**:
+
 - Financial statements (quarterly)
 - Capital adequacy (quarterly)
 - Liquidity (monthly)
 
 **Metadata to include**:
+
 ```yaml
 governance:
   rbnz_reporting:
@@ -86,8 +95,9 @@ governance:
 
 ## Resources
 
-- RBNZ Website: https://www.rbnz.govt.nz
-- Banking Supervision Handbook: https://www.rbnz.govt.nz/regulation-and-supervision/banks/banking-supervision-handbook
+- RBNZ Website: <https://www.rbnz.govt.nz>
+- Banking Supervision Handbook: <https://www.rbnz.govt.nz/regulation-and-supervision/banks/banking-supervision-handbook>
+
 ```
 
 ---
@@ -96,14 +106,16 @@ governance:
 
 ### **Scenario: User starts modeling**
 ```
+
 User: "I'm modeling financial crime for a New Zealand bank owned by an Australian parent. We need to align with BIAN."
 
-AI: 
+AI:
+
 1. Loads domain-discovery/SKILL.md
 2. Asks: "What regulatory jurisdictions apply?"
 3. User says: "APRA and RBNZ, plus FATF for AML"
 4. AI loads:
-   - external-standard-mapping/standards/bian.md
+   - external-standard-mapping/standards/bian/README.md
    - regulatory-compliance/regulators/apra.md
    - regulatory-compliance/regulators/rbnz.md
    - regulatory-compliance/regulators/fatf.md

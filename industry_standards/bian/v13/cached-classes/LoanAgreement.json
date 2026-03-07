@@ -1,0 +1,20 @@
+{
+  "isAbstract": false,
+  "name": "LoanAgreement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "Definition:\nA (Debt) Agreement into which is arranged that a party (lender) is giving money or financial instruments to another party (borrower) in exchange for future repayment of the loan value or principal amount, along with interest or finance charges. \n\nComment:\nA loan may be for a specific, one-time amount, or it can be available as an open-ended line of credit up to a specified limit, or any other variation.\nA classification of any agreement that provides funds to an entity in return for a promise from the entity to repay a lender or investor in accordance with terms and conditions of a contract. \n",
+  "bianId": "3225a15a-2356-e911-8237-060aad038e48",
+  "attributeList": [
+    {
+      "featureName": "LoanTermAndCondition",
+      "name": "LoanTermAndCondition",
+      "dataType": "Condition",
+      "description": "Term and condition to govern the use of loan product and the loan agreement in general.",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

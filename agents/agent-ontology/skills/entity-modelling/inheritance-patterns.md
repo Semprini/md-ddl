@@ -1,9 +1,11 @@
 # Inheritance Patterns - Detailed Guidance
 
 ## Overview
+
 Entity inheritance in MD-DDL allows modeling "is-a" relationships...
 
 ## Core Principles
+
 [Deep explanation]
 
 ## Industry Pattern Library
@@ -11,6 +13,7 @@ Entity inheritance in MD-DDL allows modeling "is-a" relationships...
 ### Banking / Financial Services (BIAN)
 
 **Party Hierarchy**:
+
 ```
 Party (abstract)
 ├─ Individual
@@ -22,6 +25,7 @@ Party (abstract)
 ```
 
 **Example: Individual.md**
+
 ```yaml
 specializes: Party
 
@@ -34,6 +38,7 @@ attributes:
 ```
 
 **Party Role Hierarchy**:
+
 ```
 Party Role (abstract)
 ├─ Customer
@@ -44,6 +49,7 @@ Party Role (abstract)
 ```
 
 Why this pattern works:
+
 - Customer team owns Customer with KYC requirements
 - Merchant Services owns Merchant with different compliance
 - Each role has distinct attributes and lifecycle
@@ -51,6 +57,7 @@ Why this pattern works:
 ### Insurance (ACORD)
 
 **Party Hierarchy**:
+
 ```
 Party (abstract)
 ├─ Person
@@ -58,6 +65,7 @@ Party (abstract)
 ```
 
 **Coverage Hierarchy**:
+
 ```
 Coverage (abstract)
 ├─ Auto Coverage
@@ -72,6 +80,7 @@ Coverage (abstract)
 ```
 
 **Example: Auto Coverage.md**
+
 ```yaml
 specializes: Coverage
 
@@ -88,6 +97,7 @@ attributes:
 ### Telecommunications (TM Forum SID)
 
 **Party Hierarchy**:
+
 ```
 PartyRole (TM Forum concept)
 ├─ Individual
@@ -96,6 +106,7 @@ PartyRole (TM Forum concept)
 ```
 
 **Product Hierarchy**:
+
 ```
 Product (abstract)
 ├─ Mobile Product
@@ -107,11 +118,12 @@ Product (abstract)
 └─ TV Product
 ```
 
-[Complete examples with TM Forum SID references]
+See [TM Forum standard guidance](../standards-alignment/standards/tmforum/README.md) for SID entity hierarchy and Party/Product/Service patterns.
 
 ### Healthcare (FHIR)
 
 FHIR uses flat resources, but MD-DDL can model:
+
 ```
 Party (abstract)
 ├─ Patient
@@ -130,10 +142,13 @@ Party (abstract)
 ✅ **Use composition instead**: Relationships between entities
 
 ## Edge Cases
+
 [Detailed edge case handling]
 
 ## Complete Case Studies
+
 [Full worked examples from each industry]
+
 ```
 
 ---

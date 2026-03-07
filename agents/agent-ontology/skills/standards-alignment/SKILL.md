@@ -34,9 +34,21 @@ in the `Reference` column of domain summary tables and in entity YAML.
 Do not silently map a concept to a standard if the fit is approximate. Check that
 the standard actually defines a counterpart to the entity or attribute being modelled.
 
-For BIAN BOM, use the dedicated guidance in [BIAN standard guidance](./standards/bian.md).
-It defines the deterministic lookup sequence, candidate disambiguation rules,
-version parameters, and no-guess policy.
+For BIAN BOM, use the dedicated guidance in [BIAN standard guidance](./standards/bian/README.md).
+It defines the deterministic lookup sequence, local reference files for name matching
+and attribute inspection, candidate disambiguation rules, version parameters,
+and no-guess policy.
+
+For TM Forum SID, use the dedicated guidance in [TM Forum standard guidance](./standards/tmforum/README.md).
+It defines the deterministic lookup sequence, local reference files for entity
+name matching and property inspection, SID domain taxonomy, the Party/PartyRole
+pattern, and the Customer vs Subscriber distinction critical for telecoms modelling.
+
+For ACORD, use the curated guidance in [ACORD standard guidance](./standards/acord/README.md).
+It covers core insurance entities (Policy, Coverage, Claim), party role patterns
+(PolicyHolder, Insured, Claimant, Beneficiary), ACORD naming conventions, and
+code lists. Note that ACORD schemas are membership-gated — mappings should note
+confidence level explicitly.
 
 For ISO 20022, consult the message definition catalogue for the relevant message type.
 
@@ -83,7 +95,82 @@ regulatory_scope:
 **Never fabricate a reference URL** to make the model look more aligned than it is.
 A missing reference is honest; a wrong one is harmful.
 
-For BIAN specifics (including endpoint order and exact-name resolution), follow [BIAN standard guidance](./standards/bian.md).
+For BIAN specifics (including local reference files, lookup order and exact-name resolution), follow [BIAN standard guidance](./standards/bian/README.md).
+For TM Forum SID specifics (including SID domain taxonomy and Party/Customer/Subscriber patterns), follow [TM Forum standard guidance](./standards/tmforum/README.md).
+For ACORD specifics (including insurance entity hierarchies and party role patterns), follow [ACORD standard guidance](./standards/acord/README.md).
+
+---
+
+## Standard Reconciliation Protocol
+
+Use this protocol when the user's model decomposition and the standard's
+decomposition genuinely differ — not just in naming, but in how concepts are
+split, merged, or specialised. This is common when an organisation has evolved
+its own terminology or when the standard is more abstract than the user's model.
+
+### When to Trigger
+
+Trigger reconciliation when any of these occur:
+
+- User's single concept maps to multiple standard objects (split)
+- Multiple user concepts map to a single standard object (merge)
+- User concept and standard object overlap partially with distinct extensions
+- User asks "how does our model relate to [standard]?" in structural terms
+
+### Step 1 — Build the Comparison Table
+
+Present a structured side-by-side to the user:
+
+```markdown
+Your Model | Standard | Overlap | Gap | Options
+--- | --- | --- | --- | ---
+Customer | BIAN Party Role | Both represent a business relationship to the organisation | Your Customer includes identity (name, DOB); BIAN separates identity into Party | (a) Split into Party + Customer Role (b) Keep Customer, reference BIAN Party Role with note
+Account Holder | BIAN Party Role | Both represent a party acting in a capacity | Your Account Holder is a specialisation of Customer; BIAN treats both as Party Role subtypes | (a) Model as separate entity specialising Party Role (b) Treat as Customer attribute
+```
+
+### Step 2 — Evaluate Each Option
+
+For each row, apply these decision criteria:
+
+Criterion | What to check
+--- | ---
+Ownership | Does each concept have a distinct owning team?
+Lifecycle | Does each concept have an independent lifecycle?
+Attributes | Does each concept carry meaningfully different attributes?
+Governance | Do different regulatory requirements apply?
+Standard alignment value | Does aligning more closely improve interoperability or auditability?
+Cost of divergence | What breaks if we don't align? (reporting, integration, audit trails)
+
+### Step 3 — Propose a Resolution
+
+For each row, recommend one of:
+
+Resolution | When appropriate
+--- | ---
+**Adopt standard decomposition** | Standard's split adds genuine value; aligning improves interoperability
+**Keep user decomposition, reference standard** | User's split reflects real operational boundaries; reference with qualification note
+**Hybrid** | Adopt standard's abstract parent, keep user's specialisations as subtypes
+**No alignment** | Concepts are superficially similar but semantically different; forced alignment would mislead
+
+### Step 4 — Document the Decision
+
+For each resolved concept, produce an annotation in the entity description that
+records the reconciliation:
+
+```markdown
+### Customer
+The party with an active product or service relationship.
+
+**Standards reconciliation:**
+- BIAN equivalent: Party Role (partial alignment — BIAN separates identity
+  into Party; our Customer carries identity attributes directly)
+- Decision: Kept as single entity; reference BIAN Party Role with qualification
+- Rationale: Customer team owns both identity and relationship data; splitting
+  would fragment operational ownership
+```
+
+This makes the alignment decision auditable and prevents future contributors
+from re-asking the same question.
 
 ---
 

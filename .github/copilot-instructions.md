@@ -53,6 +53,13 @@ agents/
       wide-column/                     Denormalized wide-column reporting schemas
       knowledge-graph/                 Knowledge graph schema, Neo4j Cypher DDL
 
+  agent-dataproduct/          Data product design and publication agent
+    AGENT.md                  Core prompt — identity, modes, skill index
+    skills/
+      product-design/                  Product class selection, entity scoping, governance, masking
+      odps-alignment/                  ODPS v4.0 manifest generation and mapping
+        references/                    ODPS specification reference
+
   agent-regulation/           Regulatory compliance and audit agent
     AGENT.md                  Core prompt — identity, modes (Audit/Monitor/Remediate), skill index
     skills/
@@ -64,6 +71,7 @@ agents/
   agents/                     Copilot custom-agent entrypoints (wrappers)
     agent-ontology.agent.md   Frontmatter + include of canonical `agents/agent-ontology/AGENT.md`
     agent-artifact.agent.md   Frontmatter + include of canonical `agents/agent-artifact/AGENT.md`
+    agent-dataproduct.agent.md Frontmatter + include of canonical `agents/agent-dataproduct/AGENT.md`
     agent-regulation.agent.md Frontmatter + include of canonical `agents/agent-regulation/AGENT.md`
   copilot-instructions.md     Repo-wide contributor and modelling guidance
 
@@ -163,13 +171,20 @@ Agent | Lifecycle stage | Owns
 --- | --- | ---
 `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring
 `agent-artifact` | Physical artifact generation | Dimensional star schemas, normalized 3NF designs, wide-column reporting schemas, knowledge graph schemas, SQL DDL, JSON Schema, Cypher, Parquet schema contracts
+`agent-dataproduct` | Data product design and publication | Data product class selection, entity scoping, governance overrides, masking strategies, ODPS manifest generation, external catalogue alignment
 `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation
 
 **Boundary rule — Ontology vs Artifact:** Agent Ontology produces conceptual and logical MD-DDL models. Agent Artifact consumes those models and generates physical artifacts (DDL, JSON Schema, Parquet). If Agent Artifact identifies a conceptual gap (missing entity, attribute, or relationship), it flags the gap and defers the structural change to Agent Ontology. Do not add physical generation capability to Agent Ontology or domain modelling capability to Agent Artifact.
 
+**Boundary rule — Ontology vs Data Product:** Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Agent Data Product takes over for detailed product design — choosing product class, scoping entities, setting governance overrides, masking strategies, and generating external manifests (ODPS). Do not add detailed product design or ODPS generation to Agent Ontology, and do not add entity modelling or relationship design to Agent Data Product.
+
+**Boundary rule — Data Product vs Artifact:** Agent Data Product produces MD-DDL data product declarations that serve as input contracts for Agent Artifact. Agent Artifact generates physical artifacts (DDL, JSON Schema, Parquet, Cypher) scoped by the product's `entities`, `schema_type`, `governance`, and `masking` fields. Do not add physical artifact generation to Agent Data Product, and do not add product design or ODPS alignment to Agent Artifact.
+
 **Boundary rule — Ontology vs Regulation:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
 (ongoing assurance). If a compliance gap requires a structural model change — a new entity, attribute, or relationship — Agent Regulation flags it and
 defers the structural work to Agent Ontology. Do not add structural modelling capability to Agent Regulation.
+
+**Boundary rule — Regulation vs Data Product:** Agent Regulation may audit data product governance and masking metadata (see Level 4 in the compliance-audit skill) and produce recommendations. Agent Data Product owns all product declarations and applies approved changes. Agent Regulation flags product governance gaps; Agent Data Product fixes them. Do not add product declaration authoring to Agent Regulation, and do not add compliance auditing to Agent Data Product.
 
 ### Shared skills
 

@@ -1,0 +1,111 @@
+{
+  "isAbstract": false,
+  "name": "Agreement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Savings Account Agreement",
+  "status": "Updated",
+  "description": "A formal or informal common understanding between two or more (legal competent) parties concerning one or more subject matters expressed in a set of arrangements, terms and conditions. (adapted from Legal System and FIBO) ",
+  "bianId": "b2f7829a-0a68-e911-8237-06dd5e24f7bc",
+  "attributeList": [
+    {
+      "featureName": "AgreementSignedDate",
+      "name": "AgreementSignedDate",
+      "dataType": "Date",
+      "description": "Date on which the agreement was signed by all parties. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Date"
+      }
+    },
+    {
+      "featureName": "AgreementType",
+      "name": "AgreementType",
+      "dataType": "Agreementtypevalues",
+      "description": "Specifies the category of agreement. Agreement type is very often referred to product. But, the term product does not cover all kinds of agreements. An Agreement can be subtyped from the perspective of various aspects of interest. One can classify the agreement from the perspective of format type (e.g., verbal agreement, written agreement). Other one can classify agreement based on duration like short-term agreement or long-term agreement.",
+      "isMandatory": false,
+      "isMultiValued": true,
+      "boEnumeration": {
+        "name": "Agreementtypevalues"
+      }
+    },
+    {
+      "featureName": "AgreementValidityPeriod",
+      "name": "AgreementValidityPeriod",
+      "dataType": "Datetimeperiod",
+      "description": "Period during which the agreement is valid\n",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetimeperiod"
+      }
+    },
+    {
+      "featureName": "AgreementVersion",
+      "name": "AgreementVersion",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "AgreementStatus",
+      "name": "AgreementStatus",
+      "dataType": "Agreementstatus",
+      "description": "A characteristic of agreement which refers to the LifecycleStatus of agreement (e.g., potential, offered, confirmed, completed, signed, terminated).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Agreementstatus"
+      }
+    },
+    {
+      "featureName": "AgreementSubjectMatter",
+      "name": "AgreementSubjectMatter",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "AgreementIdentification",
+      "name": "AgreementIdentification",
+      "dataType": "Identifier",
+      "description": "The identifier of agreement like Agreement Number, Contract Number, Contract Registration Number, etc. ",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "AgreementDate",
+      "name": "AgreementDate",
+      "dataType": "Datetime",
+      "description": "A characteristic of agreement which refers to 1) LifecycleDate of agreement (e.g., SignedDate, TerminatedDate, FulfilledDate) OR 2) ArrangedDate of agreement (e.g., StartingDate, EndingDate, ValidityPeriod, EffectiveDate).",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "AgreementDescription",
+      "name": "AgreementDescription",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "isAbstract": false,
+  "name": "Transaction",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Lien Transaction",
+  "status": "Updated",
+  "description": "A planned or performed action in the context of concluding an agreement or fulfilling an arrangement\n\nAct to do something.",
+  "bianId": "5708a70e-fd6f-e911-8237-06309b11004c",
+  "attributeList": [
+    {
+      "featureName": "TransactionIdentification",
+      "name": "TransactionIdentification",
+      "dataType": "Identifier",
+      "description": "An identifier that allows to uniquely refer to an instance of a transaction.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Identifier"
+      }
+    },
+    {
+      "featureName": "TransactionDate",
+      "name": "TransactionDate",
+      "dataType": "Transactiondatetime",
+      "description": "The Date that the transaction has occurred or is planned to occur.\nA characteristic of transaction which refers to the LifecycleDate of transaction (e.g., initiated date, executed date, fulfillment date). ",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Transactiondatetime"
+      }
+    },
+    {
+      "featureName": "TransactionType",
+      "name": "TransactionType",
+      "dataType": "Transactiontypevalues",
+      "description": "Specifies the category of Transaction like payment transaction, accounting transaction, financial Transaction, banking transaction, etc. ",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Transactiontypevalues"
+      }
+    },
+    {
+      "featureName": "TransactionDescription",
+      "name": "TransactionDescription",
+      "dataType": "Text",
+      "description": "A detailed explanation or commentary of transaction.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "TransactionStatus",
+      "name": "TransactionStatus",
+      "dataType": "Transactionstatus",
+      "description": "A characteristic of transaction which refers to the LifecycleStatus of transaction (e.g., initiated, executed, confirmed, cancelled, etc.) ",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Transactionstatus"
+      }
+    },
+    {
+      "featureName": "TransactionName",
+      "name": "TransactionName",
+      "dataType": "Name",
+      "description": "The name of transaction.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    }
+  ]
+}

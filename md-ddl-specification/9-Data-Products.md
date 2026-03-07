@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.0)
+# MD‑DDL Specification (Draft 0.8.1)
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 

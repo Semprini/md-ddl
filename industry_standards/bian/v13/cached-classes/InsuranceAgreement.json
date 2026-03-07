@@ -1,0 +1,20 @@
+{
+  "isAbstract": false,
+  "name": "InsuranceAgreement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "An Agreement between an insurer and a customer to insure a risk object against some risk.",
+  "bianId": "5f8ac218-7780-e911-823e-061de61e9206",
+  "attributeList": [
+    {
+      "featureName": "InsuranceAgreementIdentifier",
+      "name": "InsuranceAgreementIdentifier",
+      "dataType": "String",
+      "description": "An identifier that allows to uniquely refer to an instance of an Insurance Agreement.",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

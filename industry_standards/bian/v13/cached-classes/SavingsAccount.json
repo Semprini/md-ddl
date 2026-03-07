@@ -1,0 +1,11 @@
+{
+  "isAbstract": false,
+  "name": "SavingsAccount",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "A bank account upon which the financial position of a saving account agreement is managed. \n",
+  "bianId": "113ad50c-a29d-e911-827a-06c73ecc951a",
+  "attributeList": null
+}

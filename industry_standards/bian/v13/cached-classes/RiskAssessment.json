@@ -1,0 +1,20 @@
+{
+  "isAbstract": false,
+  "name": "RiskAssessment",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": null,
+  "status": "Updated",
+  "description": "",
+  "bianId": "5b18dd29-95d8-e911-82a8-06740d90dcce",
+  "attributeList": [
+    {
+      "featureName": "RiskAssessmentViewpoint",
+      "name": "RiskAssessmentViewpoint",
+      "dataType": "String",
+      "description": "The type of risk assessed\n\ne.g. currency risk, credit risk, reputation risk",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ]
+}

@@ -77,6 +77,22 @@ are read-only references — do not modify them:
 - `../../agent-ontology/skills/relationship-events/SKILL.md`
 - `../../agent-ontology/skills/standards-alignment/SKILL.md`
 
+### Dialect References
+
+Platform-specific guidance lives in `skills/dialects/`. Load the applicable file
+after confirming the target platform in Assessment mode:
+
+| Platform | File | Key features |
+| --- | --- | --- |
+| Snowflake | `skills/dialects/snowflake.md` | VARIANT columns, CLUSTER BY, masking policies, object tagging, Time Travel |
+| Databricks | `skills/dialects/databricks.md` | Delta Lake, Unity Catalog, LIQUID clustering, column masks, STRUCT/ARRAY |
+| PostgreSQL | `skills/dialects/postgresql.md` | JSONB, partial indexes, declarative partitioning, check constraints, RLS |
+
+When a user specifies a platform, load the dialect file before generating DDL.
+Apply the data type mappings, naming conventions, and platform features defined
+in the dialect file. If no dialect file exists for the requested platform, generate
+ANSI SQL and note which platform-specific features the user should adapt.
+
 ---
 
 ## Behaviour Modes

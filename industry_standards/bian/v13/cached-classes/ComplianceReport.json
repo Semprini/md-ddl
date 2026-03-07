@@ -1,0 +1,11 @@
+{
+  "superType": null,
+  "bianId": "bbb55e02-423a-eb11-82e3-069cf2dd6099",
+  "ownerName": "BusinessObjectModel",
+  "name": "ComplianceReport",
+  "description": "The report created by companies in order to comply to rules, standards, laws and regulations set by regulatory bodies and government agencies.",
+  "attributeList": null,
+  "isAbstract": false,
+  "isRoot": false,
+  "status": "Updated"
+}

@@ -1,0 +1,56 @@
+{
+  "isAbstract": false,
+  "name": "FinancialInstrument",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Leasing Product",
+  "status": "Updated",
+  "description": "A contract that gives rise to a financial asset of one entity and a financial liability or equity instrument of another entity. (IFRS)\nhttps://www.iasplus.com/en/standards/ias/ias32#:~:text=Key%20definitions%20%5BIAS%2032.11%5D,equity%20instrument%20of%20another%20entity\n\nFinancial instruments are financial contracts of different nature made between institutional units. These comprise the full range of financial claims and liabilities between institutional units, including contingent liabilities like guarantees, commitments, etc. (ISO 10962)\n",
+  "bianId": "2b91327b-b6a4-ea11-829f-0660fb1fa966",
+  "attributeList": [
+    {
+      "featureName": "FinancialInstrumentType",
+      "name": "FinancialInstrumentType",
+      "dataType": "Financialinstrumenttypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Financialinstrumenttypevalues"
+      }
+    },
+    {
+      "featureName": "FinancialInstrumentIdentification",
+      "name": "FinancialInstrumentIdentification",
+      "dataType": "Financialinstrumentidentification",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Financialinstrumentidentification"
+      }
+    },
+    {
+      "featureName": "FinancialInstrumentName",
+      "name": "FinancialInstrumentName",
+      "dataType": "Name",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "FinancialInstrumentDate",
+      "name": "FinancialInstrumentDate",
+      "dataType": "Financialinstrumentdatetime",
+      "description": "Key dates of financial instrument",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Financialinstrumentdatetime"
+      }
+    }
+  ]
+}

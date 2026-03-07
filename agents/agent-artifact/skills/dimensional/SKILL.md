@@ -83,6 +83,117 @@ Subtypes mostly labels | single `dim_*` + subtype enum/discriminator
 Subtypes materially different attributes | parent `dim_*` + child extension tables
 Subtypes independent operational lifecycles | separate dimensions + conformed bridge/reference strategy
 
+### Inheritance DDL Patterns (Dimensional)
+
+#### Pattern 1 — Single Dimension with Discriminator
+
+Use when subtypes differ by label or ≤2 attributes. All rows in one dimension.
+
+```sql
+CREATE TABLE dim_party (
+    party_sk       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    party_bk       VARCHAR(50) NOT NULL,
+    party_type     VARCHAR(30) NOT NULL,  -- discriminator
+    -- shared attributes
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    -- subtype-specific (nullable for other types)
+    date_of_birth  DATE,          -- Individual only
+    gender         VARCHAR(10),   -- Individual only
+    registration_number VARCHAR(50),  -- Organisation only
+    -- SCD2 temporal
+    valid_from     TIMESTAMP NOT NULL,
+    valid_to       TIMESTAMP,
+    is_current     BOOLEAN DEFAULT TRUE
+);
+```
+
+Fact tables reference `party_sk` directly. The discriminator enables filtering
+by subtype without additional joins.
+
+#### Pattern 2 — Parent Dimension + Extension Dimensions
+
+Use when subtypes add ≥3 meaningful attributes. Parent dimension carries shared
+attributes and the surrogate key. Extension dimensions carry subtype-specific
+attributes with FK to parent SK.
+
+```sql
+-- Parent dimension: shared attributes and surrogate key
+CREATE TABLE dim_party (
+    party_sk       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    party_bk       VARCHAR(50) NOT NULL,
+    party_type     VARCHAR(30) NOT NULL,  -- discriminator
+    full_name      VARCHAR(200),
+    tax_id         VARCHAR(30),
+    valid_from     TIMESTAMP NOT NULL,
+    valid_to       TIMESTAMP,
+    is_current     BOOLEAN DEFAULT TRUE
+);
+
+-- Extension dimension: Individual-specific attributes
+CREATE TABLE dim_party_individual (
+    party_sk       BIGINT PRIMARY KEY REFERENCES dim_party(party_sk),
+    date_of_birth  DATE,
+    gender         VARCHAR(10),
+    nationality    VARCHAR(50),
+    marital_status VARCHAR(20)
+);
+
+-- Extension dimension: Organisation-specific attributes
+CREATE TABLE dim_party_organisation (
+    party_sk       BIGINT PRIMARY KEY REFERENCES dim_party(party_sk),
+    registration_number VARCHAR(50),
+    industry_code  VARCHAR(10),
+    incorporation_date DATE,
+    legal_form     VARCHAR(30)
+);
+```
+
+**Rules:**
+
+- Fact tables always reference the parent `dim_party.party_sk`
+- Extension dimensions share the parent's SK as their PK and FK
+- SCD2 temporal columns live on the parent dimension only
+- Extension dimensions do not repeat parent attributes
+- When querying, join fact → parent → extension as needed
+
+#### Pattern 3 — Fully Separate Dimensions
+
+Use only when subtypes are operationally independent and never appear in the
+same fact table.
+
+```sql
+CREATE TABLE dim_individual (
+    individual_sk  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    individual_bk  VARCHAR(50) NOT NULL,
+    full_name      VARCHAR(200),
+    date_of_birth  DATE,
+    gender         VARCHAR(10),
+    nationality    VARCHAR(50),
+    valid_from     TIMESTAMP NOT NULL,
+    valid_to       TIMESTAMP,
+    is_current     BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE dim_organisation (
+    organisation_sk BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    organisation_bk VARCHAR(50) NOT NULL,
+    full_name      VARCHAR(200),
+    registration_number VARCHAR(50),
+    industry_code  VARCHAR(10),
+    valid_from     TIMESTAMP NOT NULL,
+    valid_to       TIMESTAMP,
+    is_current     BOOLEAN DEFAULT TRUE
+);
+```
+
+**Rules:**
+
+- Each dimension has independent SK sequences
+- Parent attributes are repeated (full denormalization)
+- Fact tables reference the specific subtype SK, not a shared parent
+- Only use when cross-subtype analysis is not expected
+
 ---
 
 ## Enum Guidance (Low Cardinality and Physicalization)

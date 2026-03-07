@@ -1,0 +1,190 @@
+{
+  "isAbstract": false,
+  "name": "Device",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Issued Device",
+  "status": "Updated",
+  "description": "An item created to serve a particular need, such as a credit card, a smart phone, an electronic signature, an electronic key, etc.\n\nA device is a physical resource (material and non human resources) to serve a particular need. \n\n",
+  "bianId": "0263db4b-0761-e911-8237-068e13695e26",
+  "attributeList": [
+    {
+      "featureName": "DeviceIdentification",
+      "name": "DeviceIdentification",
+      "dataType": "Deviceidentification",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Deviceidentification"
+      }
+    },
+    {
+      "featureName": "DeviceType",
+      "name": "DeviceType",
+      "dataType": "Devicetypevalues",
+      "description": "Reference to the device type of the device\n\nA device has the characteristics of the device type it belongs to possibly specified\ne.g. a device of the type \"cheque book\" will have cheques. The device specifies how many and what the number range is.\ne.g. an electronic banking app consists of software modules, the device specifies what version \n\n",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Devicetypevalues"
+      }
+    },
+    {
+      "featureName": "DeviceProperty",
+      "name": "DeviceProperty",
+      "dataType": "Text",
+      "description": "Property of a device relevant for its use.\n\nA device has the characteristics of the device type it belongs to,possibly specified\ne.g. . a device of the type \"cheque book\" will have cheques. The device specifies how many and what the number range is.\ne.g. an electronic banking app consists of software modules, the device specifies what version \n",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DeviceElement",
+      "name": "DeviceElement",
+      "dataType": "Text",
+      "description": "An element of the device that can be used independently and is individually identified\n\ne.g. a cheque in a chequebook",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DeviceStatus",
+      "name": "DeviceStatus",
+      "dataType": "Status",
+      "description": "The life cycle stage of a device\n\ne.g. active, defect",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Status"
+      }
+    },
+    {
+      "featureName": "DeviceVersion",
+      "name": "DeviceVersion",
+      "dataType": "Number",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Number"
+      }
+    },
+    {
+      "featureName": "DeviceDateTime",
+      "name": "DeviceDateTime",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "DeviceDescription",
+      "name": "DeviceDescription",
+      "dataType": "Text",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DeviceName",
+      "name": "DeviceName",
+      "dataType": "Name",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "DeviceLanguage",
+      "name": "DeviceLanguage",
+      "dataType": "Text",
+      "description": "Preferred language set on the device",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DevicePhoneNumber",
+      "name": "DevicePhoneNumber",
+      "dataType": "Text",
+      "description": "Phone number associated with the device.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DeviceLocation",
+      "name": "DeviceLocation",
+      "dataType": "Location",
+      "description": "Geographical location of the device.",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "DeviceManufacturer",
+      "name": "DeviceManufacturer",
+      "dataType": "Text",
+      "description": "Manufacturer of the device.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Text"
+      }
+    },
+    {
+      "featureName": "DeviceCountry",
+      "name": "DeviceCountry",
+      "dataType": "Country",
+      "description": "Country of the location.",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "DeviceAddress",
+      "name": "DeviceAddress",
+      "dataType": "Address",
+      "description": "The address associated with the device like Internet Protocol address, email Address",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "DeviceAddressType",
+      "name": "DeviceAddressType",
+      "dataType": "Addresstypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Addresstypevalues"
+      }
+    },
+    {
+      "featureName": "DeviceOperatingSystem",
+      "name": "DeviceOperatingSystem",
+      "dataType": "Deviceoperatingsystemtypevalues",
+      "description": "The operating system deployed on device.",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Deviceoperatingsystemtypevalues"
+      }
+    }
+  ]
+}

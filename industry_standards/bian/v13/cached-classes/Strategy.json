@@ -1,0 +1,11 @@
+{
+  "isAbstract": false,
+  "name": "Strategy",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Business Development Strategy",
+  "status": "Updated",
+  "description": "A high level plan to achieve one or more goals ",
+  "bianId": "b1cb007b-fa94-ea11-8295-06c610ca3b44",
+  "attributeList": null
+}

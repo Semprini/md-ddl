@@ -1,0 +1,11 @@
+{
+  "isAbstract": false,
+  "name": "Indicator",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Customer Position State Indicator",
+  "status": "Updated",
+  "description": "Indicators are statistics used to measure current condition or existence of something",
+  "bianId": "df9aee43-30d5-ed11-8405-0699a0ba7003",
+  "attributeList": null
+}

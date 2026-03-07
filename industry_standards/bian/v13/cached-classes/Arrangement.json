@@ -1,0 +1,72 @@
+{
+  "isAbstract": false,
+  "name": "Arrangement",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Savings Account Arrangement",
+  "status": "Updated",
+  "description": "An agreed commitment to perform actions that meet obligations under an agreement",
+  "bianId": "dd3cc0aa-0a68-e911-8237-06dd5e24f7bc",
+  "attributeList": [
+    {
+      "featureName": "ArrangementAction",
+      "name": "ArrangementAction",
+      "dataType": "Action",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "ArrangementStartDate",
+      "name": "ArrangementStartDate",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "ArrangementEndDate",
+      "name": "ArrangementEndDate",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "ArrangementStatus",
+      "name": "ArrangementStatus",
+      "dataType": "Arrangementstatus",
+      "description": "A characteristic of arrangement which refers to the LifecycleStatus of arrangement (e.g., requested, proposed, offered, accepted, cancelled, terminated, fulfilled, etc.)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Arrangementstatus"
+      }
+    },
+    {
+      "featureName": "ArrangementSubjectMatter",
+      "name": "ArrangementSubjectMatter",
+      "dataType": "Subject",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    },
+    {
+      "featureName": "Arrangementtype",
+      "name": "Arrangementtype",
+      "dataType": "Arrangementtypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Arrangementtypevalues"
+      }
+    }
+  ]
+}

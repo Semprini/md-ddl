@@ -1,0 +1,20 @@
+{
+  "superType": null,
+  "bianId": "86e0e873-aa4a-ef11-8b66-a402b9460f22",
+  "ownerName": "BusinessObjectModel",
+  "name": "ComplianceCheck",
+  "description": "An assessment to check the compliance",
+  "attributeList": [
+    {
+      "featureName": "ComplianceCheckType",
+      "name": "ComplianceCheckType",
+      "dataType": "String",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false
+    }
+  ],
+  "isAbstract": false,
+  "isRoot": false,
+  "status": "Updated"
+}

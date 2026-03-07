@@ -1,0 +1,67 @@
+{
+  "isAbstract": false,
+  "name": "Party",
+  "isRoot": false,
+  "ownerName": "BusinessObjectModel",
+  "superType": "Person",
+  "status": "Updated",
+  "description": "A party represents an autonomous entity in which a bank has a business interest. It has a legal definition and identity. A party is a Person, Organization, (a proposed definition for BIAN BOM adapted from BIAN Party Working Group) \n\n- Entity involved in an activity. (ISO20022)",
+  "bianId": "6f53fd37-8257-e911-8237-0645314e65ac",
+  "attributeList": [
+    {
+      "featureName": "PartyName",
+      "name": "PartyName",
+      "dataType": "Name",
+      "description": "Name by which a party is known and which is usually used to identify that party. (ISO20022)\n",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Name"
+      }
+    },
+    {
+      "featureName": "PartyType",
+      "name": "PartyType",
+      "dataType": "Partytypevalues",
+      "description": "Specifies the type of party in different business contexts. (ISO20022)",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Partytypevalues"
+      }
+    },
+    {
+      "featureName": "PartyDateTime",
+      "name": "PartyDateTime",
+      "dataType": "Datetime",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Datetime"
+      }
+    },
+    {
+      "featureName": "PartyIdentification",
+      "name": "PartyIdentification",
+      "dataType": "Partyidentification",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boDataType": {
+        "name": "Partyidentification"
+      }
+    },
+    {
+      "featureName": "PartyLegalStructureType",
+      "name": "PartyLegalStructureType",
+      "dataType": "Partylegalstructuretypevalues",
+      "description": "",
+      "isMandatory": false,
+      "isMultiValued": false,
+      "boEnumeration": {
+        "name": "Partylegalstructuretypevalues"
+      }
+    }
+  ]
+}

@@ -79,6 +79,65 @@ with drafting.
 
 ---
 
+## Brownfield Interview Path
+
+Use this path when the user wants to extend, modify, or integrate with an
+**existing** domain model rather than starting from scratch. Triggers include:
+
+- "Add an entity to [domain]"
+- "We have a new source system to connect"
+- "We need to add governance for [regulation]"
+- "Model this new concept in the existing [domain]"
+- Any request where a domain file already exists
+
+### Brownfield Step 1 — Understand the Existing Model
+
+Read the domain file and build context:
+
+- What entities, relationships, events, and products already exist?
+- What governance posture is declared?
+- What source systems are connected?
+- What modelling strategy is in use (Canonical vs. BoundedContext)?
+
+Do not re-interview the domain's purpose or boundaries unless the user is
+questioning them.
+
+### Brownfield Step 2 — Scope the Change
+
+Ask:
+- What specifically are you adding or changing?
+- Is this a new concept, an extension to an existing concept, or a correction?
+- Does this change affect existing entities, relationships, or events?
+
+Classify the change using the Domain Evolution rules from the Domains spec:
+
+- **Breaking**: changes meaning or removes concepts → major version bump
+- **Additive**: extends the model without altering existing meaning → minor bump
+- **Corrective**: fixes errors without changing intended meaning → patch bump
+
+### Brownfield Step 3 — Impact Assessment
+
+Before modifying anything, assess impact:
+
+- Which existing detail files are affected?
+- Do any data products reference the affected entities?
+- Will this change require updates to source mappings?
+- Does the change affect the domain's governance posture?
+
+Flag cross-cutting impacts to the user before proceeding to drafting.
+
+### Brownfield Step 4 — Targeted Drafting
+
+Apply the relevant specialist skill (Entity Modelling, Relationship & Events,
+Source Mapping, etc.) for just the change in question. Update:
+
+1. The affected detail files
+2. The relevant summary tables in the domain file
+3. The domain `version` field per version-bump rules
+4. The domain overview diagram if entities or relationships changed
+
+---
+
 ## Modelling Strategy
 
 Determine and state the strategy explicitly in the domain description and in the

@@ -122,7 +122,7 @@ Field | Purpose
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
-`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`.
+`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
 `entities` | List of canonical entity names included in this product.
 
 #### Optional Metadata Fields
@@ -335,3 +335,68 @@ Product detail files follow the same structural rules as entity detail files:
 9. **Two-layer compliance.** Every data product must appear in both the domain file summary table and a detail file. The domain file is the index; the detail file is the contract.
 
 10. **Name uniqueness.** Data product names must be unique within a domain. The level-3 heading is the product's identity in the Knowledge Graph.
+
+---
+
+### **Product Lifecycle**
+
+Data products progress through defined lifecycle states. The `status` field declares the current state; optional date fields document transition timing.
+
+#### Lifecycle States
+
+State | Meaning
+--- | ---
+`Draft` | Product is being designed. Not yet available to consumers. May change without notice.
+`Production` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
+`Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
+
+#### Transition Rules
+
+- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Data Product's design process).
+- `Production` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
+- `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
+- `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
+
+#### Lifecycle Metadata Fields
+
+Field | Required | Purpose
+--- | --- | ---
+`deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
+`successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
+`sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
+
+Example:
+
+```yaml
+status: Deprecated
+deprecated_date: "2025-03-15"
+successor: "Customer 360 Profile v2"
+```
+
+---
+
+### **Cross-Domain Governance Conflict Resolution**
+
+When a consumer-aligned data product spans multiple domains via `cross_domain`, governance metadata may conflict between the owning domain and the referenced domains. These conflicts must be resolved explicitly — silent inheritance of weaker controls is not permitted.
+
+#### Conflict Detection
+
+For each `cross_domain` entry, compare the owning domain's governance defaults with the referenced domain's defaults across:
+
+Field | Conflict Exists When
+--- | ---
+`classification` | Referenced domain has a higher classification than the product declares
+`retention` | Domains declare different retention periods
+`pii` | Referenced domain declares `pii: true` but the product does not acknowledge it
+`regulatory_scope` | Referenced domain is subject to regulatory frameworks not listed in the product's owning domain
+
+#### Resolution Rules
+
+1. **Classification: highest wins.** The product's effective classification is the highest of all contributing domains. If the product declares a lower classification, it must include an explicit `governance.classification` override with a justification comment explaining why the lower classification is appropriate (e.g., masking renders the data non-sensitive).
+
+2. **Retention: longest wins.** The product's effective retention is the longest period required by any contributing domain's regulatory obligations. A shorter retention may be declared only if the product's masking or aggregation removes the retention trigger.
+
+3. **PII: union of obligations.** If any contributing domain declares `pii: true`, the product must either declare `pii: true` with appropriate masking entries, or demonstrate that all PII attributes are masked to a level where PII obligations no longer apply.
+
+4. **Regulatory scope: union of frameworks.** The product is subject to the combined regulatory scope of all contributing domains. The owning domain's `regulatory_scope` does not shield the product from obligations in the referenced domains.

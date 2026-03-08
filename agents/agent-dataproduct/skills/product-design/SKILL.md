@@ -116,6 +116,27 @@ Governance Field | When to Override
 `retention` | Product has a different retention requirement (e.g., regulatory report kept longer)
 `masking` | Product needs attribute-level masking for PII exposure
 
+#### Cross-Domain Governance Conflicts
+
+For consumer-aligned products with `cross_domain` references, governance may conflict
+between the owning domain and referenced domains. Apply these resolution rules:
+
+1. **Read each referenced domain's governance defaults** before setting overrides.
+2. **Classification: highest wins.** The product's classification must be at least as
+   restrictive as the highest classification among all contributing domains. If you
+   declare a lower classification, add a justification comment explaining why (e.g.,
+   masking renders data non-sensitive).
+3. **Retention: longest wins.** The product's retention must meet the longest period
+   required by any contributing domain's regulatory obligations.
+4. **PII: union of obligations.** If any contributing domain declares `pii: true`,
+   the product must either declare `pii: true` with masking entries, or demonstrate
+   that masking eliminates the PII obligation.
+5. **Regulatory scope: union of frameworks.** The product is subject to the combined
+   regulatory scope of all contributing domains.
+
+When conflicts exist, flag them explicitly in the product description or as a comment
+in the governance block. Do not silently inherit weaker controls.
+
 **Masking strategy selection:**
 
 Strategy | Use When
@@ -209,11 +230,14 @@ Before declaring a product complete, verify:
 - [ ] Every entity in `entities` exists in the domain or `cross_domain` declaration
 - [ ] `cross_domain` is only used on consumer-aligned products
 - [ ] Governance overrides are genuine differences from domain defaults (not duplicates)
+- [ ] Cross-domain products resolve governance conflicts (classification, retention, PII, regulatory scope)
 - [ ] Masking strategies are appropriate for the sensitivity level and consumer access
 - [ ] Source-aligned products use `source` field, not `entities`
 - [ ] Product appears in both domain summary table and detail file
 - [ ] Product name is unique within the domain
 - [ ] Description clearly states what the product provides and for whom
+- [ ] Status is a valid lifecycle state (`Draft`, `Production`, `Deprecated`, `Retired`)
+- [ ] Deprecated products include `deprecated_date` and ideally `successor`
 
 ## Product Review
 
@@ -224,3 +248,31 @@ When reviewing existing products, check for:
 - **Stale status:** Products marked Production that are no longer consumed
 - **Governance drift:** Products whose governance overrides no longer match current policy
 - **Orphaned products:** Products in detail files that are missing from the domain summary table (or vice versa)
+
+## Product Lifecycle Management
+
+When managing existing products, apply the lifecycle rules from the Data Products
+specification:
+
+### Status Transitions
+
+Transition | Required Actions
+--- | ---
+Draft → Production | All quality checklist items pass; governance overrides reviewed
+Production → Deprecated | Add `deprecated_date` to metadata; add `successor` if a replacement exists; notify declared consumers
+Deprecated → Retired | Add `sunset_date` to metadata; confirm no active consumers remain; product remains in detail file for audit
+
+### Managing Deprecation
+
+When a user deprecates a product:
+
+1. Set `status: Deprecated` and add `deprecated_date`
+2. If a replacement exists, add `successor: "[New Product Name]"`
+3. Update the domain summary table status
+4. Identify consumers that need to migrate — review the `consumers` list
+
+### Retired Products
+
+Retired products are immutable records. Do not delete them from detail files.
+They remain as lineage evidence. If a similar product is needed later, create
+a new product with a new name — do not revive a retired product.

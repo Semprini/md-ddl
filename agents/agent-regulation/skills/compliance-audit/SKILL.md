@@ -373,6 +373,19 @@ lightly cleansed data. Apply these checks:
 - If the source contains PII, the product should either declare `masking` or
   document why raw PII access is justified (e.g., audit replay requirements)
 
+### Cross-domain governance consistency
+
+For consumer-aligned products with `cross_domain` references, verify that governance
+conflicts between the owning domain and referenced domains are resolved correctly:
+
+Check | What to verify | Gap if failed
+--- | --- | ---
+**Classification floor** | Product classification is at least as restrictive as the highest classification among all contributing domains | Cross-domain classification downgrade without justification
+**Retention ceiling** | Product retention meets the longest period required by any contributing domain | Cross-domain retention shorter than referenced domain requires
+**PII union** | If any referenced domain declares `pii: true`, the product declares `pii: true` with masking or justifies omission | PII from referenced domain exposed without acknowledgement
+**Regulatory scope union** | Product's owning domain `regulatory_scope` covers all frameworks from referenced domains, or product-level overrides address the gap | Product subject to unacknowledged regulatory framework from referenced domain
+**Masking cross-domain PII** | PII attributes from `cross_domain` entities are covered by the product's `masking` entries | External PII attribute exposed without masking strategy
+
 ### Product governance gap report format
 
 Add a "Product Governance" section to the gap report:

@@ -18,6 +18,8 @@ Load these references before performing the review:
 - Enumerations spec: `../entity-modelling/references/enumerations-spec.md`
 - Relationships spec: `../relationship-events/references/relationships-spec.md`
 - Events spec: `../relationship-events/references/events-spec.md`
+- Sources spec: `../source-mapping/references/sources-spec.md`
+- Transformations spec: `../source-mapping/references/transformations-spec.md`
 - Conceptual/physical realization: `../entity-modelling/conceptual-to-physical-realisation.md`
 - Standards alignment: `../standards-alignment/SKILL.md`
 - Regulatory compliance benchmark: `../../../agent-regulation/skills/regulatory-compliance/SKILL.md`
@@ -120,6 +122,34 @@ Assess domain and entity governance posture against stated jurisdictional scope:
 - AML/CTF, privacy, and jurisdiction-specific obligations are represented where applicable
 
 Flag under-specified regulatory posture and unsupported claims.
+
+### 6) Source and Transform Review
+
+If the domain declares source systems in `## Source Systems`, review the source layer:
+
+#### Source File Conformance
+
+- Each source system in the domain summary has a corresponding `sources/<system>/source.md` file
+- Source files include platform, capability, and change model metadata
+- Domain feed tables map every source table to a canonical entity
+- Source schema tables are present with column-level detail
+- `Destination` column uses correct formats (`Entity.Attribute` for direct, `[Name](#anchor)` for transforms)
+
+#### Transform File Conformance
+
+- Transform files follow `table_<source-table>.md` naming pattern
+- Each transform has a level-3 heading, prose description, and YAML block
+- YAML blocks declare `type`, `source_field`, `target_entity`, `target_attribute`
+- Transformation types use the vocabulary from the Transformations spec (Section 8)
+- Destination column in source schema tables links correctly to transform anchors
+
+#### Source-Domain Consistency
+
+- Every canonical entity that is claimed to receive data from a source has at least one mapping (domain feed table entry or transform destination)
+- Source fields that map to PII attributes are flagged if entity governance does not already declare `pii: true`
+- No source references appear in entity detail files (source-agnostic canonical layer is maintained)
+
+If no source systems are declared, skip this step but note the absence as advisory — most production domains should declare at least one source.
 
 ---
 

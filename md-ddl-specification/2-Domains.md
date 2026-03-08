@@ -322,7 +322,7 @@ Column | Purpose
 **Name** | The product name, linked to its detail definition.
 **Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
 **Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`.
+**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
 
 ---
 
@@ -335,6 +335,42 @@ Column | Purpose
 - The description must include a short natural‑language description. A longer description will be included in the detail file.
 
 This allows the domain file to act as a semantic index of the domain.
+
+---
+
+### **Domain Evolution**
+
+Domains are living artifacts. They evolve as business understanding deepens, new source systems are integrated, regulatory requirements change, and consumer needs shift. The `version` field in domain metadata tracks this evolution using semantic versioning.
+
+#### Version Bump Rules
+
+Change Type | Version Impact | Examples
+--- | --- | ---
+**Breaking** — changes meaning or removes concepts | Major bump | Removing an entity; renaming an entity; changing a relationship's cardinality, granularity, or direction; removing an attribute that downstream products consume
+**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, enum, relationship, or event; adding attributes to existing entities; declaring a new source system or data product
+**Corrective** — fixes errors without changing intended meaning | Patch bump | Fixing a typo in a description; correcting a broken link; updating a `# TODO:` with the resolved value; adjusting formatting
+
+#### Breaking vs Non-Breaking Changes
+
+A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied. Specifically:
+
+- Removing or renaming an entity or enum is always breaking.
+- Changing relationship cardinality (e.g., `1:N` to `M:N`) is breaking — physical schemas may need restructuring.
+- Changing relationship granularity (`atomic` to `period`) is breaking — it alters the semantics of the join.
+- Removing an attribute is breaking if any data product includes that entity.
+- Changing an attribute's type or constraints is breaking if it narrows the valid domain.
+
+A change is **non-breaking** if existing consumers continue to produce correct output without modification.
+
+#### Evolution Workflow
+
+When modifying an existing domain:
+
+1. Identify the change and classify it as breaking, additive, or corrective.
+2. Bump the `version` field in metadata according to the rules above.
+3. If breaking: review all data products that reference the affected entities and update them accordingly.
+4. If additive: update the relevant summary tables and create/update detail files.
+5. If corrective: fix the error in place.
 
 ---
 

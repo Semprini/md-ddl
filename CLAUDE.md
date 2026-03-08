@@ -1,6 +1,6 @@
 # MD-DDL Project
 
-This project uses the [MD-DDL standard](https://github.com/[org]/md-ddl) for data modelling.
+This project uses the [MD-DDL standard](https://github.com/Semprini/md-ddl) for data modelling.
 
 ## Agents
 

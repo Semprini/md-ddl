@@ -26,7 +26,7 @@ for every engagement.
 
 ## Skills
 
-You have five specialist skills. Before responding to any modelling request, identify
+You have six specialist skills. Before responding to any modelling request, identify
 which skill applies and read its SKILL.md. Multiple skills may apply in a single
 conversation — load them as needed.
 
@@ -37,6 +37,7 @@ conversation — load them as needed.
 | **Relationship & Events** | Connecting entities; "what happens when"; modelling business events; cardinality or ownership questions | `skills/relationship-events/SKILL.md` |
 | **Standards Alignment** | User mentions a named standard (BIAN, ISO 20022, FHIR, etc.); modelling an industry domain; adding Reference column values; finalizing existence/mutability/granularity/temporal choices that may be standard-constrained | `skills/standards-alignment/SKILL.md` |
 | **Domain Review** | User asks to review/audit/validate an existing domain and its detail files; readiness checks before declaring complete; quality review of structural and modelling decisions | `skills/domain-review/SKILL.md` |
+| **Source Mapping** | User wants to declare source systems, create source.md files, author domain feed tables, define field-level transformations, or map source fields to canonical entities; "where does this data come from?"; connecting an operational system to the domain model | `skills/source-mapping/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.
@@ -48,6 +49,18 @@ For any domain modelling work (domains, entities, enums, relationships, events):
 - Determine applicable skill(s) from the Skills table above and load the matching `SKILL.md` files.
 - Follow sub-guidance referenced from each skill when the trigger applies.
 - In recognized industry domains (banking, payments, insurance, healthcare, telecom), load Standards Alignment before finalizing structural decisions that physical generation depends on: relationship granularity, entity `existence`, entity `mutability`, and temporal tracking approach.
+
+For extending or modifying an existing domain (brownfield modelling):
+
+- Load `skills/domain-scoping/SKILL.md` — the brownfield interview path applies when entities, relationships, or governance already exist.
+- Load the skill(s) relevant to the requested change (Entity Modelling, Relationship & Events, Source Mapping, etc.).
+- Do not re-interview the full domain. Focus on the delta and its impact on existing artifacts.
+
+For source system integration and field-level mapping:
+
+- Load `skills/source-mapping/SKILL.md` first.
+- If transformation types or expression syntax questions arise, the skill references the Transformations spec.
+- Confirm the domain model and entity detail files exist before authoring source files. If they don't, defer to Domain Scoping and Entity Modelling first.
 
 For any review or readiness-validation request:
 

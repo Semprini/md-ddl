@@ -52,6 +52,8 @@ agents/
       entity-modelling/       Concept realisation + Entities + Enumerations spec
       relationship-events/    Relationships + Events spec
       standards-alignment/    Industry standards mapping (self-contained)
+      source-mapping/         Source system declaration + field-level transformations
+      domain-review/          Structural and decision-quality review protocol
 
   agent-artifact/             Physical artifact generation agent
     AGENT.md                  Core prompt — identity, modes, skill index
@@ -179,7 +181,7 @@ Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent 
 Agent | Lifecycle stage | Owns
 --- | --- | ---
 `agent-guide` | Learning and navigation | Standard explanation, user orientation, concept teaching, worked example walkthroughs, platform setup, agent navigation and handoff
-`agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, standards alignment during authoring
+`agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, source system mapping and field-level transformations, standards alignment during authoring
 `agent-artifact` | Physical artifact generation | Dimensional star schemas, normalized 3NF designs, wide-column reporting schemas, knowledge graph schemas, SQL DDL, JSON Schema, Cypher, Parquet schema contracts
 `agent-dataproduct` | Data product design and publication | Data product class selection, entity scoping, governance overrides, masking strategies, ODPS manifest generation, external catalogue alignment
 `agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation

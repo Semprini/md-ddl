@@ -1,5 +1,7 @@
 # EBA — European Banking Authority
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The European Banking Authority is the EU agency responsible for ensuring effective and consistent prudential regulation and supervision across the European banking sector. Key regulations include CRD/CRR capital requirements and EBA Guidelines on data governance.

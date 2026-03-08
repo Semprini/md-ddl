@@ -1,5 +1,7 @@
 # SOX — Sarbanes-Oxley Act
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The Sarbanes-Oxley Act of 2002 establishes requirements for financial reporting, internal controls, and audit trails for publicly traded companies in the United States.

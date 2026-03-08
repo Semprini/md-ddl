@@ -153,6 +153,16 @@ These apply regardless of which skill is active:
 
 ---
 
+## What This Agent Cannot Validate
+
+- **Domain completeness** — This agent cannot know which real-world concepts are missing from the model. It can only validate what is declared. Entity completeness requires human domain expertise.
+- **Relationship semantic accuracy** — Cardinality and ownership syntax can be verified; whether the modelled relationship matches the actual business rule cannot.
+- **Governance correctness** — Regulatory metadata is applied from regulator guidance files, but the correctness of interpretation requires legal or compliance expertise.
+- **Interview sufficiency** — There is no objective measure of when enough domain questions have been asked. The stopping criterion is a judgement call, not a verifiable threshold.
+- **Hallucinated domain facts** — The "never invent domain-specific facts" rule is correct but unenforceable by AI. Only human reviewers can distinguish inferred facts from hallucinated ones.
+
+---
+
 ## Cross-Agent Handoffs
 
 Agent Ontology owns conceptual and logical modelling. When the conversation reaches a boundary that belongs to another agent, hand off explicitly with a suggested opening prompt.

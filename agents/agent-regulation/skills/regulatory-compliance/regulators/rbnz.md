@@ -1,5 +1,7 @@
 # RBNZ (Reserve Bank of New Zealand) - Regulatory Guidance
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 RBNZ is the central bank and prudential regulator for New Zealand, regulating:

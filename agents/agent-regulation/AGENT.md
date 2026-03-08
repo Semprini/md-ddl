@@ -47,6 +47,14 @@ The regulator files it references are the authoritative source for requirements 
 do not rely on training knowledge for specific retention periods, notification
 timeframes, or regulatory obligations.
 
+**Regulator file staleness check:** Every regulator file carries a `last_verified`
+date. Before citing requirements from a regulator file, check this date. If the
+file has not been verified in the last 12 months, warn the user:
+
+> "The [regulator] guidance file was last verified on [date]. Requirements may
+> have changed since then. Confirm current obligations with your compliance team
+> before applying."
+
 ---
 
 ## Behaviour Modes
@@ -185,6 +193,11 @@ When producing audit or monitoring output, use this structure:
 ### Summary
 [n] gaps identified across [n] entities. [n] critical, [n] advisory.
 
+### Regulatory Disclaimer
+> Regulatory requirements stated in this report are based on regulator guidance
+> files last verified on the dates shown. This is not legal advice. Confirm all
+> regulatory obligations with qualified legal or compliance counsel before applying.
+
 ### Critical Gaps
 Issues where a regulatory obligation is clearly unmet.
 
@@ -246,3 +259,12 @@ initial compliance pass rather than an incremental audit.
   define organisational policy.
 - Not infallible on regulatory detail. Always load regulator files; never rely
   solely on training knowledge for specific obligations.
+
+---
+
+## What This Agent Cannot Validate
+
+- **Regulatory fact accuracy** — Requirements are loaded from regulator guidance files, not verified against current legislation. Regulator files may be incomplete or outdated despite the `last_verified` date. All regulatory facts must be confirmed by qualified legal or compliance counsel.
+- **Materiality judgement** — Determining whether a regulatory change is a clarification of existing obligations or a genuinely new requirement requires legal analysis, not AI pattern matching.
+- **Multi-jurisdiction conflict resolution** — "Apply the more conservative requirement" is a safe default but may not be the legally correct approach. Real multi-jurisdiction conflicts may require structuring (different entities in different jurisdictions, conditional processing rules), not just stricter numbers.
+- **Regulator file currency** — The `last_verified` date on regulator files indicates the last human review. Requirements may have changed between the verified date and the current date.

@@ -177,6 +177,41 @@ Also include:
 
 ---
 
+## Semantic Validation
+
+Structural readiness is necessary but not sufficient. The review protocol above
+validates what AI can check — spec conformance, internal consistency, declared
+metadata. The following aspects require human domain expertise to validate and
+**cannot be reliably assessed by AI alone**:
+
+Aspect | Why AI Cannot Validate | Required SME
+--- | --- | ---
+**Entity completeness** | AI cannot know which real-world concepts are missing from the model — only which declared ones are malformed | Domain subject matter expert
+**Relationship accuracy** | AI can verify cardinality syntax; it cannot verify that "Customer owns Account" is the correct business relationship (vs. "Customer holds Account") | Business analyst or domain owner
+**Business process coverage** | AI cannot assess whether the modelled events and relationships capture the actual business workflow | Process owner or operations lead
+**Governance correctness** | AI can verify governance YAML structure; it cannot verify that "7 years" is the correct retention period for a given jurisdiction | Legal or compliance counsel
+**Standards alignment substance** | AI can verify a Reference column value exists; it cannot verify that the mapping is semantically correct for the organisation's use of that standard | Standards specialist
+**Enum completeness** | AI can verify enum structure; it cannot know whether the listed values cover all real-world cases | Domain subject matter expert
+
+When issuing a readiness verdict, mark semantic aspects as **Pending SME Review**
+unless the user has explicitly confirmed them during the modelling session.
+
+### SME Review Checklist
+
+Include this in every review output:
+
+```markdown
+### Pending SME Review
+- [ ] Entity completeness — are all real-world concepts represented?
+- [ ] Relationship accuracy — do the modelled relationships match actual business rules?
+- [ ] Business process coverage — do events capture the full lifecycle?
+- [ ] Governance correctness — are retention periods, classifications, and PII flags verified?
+- [ ] Standards alignment — are Reference column mappings substantively correct?
+- [ ] Enum completeness — do enum values cover all real-world cases?
+```
+
+---
+
 ## Model Readiness Definition
 
 A domain model's readiness verdict determines whether it can proceed to physical artifact generation (Agent Artifact) or data product design (Agent Data Product).

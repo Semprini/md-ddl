@@ -312,3 +312,15 @@ When returning a pragmatic 3NF design, include:
 - strict-vs-pragmatic decisions list
 - assumptions and open questions
 - generated artifacts in requested format(s): DDL, JSON Schema, Parquet schema contract
+
+---
+
+## Generation Limitations
+
+Generated artifacts are syntactically valid but functionally untested. This agent
+cannot validate the following — they require human verification:
+
+- **Execution correctness** — DDL has not been run against an actual database. Test against a real environment before deployment.
+- **Type appropriateness** — Type mappings follow dialect conventions but may not be optimal for actual data characteristics (precision, scale, string lengths).
+- **Denormalization trade-offs** — Pragmatic 3NF decisions are based on heuristics. Validate that denormalized structures serve actual query patterns.
+- **JSON Schema / Parquet fidelity** — Generated contracts reflect the logical model. Validate against actual API payloads or data files.

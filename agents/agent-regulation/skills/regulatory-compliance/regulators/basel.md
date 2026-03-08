@@ -1,5 +1,7 @@
 # **Basel (BCBS) - Regulatory Guidance**
 
+> **last_verified:** 2025-03-08
+
 ## **Overview**
 
 The Basel Accords are a series of international banking regulations (Basel I, II, III, and now IV) set by the **Basel Committee on Banking Supervision (BCBS)**. They aim to ensure financial institutions have enough capital to meet obligations and absorb unexpected losses.

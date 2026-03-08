@@ -85,6 +85,10 @@ agents/
     agent-dataproduct.agent.md Frontmatter + include of canonical `agents/agent-dataproduct/AGENT.md`
     agent-regulation.agent.md Frontmatter + include of canonical `agents/agent-regulation/AGENT.md`
   copilot-instructions.md     Repo-wide contributor and modelling guidance
+  md-ddl-review-prompt.md     Layer 1: Structural review prompt
+  md-ddl-adversarial-review-prompt.md  Layer 2: Adversarial review prompt
+  md-ddl-evaluation-prompt.md Layer 3: Stakeholder simulation prompt
+  md-ddl-layered-review-process.md    Review process orchestration
 
 examples/
   Financial Crime/            Primary reference example (most current)
@@ -286,3 +290,26 @@ When upgrading an example, update all patterns in the file in a single pass — 
 - **No invented content.** Do not fabricate standards references, regulatory requirements, or example data that is not verifiable.
 - **Validate Markdown structure** on any changed file: table/link integrity, Mermaid syntax, heading hierarchy, and YAML block correctness.
 - **No runtime assumptions.** There is no build system. Validation is structural and manual (or via a linter if one is added). Do not add code that assumes a build or test pipeline exists unless one has been defined.
+
+---
+
+## Reviewing the standard
+
+When a user asks to review, evaluate, audit, or assess the MD-DDL standard, agents, or examples, use the layered review process defined in `.github/md-ddl-layered-review-process.md`.
+
+### Quick reference
+
+Request | What to do
+--- | ---
+"Review the standard" / "check for issues" / "run a review" | Load `.github/md-ddl-review-prompt.md` (Layer 1 — structural). Run it. Report findings.
+"Find weaknesses" / "what's wrong" / "stress test" / "adversarial review" | Load `.github/md-ddl-adversarial-review-prompt.md` (Layer 2 — adversarial). Run it. Report findings.
+"Evaluate for users" / "would people adopt this" / "stakeholder review" | Load `.github/md-ddl-evaluation-prompt.md` (Layer 3 — stakeholder simulation). Run it. Report findings.
+"Full review" / "layered review" / "comprehensive review" | Load `.github/md-ddl-layered-review-process.md` for the orchestration protocol, then run layers 1 → 2 → 3 in order, cross-referencing findings between layers.
+Review from a specific viewpoint (e.g. "review as a data engineer") | Load `.github/md-ddl-layered-review-process.md`, check the Ad-Hoc Viewpoint Reviews table, and frame the review from the requested perspective.
+
+### Key rules for reviews
+
+- Each layer should run in a separate conversation to prevent cross-contamination between evaluation stances.
+- Every review report must include a "What I Cannot Evaluate" section declaring the limits of AI assessment.
+- Cross-model diversity improves review quality — run different layers with different AI models when possible.
+- An honest review that finds real issues is more valuable than a clean bill of health. Never soften findings.

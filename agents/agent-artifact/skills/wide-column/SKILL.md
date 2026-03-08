@@ -250,3 +250,15 @@ Before finalizing:
 - [ ] Included columns reflect real reporting use cases
 - [ ] Rebuild and correction policy is specified
 - [ ] Governance-sensitive fields (PII/classification) are clearly tagged
+
+---
+
+## Generation Limitations
+
+Generated artifacts are syntactically valid but functionally untested. This agent
+cannot validate the following — they require human verification:
+
+- **Grain preservation** — Join logic is designed to preserve grain, but only testing with real data confirms no fan-out or duplication.
+- **Consumer fitness** — Wide-column schemas are designed for assumed query patterns. Validate with actual report consumers that the included columns serve their needs.
+- **Refresh feasibility** — Build strategies (incremental/full/restate) are recommended based on metadata. Infrastructure capacity and SLA constraints must be validated by the platform team.
+- **Performance at scale** — Column count and join complexity affect query performance. Test with representative data volumes.

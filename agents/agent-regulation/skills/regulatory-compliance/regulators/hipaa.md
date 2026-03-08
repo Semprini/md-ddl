@@ -1,5 +1,7 @@
 # HIPAA — Health Insurance Portability and Accountability Act
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 HIPAA establishes national standards for the protection of individually identifiable health information (Protected Health Information — PHI) in the United States. It applies to covered entities (health plans, healthcare clearinghouses, healthcare providers) and their business associates.

@@ -274,3 +274,15 @@ Before finalizing a knowledge graph schema, confirm:
 - [ ] Associative entities are realized appropriately (intermediate node vs relationship properties)
 - [ ] Dependent entities have orphan-detection validation queries
 - [ ] All constraint and index statements use `IF NOT EXISTS` for idempotency
+
+---
+
+## Generation Limitations
+
+Generated artifacts are syntactically valid but functionally untested. This agent
+cannot validate the following — they require human verification:
+
+- **Cypher execution** — Generated DDL and seed data have not been run against an actual Neo4j instance. Version-specific syntax differences may require adjustment.
+- **Relationship modelling choices** — Whether to model an associative entity as an intermediate node or relationship properties is a design judgement. Validate against actual graph traversal queries.
+- **Performance at scale** — Index and constraint choices follow best practice but depend on data volume and query patterns. Profile with representative data.
+- **Enum realization** — The choice between property constraints and reference nodes affects query ergonomics. Validate against actual consumer query patterns.

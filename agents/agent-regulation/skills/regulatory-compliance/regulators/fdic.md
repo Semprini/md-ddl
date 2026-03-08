@@ -1,5 +1,7 @@
 # FDIC — Federal Deposit Insurance Corporation
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The FDIC insures deposits, examines and supervises financial institutions for safety and soundness, and manages receiverships. It regulates state-chartered banks that are not members of the Federal Reserve System.

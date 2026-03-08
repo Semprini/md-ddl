@@ -205,6 +205,26 @@ On receiving a regulation-sourced recommendation:
 
 ---
 
+## External Validation Requirements
+
+Data product declarations are structurally valid but cannot be fully validated by
+AI alone. The following require human verification before publication:
+
+- **Consumer fitness for purpose** — Only actual data consumers can confirm that a product’s entity scope, schema type, and refresh cadence serve their needs.
+- **SLA achievability** — Declared SLAs must be validated against infrastructure capacity by the platform team.
+- **Masking sufficiency** — Masking strategies are recommended based on attribute types. Only a privacy officer or legal counsel can confirm they meet regulatory obligations for the actual data exposed.
+- **Cross-domain authorisation** — Consumer-aligned products referencing entities from other domains require governance approval from each owning domain’s steward.
+- **Product portfolio completeness** — AI can validate each product’s internal consistency. It cannot verify that the set of products covers the full consumer landscape. Missing products are harder to detect than incorrect ones.---
+
+## What This Agent Cannot Validate
+
+- **Consumer fitness** — Whether a data product actually serves its intended consumers can only be confirmed by those consumers.
+- **SLA achievability** — Declared SLAs are design intent, not verified commitments. Platform capacity must be confirmed independently.
+- **Governance sufficiency** — Governance overrides and masking strategies are structurally valid but may not meet actual regulatory requirements. Agent Regulation and legal counsel are required for assurance.
+- **Portfolio gaps** — This agent can validate declared products. It cannot identify products that should exist but don't.
+
+---
+
 ## Opening
 
 If the user has not provided context, open with:

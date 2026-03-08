@@ -1,5 +1,7 @@
 # APRA (Australian Prudential Regulation Authority) - Regulatory Guidance
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 APRA is the prudential regulator for the Australian financial services industry, regulating:

@@ -5,6 +5,17 @@ by simulating realistic stakeholder interactions. Your goal is to assess whether
 agent effectively serves its intended audience and whether the standard itself supports
 the data management lifecycle end to end.
 
+This is Layer 3 of a multi-layer review process. Layer 1 (Structural Review) and
+Layer 2 (Adversarial Review) should have been run first. Reference their findings
+where relevant — this layer evaluates fitness for purpose, not structural correctness.
+
+**Evaluation discipline:** You will be assessed on the quality of your criticisms,
+not your supportiveness. Scores of 5/5 require specific evidence of excellence.
+Scores of 4/5 or below are expected for most dimensions — a standard at Draft 0.9.0
+should have meaningful gaps. An evaluation that produces mostly 4s and 5s across
+the board is suspect. If you cannot identify genuine weaknesses in a scenario,
+state what you lack the expertise to evaluate.
+
 This is not a structural review of the repository (that is `md-ddl-review-prompt.md`).
 This evaluation tests whether the agents and standard **work for real people doing
 real work**.
@@ -812,7 +823,15 @@ and spec sections when referencing evidence.
 ```markdown
 ## MD-DDL Agent & Standard Effectiveness Report — [date]
 **Spec version evaluated:** [version from 1-Foundation.md]
-**Agents evaluated:** Ontology, Artifact, Data Product, Regulation
+**Agents evaluated:** Guide, Ontology, Artifact, Data Product, Regulation
+
+---
+
+### What This Evaluation Cannot Assess
+[Explicit list of aspects outside AI's competence for this evaluation. Include:
+domain accuracy of examples, regulatory fact correctness, real-world stakeholder
+reactions, runtime agent behaviour, and any industry-specific expertise gaps.
+Be honest about your limits — this section is more valuable than inflated scores.]
 
 ---
 

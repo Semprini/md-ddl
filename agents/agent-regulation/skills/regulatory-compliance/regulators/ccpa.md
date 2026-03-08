@@ -1,5 +1,7 @@
 # CCPA — California Consumer Privacy Act
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The California Consumer Privacy Act (CCPA), as amended by the California Privacy Rights Act (CPRA), grants California consumers rights over their personal information and imposes obligations on businesses that collect, use, or sell personal information.

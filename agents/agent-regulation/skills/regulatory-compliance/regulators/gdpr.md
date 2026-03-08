@@ -1,5 +1,7 @@
 # GDPR — General Data Protection Regulation (EU)
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The General Data Protection Regulation (EU 2016/679) is the primary data protection and privacy regulation for the European Union. It governs the processing of personal data of individuals within the EU/EEA.

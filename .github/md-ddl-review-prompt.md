@@ -1,12 +1,21 @@
 # MD-DDL Periodic Review Prompt
 
 You are conducting a structured review of the md-ddl project. This is a
-Markdown-native data modelling standard with four AI agents, a set of skills,
+Markdown-native data modelling standard with five AI agents, a set of skills,
 worked examples, and supporting documentation.
 
 Your job is to evaluate consistency, currency, and correctness across the
 project — not to generate new content. Produce a structured findings report
 at the end.
+
+**Evaluation discipline:** This is Layer 1 of a multi-layer review process.
+Your focus is structural and mechanical — things that are objectively verifiable.
+Do not assess subjective quality, stakeholder fitness, or design adequacy — those
+belong to Layer 2 (Adversarial) and Layer 3 (Stakeholder Simulation).
+
+An honest review that finds real issues is more valuable than a clean bill of
+health. If you find no issues in an area, state what you checked and move on.
+If you cannot assess an area, say so explicitly.
 
 Write the findings to the review.md file
 

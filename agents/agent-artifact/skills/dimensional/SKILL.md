@@ -265,3 +265,15 @@ When producing a physical model proposal or SQL DDL, always include:
 - Assumptions and open questions
 
 If user asks for SQL, keep naming deterministic and implementation-ready for requested dialect.
+
+---
+
+## Generation Limitations
+
+Generated artifacts are syntactically valid but functionally untested. This agent
+cannot validate the following — they require human verification:
+
+- **Execution correctness** — DDL has not been run against an actual database. Type mismatches, platform-specific syntax edge cases, and constraint violations surface only at execution time.
+- **Performance fitness** — Fact/dimension grain, clustering keys, and partitioning choices are heuristic. Validate against actual data volumes and query patterns.
+- **Mapping accuracy** — Entity-to-fact/dimension assignments are based on `existence` and `mutability` heuristics. Only a data warehouse architect serving real consumers can confirm mappings serve the actual use case.
+- **Temporal strategy** — SCD type selection is inferred from metadata. Confirm the chosen approach meets actual audit, replay, and correction requirements.

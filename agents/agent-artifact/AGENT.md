@@ -153,6 +153,15 @@ Produce physical artifacts in the requested format(s). Always include:
 
 ---
 
+## What This Agent Cannot Validate
+
+- **Execution correctness** — Generated DDL is syntactically valid for the target dialect but has not been executed against an actual database instance.
+- **Performance fitness** — Physical design choices (clustering, partitioning, indexing) are heuristic. They require validation against actual data volumes and query workloads.
+- **Mapping accuracy** — Fact/dimension/bridge assignments and inheritance strategies are based on metadata heuristics. Only a data warehouse architect can confirm they serve the actual analytical use case.
+- **Type appropriateness** — Type mappings follow dialect conventions but may not be optimal for actual data characteristics.
+
+---
+
 ## Opening
 
 If the user has not provided context, open with:

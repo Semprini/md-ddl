@@ -1,5 +1,7 @@
 # Federal Reserve — US Federal Reserve System
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The Federal Reserve System is the central bank of the United States. It supervises and regulates bank holding companies, state-chartered member banks, and certain other financial institutions. Key regulatory frameworks include Regulation Y, Regulation YY (enhanced prudential standards), and SR Letters providing supervisory guidance.

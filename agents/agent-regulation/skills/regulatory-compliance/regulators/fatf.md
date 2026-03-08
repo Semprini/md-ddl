@@ -1,5 +1,7 @@
 # FATF — Financial Action Task Force
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The Financial Action Task Force sets international standards for combating money laundering, terrorist financing, and proliferation financing. FATF Recommendations are implemented through national legislation in member jurisdictions.

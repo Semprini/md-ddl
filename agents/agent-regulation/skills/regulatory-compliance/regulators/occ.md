@@ -1,5 +1,7 @@
 # OCC — Office of the Comptroller of the Currency
 
+> **last_verified:** 2025-03-08
+
 ## Overview
 
 The OCC charters, regulates, and supervises national banks, federal savings associations, and federal branches and agencies of foreign banks in the United States. Key guidance includes the Comptroller's Handbook and OCC Bulletins.

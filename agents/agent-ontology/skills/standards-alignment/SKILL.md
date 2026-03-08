@@ -177,6 +177,62 @@ from re-asking the same question.
 
 ---
 
+## Worked Example: BIAN Alignment for Financial Crime
+
+This example demonstrates the standards alignment process applied to core entities
+from the `examples/Financial Crime/` domain, mapping against the BIAN v13 Business
+Object Model.
+
+### Step 1 — Identify candidate mappings
+
+MD-DDL Entity | BIAN BOM Candidate | Confidence
+--- | --- | ---
+Party | Party | High — both represent an individual or organisation
+Person | IndividualEntity | High — BIAN separates natural persons from legal entities
+Company | Organisation | High — BIAN equivalent of legal entity
+Party Role | PartyRole | High — BIAN uses the same abstraction
+Customer | CustomerRole | High — BIAN models Customer as a PartyRole subtype
+Account | Account | High — direct match on definition and semantics
+Transaction | AccountEntry | Medium — BIAN uses AccountEntry for ledger movements; financial transaction is broader
+
+### Step 2 — Evaluate differences
+
+MD-DDL Entity | BIAN Difference | Impact
+--- | --- | ---
+Party | BIAN's Party is abstract with IndividualEntity and Organisation subtypes. MD-DDL models Person and Company as subtypes of Party. | Structural match — inheritance hierarchy is aligned
+Party Role | BIAN's PartyRole is abstract. MD-DDL matches this pattern. | No difference
+Customer | BIAN's CustomerRole inherits from PartyRole. MD-DDL's Customer inherits from Party Role. | Aligned
+Transaction | BIAN's AccountEntry is narrowly scoped to account postings. MD-DDL's Transaction covers the full payment event including payer, payee, and payment initiator roles. | Material difference — Transaction is broader than AccountEntry
+
+### Step 3 — Resolution
+
+Entity | Resolution | Rationale
+--- | --- | ---
+Party, Person, Company | Adopt standard decomposition | MD-DDL's inheritance hierarchy already matches BIAN's Party → IndividualEntity / Organisation pattern
+Party Role, Customer | Adopt standard decomposition | Both model the role abstraction identically
+Transaction | Keep MD-DDL decomposition, reference BIAN with qualification | Transaction includes payment orchestration (Payer, Payee, Payment Initiator) beyond BIAN's AccountEntry scope
+
+### Step 4 — Resulting Reference column entries
+
+```markdown
+Entity | Reference
+--- | ---
+Party | BIAN BOM - Party
+Person | BIAN BOM - IndividualEntity
+Company | BIAN BOM - Organisation
+Party Role | BIAN BOM - PartyRole
+Customer | BIAN BOM - CustomerRole
+Transaction | BIAN BOM - AccountEntry (partial — Transaction extends beyond ledger movements to include payment roles and initiator context)
+```
+
+### Key takeaway
+
+Not every entity maps 1:1 to a standard. Transaction → AccountEntry is a legitimate
+partial alignment. The reconciliation note ensures future contributors understand
+why the mapping is qualified rather than exact.
+
+---
+
 ## Regulatory Metadata Prompt
 
 When a domain's `regulatory_scope` is being populated, prompt the user with this

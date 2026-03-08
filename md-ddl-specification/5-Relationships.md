@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.2)
+# MD‑DDL Specification (Draft 0.9.0)
 
 ## **Relationships**
 

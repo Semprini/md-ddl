@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.2)
+# MD‑DDL Specification (Draft 0.9.0)
 
 ## **Domains**
 
@@ -33,9 +33,9 @@ Include a `governance:` block in detail files only when specifying an exception 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
-Governance & Security|classification, confidentiality, pii|The default security posture for the entire domain.
-Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frameworks governing this data.
-Lifecycle|status (Draft/Live), version|The maturity of the data domain.
+Governance & Security|classification, pii|The default security posture for the entire domain.
+Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
+Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
 Discovery|tags|Searchability
 
 #### **Metadata Format**

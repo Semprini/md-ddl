@@ -2,11 +2,11 @@
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.8.2** (Latest)
+> **Version 0.9.0** (Latest)
 
 **Model once. Reuse everywhere.**
 
-MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — and generates the physical artifacts your processes need — all in one format for humans and AI agents.
+MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — then generating the physical artifacts your platforms need — all in one format for humans and AI agents.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
@@ -63,9 +63,10 @@ your-project/
 
 - **AI + human collaboration:** one shared language for SMEs, architects, and agents.
 - **Standards-aligned:** practical patterns for BIAN, ISO 20022, and regulatory mapping.
-- **Governance in-model:** classification, PII, retention, lineage, and ownership live with definitions.
+- **Governance in-model:** classification, PII, retention, access roles, and regulatory scope live with definitions — with formal inheritance from domain to entity.
 - **Source-to-canonical clarity:** source files + table transforms make mapping explicit and auditable.
 - **Data products built in:** declare what you publish, for whom, in what shape, under what governance — right next to the model.
+- **Multi-platform generation:** target Snowflake, Databricks, PostgreSQL, Neo4j, and more from one model.
 
 ---
 
@@ -86,7 +87,8 @@ your-project/
 - **Domain layer:** domains, entities, enums, relationships, events, constraints
 - **Source layer:** source files and transformation rules (direct, derived, lookup, reconciliation, conditional, aggregation)
 - **Data products:** three classes (source-aligned, domain-aligned, consumer-aligned) declare publication scope, shape, audience, SLA, and masking — driving automated artifact generation
-- **Governance layer:** ownership, classification, PII, retention, regulatory scope, lineage
+- **Governance layer:** ownership, classification, PII, retention, regulatory scope, access roles, masking strategies, lineage
+- **Physical artifacts:** dimensional star schemas, normalized 3NF, wide-column reporting schemas, knowledge graph (Cypher), JSON Schema, Parquet contracts
 
 ---
 
@@ -99,8 +101,19 @@ md-ddl-specification/         Normative standard
   MD-DDL-Complete.md
 
 agents/                       Canonical agent prompts and skills
-examples/                     Reference examples
+examples/                     Reference examples (Financial Crime, Simple Customer)
+industry_standards/            BIAN, FHIR, TM Forum reference data
 ```
+
+### Agents
+
+Agent | Purpose
+--- | ---
+**Agent Guide** | Learning companion and navigator — start here
+**Agent Ontology** | Domain discovery, entity modelling, source mapping
+**Agent Artifact** | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher)
+**Agent Data Product** | Data product design and ODPS manifest generation
+**Agent Regulation** | Compliance auditing and governance assurance
 
 > Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 

@@ -177,6 +177,51 @@ Also include:
 
 ---
 
+## Model Readiness Definition
+
+A domain model's readiness verdict determines whether it can proceed to physical artifact generation (Agent Artifact) or data product design (Agent Data Product).
+
+### Ready
+
+All of the following must be true:
+
+- Zero Critical findings
+- Zero Major findings
+- All entities have `existence` and `mutability` declared
+- All entities have at least one `identifier: true` attribute
+- All relationships have `cardinality`, `granularity`, and `ownership`
+- Domain metadata includes `classification`, `pii`, `regulatory_scope`, and `default_retention`
+- Governance blocks on entities with PII or elevated classification are present
+- Mermaid diagrams are syntactically valid with ELK layout
+- No unresolved `# TODO:` markers in production-status domains
+
+### Conditionally Ready
+
+- Zero Critical findings
+- One or more Major findings that do not affect the specific physical target requested
+- Example: missing `mutability` on a reference entity that is not part of the requested schema scope
+
+When issuing a Conditionally Ready verdict, list the specific conditions under which generation can proceed and which artifacts would be affected if the Major findings are not resolved.
+
+### Not Ready
+
+- One or more Critical findings, OR
+- Major findings that would produce incorrect physical artifacts (wrong dimensional grain, missing identifiers, contradictory temporal strategy)
+
+A Not Ready verdict must include a prioritised remediation plan.
+
+### Handoff to Downstream Agents
+
+When the verdict is **Ready**, tell the user which agents can now consume the model:
+
+> "This domain is ready for physical artifact generation (Agent Artifact) and data product design (Agent Data Product)."
+
+When **Conditionally Ready**, specify the safe scope:
+
+> "This domain can proceed to [specific artifact type] but [listed conditions] must be resolved before [other artifact type]."
+
+---
+
 ## Review Guardrails
 
 - Do not fabricate standards/regulatory facts.

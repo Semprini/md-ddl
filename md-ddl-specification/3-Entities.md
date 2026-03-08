@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.2)
+# MD‑DDL Specification (Draft 0.9.0)
 
 ## **Entities**
 
@@ -269,11 +269,93 @@ constraints:
 ```yaml
 governance:
   pii: true
-  retention: 7 years
-  access_role: HR_ADMIN
   classification: Confidential
+  retention: 7 years
+  access_role:
+    - HR_ADMIN
 ```
 ````
+
+### Governance Metadata Schema
+
+Governance metadata is declared at the domain level (in the domain file metadata block) and optionally overridden at the entity level (in a `governance:` block within an entity detail file). Entities inherit all governance fields from the domain. Include a `governance:` block in an entity detail file only when specifying an override or stricter requirement than the domain default.
+
+#### Domain-Level Governance Fields
+
+These fields are declared in the domain metadata YAML block. They set the default governance posture for all entities, relationships, and events in the domain.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`classification` | string | Yes | The sensitivity level of the domain's data. Valid values: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
+`pii` | boolean | Yes | Whether any entity in the domain contains personally identifiable information.
+`regulatory_scope` | string[] | Yes | The regulatory frameworks applicable to this domain (e.g., `GDPR`, `APRA CPS 234`, `FATF`, `HIPAA`).
+`default_retention` | string | Yes | The default data retention period applied to all entities unless overridden (e.g., `"7 years"`, `"10 years post relationship end"`).
+
+#### Entity-Level Governance Fields
+
+These fields may appear in an entity's `governance:` YAML block. Only include fields that differ from the domain default.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`pii` | boolean | No | Override the domain's PII flag for this entity.
+`classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
+`retention` | string | No | Override the domain's retention period for this entity.
+`retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.
+`access_role` | string[] | No | Roles permitted to access this entity's data. An array of role identifiers. When absent, access is governed by broader domain or organisational policy.
+`compliance_relevance` | string[] | No | Specific regulatory acts or standards that apply directly to this entity (e.g., `"AUSTRAC AML/CTF Act 2006"`, `"GDPR Article 17"`).
+`regulatory_reporting` | string[] | No | Named regulatory reports or submissions that include data from this entity (e.g., `"Suspicious Matter Report (SMR)"`, `"Threshold Transaction Report (TTR)"`).
+`description` | string | No | Free-text explanation of the governance posture for this entity — why the override exists and what regulatory obligation drives it.
+
+#### Governance Inheritance Rules
+
+1. **Domain defaults apply everywhere.** Every entity, relationship, and event inherits the domain's `classification`, `pii`, `regulatory_scope`, and `default_retention` unless explicitly overridden.
+2. **Override only when stricter or different.** An entity-level `governance:` block must contain only fields that differ from domain defaults. Do not repeat identical values.
+3. **Strictness direction.** An entity may declare a higher `classification` or longer `retention` than the domain default. Declaring a weaker posture requires a documented justification in the `description` or `retention_basis` field.
+4. **`access_role` is additive context.** It restricts who may access entity data. It does not exist at the domain level — it is entity-specific.
+5. **`compliance_relevance` and `regulatory_reporting` are entity-specific.** They document which specific regulations and reports apply to a particular entity. Domain-level `regulatory_scope` declares the applicable frameworks; entity-level fields map those frameworks to specific obligations.
+
+#### Example: Domain-Level Governance (in domain metadata)
+
+```yaml
+classification: "Highly Confidential"
+pii: true
+regulatory_scope:
+  - AML (Anti-Money Laundering)
+  - KYC (Know Your Customer)
+  - FATF Recommendations
+default_retention: "10 years post relationship end"
+```
+
+#### Example: Entity-Level Override (in entity detail file)
+
+```yaml
+governance:
+  pii: true
+  classification: Highly Confidential
+  retention: 10 years
+  retention_basis: Minimum 7-year retention from end of business relationship, aligned to AML/CTF record-keeping obligations
+  access_role:
+    - FINANCIAL_CRIME_ANALYST
+    - KYC_OFFICER
+    - COMPLIANCE_OFFICER
+  compliance_relevance:
+    - AUSTRAC AML/CTF Act 2006
+    - FATF Recommendations 10, 11, 12
+  regulatory_reporting:
+    - Suspicious Matter Report (SMR)
+    - Threshold Transaction Report (TTR)
+```
+
+#### Example: Entity Inheriting Domain Defaults (no override needed)
+
+When an entity's governance posture matches the domain default exactly, no `governance:` block is needed. To document the inheritance explicitly without adding new fields, a minimal `governance:` block with only a `retention_basis` may be included:
+
+```yaml
+governance:
+  retention_basis: Inherited from domain default retention of 10 years post relationship end
+```
+
+---
 
 ### The "Key-as-Name" Principle
 

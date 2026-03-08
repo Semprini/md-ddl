@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.8.2)
+# MD‑DDL Specification (Draft 0.9.0)
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -118,7 +118,19 @@ The only structural requirement is that every detail file begins with a level‑
 
 Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
 
----
+### Include Directive
+
+Agent prompt files and skill reference stubs use an `{{INCLUDE: <path>}}` directive to inject content from other files at prompt-load time. This is processed by the AI platform (e.g. VS Code Copilot custom agents, Claude Code) before the prompt reaches the model — it is not part of the MD-DDL modelling language itself.
+
+The directive appears on its own line and takes a file-relative path:
+
+```text
+{{INCLUDE: ../../../md-ddl-specification/3-Entities.md}}
+```
+
+Paths must be relative to the file containing the directive. Do not use workspace-root paths, as MD-DDL repositories are commonly consumed as submodules where absolute paths break.
+
+This mechanism enables the spec reference stub pattern: skill reference files contain a brief description and an `{{INCLUDE}}` pointing to the canonical spec section, so that spec updates propagate automatically without duplicating content across agent files.
 
 ## **Domains**
 
@@ -153,9 +165,9 @@ Include a `governance:` block in detail files only when specifying an exception 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
-Governance & Security|classification, confidentiality, pii|The default security posture for the entire domain.
-Compliance|sox_scope, gdpr_relevant, retention_policy|Legal and regulatory frameworks governing this data.
-Lifecycle|status (Draft/Live), version|The maturity of the data domain.
+Governance & Security|classification, pii|The default security posture for the entire domain.
+Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
+Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
 Discovery|tags|Searchability
 
 #### **Metadata Format**
@@ -442,7 +454,7 @@ Column | Purpose
 **Name** | The product name, linked to its detail definition.
 **Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
 **Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`.
+**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
 
 ---
 
@@ -455,6 +467,42 @@ Column | Purpose
 - The description must include a short natural‑language description. A longer description will be included in the detail file.
 
 This allows the domain file to act as a semantic index of the domain.
+
+---
+
+### **Domain Evolution**
+
+Domains are living artifacts. They evolve as business understanding deepens, new source systems are integrated, regulatory requirements change, and consumer needs shift. The `version` field in domain metadata tracks this evolution using semantic versioning.
+
+#### Version Bump Rules
+
+Change Type | Version Impact | Examples
+--- | --- | ---
+**Breaking** — changes meaning or removes concepts | Major bump | Removing an entity; renaming an entity; changing a relationship's cardinality, granularity, or direction; removing an attribute that downstream products consume
+**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, enum, relationship, or event; adding attributes to existing entities; declaring a new source system or data product
+**Corrective** — fixes errors without changing intended meaning | Patch bump | Fixing a typo in a description; correcting a broken link; updating a `# TODO:` with the resolved value; adjusting formatting
+
+#### Breaking vs Non-Breaking Changes
+
+A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied. Specifically:
+
+- Removing or renaming an entity or enum is always breaking.
+- Changing relationship cardinality (e.g., `1:N` to `M:N`) is breaking — physical schemas may need restructuring.
+- Changing relationship granularity (`atomic` to `period`) is breaking — it alters the semantics of the join.
+- Removing an attribute is breaking if any data product includes that entity.
+- Changing an attribute's type or constraints is breaking if it narrows the valid domain.
+
+A change is **non-breaking** if existing consumers continue to produce correct output without modification.
+
+#### Evolution Workflow
+
+When modifying an existing domain:
+
+1. Identify the change and classify it as breaking, additive, or corrective.
+2. Bump the `version` field in metadata according to the rules above.
+3. If breaking: review all data products that reference the affected entities and update them accordingly.
+4. If additive: update the relevant summary tables and create/update detail files.
+5. If corrective: fix the error in place.
 
 ---
 
@@ -519,10 +567,6 @@ Name | Class | Consumers | Status
 [Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
 
 ````
-
----
-
-...next: [Entities](3-Entities.md)
 
 ## **Entities**
 
@@ -793,11 +837,93 @@ constraints:
 ```yaml
 governance:
   pii: true
-  retention: 7 years
-  access_role: HR_ADMIN
   classification: Confidential
+  retention: 7 years
+  access_role:
+    - HR_ADMIN
 ```
 ````
+
+### Governance Metadata Schema
+
+Governance metadata is declared at the domain level (in the domain file metadata block) and optionally overridden at the entity level (in a `governance:` block within an entity detail file). Entities inherit all governance fields from the domain. Include a `governance:` block in an entity detail file only when specifying an override or stricter requirement than the domain default.
+
+#### Domain-Level Governance Fields
+
+These fields are declared in the domain metadata YAML block. They set the default governance posture for all entities, relationships, and events in the domain.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`classification` | string | Yes | The sensitivity level of the domain's data. Valid values: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
+`pii` | boolean | Yes | Whether any entity in the domain contains personally identifiable information.
+`regulatory_scope` | string[] | Yes | The regulatory frameworks applicable to this domain (e.g., `GDPR`, `APRA CPS 234`, `FATF`, `HIPAA`).
+`default_retention` | string | Yes | The default data retention period applied to all entities unless overridden (e.g., `"7 years"`, `"10 years post relationship end"`).
+
+#### Entity-Level Governance Fields
+
+These fields may appear in an entity's `governance:` YAML block. Only include fields that differ from the domain default.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`pii` | boolean | No | Override the domain's PII flag for this entity.
+`classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
+`retention` | string | No | Override the domain's retention period for this entity.
+`retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.
+`access_role` | string[] | No | Roles permitted to access this entity's data. An array of role identifiers. When absent, access is governed by broader domain or organisational policy.
+`compliance_relevance` | string[] | No | Specific regulatory acts or standards that apply directly to this entity (e.g., `"AUSTRAC AML/CTF Act 2006"`, `"GDPR Article 17"`).
+`regulatory_reporting` | string[] | No | Named regulatory reports or submissions that include data from this entity (e.g., `"Suspicious Matter Report (SMR)"`, `"Threshold Transaction Report (TTR)"`).
+`description` | string | No | Free-text explanation of the governance posture for this entity — why the override exists and what regulatory obligation drives it.
+
+#### Governance Inheritance Rules
+
+1. **Domain defaults apply everywhere.** Every entity, relationship, and event inherits the domain's `classification`, `pii`, `regulatory_scope`, and `default_retention` unless explicitly overridden.
+2. **Override only when stricter or different.** An entity-level `governance:` block must contain only fields that differ from domain defaults. Do not repeat identical values.
+3. **Strictness direction.** An entity may declare a higher `classification` or longer `retention` than the domain default. Declaring a weaker posture requires a documented justification in the `description` or `retention_basis` field.
+4. **`access_role` is additive context.** It restricts who may access entity data. It does not exist at the domain level — it is entity-specific.
+5. **`compliance_relevance` and `regulatory_reporting` are entity-specific.** They document which specific regulations and reports apply to a particular entity. Domain-level `regulatory_scope` declares the applicable frameworks; entity-level fields map those frameworks to specific obligations.
+
+#### Example: Domain-Level Governance (in domain metadata)
+
+```yaml
+classification: "Highly Confidential"
+pii: true
+regulatory_scope:
+  - AML (Anti-Money Laundering)
+  - KYC (Know Your Customer)
+  - FATF Recommendations
+default_retention: "10 years post relationship end"
+```
+
+#### Example: Entity-Level Override (in entity detail file)
+
+```yaml
+governance:
+  pii: true
+  classification: Highly Confidential
+  retention: 10 years
+  retention_basis: Minimum 7-year retention from end of business relationship, aligned to AML/CTF record-keeping obligations
+  access_role:
+    - FINANCIAL_CRIME_ANALYST
+    - KYC_OFFICER
+    - COMPLIANCE_OFFICER
+  compliance_relevance:
+    - AUSTRAC AML/CTF Act 2006
+    - FATF Recommendations 10, 11, 12
+  regulatory_reporting:
+    - Suspicious Matter Report (SMR)
+    - Threshold Transaction Report (TTR)
+```
+
+#### Example: Entity Inheriting Domain Defaults (no override needed)
+
+When an entity's governance posture matches the domain default exactly, no `governance:` block is needed. To document the inheritance explicitly without adding new fields, a minimal `governance:` block with only a `retention_basis` may be included:
+
+```yaml
+governance:
+  retention_basis: Inherited from domain default retention of 10 years post relationship end
+```
+
+---
 
 ### The "Key-as-Name" Principle
 
@@ -932,10 +1058,6 @@ Entity YAML contains no `source:` keys, no source field names, and no references
 - Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, physical artifact generation automatically handles the normalisation (e.g., conversion to snake_case) for target systems.
 - Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `sources/<system>/transforms/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
----
-
-...next: [Enums](4-Enumerations.md)
-
 ## **Enumerations**
 
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
@@ -984,10 +1106,6 @@ values:
 - Natural Language: Values should use business-friendly names (e.g., Part Time, not PT).
 - Normalization: Physical artifact generation handles the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target system.
 - Global Reference: Once defined in a Domain, an Enum can be referenced by any Entity or Event using the enum:Enum Name type syntax.
-
----
-
-...next: [Relationships](5-Relationships.md)
 
 ## **Relationships**
 
@@ -1074,10 +1192,6 @@ If not specified, the default is atomic.
 
 - Action-Oriented: Use natural language that describes the interaction (e.g., Account Holds Balance or Customer Places Order).
 - Avoid Key Redundancy: Do not define Foreign Keys (e.g., Customer ID) inside the Entity attributes. The Relationship definition handles this link automatically.
-
----
-
-...next: [Events](6-Events.md)
 
 ## **Events**
 
@@ -1208,8 +1322,6 @@ attributes:
       type: datetime
 ```
 ````
-
----
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -1686,6 +1798,8 @@ source:
 
 6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.
 
+7. **Sources do not carry governance metadata.** Source files do not declare a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
+
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
 ---
@@ -1783,6 +1897,8 @@ source:
   cast: string
 ```
 ````
+
+---
 
 `cast` is optional. Valid values match the MD-DDL type system:
 `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`.
@@ -1895,6 +2011,8 @@ fallback: null
 ```
 ````
 
+---
+
 `reference` must name a domain Enum or Entity defined in the same model. `match_on` and `return` must be valid attribute or value names within that reference. `fallback` declares what to do when no match is found: `null`, `reject` (fail the record), or a literal default value.
 
 ---
@@ -1923,6 +2041,8 @@ cases:
 fallback: null
 ```
 ````
+
+---
 
 Case keys must be valid values of the attribute's declared type. If `target` is an `enum:` type, case keys must be valid enum values. `fallback` behaves identically to the lookup type.
 
@@ -2101,7 +2221,7 @@ A data product is declared using a **level-3 Markdown heading** inside a detail 
 
 The heading is the product's name — its identity in the Knowledge Graph.
 
-#### Data Product Metadata
+#### Metadata
 
 Product metadata is expressed as YAML inside a fenced code block immediately after the heading:
 
@@ -2146,7 +2266,7 @@ Field | Purpose
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
-`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`.
+`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
 `entities` | List of canonical entity names included in this product.
 
 #### Optional Metadata Fields
@@ -2359,3 +2479,68 @@ Product detail files follow the same structural rules as entity detail files:
 9. **Two-layer compliance.** Every data product must appear in both the domain file summary table and a detail file. The domain file is the index; the detail file is the contract.
 
 10. **Name uniqueness.** Data product names must be unique within a domain. The level-3 heading is the product's identity in the Knowledge Graph.
+
+---
+
+### **Product Lifecycle**
+
+Data products progress through defined lifecycle states. The `status` field declares the current state; optional date fields document transition timing.
+
+#### Lifecycle States
+
+State | Meaning
+--- | ---
+`Draft` | Product is being designed. Not yet available to consumers. May change without notice.
+`Production` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
+`Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
+
+#### Transition Rules
+
+- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Data Product's design process).
+- `Production` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
+- `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
+- `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
+
+#### Lifecycle Metadata Fields
+
+Field | Required | Purpose
+--- | --- | ---
+`deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
+`successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
+`sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
+
+Example:
+
+```yaml
+status: Deprecated
+deprecated_date: "2025-03-15"
+successor: "Customer 360 Profile v2"
+```
+
+---
+
+### **Cross-Domain Governance Conflict Resolution**
+
+When a consumer-aligned data product spans multiple domains via `cross_domain`, governance metadata may conflict between the owning domain and the referenced domains. These conflicts must be resolved explicitly — silent inheritance of weaker controls is not permitted.
+
+#### Conflict Detection
+
+For each `cross_domain` entry, compare the owning domain's governance defaults with the referenced domain's defaults across:
+
+Field | Conflict Exists When
+--- | ---
+`classification` | Referenced domain has a higher classification than the product declares
+`retention` | Domains declare different retention periods
+`pii` | Referenced domain declares `pii: true` but the product does not acknowledge it
+`regulatory_scope` | Referenced domain is subject to regulatory frameworks not listed in the product's owning domain
+
+#### Resolution Rules
+
+1. **Classification: highest wins.** The product's effective classification is the highest of all contributing domains. If the product declares a lower classification, it must include an explicit `governance.classification` override with a justification comment explaining why the lower classification is appropriate (e.g., masking renders the data non-sensitive).
+
+2. **Retention: longest wins.** The product's effective retention is the longest period required by any contributing domain's regulatory obligations. A shorter retention may be declared only if the product's masking or aggregation removes the retention trigger.
+
+3. **PII: union of obligations.** If any contributing domain declares `pii: true`, the product must either declare `pii: true` with appropriate masking entries, or demonstrate that all PII attributes are masked to a level where PII obligations no longer apply.
+
+4. **Regulatory scope: union of frameworks.** The product is subject to the combined regulatory scope of all contributing domains. The owning domain's `regulatory_scope` does not shield the product from obligations in the referenced domains.

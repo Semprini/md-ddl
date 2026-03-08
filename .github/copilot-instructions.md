@@ -124,7 +124,15 @@ When adding or changing a rule, edit the owning section only. Do not duplicate r
 
 Never edit the `MD-DDL-Complete.md` directly, as we will join this from the individual spec files when we are about to push to github.
 
-This is a generated file — a concatenation of sections 1–9 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly. Regenerate it by concatenating the section files after any spec change. When concatenating, strip the first 2 lines which contain the same level 1 heading in each file and last 2 lines which contain a URL link to the next file (where present).
+This is a generated file — a concatenation of sections 1–9 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly.
+
+Regenerate with the repo script:
+
+`powershell -ExecutionPolicy Bypass -File .\.github\scripts\concat-md-ddl-specs.ps1`
+
+Canonical generation rules are maintained in `.github/concat-md-ddl-specs.prompt.md`. Keep concatenation behavior defined there and avoid duplicating detailed algorithm rules in multiple files.
+
+After regeneration, run the verification checklist defined in `.github/concat-md-ddl-specs.prompt.md` before committing.
 
 ### Versioning
 

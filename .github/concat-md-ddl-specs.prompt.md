@@ -1,19 +1,38 @@
-You are given a directory named `md-ddl-specification/` containing multiple Markdown specification files.
+You are given a directory named `md-ddl-specification/` containing MD-DDL section files.
 
 Use the repo script for one-command generation:
 
 `powershell -ExecutionPolicy Bypass -File .\.github\scripts\concat-md-ddl-specs.ps1`
 
-The above script should create a single output file named `MD-DDL-Complete.md` by concatenating all other specification files in that directory with these rules:
+The script must generate `md-ddl-specification/MD-DDL-Complete.md` using these exact rules:
 
-1. Process all `.md` files in deterministic order (alphabetical by filename).
-2. For each file:
-   - Read all lines.
-   - Apart from 1-Foundation.md, remove the first 2 lines.
-   - Remove the last 2 lines.
-   - Append the remaining lines to `MD-DDL-Complete.md`.
-3. Insert exactly one blank line between each file section in the final output.
-4. Do not add any extra headers, footers, commentary, or metadata.
-5. Preserve original line formatting for all kept lines.
+1. Input files:
+   - Include only section files `1-Foundation.md` through `9-Data-Products.md`.
+   - Exclude `MD-DDL-Complete.md` from inputs.
+2. Order:
+   - Concatenate in deterministic section order: `1` to `9`.
+3. Heading handling:
+   - Preserve one top-level H1 from `1-Foundation.md`.
+   - For each section body, remove the first 2 lines (repeated section heading + subtitle line).
+4. Trailing navigation handling:
+   - Remove the trailing nav block only when present, by pattern (not fixed line count):
+     - optional blank lines
+     - `---`
+     - optional blank lines
+     - `...next: Section -> next-file-name.md`
+   - Do not assume every section has this block; `9-Data-Products.md` may not.
+5. Output formatting:
+   - Insert exactly one blank line between concatenated section bodies.
+   - Do not add any extra headers, footers, commentary, or metadata.
+   - Preserve original line formatting for kept lines.
+   - Write UTF-8 so Unicode punctuation remains valid.
 
-Return only the final combined Markdown content.
+Post-generation verification checklist:
+
+1. `MD-DDL-Complete.md` begins with `# MD‑DDL Specification (Draft X.Y.Z)` from `1-Foundation.md`.
+2. No `...next:` navigation lines remain in the output.
+3. Section headings `## **Domains**` through `## **Data Products**` are present.
+4. Exactly one blank line separates concatenated section bodies.
+5. File is valid UTF-8 and preserves Unicode punctuation used by the source files.
+
+Return only the final combined Markdown content when asked to output content directly.

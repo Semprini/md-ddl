@@ -134,6 +134,46 @@ When relationship cardinality/ownership materially affects dimensional realizati
 
 ---
 
+## Governance Authoring Protocol
+
+Apply governance metadata to every entity during drafting — do not defer governance to a later pass. The spec defines the authoritative schema in `3-Entities.md § Governance Metadata Schema`.
+
+### Domain-Level Governance (set once in domain.md)
+
+Every domain file must declare these four fields in its metadata YAML:
+
+Field | Purpose
+--- | ---
+`classification` | Data sensitivity tier (`Public`, `Internal`, `Confidential`, `Highly Confidential`)
+`pii` | Whether the domain handles personal data by default
+`regulatory_scope` | Applicable regulations and frameworks (list)
+`default_retention` | Base retention period for entities that do not override
+
+Set these during domain scoping (see `../domain-scoping/SKILL.md`). They become the inherited defaults for all entities in the domain.
+
+### Entity-Level Governance (override only what differs)
+
+Entity governance blocks are optional overrides. Include a `governance:` YAML block on an entity only when it needs to differ from or extend the domain defaults.
+
+**Override fields** (replace the domain default for this entity):
+- `pii`, `classification`, `retention`, `access_role`
+
+**Extension fields** (add entity-specific detail, no domain default exists):
+- `retention_basis`, `compliance_relevance`, `regulatory_reporting`, `description`
+
+When drafting an entity:
+
+1. **Check domain defaults** — if the entity's governance posture matches the domain, add only `retention_basis` explaining why it inherits the default.
+2. **Override where needed** — if `pii`, `classification`, `retention`, or `access_role` differ from the domain, include those fields.
+3. **Add compliance detail for regulated entities** — entities directly involved in regulatory reporting should include `compliance_relevance` and `regulatory_reporting` listing specific obligations.
+4. **Mark uncertainty** — if you cannot determine governance posture, add `# TODO: Confirm classification with data steward` rather than guessing.
+
+### Handoff to Regulation Agent
+
+Entity-modelling sets first-pass governance during authoring. Agent Regulation audits and maintains that metadata over time. Do not attempt to resolve jurisdiction-specific compliance questions — flag them and defer to Agent Regulation.
+
+---
+
 ## Entity Detail File Checklist
 
 Before presenting a drafted entity detail file:

@@ -70,15 +70,15 @@ When a concept is represented as a coded set:
 To regenerate local FHIR reference files:
 
 ```shell
-python industry_standards/fhir/extract-references.py --download
+python references/industry_standards/fhir/extract-references.py --download
 ```
 
 This command downloads and caches these FHIR R4 bundles to:
 
-- `industry_standards/fhir/r4/profiles-resources.json`
-- `industry_standards/fhir/r4/valuesets.json`
-- `industry_standards/fhir/r4/v3-codesystems.json`
-- `industry_standards/fhir/r4/v2-tables.json`
+- `references/industry_standards/fhir/r4/profiles-resources.json`
+- `references/industry_standards/fhir/r4/valuesets.json`
+- `references/industry_standards/fhir/r4/v3-codesystems.json`
+- `references/industry_standards/fhir/r4/v2-tables.json`
 
 Then it regenerates:
 

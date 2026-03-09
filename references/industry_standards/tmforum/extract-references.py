@@ -5,14 +5,14 @@ Downloads TM Forum Open API JSON schemas from GitHub, then extracts
 clean markdown reference files for the agent-ontology standards-alignment skill.
 
 Usage:
-    python industry_standards/tmforum/extract-references.py                  # generate from already-downloaded schemas
-    python industry_standards/tmforum/extract-references.py --download       # download schemas first, then generate
+    python references/industry_standards/tmforum/extract-references.py                  # generate from already-downloaded schemas
+    python references/industry_standards/tmforum/extract-references.py --download       # download schemas first, then generate
 
 Output directory:
     agents/agent-ontology/skills/standards-alignment/standards/tmforum/
 
 Schema cache:
-    industry_standards/tmforum/v4/schemas/<Domain>/*.schema.json
+    references/industry_standards/tmforum/v4/schemas/<Domain>/*.schema.json
 
 Source:
     https://github.com/tmforum-apis/Open_Api_And_Data_Model  (Apache 2.0)
@@ -30,7 +30,9 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SCHEMA_DIR = REPO_ROOT / "industry_standards" / "tmforum" / "v4" / "schemas"
+SCHEMA_DIR = (
+    REPO_ROOT / "references" / "industry_standards" / "tmforum" / "v4" / "schemas"
+)
 OUTPUT_DIR = (
     REPO_ROOT
     / "agents"
@@ -582,7 +584,9 @@ def main() -> None:
     if not SCHEMA_DIR.exists() or not any(SCHEMA_DIR.rglob("*.schema.json")):
         print("ERROR: No schemas found. Run with --download first:")
         print()
-        print("  python industry_standards/tmforum/extract-references.py --download")
+        print(
+            "  python references/industry_standards/tmforum/extract-references.py --download"
+        )
         print()
         sys.exit(1)
 

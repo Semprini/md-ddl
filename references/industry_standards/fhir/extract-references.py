@@ -6,8 +6,8 @@ Outputs generated files into:
   agents/agent-ontology/skills/standards-alignment/standards/fhir/
 
 Usage:
-  python industry_standards/fhir/extract-references.py
-  python industry_standards/fhir/extract-references.py --download
+    python references/industry_standards/fhir/extract-references.py
+    python references/industry_standards/fhir/extract-references.py --download
 
 Data source:
   https://hl7.org/fhir/R4/profiles-resources.json
@@ -382,7 +382,7 @@ def main() -> None:
     args = parse_args()
 
     root = repo_root()
-    cache_dir = root / "industry_standards" / "fhir" / "r4"
+    cache_dir = root / "references" / "industry_standards" / "fhir" / "r4"
     cache_path = cache_dir / "profiles-resources.json"
     valuesets_path = cache_dir / "valuesets.json"
     v3_codesystems_path = cache_dir / "v3-codesystems.json"

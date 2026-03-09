@@ -203,13 +203,13 @@ frameworks, not data standards.
 To regenerate these reference files from the cached schemas:
 
 ```shell
-python industry_standards/tmforum/extract-references.py
+python references/industry_standards/tmforum/extract-references.py
 ```
 
 To re-download schemas from GitHub first:
 
 ```shell
-python industry_standards/tmforum/extract-references.py --download
+python references/industry_standards/tmforum/extract-references.py --download
 ```
 
-Schema cache location: `industry_standards/tmforum/v4/schemas/`
+Schema cache location: `references/industry_standards/tmforum/v4/schemas/`

@@ -102,8 +102,23 @@ md-ddl-specification/         Normative standard
 
 agents/                       Canonical agent prompts and skills
 examples/                     Reference examples (Financial Crime, Simple Customer)
-industry_standards/            BIAN, FHIR, TM Forum reference data
+references/                    Architecture + industry standards reference data
 ```
+
+### BIAN reference datasets
+
+BIAN sources are maintained side-by-side by release under `references/industry_standards/bian/`
+(`v13/`, `v14/`). New modelling defaults to v14; v13 remains for compatibility.
+
+Refresh generated BIAN reference files with:
+
+```powershell
+python references/industry_standards/bian/extract-references.py --version 14.0.0
+python references/industry_standards/bian/extract-references.py --version 13.0.0
+```
+
+Record file provenance in `references/industry_standards/bian/source-manifest.md` whenever
+source snapshots are updated.
 
 ### Agents
 

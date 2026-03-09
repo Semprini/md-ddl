@@ -1,122 +1,192 @@
 """
-BIAN v13 Reference Extractor
-=============================
-Reads raw BIAN v13 JSON files and produces clean markdown reference files
-for the agent-ontology standards-alignment skill.
+BIAN Reference Extractor
+========================
+Reads raw BIAN JSON files for a selected release and produces clean markdown
+reference files for the agent-ontology standards-alignment skill.
 
-Usage:
-    python industry_standards/bian/extract-references.py                   # generate from local JSON only
-    python industry_standards/bian/extract-references.py --fetch-classes    # also fetch core class attributes via API
+Usage examples:
+    python references/industry_standards/bian/extract-references.py
+    python references/industry_standards/bian/extract-references.py --version 13.0.0
+    python references/industry_standards/bian/extract-references.py --fetch-classes
+    python references/industry_standards/bian/extract-references.py --version 14.0.0 --output-mode flat
 
-Output directory:
+Default output mode writes to versioned directories:
+    agents/agent-ontology/skills/standards-alignment/standards/bian/v13/
+    agents/agent-ontology/skills/standards-alignment/standards/bian/v14/
+
+Flat mode preserves legacy output path:
     agents/agent-ontology/skills/standards-alignment/standards/bian/
-
-Source directory:
-    industry_standards/bian/v13/
-
-Cached class data:
-    industry_standards/bian/v13/cached-classes/
 """
 
+from __future__ import annotations
+
+import argparse
 import json
-import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Paths
+# Constants
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SOURCE_DIR = REPO_ROOT / "industry_standards" / "bian" / "v13"
-CACHE_DIR = SOURCE_DIR / "cached-classes"
-OUTPUT_DIR = (
-    REPO_ROOT
-    / "agents"
-    / "agent-ontology"
-    / "skills"
-    / "standards-alignment"
-    / "standards"
-    / "bian"
-)
-
+DEFAULT_VERSION = "14.0.0"
 API_BASE = "https://bian-modelapi-v4.azurewebsites.net"
-BIAN_VERSION = "13.0.0"
 
-# ---------------------------------------------------------------------------
-# Core BO Classes — fetched with full attributes
-# ---------------------------------------------------------------------------
 # Selection criteria:
 #   - Classes referenced in the Financial Crime example
 #   - Abstract base classes forming inheritance roots
 #   - Classes commonly encountered in banking/FS domains
 #   - Covers party, account, product, agreement, payment, risk, location,
 #     document, arrangement, and channel families
-
 CORE_CLASSES = [
-    # Party family
     "Party",
     "Person",
     "PartyRole",
     "Merchant",
-    # Account family
     "Account",
     "CurrentAccount",
     "SavingsAccount",
     "LoanAccount",
     "BalanceSheet",
-    # Product family
     "ProductAgreement",
     "ProductFeature",
     "BankingProduct",
-    # Agreement family
     "Agreement",
     "CustomerAgreement",
     "LoanAgreement",
     "TermDepositAgreement",
     "InsuranceAgreement",
-    # Payment / Transaction family
     "Transaction",
     "CardPaymentService",
-    # Financial instrument family
     "FinancialInstrument",
     "Security",
-    # Risk and compliance
     "RiskAssessment",
     "ComplianceCheck",
     "ComplianceReport",
     "RegulatoryReport",
     "Audit",
-    # Location and address
     "Location",
     "Address",
     "Country",
-    # Document and communication
     "Document",
     "Correspondence",
     "Notification",
-    # Arrangement and condition
     "Arrangement",
     "Condition",
     "Obligation",
     "AccessArrangement",
-    # Channel and device
     "Channel",
     "Device",
     "ContactPoint",
-    # Date/time and identifiers
     "DateTime",
     "Indicator",
-    # Plan and strategy
     "Plan",
     "Strategy",
     "Goal",
-    # Event
     "Event",
 ]
+
+
+@dataclass
+class ExtractorConfig:
+    version: str
+    major_version: str
+    source_dir: Path
+    cache_dir: Path
+    output_dir: Path
+    api_base: str
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate BIAN reference markdown files."
+    )
+    parser.add_argument(
+        "--version",
+        default=DEFAULT_VERSION,
+        help="BIAN release version (for example: 13.0.0, 14.0.0).",
+    )
+    parser.add_argument(
+        "--source-dir",
+        help="Override source directory containing raw BIAN JSON files.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        help="Override output directory where markdown files are generated.",
+    )
+    parser.add_argument(
+        "--output-mode",
+        choices=["versioned", "flat"],
+        default="versioned",
+        help="Write to standards/bian/v{major}/ (versioned) or standards/bian/ (flat).",
+    )
+    parser.add_argument(
+        "--fetch-classes",
+        action="store_true",
+        help="Fetch core class details from the BIAN API into cache.",
+    )
+    parser.add_argument(
+        "--api-base",
+        default=API_BASE,
+        help="BIAN model API base URL.",
+    )
+    return parser.parse_args()
+
+
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
+
+
+def major_version_from(version: str) -> str:
+    # Accept semver-like strings and use the first component for path names.
+    return version.split(".")[0]
+
+
+def build_config(args: argparse.Namespace) -> ExtractorConfig:
+    major = major_version_from(args.version)
+
+    if args.source_dir:
+        source_dir = Path(args.source_dir).resolve()
+    else:
+        source_dir = (
+            REPO_ROOT / "references" / "industry_standards" / "bian" / f"v{major}"
+        )
+
+    cache_dir = source_dir / "cached-classes"
+
+    if args.output_dir:
+        output_dir = Path(args.output_dir).resolve()
+    else:
+        base = (
+            REPO_ROOT
+            / "agents"
+            / "agent-ontology"
+            / "skills"
+            / "standards-alignment"
+            / "standards"
+            / "bian"
+        )
+        output_dir = base if args.output_mode == "flat" else base / f"v{major}"
+
+    return ExtractorConfig(
+        version=args.version,
+        major_version=major,
+        source_dir=source_dir,
+        cache_dir=cache_dir,
+        output_dir=output_dir,
+        api_base=args.api_base,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -124,18 +194,16 @@ CORE_CLASSES = [
 # ---------------------------------------------------------------------------
 
 
-def load_json(filename: str) -> list:
-    path = SOURCE_DIR / filename
+def load_json(config: ExtractorConfig, filename: str) -> list:
+    path = config.source_dir / filename
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
 def first_sentence(text: str | None) -> str:
-    """Return the first sentence (or first 200 chars) of a description."""
     if not text:
         return ""
     text = text.strip().replace("\n", " ").replace("\r", " ")
-    # Remove redundant internal whitespace
     while "  " in text:
         text = text.replace("  ", " ")
     for sep in (". ", ".\n"):
@@ -146,13 +214,16 @@ def first_sentence(text: str | None) -> str:
 
 
 def escape_md(text: str) -> str:
-    """Escape pipe characters for markdown table cells."""
     return text.replace("|", "\\|").replace("\n", " ")
 
 
-def write_file(name: str, content: str) -> None:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUTPUT_DIR / name
+def version_label(config: ExtractorConfig) -> str:
+    return f"v{config.major_version}"
+
+
+def write_file(config: ExtractorConfig, name: str, content: str) -> None:
+    config.output_dir.mkdir(parents=True, exist_ok=True)
+    path = config.output_dir / name
     path.write_text(content, encoding="utf-8")
     lines = content.count("\n") + 1
     print(f"  wrote {path.relative_to(REPO_ROOT)}  ({lines} lines)")
@@ -163,66 +234,58 @@ def write_file(name: str, content: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def generate_bo_classes() -> str:
-    """Generate bo-classes.md — searchable index of all BO classes."""
-    classes = load_json("BOClassesLite.json")
+def generate_bo_classes(config: ExtractorConfig) -> str:
+    classes = load_json(config, "BOClassesLite.json")
     classes.sort(key=lambda c: c["name"])
 
+    label = version_label(config)
     lines = [
-        "# BIAN v13 — Business Object Classes",
+        f"# BIAN {label} - Business Object Classes",
         "",
-        f"Auto-generated index of {len(classes)} BO classes from BIAN v13.0.0.",
+        f"Auto-generated index of {len(classes)} BO classes from BIAN {config.version}.",
         "Use this file for name-matching when mapping MD-DDL entities to BIAN.",
         "",
         "Name | Description | Status",
         "--- | --- | ---",
     ]
 
-    for c in classes:
-        name = escape_md(c["name"])
-        desc = escape_md(first_sentence(c.get("description")))
-        status = c.get("status", "")
+    for item in classes:
+        name = escape_md(item["name"])
+        desc = escape_md(first_sentence(item.get("description")))
+        status = item.get("status", "")
         lines.append(f"{name} | {desc} | {status}")
 
     lines.append("")
     return "\n".join(lines)
 
 
-def generate_hierarchy() -> str:
-    """Generate hierarchy.md — Business Areas > Domains > Service Domains."""
-    areas = load_json("BusinessAreas.json")
-    domains = load_json("BusinessDomains.json")
-    service_domains = load_json("ServiceDomainsBasic.json")
+def generate_hierarchy(config: ExtractorConfig) -> str:
+    areas = load_json(config, "BusinessAreas.json")
+    domains = load_json(config, "BusinessDomains.json")
+    service_domains = load_json(config, "ServiceDomainsBasic.json")
 
-    # Index areas by bianId
-    area_map: dict[str, dict] = {}
-    for a in areas:
-        area_map[a["bianId"]] = a
-
-    # Group domains by area bianId
     domain_by_area: dict[str, list] = {}
-    for d in domains:
+    for domain in domains:
         area_id = (
-            d.get("businessArea", {}).get("bianId", "unknown")
-            if d.get("businessArea")
+            domain.get("businessArea", {}).get("bianId", "unknown")
+            if domain.get("businessArea")
             else "unknown"
         )
-        domain_by_area.setdefault(area_id, []).append(d)
+        domain_by_area.setdefault(area_id, []).append(domain)
 
-    # Group service domains by domain bianId
     sd_by_domain: dict[str, list] = {}
-    for sd in service_domains:
-        dom_id = (
-            sd.get("businessDomain", {}).get("bianId", "unknown")
-            if sd.get("businessDomain")
+    for service_domain in service_domains:
+        domain_id = (
+            service_domain.get("businessDomain", {}).get("bianId", "unknown")
+            if service_domain.get("businessDomain")
             else "unknown"
         )
-        sd_by_domain.setdefault(dom_id, []).append(sd)
+        sd_by_domain.setdefault(domain_id, []).append(service_domain)
 
     lines = [
-        "# BIAN v13 — Taxonomy Hierarchy",
+        f"# BIAN {version_label(config)} - Taxonomy Hierarchy",
         "",
-        "Business Areas → Business Domains → Service Domains.",
+        "Business Areas -> Business Domains -> Service Domains.",
         "Use this to understand where a concept sits in BIAN's taxonomy.",
         "",
     ]
@@ -269,41 +332,39 @@ def generate_hierarchy() -> str:
     return "\n".join(lines)
 
 
-def generate_enumerations() -> str:
-    """Generate enumerations.md — BO Enumerations index."""
-    enums = load_json("BOEnumerationsLite.json")
+def generate_enumerations(config: ExtractorConfig) -> str:
+    enums = load_json(config, "BOEnumerationsLite.json")
     enums.sort(key=lambda e: e["name"])
 
     lines = [
-        "# BIAN v13 — Business Object Enumerations",
+        f"# BIAN {version_label(config)} - Business Object Enumerations",
         "",
-        f"Auto-generated index of {len(enums)} BO enumerations from BIAN v13.0.0.",
+        f"Auto-generated index of {len(enums)} BO enumerations from BIAN {config.version}.",
         "Use this file when mapping MD-DDL enums to BIAN counterparts.",
         "",
         "Name | Description",
         "--- | ---",
     ]
 
-    for e in enums:
-        name = escape_md(e["name"])
-        desc = escape_md(first_sentence(e.get("description")))
+    for enum_item in enums:
+        name = escape_md(enum_item["name"])
+        desc = escape_md(first_sentence(enum_item.get("description")))
         lines.append(f"{name} | {desc}")
 
     lines.append("")
     return "\n".join(lines)
 
 
-def generate_bo_classes_detail() -> str:
-    """Generate bo-classes-detail.md from cached class JSON files."""
-    if not CACHE_DIR.exists():
-        return _detail_placeholder()
+def generate_bo_classes_detail(config: ExtractorConfig) -> str:
+    if not config.cache_dir.exists():
+        return detail_placeholder(config)
 
-    cached_files = sorted(CACHE_DIR.glob("*.json"))
+    cached_files = sorted(config.cache_dir.glob("*.json"))
     if not cached_files:
-        return _detail_placeholder()
+        return detail_placeholder(config)
 
     lines = [
-        "# BIAN v13 — Core Class Detail",
+        f"# BIAN {version_label(config)} - Core Class Detail",
         "",
         f"Detailed definitions for {len(cached_files)} core BO classes,",
         "including inheritance, abstraction, and attribute lists.",
@@ -331,7 +392,7 @@ def generate_bo_classes_detail() -> str:
             lines.append(f"> {description}")
             lines.append("")
 
-        meta_parts = []
+        meta_parts: list[str] = []
         if super_type:
             super_name = (
                 super_type.get("name", "")
@@ -351,7 +412,6 @@ def generate_bo_classes_detail() -> str:
             lines.append("--- | --- | --- | --- | ---")
             for attr in attrs:
                 attr_name = escape_md(attr.get("featureName") or attr.get("name") or "")
-                # Resolve type: prefer dataType string, then boEnumeration name, then boDataType name
                 attr_type = attr.get("dataType") or ""
                 if not attr_type and attr.get("boEnumeration"):
                     attr_type = attr["boEnumeration"].get("name", "")
@@ -372,15 +432,15 @@ def generate_bo_classes_detail() -> str:
     return "\n".join(lines)
 
 
-def _detail_placeholder() -> str:
+def detail_placeholder(config: ExtractorConfig) -> str:
     return "\n".join(
         [
-            "# BIAN v13 — Core Class Detail",
+            f"# BIAN {version_label(config)} - Core Class Detail",
             "",
             "No cached class data found. Run with `--fetch-classes` to populate:",
             "",
             "```",
-            "python industry_standards/bian/extract-references.py --fetch-classes",
+            f"python references/industry_standards/bian/extract-references.py --version {config.version} --fetch-classes",
             "```",
             "",
         ]
@@ -392,25 +452,23 @@ def _detail_placeholder() -> str:
 # ---------------------------------------------------------------------------
 
 
-def fetch_core_classes() -> None:
-    """Fetch full BO class data for each core class and cache as JSON."""
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+def fetch_core_classes(config: ExtractorConfig) -> None:
+    config.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load existing class names from BOClassesLite to validate names
-    all_classes = load_json("BOClassesLite.json")
-    known_names = {c["name"] for c in all_classes}
+    all_classes = load_json(config, "BOClassesLite.json")
+    known_names = {item["name"] for item in all_classes}
 
     fetched = 0
     skipped = 0
     failed = 0
 
     for name in CORE_CLASSES:
-        cache_path = CACHE_DIR / f"{name}.json"
+        cache_path = config.cache_dir / f"{name}.json"
         if cache_path.exists():
             skipped += 1
             continue
 
-        url = f"{API_BASE}/BOClassByName/{urllib.parse.quote(name)}/BIAN/{BIAN_VERSION}"
+        url = f"{config.api_base}/BOClassByName/{urllib.parse.quote(name)}/BIAN/{config.version}"
         note = "" if name in known_names else " (not in Lite index)"
         print(f"  fetching {name}{note}...", end=" ", flush=True)
 
@@ -419,8 +477,7 @@ def fetch_core_classes() -> None:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 raw = json.loads(resp.read().decode("utf-8"))
 
-            # Strip deep noise from the response before caching
-            cleaned = _clean_class_response(raw)
+            cleaned = clean_class_response(raw)
             cache_path.write_text(
                 json.dumps(cleaned, indent=2, ensure_ascii=False), encoding="utf-8"
             )
@@ -431,14 +488,12 @@ def fetch_core_classes() -> None:
             print(f"FAILED ({exc})")
             failed += 1
 
-        # Rate limit — be polite to the API
         time.sleep(0.5)
 
     print(f"\n  Fetch summary: {fetched} fetched, {skipped} skipped, {failed} failed")
 
 
-def _clean_class_response(raw) -> dict:
-    """Strip noise fields from a full BOClass API response."""
+def clean_class_response(raw) -> dict:
     if isinstance(raw, list):
         if not raw:
             return {}
@@ -456,16 +511,14 @@ def _clean_class_response(raw) -> dict:
         "bianId",
     }
 
-    cleaned: dict = {k: raw[k] for k in keep_keys if k in raw}
+    cleaned: dict = {key: raw[key] for key in keep_keys if key in raw}
 
-    # Clean superType
     if cleaned.get("superType") and isinstance(cleaned["superType"], dict):
         cleaned["superType"] = {
             "name": cleaned["superType"].get("name"),
             "bianId": cleaned["superType"].get("bianId"),
         }
 
-    # Clean attributes
     if cleaned.get("attributeList"):
         clean_attrs = []
         for attr in cleaned["attributeList"]:
@@ -477,12 +530,10 @@ def _clean_class_response(raw) -> dict:
                 "isMandatory": attr.get("isMandatory"),
                 "isMultiValued": attr.get("isMultiValued"),
             }
-            # Keep enum name if present
             if attr.get("boEnumeration"):
                 clean_attr["boEnumeration"] = {
                     "name": attr["boEnumeration"].get("name")
                 }
-            # Keep data type name if present
             if attr.get("boDataType"):
                 clean_attr["boDataType"] = {"name": attr["boDataType"].get("name")}
             clean_attrs.append(clean_attr)
@@ -492,28 +543,54 @@ def _clean_class_response(raw) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+
+def validate_source_layout(config: ExtractorConfig) -> None:
+    required = [
+        "BOClassesLite.json",
+        "BOEnumerationsLite.json",
+        "BusinessAreas.json",
+        "BusinessDomains.json",
+        "ServiceDomainsBasic.json",
+    ]
+    missing = [name for name in required if not (config.source_dir / name).exists()]
+    if missing:
+        missing_list = ", ".join(missing)
+        raise FileNotFoundError(
+            f"Missing required BIAN source files in {config.source_dir}: {missing_list}"
+        )
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
 
 def main() -> None:
-    fetch = "--fetch-classes" in sys.argv
+    args = parse_args()
+    config = build_config(args)
 
-    print("BIAN v13 Reference Extractor")
-    print(f"  source: {SOURCE_DIR}")
-    print(f"  output: {OUTPUT_DIR}")
+    print("BIAN Reference Extractor")
+    print(f"  version: {config.version}")
+    print(f"  source: {config.source_dir}")
+    print(f"  output: {config.output_dir}")
+    print(f"  mode: {args.output_mode}")
     print()
 
-    if fetch:
+    validate_source_layout(config)
+
+    if args.fetch_classes:
         print("Phase 1: Fetching core class attributes from API...")
-        fetch_core_classes()
+        fetch_core_classes(config)
         print()
 
     print("Phase 2: Generating markdown reference files...")
-    write_file("bo-classes.md", generate_bo_classes())
-    write_file("hierarchy.md", generate_hierarchy())
-    write_file("enumerations.md", generate_enumerations())
-    write_file("bo-classes-detail.md", generate_bo_classes_detail())
+    write_file(config, "bo-classes.md", generate_bo_classes(config))
+    write_file(config, "hierarchy.md", generate_hierarchy(config))
+    write_file(config, "enumerations.md", generate_enumerations(config))
+    write_file(config, "bo-classes-detail.md", generate_bo_classes_detail(config))
 
     print("\nDone.")
 

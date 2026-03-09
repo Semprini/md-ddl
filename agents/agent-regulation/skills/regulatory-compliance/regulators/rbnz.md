@@ -100,14 +100,13 @@ governance:
 - RBNZ Website: <https://www.rbnz.govt.nz>
 - Banking Supervision Handbook: <https://www.rbnz.govt.nz/regulation-and-supervision/banks/banking-supervision-handbook>
 
-```
-
 ---
 
 ## **How AI Uses This Architecture**
 
 ### **Scenario: User starts modeling**
-```
+
+```text
 
 User: "I'm modeling financial crime for a New Zealand bank owned by an Australian parent. We need to align with BIAN."
 
@@ -117,13 +116,14 @@ AI:
 2. Asks: "What regulatory jurisdictions apply?"
 3. User says: "APRA and RBNZ, plus FATF for AML"
 4. AI loads:
-   - external-standard-mapping/standards/bian/README.md
-   - regulatory-compliance/regulators/apra.md
-   - regulatory-compliance/regulators/rbnz.md
-   - regulatory-compliance/regulators/fatf.md
+  - agents/agent-ontology/skills/standards-alignment/standards/bian/README.md
+  - regulatory-compliance/regulators/apra.md
+  - regulatory-compliance/regulators/rbnz.md
+  - regulatory-compliance/regulators/fatf.md
 5. AI now has context to:
    - Find BIAN BOM references
    - Apply APRA CPS 234 metadata
    - Apply RBNZ data residency requirements
    - Apply FATF AML requirements
 6. AI does NOT load ACORD, TM Forum, GDPR, CCPA (not relevant)
+```

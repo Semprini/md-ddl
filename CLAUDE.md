@@ -18,6 +18,10 @@ Start with Agent Guide for learning and navigation, then use specialist agents f
 - **Agent Regulation** — Compliance auditing and governance assurance.
   Read: `.md-ddl/agents/agent-regulation/AGENT.md`
 
+## Validation
+
+MD-DDL uses **agent-driven quality review**, not traditional linting. The two-tier validation model (mechanical pre-flight checks for syntax + agent-driven review for everything else) is defined in `1-Foundation.md`. Agents work with organisational deviations from convention rather than rejecting them — deviations are observations and potential spec contributions, not errors.
+
 ## Key References
 
 - MD-DDL specification: `.md-ddl/md-ddl-specification/`

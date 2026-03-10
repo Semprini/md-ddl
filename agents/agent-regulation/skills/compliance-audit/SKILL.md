@@ -10,6 +10,15 @@ requirements. This skill does not contain regulatory requirements — those live
 in `skills/regulatory-compliance/` and its regulator reference files. Load those
 first, then use this skill to drive the audit.
 
+**Validation model alignment:** This audit is a quality review, not a lint pass. It distinguishes between two categories of governance concern:
+
+- **Structurally missing governance** — the YAML key is completely absent (e.g., no `governance:` block at all, no `classification` field). This is a pre-flight-adjacent concern: a missing structural anchor prevents downstream processing. Flag as a gap.
+- **Substantively incomplete governance** — the field exists but its value may be insufficient (e.g., `retention: "7 years"` that may not meet a specific regulatory minimum). This is a quality concern requiring judgment. Flag as advisory with a rationale.
+
+**On vocabulary deviations:** When a domain uses non-standard governance vocabulary (e.g., `phi` instead of `pii`, `data_sensitivity` instead of `classification`), flag it as a **potential spec vocabulary gap** — not a compliance failure. Note what the standard vocabulary is and invite the owner to confirm the intent. Do not assign Critical severity for vocabulary differences unless the deviation creates actual regulatory exposure (e.g., a field is completely missing, not just renamed).
+
+See `md-ddl-specification/1-Foundation.md` "Validation Model" for the normative definition of what constitutes a mechanical check versus an agent-driven review.
+
 ---
 
 ## Pre-Audit Setup
@@ -266,8 +275,8 @@ Use the gap report format defined in `agents/agent-regulation/AGENT.md`.
 Apply these severity rules when classifying gaps:
 
 ### Critical
-A regulatory obligation is clearly unmet and the gap creates direct exposure:
-- Required field absent entirely
+A regulatory obligation is clearly unmet and the gap creates direct exposure, OR downstream processing is broken by a structural absence:
+- Required field absent entirely (structural absence — no key at all)
 - Retention period shorter than regulatory minimum
 - Breach notification timeframe exceeds regulatory maximum
 - PII declared but `pii_fields` empty
@@ -275,9 +284,10 @@ A regulatory obligation is clearly unmet and the gap creates direct exposure:
 - Jurisdiction conflict on data residency (human decision required)
 - `breach_notification_required` absent on entities in scope
 
+**Critical severity is reserved for things that break downstream processing or create direct regulatory exposure.** Convention deviations and vocabulary differences do not qualify as Critical unless they result in a required obligation being unrepresented.
+
 ### Advisory
-Best practice is not met, or a field needs confirmation to determine if a
-gap exists:
+Best practice is not met, a field needs confirmation, or governance exists but may be substantively insufficient:
 - `retention_basis` absent (retention is declared but source not cited)
 - Entity-level `classification` not declared (inheriting from domain — confirm
   this is correct)
@@ -287,6 +297,7 @@ gap exists:
   that differ from the domain default
 - Attributes with sensitivity-suggesting names but no PII flag
 - Type B absences (explicit exclusion annotations that may be outdated)
+- Governance vocabulary deviations (e.g., `phi` instead of `pii`) — note as "potential spec vocabulary gap" with a recommendation to align to standard vocabulary
 
 ### Not Assessed
 Gaps that cannot be evaluated due to missing information:

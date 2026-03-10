@@ -1,6 +1,6 @@
 ---
 name: concept-explorer
-description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.).
+description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness.
 ---
 
 # Skill: Concept Explorer
@@ -170,6 +170,40 @@ what they care about most:
 - **Different:** Catalogues index existing data; MD-DDL *defines* data from the
   start. Governance metadata lives in the model, not in a separate system
 - **Complementary:** MD-DDL data product manifests (ODPS) can publish to catalogues
+
+---
+
+## Explaining the Validation Model
+
+When a user asks about linting, validation, conformance checking, or why MD-DDL has no traditional linter, explain the two-tier model clearly. Load `references/foundation-spec.md` to access the normative definition.
+
+### Core explanation to give
+
+MD-DDL uses a **two-tier validation model**:
+
+1. **Mechanical pre-flight checks** — syntax-level only. Five checks: YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, and domain version field. These are binary (broken or not broken) and have no exceptions.
+
+2. **Agent-driven quality review** — everything above syntax. Structure, convention, governance completeness, domain fitness. This is handled by Agent Ontology's domain-review skill and Agent Regulation's compliance-audit skill, because these concerns require context and judgment that no rule engine can provide.
+
+### Why MD-DDL doesn't have a traditional linter
+
+Use this 5-level categorisation to explain why each level is — or isn't — mechanically checkable:
+
+Level | Category | Example | Mechanically checked?
+--- | --- | --- | ---
+1 | Syntax | YAML parses, links resolve | Yes — no wiggle room; broken syntax corrupts agent interpretation
+2 | Structure | Required sections present | Partially — legitimate exceptions exist (governance inheritance, minimal domains)
+3 | Convention | Naming patterns, vocabulary choices | No — organisational adaptations are valuable signal, not errors
+4 | Quality | Governance completeness, relationship coverage | No — requires judgment about intent and context
+5 | Domain fitness | Is this the right model for the business? | Never — requires human domain expertise
+
+The key insight: **the primary consumer of an MD-DDL model is more sophisticated than any linter**. Agent Ontology already reads intent, identifies gaps, and produces contextual feedback. A linter saying "missing `mutability` key" adds less than the agent — with less context about whether the omission was intentional.
+
+### Handling vocabulary deviations
+
+When an organisation uses `phi` instead of `pii`, or `data_class` instead of `classification`, that is not an error — it is signal. Agents work with deviations and flag them as potential spec vocabulary gaps. This is how the standard improves.
+
+> "In your domain, what terminology do you use for data sensitivity classification? MD-DDL uses `classification`, but if you have existing vocabulary, your agents will understand it and can note the gap for spec consideration."
 
 ---
 

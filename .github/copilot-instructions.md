@@ -283,6 +283,20 @@ When upgrading an example, update all patterns in the file in a single pass — 
 
 ---
 
+## Validation philosophy
+
+MD-DDL distinguishes between **mechanical pre-flight checks** (syntax, links, entity references) and **agent-driven quality review** (structure, convention, governance, domain fitness). This split is deliberate and normative — see `md-ddl-specification/1-Foundation.md` "Validation Model" for the authoritative definition.
+
+Rules for contributors:
+
+- **Do not add lint-style enforcement to agent prompts.** If an agent rejects a file for a convention violation, that is a prompt bug. Agents flag deviations; they do not reject files for anything above syntax level.
+- **Validation language in agent prompts must match the tier.** Use `flag` / `note` / `suggest` / `observe` for convention and quality issues (Levels 3–5). Use `error` / `reject` / `fail` only for syntax-level failures (Level 1). When reviewing an agent prompt, search for error-language and confirm it is limited to syntax contexts.
+- **Organisational vocabulary deviations are observations, not errors.** When an agent encounters `phi` instead of `pii`, or `data_class` instead of `classification`, the correct response is to note it as a potential spec vocabulary gap and continue working. Do not add prompt rules that reject non-standard vocabulary.
+- **Pre-flight checks are fixed and minimal.** There are exactly 5 checks (YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, domain version field). Adding a new check requires a spec version bump — it is a deliberate, reviewed decision, not a casual addition.
+- **The `1-Foundation.md` validation model section is the normative reference.** If you are unsure whether something is a pre-flight check or an agent-driven concern, consult that section. Do not resolve the ambiguity by adding enforcement rules to agent prompts.
+
+---
+
 ## Cross-cutting rules for all contributions
 
 - **Spec owns the rules.** Agents and examples implement them. When they conflict, fix the agent or example, not the spec (unless the spec is genuinely wrong).

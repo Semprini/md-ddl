@@ -86,7 +86,19 @@ The Financial Crime example is the project's quality benchmark. Find its weaknes
 - Are the source mappings and transformations realistic?
 - Are the data products well-designed for real consumer needs?
 
-### 5. Specification Internal Contradictions
+### 5. Validation Philosophy Robustness
+
+The standard explicitly rejects traditional linting above syntax level (see `1-Foundation.md` "Validation Model"). Probe whether this philosophy holds up in practice:
+
+- **What happens when an organisation uses non-standard vocabulary?** If a domain uses `phi: true` instead of `pii: true`, does any agent prompt reject it or flag it as an error? If so, that is a prompt bug contradicting the stated philosophy.
+- **Is there hidden rigidity in agent prompts?** Search agent SKILL.md files for "must have", "required", "error if missing", "not valid" language. Identify any instance where this language applies to convention or quality concerns rather than syntax-level failures.
+- **Pre-flight check scope creep risk.** The spec defines exactly 5 pre-flight checks. What prevents a sixth check being added casually? Is there a mechanism (spec version bump requirement) that makes scope expansion a deliberate decision rather than a silent accumulation? If the mechanism exists only as text in the spec, how would a contributor know to check?
+- **Agents as quality layer — can they actually deliver?** The spec defers Levels 2–5 entirely to agents. Is there any category of structural gap (e.g., completely missing `governance:` block) where no agent would currently catch it? Is the handoff between pre-flight checks and agent review gapless?
+- **Vocabulary deviation pathway.** When an agent flags "potential spec vocabulary gap", where does that signal go? Is there a community contribution mechanism? If not, the feedback loop the philosophy depends on does not yet exist.
+
+---
+
+### 6. Specification Internal Contradictions
 
 Search for rules in the spec that contradict each other or create ambiguity:
 

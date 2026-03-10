@@ -9,6 +9,10 @@ Covers full-domain review of MD-DDL artifacts with two goals:
 1) structural correctness against the MD-DDL specification, and
 2) modelling decision quality against cross-skill guidance and standards/regulatory expectations.
 
+**This is a contextual quality review, not a lint pass.** The review protocol below identifies structural breakages and decision-quality issues — it does not reject files for convention deviations, vocabulary differences, or organisational adaptations. See `md-ddl-specification/1-Foundation.md` "Validation Model" for the normative definition of what is and is not mechanically enforced.
+
+**On vocabulary deviations:** If the domain uses non-standard field names or vocabulary (e.g., `phi` instead of `pii`, `data_class` instead of `classification`), note this as an **observation** with the flag "potential spec vocabulary gap" — do not flag it as a structural error or non-conformance. The deviation is signal about how the spec should evolve.
+
 ## References to Load
 
 Load these references before performing the review:
@@ -264,3 +268,5 @@ When **Conditionally Ready**, specify the safe scope:
 - Prefer smallest corrective change that restores consistency.
 - Keep structural findings and decision-quality findings distinct.
 - When proposing fixes, preserve existing domain intent unless the user requests redesign.
+- **Do not use error/reject language for convention or quality issues.** Use `flag` / `note` / `observe` / `suggest` for Levels 3–5 concerns. Reserve `error` language for syntax-level failures (Level 1) only.
+- **Treat vocabulary deviations as observations.** If an organisation uses non-standard terminology, note it as "potential spec vocabulary gap" rather than "non-conformance". Include it in the Observations section of the review output, not in Critical or Major findings.

@@ -143,6 +143,24 @@ product framing. It is read by people deciding whether to adopt md-ddl.
 - Are there any capability claims in the README that are not yet supported by
   the spec or agents (promises without implementation)?
 
+### Validation Philosophy Consistency
+
+**Purpose:** Verify that the two-tier validation model defined in `1-Foundation.md` is consistently applied across all agent prompts and review tooling.
+
+**Review lens:**
+
+- Does `md-ddl-specification/1-Foundation.md` contain a "Validation Model" section that defines the two-tier model and lists exactly 5 pre-flight checks?
+- Does `.github/copilot-instructions.md` contain a "Validation philosophy" section that references `1-Foundation.md`?
+- Do all agent SKILL.md files use `flag` / `note` / `suggest` / `observe` language for convention and quality concerns (Levels 3–5)?
+- Is `error` / `reject` / `fail` language in agent prompts limited to syntax-level failures (Level 1)?
+- Does the domain-review SKILL.md (Agent Ontology) explicitly state it is a contextual quality review, not a lint pass?
+- Does the compliance-audit SKILL.md (Agent Regulation) distinguish between structurally missing governance (structural absence) and substantively incomplete governance (quality concern)?
+- Does the compliance-audit SKILL.md treat governance vocabulary deviations as Advisory observations rather than Critical gaps?
+
+Flag any agent prompt where enforcement language is used for convention or quality issues — this is a prompt bug.
+
+---
+
 ### Copilot Instructions (`.github/copilot-instructions.md`)
 
 **Purpose:** Developer guidance for contributors working on the standard itself —

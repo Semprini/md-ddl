@@ -134,4 +134,71 @@ This mechanism enables the spec reference stub pattern: skill reference files co
 
 ---
 
+## **Validation Model**
+
+MD-DDL uses a two-tier validation model: **mechanical pre-flight checks** and **agent-driven quality review**. These tiers are deliberately separate because different categories of problem require different kinds of intelligence to detect.
+
+### Why Not a Traditional Linter
+
+MD-DDL is an AI-native standard. The primary consumer of an MD-DDL model is an AI agent that already understands intent, domain context, and organisational conventions — capabilities that no rule-based linter can match. Applying rigid pass/fail enforcement above the syntax level would:
+
+- Reject legitimate organisational vocabulary differences (e.g., `phi` instead of `pii`) that agents understand and can work with
+- Suppress feedback that drives spec evolution — when organisations adapt MD-DDL to their context, that signal is valuable
+- Produce false positives for intentional exceptions (governance inheritance, minimal reference domains) that require domain context to evaluate correctly
+
+Traditional linters assume the checker is smarter than the thing being checked. For MD-DDL, the inverse is true.
+
+### Validation Levels
+
+Five categories of check exist across the MD-DDL model. Only Level 1 benefits from mechanical tooling:
+
+Level | Category | Example | Mechanically checked?
+--- | --- | --- | ---
+1 | Syntax | YAML parses, Mermaid renders, markdown links resolve | Yes — broken syntax silently corrupts agent interpretation with no wiggle room
+2 | Structure | Required sections present, required YAML keys present | Partially — legitimate exceptions exist; structural checks need domain context to avoid false positives
+3 | Convention | Naming patterns, column order, heading hierarchy | No — organisational vocabulary differences are signal, not errors
+4 | Quality | Governance completeness, relationship coverage, event payloads | No — this is judgment; agents handle it through domain-review and compliance-audit
+5 | Domain fitness | Is this the right model for the business? | Never — requires human domain expertise by definition
+
+**The split:** Level 1 gets mechanical pre-flight checks. Levels 2–5 stay with agents and humans, where context and judgment live.
+
+### Pre-Flight Check Scope
+
+The following checks are the complete set of mechanical validation that MD-DDL endorses. No additional checks should be added without a spec version bump.
+
+Check | What it validates | Why it is mechanical
+--- | --- | ---
+YAML syntax | All YAML code blocks parse without syntax errors | A YAML parse error silently corrupts agent interpretation of every attribute in the block
+Mermaid syntax | All Mermaid code blocks use valid diagram syntax | A Mermaid syntax error breaks every rendering of the domain or entity diagram
+Internal link integrity | All markdown links (`[text](path)`) resolve to existing files or headings | Dead links break navigation for both humans and agents
+Entity reference consistency | Entity names in relationships, events, products, and source mappings match an entity defined in the domain | A typo in an entity name creates a silent reference to nothing
+Domain version field | The `version:` key exists in domain metadata | Versionless domains cannot participate in maturity tracking or change management
+
+**What is explicitly not checked mechanically:**
+- Presence or absence of optional YAML keys (mutability, temporal, governance fields)
+- Naming conventions or vocabulary choices
+- Governance metadata completeness or correctness
+- Relationship granularity or cardinality appropriateness
+- Event payload structure completeness
+- Standards alignment accuracy
+- Any modelling judgment
+
+### Pre-Flight Check Tool Interface
+
+Any tool implementing pre-flight checks must conform to this interface:
+
+- **Input:** a domain folder path
+- **Output:** a list of findings, each with file path, line number, check name, and message
+- **Exit behaviour:** report all findings; do not stop on first error
+- **Severity:** all findings are a single severity ("pre-flight failure") — there is no warning/error distinction because all checks are binary
+- **Configuration:** none — the checks are fixed and minimal; there are no rules to enable or disable
+
+### Agent-Driven Quality Review
+
+Everything above Level 1 is the responsibility of agents. Agent Ontology's domain-review skill, Agent Regulation's compliance-audit skill, and the structured review prompts in `.github/` handle structural, convention, quality, and domain-fitness concerns. They understand context and intent. They flag deviations as observations, not errors.
+
+When an agent encounters an organisational vocabulary deviation — a field named `phi` instead of `pii`, `data_class` instead of `classification` — the correct response is to note it as a **potential spec vocabulary gap** and work with it, not reject the file.
+
+---
+
 ...next: [Domains](2-Domains.md)

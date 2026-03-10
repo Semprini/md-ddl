@@ -66,7 +66,7 @@ Common fixes by check:
 |---|---|
 | `yaml-syntax` | Find the block at the reported line and fix indentation or quoting |
 | `mermaid-syntax` | Ensure the block starts with a valid diagram type (e.g. `graph TD`, `classDiagram`) |
-| `internal-links` | Verify the linked file exists; check for typos in the path or anchor |
+| `internal-links` | Verify the linked file exists; check for typos in path or anchor — applies to markdown links `[text](path)`, HTML `href='path'` inside Mermaid node labels, and same-page anchors `#heading` |
 | `entity-references` | Match the value exactly to an entity name in the `## Entities` table in `domain.md` |
 | `domain-version` | Add `version: "x.y.z"` to the `## Metadata` YAML block in `domain.md` |
 
@@ -84,8 +84,13 @@ clean pass before they proceed to commit.
 
 ## Notes
 
-- The script skips files under `sources/` for entity reference checks,
-  because source mappings may reference entities from other domains.
+- The `internal-links` check covers three link forms: markdown `[text](path)`,
+  HTML `href='path'` or `href="path"` (used in Mermaid node labels), and
+  same-page anchors `#heading`. All must resolve.
+- `{{INCLUDE: path}}` directives in agent/skill files are not covered — they
+  live outside domain folders and are a separate concern.
+- The script skips files under `sources/` and `products/` for entity reference
+  checks, because those files use the `source:` key for system names, not entity names.
 - Checks 1–3 (YAML, Mermaid, links) run against every `.md` file in the
   domain folder tree.
 - Checks 4–5 require `domain.md` to exist at the domain folder root.

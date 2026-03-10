@@ -178,31 +178,65 @@ def check_mermaid_syntax(md_file: Path) -> list[Finding]:
 # Check 3 — Internal link integrity
 # ---------------------------------------------------------------------------
 
+# Patterns that carry URL/path values in MD-DDL files:
+#   [text](url)          — standard markdown link (also catches ![alt](url) images)
+#   href='url'           — HTML anchor inside Mermaid node labels (single quotes)
+#   href="url"           — same, double-quote variant
+#
+# Not checked here (out of scope for domain preflight):
+#   {{INCLUDE: path}}    — agent/skill file directive; not used in domain folders
+#   reference-style links [text][ref] / [ref]: url — only found as external URLs in README
+
+_MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+_HREF_RE = re.compile(r'href=["\']([^"\']+)["\']')
+
+
+def _check_url(url: str, line_num: int, md_file: Path, findings: list[Finding]) -> None:
+    """Validate a single URL extracted from md_file at line_num."""
+    # Skip external links — not our concern
+    if url.startswith(("http://", "https://", "mailto:")):
+        return
+
+    # Pure same-page anchor: #heading — verify heading exists in this file
+    if url.startswith("#"):
+        anchor = url[1:]
+        if anchor and _heading_slug(anchor) not in _get_headings(md_file):
+            findings.append(Finding(str(md_file), line_num, "internal-links",
+                                    f"Broken same-page anchor: '#{anchor}' not found in this file"))
+        return
+
+    # File path, with optional anchor
+    file_part, anchor = (url.rsplit("#", 1) if "#" in url else (url, None))
+    if not file_part:
+        return
+
+    target = (md_file.parent / file_part).resolve()
+    if not target.exists():
+        findings.append(Finding(str(md_file), line_num, "internal-links",
+                                f"Broken link: '{file_part}' does not exist"))
+    elif anchor:
+        if _heading_slug(anchor) not in _get_headings(target):
+            findings.append(Finding(str(md_file), line_num, "internal-links",
+                                    f"Broken anchor: '#{anchor}' not found in {file_part}"))
+
+
 def check_internal_links(md_file: Path) -> list[Finding]:
     findings: list[Finding] = []
     lines = _read(md_file).splitlines()
-    link_re = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
 
     for line_num, line in enumerate(lines, 1):
-        for m in link_re.finditer(line):
-            url = m.group(2).strip()
-            # Skip external and same-page anchor links
-            if url.startswith(("http://", "https://", "mailto:", "#")):
-                continue
+        seen: set[str] = set()
+        for m in _MD_LINK_RE.finditer(line):
+            url = m.group(1).strip()
+            if url not in seen:
+                seen.add(url)
+                _check_url(url, line_num, md_file, findings)
+        for m in _HREF_RE.finditer(line):
+            url = m.group(1).strip()
+            if url not in seen:
+                seen.add(url)
+                _check_url(url, line_num, md_file, findings)
 
-            file_part, anchor = (url.rsplit("#", 1) if "#" in url else (url, None))
-            if not file_part:
-                continue
-
-            target = (md_file.parent / file_part).resolve()
-            if not target.exists():
-                findings.append(Finding(str(md_file), line_num, "internal-links",
-                                        f"Broken link: '{file_part}' does not exist"))
-            elif anchor:
-                headings = _get_headings(target)
-                if _heading_slug(anchor) not in headings:
-                    findings.append(Finding(str(md_file), line_num, "internal-links",
-                                            f"Broken anchor: '#{anchor}' not found in {file_part}"))
     return findings
 
 

@@ -9,10 +9,10 @@ Covers concept realisation decisions, inheritance hierarchies, entity YAML struc
 
 ## MD-DDL Reference
 
-- Full entity specification: `references/entities-spec.md`
-  (source: `md-ddl-specification/3-Entities.md`)
-- Full enumeration specification: `references/enumerations-spec.md`
-  (source: `md-ddl-specification/4-Enumerations.md`)
+- Full entity specification: `md-ddl-specification/3-Entities.md`
+  (reference stub: `references/entities-spec.md`)
+- Full enumeration specification: `md-ddl-specification/4-Enumerations.md`
+  (reference stub: `references/enumerations-spec.md`)
 - Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
   (use for ownership/cardinality decisions, dimensional implementation reasoning, and final `existence` value selection)
 - Entity-vs-enum classification deep guidance: `guidance.md`
@@ -170,7 +170,7 @@ When drafting an entity:
 
 ### Handoff to Regulation Agent
 
-Entity-modelling sets first-pass governance during authoring. Agent Regulation audits and maintains that metadata over time. Do not attempt to resolve jurisdiction-specific compliance questions — flag them and defer to Agent Regulation.
+Entity-modelling sets first-pass governance during authoring. Agent Governance audits and maintains that metadata over time. Do not attempt to resolve jurisdiction-specific compliance questions — flag them and defer to Agent Governance.
 
 ---
 

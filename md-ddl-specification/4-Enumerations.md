@@ -49,6 +49,31 @@ values:
 - Normalization: Physical artifact generation handles the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target system.
 - Global Reference: Once defined in a Domain, an Enum can be referenced by any Entity or Event using the enum:Enum Name type syntax.
 
+### External Standard Enumerations
+
+When an enum's values are defined by an external standard (for example ISO 4217
+currencies, HL7 FHIR value sets, or BIAN enumerations), include a representative
+subset of 5 to 15 values sufficient to demonstrate the pattern. Reference the
+authoritative source using a `standard` metadata field.
+
+```yaml
+values:
+  AUD:
+    description: Australian Dollar
+  USD:
+    description: United States Dollar
+  EUR:
+    description: Euro
+standard:
+  name: ISO 4217
+  version: "2024"
+  url: https://www.iso.org/iso-4217-currency-codes.html
+  note: Representative subset - full standard defines 180+ active currency codes
+```
+
+Physical artifact generation should support loading the full external value set
+when the representative subset is insufficient for the target use case.
+
 ---
 
 ...next: [Relationships](5-Relationships.md)

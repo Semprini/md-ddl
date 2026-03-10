@@ -107,12 +107,12 @@ constraints:
 
 ```yaml
 governance:
+  pii: true
   classification: Confidential
-  pii_fields:
-    - Email Address
   retention: 10 years
   retention_basis: Aligned to domain default retention policy
-  access_role: CUSTOMER_SERVICE
+  access_role:
+    - CUSTOMER_SERVICE
 ```
 
 ---

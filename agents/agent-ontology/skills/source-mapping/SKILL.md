@@ -13,8 +13,10 @@ mappings using the transformation vocabulary from the MD-DDL specification.
 
 Load these references before authoring any source or transform files:
 
-- Sources spec: `references/sources-spec.md`
-- Transformations spec: `references/transformations-spec.md`
+- Sources spec: `md-ddl-specification/7-Sources.md`
+  (reference stub: `references/sources-spec.md`)
+- Transformations spec: `md-ddl-specification/8-Transformations.md`
+  (reference stub: `references/transformations-spec.md`)
 
 Key concepts to apply:
 

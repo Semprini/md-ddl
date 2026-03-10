@@ -11,20 +11,21 @@ Teaches through analogy, progressive depth, and guided self-discovery.
 
 ## Spec References
 
-Each spec section has a reference stub in `references/`. Load the one matching the
-user's question — do not load all nine at once.
+Load the canonical spec section in `md-ddl-specification/` that matches the
+user's question. Reference stubs in `references/` document dependencies for
+`{{INCLUDE}}`-aware platforms — do not rely on the stub content alone.
 
 Reference | When to load
 --- | ---
-`references/foundation-spec.md` | Core principles, document structure, two-layer model
-`references/domains-spec.md` | Domain file format, metadata, overview diagrams, summary tables
-`references/entities-spec.md` | Entity YAML, attributes, types, constraints, inheritance
-`references/enumerations-spec.md` | Enum formats, naming, dictionary vs simple list
-`references/relationships-spec.md` | Relationship types, cardinality, granularity, constraints
-`references/events-spec.md` | Event structure, payload, temporal rules, actor/entity
-`references/sources-spec.md` | Source file format, change models, domain feed tables
-`references/transformations-spec.md` | Transformation types, expression language, mapping rules
-`references/dataproducts-spec.md` | Data product classes, declaration, governance, masking
+`md-ddl-specification/1-Foundation.md` (stub: `references/foundation-spec.md`) | Core principles, document structure, two-layer model
+`md-ddl-specification/2-Domains.md` (stub: `references/domains-spec.md`) | Domain file format, metadata, overview diagrams, summary tables
+`md-ddl-specification/3-Entities.md` (stub: `references/entities-spec.md`) | Entity YAML, attributes, types, constraints, inheritance
+`md-ddl-specification/4-Enumerations.md` (stub: `references/enumerations-spec.md`) | Enum formats, naming, dictionary vs simple list
+`md-ddl-specification/5-Relationships.md` (stub: `references/relationships-spec.md`) | Relationship types, cardinality, granularity, constraints
+`md-ddl-specification/6-Events.md` (stub: `references/events-spec.md`) | Event structure, payload, temporal rules, actor/entity
+`md-ddl-specification/7-Sources.md` (stub: `references/sources-spec.md`) | Source file format, change models, domain feed tables
+`md-ddl-specification/8-Transformations.md` (stub: `references/transformations-spec.md`) | Transformation types, expression language, mapping rules
+`md-ddl-specification/9-Data-Products.md` (stub: `references/dataproducts-spec.md`) | Data product classes, declaration, governance, masking
 
 ---
 
@@ -175,7 +176,7 @@ what they care about most:
 
 ## Explaining the Validation Model
 
-When a user asks about linting, validation, conformance checking, or why MD-DDL has no traditional linter, explain the two-tier model clearly. Load `references/foundation-spec.md` to access the normative definition.
+When a user asks about linting, validation, conformance checking, or why MD-DDL has no traditional linter, explain the two-tier model clearly. Load `md-ddl-specification/1-Foundation.md` (stub: `references/foundation-spec.md`) to access the normative definition.
 
 ### Core explanation to give
 
@@ -183,7 +184,7 @@ MD-DDL uses a **two-tier validation model**:
 
 1. **Mechanical pre-flight checks** — syntax-level only. Five checks: YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, and domain version field. These are binary (broken or not broken) and have no exceptions.
 
-2. **Agent-driven quality review** — everything above syntax. Structure, convention, governance completeness, domain fitness. This is handled by Agent Ontology's domain-review skill and Agent Regulation's compliance-audit skill, because these concerns require context and judgment that no rule engine can provide.
+2. **Agent-driven quality review** — everything above syntax. Structure, convention, governance completeness, domain fitness. This is handled by Agent Ontology's domain-review skill and Agent Governance's compliance-audit skill, because these concerns require context and judgment that no rule engine can provide.
 
 ### Why MD-DDL doesn't have a traditional linter
 

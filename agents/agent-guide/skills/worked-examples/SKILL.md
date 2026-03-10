@@ -5,7 +5,7 @@ description: Use this skill when the user asks to see an example, says "walk me 
 
 # Skill: Worked Examples
 
-Covers interactive walkthroughs of the two reference examples in this repository.
+Covers interactive walkthroughs of the three reference examples in this repository.
 Teaches by exploring real artifacts — domain files, entity details, relationships,
 events, governance metadata, and data products — with guided commentary.
 
@@ -39,6 +39,22 @@ features like inheritance, governance metadata, standards alignment, data produc
 - `events/` — One file per event with YAML definitions
 - `products/` — Data product declarations (canonical, analytics, source-feeds)
 - `sources/` — Source system declarations with transformation mappings
+
+### Track 3 — Healthcare (Intermediate)
+
+**Location:** `examples/Healthcare/`
+**Scope:** 12 entities, 11 enums, 14 relationships, 4 events, 2 data products,
+2 source systems
+**Best for:** Users exploring standards-aligned healthcare modelling (FHIR),
+transaction_time and bitemporal temporal patterns, and knowledge-graph products
+
+**Files:**
+
+- `domain.md` — Full healthcare domain with metadata, overview diagram, and summary tables
+- `entities/` — One file per clinical entity with full YAML, diagrams, and constraints
+- `events/` — Clinical workflow events with payload attributes
+- `products/` — Canonical and analytics product declarations
+- `sources/` — EHR and LIS source declarations with transformation mappings
 
 ---
 

@@ -17,16 +17,23 @@ Covers full-domain review of MD-DDL artifacts with two goals:
 
 Load these references before performing the review:
 
-- Domains spec: `../domain-scoping/references/domains-spec.md`
-- Entities spec: `../entity-modelling/references/entities-spec.md`
-- Enumerations spec: `../entity-modelling/references/enumerations-spec.md`
-- Relationships spec: `../relationship-events/references/relationships-spec.md`
-- Events spec: `../relationship-events/references/events-spec.md`
-- Sources spec: `../source-mapping/references/sources-spec.md`
-- Transformations spec: `../source-mapping/references/transformations-spec.md`
+- Domains spec: `md-ddl-specification/2-Domains.md`
+	(reference stub: `../domain-scoping/references/domains-spec.md`)
+- Entities spec: `md-ddl-specification/3-Entities.md`
+	(reference stub: `../entity-modelling/references/entities-spec.md`)
+- Enumerations spec: `md-ddl-specification/4-Enumerations.md`
+	(reference stub: `../entity-modelling/references/enumerations-spec.md`)
+- Relationships spec: `md-ddl-specification/5-Relationships.md`
+	(reference stub: `../relationship-events/references/relationships-spec.md`)
+- Events spec: `md-ddl-specification/6-Events.md`
+	(reference stub: `../relationship-events/references/events-spec.md`)
+- Sources spec: `md-ddl-specification/7-Sources.md`
+	(reference stub: `../source-mapping/references/sources-spec.md`)
+- Transformations spec: `md-ddl-specification/8-Transformations.md`
+	(reference stub: `../source-mapping/references/transformations-spec.md`)
 - Conceptual/physical realization: `../entity-modelling/conceptual-to-physical-realisation.md`
 - Standards alignment: `../standards-alignment/SKILL.md`
-- Regulatory compliance benchmark: `../../../agent-regulation/skills/regulatory-compliance/SKILL.md`
+- Regulatory compliance benchmark: `../../../agent-governance/skills/regulatory-compliance/SKILL.md`
 
 If the domain is in a recognized industry (banking, payments, insurance, healthcare, telecom), standards and regulatory checks are mandatory, not optional.
 
@@ -218,7 +225,7 @@ Include this in every review output:
 
 ## Model Readiness Definition
 
-A domain model's readiness verdict determines whether it can proceed to physical artifact generation (Agent Artifact) or data product design (Agent Data Product).
+A domain model's readiness verdict determines whether it can proceed to physical artifact generation (Agent Artifact) or data product design (Agent Architect).
 
 ### Ready
 
@@ -253,7 +260,7 @@ A Not Ready verdict must include a prioritised remediation plan.
 
 When the verdict is **Ready**, tell the user which agents can now consume the model:
 
-> "This domain is ready for physical artifact generation (Agent Artifact) and data product design (Agent Data Product)."
+> "This domain is ready for physical artifact generation (Agent Artifact) and data product design (Agent Architect)."
 
 When **Conditionally Ready**, specify the safe scope:
 

@@ -1,3 +1,5 @@
+<!-- This stub is processed by {{INCLUDE}}-aware platforms. Other platforms: load the path below directly. -->
+
 # Sources Specification Reference
 
 <sources_spec>

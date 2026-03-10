@@ -55,12 +55,15 @@ classDiagram
 existence: independent
 mutability: slowly_changing
 temporal:
-  tracking: valid_time
+  tracking: bitemporal
   description: >
-    Valid time tracks the period during which the role was active in the real
-    world, using Role Start Date and Role End Date. This supports point-in-time
-    queries required for regulatory audit — e.g. "was this party a Beneficial
-    Owner at the time of this transaction?"
+    Bitemporal tracking captures both when the role was active in the real
+    world (valid time via Role Start Date and Role End Date) and when the
+    record was known to the system (transaction time). This supports
+    point-in-time queries required for regulatory audit — e.g. "was this
+    party a Beneficial Owner at the time of this transaction?" — while also
+    enabling reconstruction of what the system believed at any past moment,
+    critical for audit trail integrity and late-arriving corrections.
 attributes:
   Role Identifier:
     type: string
@@ -178,5 +181,18 @@ type: references
 target: Agreement
 cardinality: many-to-one
 granularity: atomic
+ownership: Party Role
+```
+
+### Party Role At Point In Time
+
+Captures the state of a Party Role as it stood at a specific point in time. Used for regulatory snapshots — e.g. quarterly compliance reporting requires the role state as of the reporting date, not the current state.
+
+```yaml
+source: Party Role
+type: associates_with
+target: Customer
+cardinality: one-to-one
+granularity: period
 ownership: Party Role
 ```

@@ -53,8 +53,8 @@ mkdir -p .github/agents
 cp .md-ddl/.github/agents/agent-guide.agent.md .github/agents/
 cp .md-ddl/.github/agents/agent-ontology.agent.md .github/agents/
 cp .md-ddl/.github/agents/agent-artifact.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-dataproduct.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-regulation.agent.md .github/agents/
+cp .md-ddl/.github/agents/agent-architect.agent.md .github/agents/
+cp .md-ddl/.github/agents/agent-governance.agent.md .github/agents/
 ```
 
 These are lightweight wrappers that include the full agent prompts from the
@@ -68,8 +68,8 @@ agents listed:
 - `@agent-guide` — Learning and navigation (start here)
 - `@agent-ontology` — Domain modelling
 - `@agent-artifact` — Physical schema generation
-- `@agent-dataproduct` — Data product design
-- `@agent-regulation` — Compliance auditing
+- `@agent-architect` — Data product design
+- `@agent-governance` — Compliance auditing
 
 If agents do not appear, check:
 
@@ -87,8 +87,8 @@ Type `@agent-name` in Copilot Chat to invoke a specific agent:
 - `@agent-guide What is an entity in MD-DDL?` — Learn a concept
 - `@agent-ontology Model a Customer domain for retail banking` — Start modelling
 - `@agent-artifact Generate Snowflake DDL for the Customer domain` — Generate schemas
-- `@agent-dataproduct Design a data product for the analytics team` — Design products
-- `@agent-regulation Audit the Customer domain against GDPR` — Run compliance audit
+- `@agent-architect Design a data product for the analytics team` — Design products
+- `@agent-governance Audit the Customer domain against GDPR` — Run compliance audit
 
 #### Context Tips
 
@@ -111,8 +111,8 @@ your-project/
       agent-guide.agent.md
       agent-ontology.agent.md
       agent-artifact.agent.md
-      agent-dataproduct.agent.md
-      agent-regulation.agent.md
+      agent-architect.agent.md
+      agent-governance.agent.md
   domains/
     customer/
       domain.md               ← Your domain models
@@ -162,8 +162,8 @@ This project uses the MD-DDL standard for data modelling.
 For learning and guidance, read: `.md-ddl/agents/agent-guide/AGENT.md`
 For domain modelling, read: `.md-ddl/agents/agent-ontology/AGENT.md`
 For physical schema generation, read: `.md-ddl/agents/agent-artifact/AGENT.md`
-For data product design, read: `.md-ddl/agents/agent-dataproduct/AGENT.md`
-For compliance auditing, read: `.md-ddl/agents/agent-regulation/AGENT.md`
+For data product design, read: `.md-ddl/agents/agent-architect/AGENT.md`
+For compliance auditing, read: `.md-ddl/agents/agent-governance/AGENT.md`
 
 ## Key References
 

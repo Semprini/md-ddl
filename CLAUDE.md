@@ -13,10 +13,10 @@ Start with Agent Guide for learning and navigation, then use specialist agents f
   Read: `.md-ddl/agents/agent-ontology/AGENT.md`
 - **Agent Artifact** — Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher).
   Read: `.md-ddl/agents/agent-artifact/AGENT.md`
-- **Agent Data Product** — Data product design and ODPS manifest generation.
-  Read: `.md-ddl/agents/agent-dataproduct/AGENT.md`
-- **Agent Regulation** — Compliance auditing and governance assurance.
-  Read: `.md-ddl/agents/agent-regulation/AGENT.md`
+- **Agent Architect** — Strategic design, data product declaration, and ODPS manifest generation.
+  Read: `.md-ddl/agents/agent-architect/AGENT.md`
+- **Agent Governance** — Standards conformance, compliance auditing, and governance assurance.
+  Read: `.md-ddl/agents/agent-governance/AGENT.md`
 
 ## Validation
 

@@ -353,7 +353,7 @@ State | Meaning
 
 #### Transition Rules
 
-- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Data Product's design process).
+- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Architect's design process).
 - `Production` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
 - `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
 - `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.

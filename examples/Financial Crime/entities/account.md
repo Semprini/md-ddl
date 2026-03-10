@@ -30,7 +30,7 @@ classDiagram
 
 ```yaml
 existence: independent
-mutability: slowly_changing
+mutability: frequently_changing
 attributes:
   Account Identifier:
     type: string

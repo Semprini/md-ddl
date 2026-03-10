@@ -63,16 +63,18 @@ agents/
       wide-column/                     Denormalized wide-column reporting schemas
       knowledge-graph/                 Knowledge graph schema, Neo4j Cypher DDL
 
-  agent-dataproduct/          Data product design and publication agent
+  agent-architect/            Strategic design and data product publication agent
     AGENT.md                  Core prompt — identity, modes, skill index
     skills/
+      architecture/                    Architectural philosophy, tenets, comparison (planned)
       product-design/                  Product class selection, entity scoping, governance, masking
       odps-alignment/                  ODPS v4.0 manifest generation and mapping
         references/                    ODPS specification reference
 
-  agent-regulation/           Regulatory compliance and audit agent
-    AGENT.md                  Core prompt — identity, modes (Audit/Monitor/Remediate), skill index
+  agent-governance/           Standards conformance and compliance assurance agent
+    AGENT.md                  Core prompt — identity, modes (Conformance/Compliance/Monitor/Remediate), skill index
     skills/
+      standards-conformance/  Post-modelling industry standards audit
       regulatory-compliance/  Jurisdiction mapping + regulator file loader (shared with agent-ontology)
         regulators/           Per-regulator guidance files (apra.md, gdpr.md, fatf.md, etc.)
       compliance-audit/       Three-level audit protocol, gap report format, severity rules
@@ -82,8 +84,8 @@ agents/
     agent-guide.agent.md      Frontmatter + include of canonical `agents/agent-guide/AGENT.md`
     agent-ontology.agent.md   Frontmatter + include of canonical `agents/agent-ontology/AGENT.md`
     agent-artifact.agent.md   Frontmatter + include of canonical `agents/agent-artifact/AGENT.md`
-    agent-dataproduct.agent.md Frontmatter + include of canonical `agents/agent-dataproduct/AGENT.md`
-    agent-regulation.agent.md Frontmatter + include of canonical `agents/agent-regulation/AGENT.md`
+    agent-architect.agent.md  Frontmatter + include of canonical `agents/agent-architect/AGENT.md`
+    agent-governance.agent.md Frontmatter + include of canonical `agents/agent-governance/AGENT.md`
   copilot-instructions.md     Repo-wide contributor and modelling guidance
   md-ddl-review-prompt.md     Layer 1: Structural review prompt
   md-ddl-adversarial-review-prompt.md  Layer 2: Adversarial review prompt
@@ -186,6 +188,17 @@ Reference files in `skills/*/references/` are stubs that point to the canonical 
 
 Use file-relative paths in both Markdown links and `{{INCLUDE: ...}}` directives inside reference stubs. Do not use workspace-root paths (for example `md-ddl-specification/...`) because this repo is commonly consumed as a `.md-ddl` submodule and root-based paths break in consumer projects.
 
+### Reference Loading
+
+Treat `{{INCLUDE: ...}}` as platform-dependent.
+
+- VS Code Copilot custom-agent wrappers in `.github/agents/` process `{{INCLUDE}}` natively.
+- Many other chat platforms do not process `{{INCLUDE}}` in arbitrary Markdown files.
+- In SKILL.md guidance, instruct agents to load canonical spec files directly from `md-ddl-specification/*.md`.
+- Keep `skills/*/references/*-spec.md` stub files as dependency documentation and include-aware fallbacks.
+
+When updating a skill, prefer wording like: `Load md-ddl-specification/3-Entities.md (reference stub: references/entities-spec.md)`.
+
 ### Agent responsibilities and boundaries
 
 Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent that belong to another agent's stage.
@@ -193,33 +206,35 @@ Each agent owns a distinct lifecycle stage. Do not add capabilities to an agent 
 Agent | Lifecycle stage | Owns
 --- | --- | ---
 `agent-guide` | Learning and navigation | Standard explanation, user orientation, concept teaching, worked example walkthroughs, platform setup, agent navigation and handoff
+`agent-architect` | Strategic design and data products | Architecture philosophy discussion, data product class selection, entity scoping, governance overrides, masking strategies, ODPS manifest generation, external catalogue alignment
 `agent-ontology` | Discovery and design | Domain modelling, entity authoring, relationship and event design, source system mapping and field-level transformations, standards alignment during authoring
 `agent-artifact` | Physical artifact generation | Dimensional star schemas, normalized 3NF designs, wide-column reporting schemas, knowledge graph schemas, SQL DDL, JSON Schema, Cypher, Parquet schema contracts
-`agent-dataproduct` | Data product design and publication | Data product class selection, entity scoping, governance overrides, masking strategies, ODPS manifest generation, external catalogue alignment
-`agent-regulation` | Governance assurance | Compliance metadata auditing, regulatory monitoring, governance remediation
+`agent-governance` | Standards conformance and compliance assurance | Standards conformance auditing, compliance metadata auditing, regulatory monitoring, governance remediation
 
-**Boundary rule — Guide vs All Specialists:** Agent Guide teaches concepts, walks through examples, helps with platform setup, and navigates users to the right specialist agent. It never creates production MD-DDL artifacts — domain files, entity details, data product declarations, physical schemas, or compliance audit reports. When a user is ready for production work, Agent Guide hands off explicitly to the appropriate specialist agent. Do not add production modelling, generation, product design, or compliance auditing to Agent Guide.
+**Boundary rule — Guide vs All Specialists:** Agent Guide teaches concepts, walks through examples, helps with platform setup, and navigates users to the right specialist agent. It never creates production MD-DDL artifacts — domain files, entity details, data product declarations, physical schemas, or compliance audit reports. When a user is ready for production work, Agent Guide hands off explicitly to the appropriate specialist agent. Do not add production modelling, generation, product design, architecture discussion, or compliance auditing to Agent Guide.
 
 **Boundary rule — Guide vs Ontology:** Agent Guide may sketch MD-DDL to illustrate concepts (clearly marked as demonstrations, not production artifacts). Agent Ontology creates production domain files, entity details, relationships, and events. If Agent Guide identifies that a user is ready to model, it hands off to Agent Ontology with a suggested opening prompt. Do not add production modelling capability to Agent Guide, and do not add tutorial or onboarding capability to Agent Ontology.
 
+**Boundary rule — Guide vs Architect:** Agent Guide may mention architecture concepts when teaching (Teach mode). Agent Architect engages in strategic architecture discussion, positioning, and comparison (Discuss mode). If Agent Guide identifies that a user wants to discuss architecture philosophy, compare approaches, or prepare strategic material, it hands off to Agent Architect. Do not add strategic discussion capability to Agent Guide, and do not add tutorial or onboarding capability to Agent Architect.
+
 **Boundary rule — Ontology vs Artifact:** Agent Ontology produces conceptual and logical MD-DDL models. Agent Artifact consumes those models and generates physical artifacts (DDL, JSON Schema, Parquet). If Agent Artifact identifies a conceptual gap (missing entity, attribute, or relationship), it flags the gap and defers the structural change to Agent Ontology. Do not add physical generation capability to Agent Ontology or domain modelling capability to Agent Artifact.
 
-**Boundary rule — Ontology vs Data Product:** Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Agent Data Product takes over for detailed product design — choosing product class, scoping entities, setting governance overrides, masking strategies, and generating external manifests (ODPS). Do not add detailed product design or ODPS generation to Agent Ontology, and do not add entity modelling or relationship design to Agent Data Product.
+**Boundary rule — Ontology vs Architect:** Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Agent Architect takes over for detailed product design — choosing product class, scoping entities, setting governance overrides, masking strategies, and generating external manifests (ODPS). Agent Architect also handles architecture philosophy discussion. Do not add detailed product design, ODPS generation, or architecture discussion to Agent Ontology, and do not add entity modelling or relationship design to Agent Architect.
 
-**Boundary rule — Data Product vs Artifact:** Agent Data Product produces MD-DDL data product declarations that serve as input contracts for Agent Artifact. Agent Artifact generates physical artifacts (DDL, JSON Schema, Parquet, Cypher) scoped by the product's `entities`, `schema_type`, `governance`, and `masking` fields. Do not add physical artifact generation to Agent Data Product, and do not add product design or ODPS alignment to Agent Artifact.
+**Boundary rule — Architect vs Artifact:** Agent Architect produces MD-DDL data product declarations that serve as input contracts for Agent Artifact. Agent Artifact generates physical artifacts (DDL, JSON Schema, Parquet, Cypher) scoped by the product's `entities`, `schema_type`, `governance`, and `masking` fields. Do not add physical artifact generation to Agent Architect, and do not add product design or ODPS alignment to Agent Artifact.
 
-**Boundary rule — Ontology vs Regulation:** Agent Ontology applies governance metadata during authoring (first pass). Agent Regulation audits and maintains that metadata over time
-(ongoing assurance). If a compliance gap requires a structural model change — a new entity, attribute, or relationship — Agent Regulation flags it and
-defers the structural work to Agent Ontology. Do not add structural modelling capability to Agent Regulation.
+**Boundary rule — Ontology vs Governance:** Agent Ontology applies governance metadata and industry standards alignment during authoring (design-time). Agent Governance audits standards conformance and regulatory compliance after modelling (assurance-time). If a compliance or conformance gap requires a structural model change — a new entity, attribute, or relationship — Agent Governance flags it and defers the structural work to Agent Ontology. Do not add structural modelling capability to Agent Governance, and do not add post-hoc conformance auditing to Agent Ontology.
 
-**Boundary rule — Regulation vs Data Product:** Agent Regulation may audit data product governance and masking metadata (see Level 4 in the compliance-audit skill) and produce recommendations. Agent Data Product owns all product declarations and applies approved changes. Agent Regulation flags product governance gaps; Agent Data Product fixes them. Do not add product declaration authoring to Agent Regulation, and do not add compliance auditing to Agent Data Product.
+**Boundary rule — Governance vs Architect:** Agent Governance may audit data product governance and masking metadata (see Level 4 in the compliance-audit skill) and produce recommendations. Agent Architect owns all product declarations and applies approved changes. Agent Governance flags product governance gaps; Agent Architect fixes them. Do not add product declaration authoring to Agent Governance, and do not add compliance auditing to Agent Architect.
 
 ### Shared skills
 
 Some skills are used by more than one agent. The `regulatory-compliance` skill is the current example — Agent Ontology uses it to apply governance metadata
-during domain authoring; Agent Regulation uses it as the requirements benchmark during audits.
+during domain authoring; Agent Governance uses it as the requirements benchmark during audits.
 
-Shared skills live under the agent that owns them conceptually. Agent Regulation owns `regulatory-compliance` because compliance assurance is its primary purpose. Agent Ontology loads it as an external reference.
+Shared skills live under the agent that owns them conceptually. Agent Governance owns `regulatory-compliance` because compliance assurance is its primary purpose. Agent Ontology loads it as an external reference.
+
+Industry standard reference files (`industry_standards/bian/`, `industry_standards/fhir/`, `industry_standards/tmforum/`) are shared read-only references used by both Agent Ontology (standards-alignment skill, design-time) and Agent Governance (standards-conformance skill, assurance-time).
 
 When editing a shared skill, consider the impact on both agents. The skill's trigger description should reflect all contexts in which it is used.
 

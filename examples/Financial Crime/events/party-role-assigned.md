@@ -16,7 +16,7 @@ downstream_impact:
   - Access and entitlements can be updated for the new role
   - Role-based monitoring and due diligence workflows are triggered
 attributes:
-  - event timestamp:
-      type: datetime
-      description: Time the role assignment became effective
+  event_timestamp:
+    type: datetime
+    description: Time the role assignment became effective
 ```

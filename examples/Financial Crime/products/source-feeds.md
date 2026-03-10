@@ -20,4 +20,10 @@ version: "1.0.0"
 governance:
   classification: Internal
   retention: "3 years"
+
+sla:
+  freshness: "< 5 minutes"
+  availability: "99.9%"
+
+refresh: real-time
 ```

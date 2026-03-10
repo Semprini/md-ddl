@@ -60,3 +60,16 @@ cardinality: one-to-many
 granularity: atomic
 ownership: Branch
 ```
+
+### Branch Transaction Summary
+
+A Branch has a grouped relationship to Transactions processed through its serviced Accounts. This supports branch-level aggregated reporting for fraud pattern analysis.
+
+```yaml
+source: Branch
+type: associates_with
+target: Transaction
+cardinality: one-to-many
+granularity: group
+ownership: Branch
+```

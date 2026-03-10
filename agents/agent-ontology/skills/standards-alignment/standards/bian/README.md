@@ -10,13 +10,13 @@ This directory now supports side-by-side BIAN versions:
 
 Version | Purpose | Path
 --- | --- | ---
-v14 | Default for new mapping work | `v14/`
-v13 | Backward compatibility and historical mapping | `v13/`
+v13 | Current production mapping baseline | `v13/`
+v14 | Planned default when source snapshots are available | `v14/`
 
 ## Version Selection Rules
 
-1. Default to v14 for new modelling.
-2. Use v13 only when maintaining existing v13-aligned artifacts.
+1. Use v13 for current modelling until v14 snapshots are published and extracted.
+2. Use v14 only when required raw snapshots and generated references are available.
 3. If a model is sensitive to release semantics, state the version in notes.
 4. Keep MD-DDL reference URLs version-agnostic unless strict version specificity is required.
 

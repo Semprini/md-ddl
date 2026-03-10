@@ -17,11 +17,11 @@ If any of these are missing, defer to Agent Ontology before proceeding.
 
 ## Load the Specification
 
-Read the data products specification for normative rules:
+Read `md-ddl-specification/9-Data-Products.md` for normative rules.
 
-<data_products_spec>
-{{INCLUDE: ../../../md-ddl-specification/9-Data-Products.md}}
-</data_products_spec>
+Platform note: `{{INCLUDE}}` blocks are only processed by include-aware
+platforms (for example, VS Code Copilot custom agents). In other platforms,
+load the file path above directly.
 
 ## Product Design Process
 

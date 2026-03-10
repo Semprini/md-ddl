@@ -11,10 +11,10 @@ business events and technical mechanics.
 
 ## MD-DDL Reference
 
-- Full relationships specification: `references/relationships-spec.md`
-  (source: `md-ddl-specification/5-Relationships.md`)
-- Full events specification: `references/events-spec.md`
-  (source: `md-ddl-specification/6-Events.md`)
+- Full relationships specification: `md-ddl-specification/5-Relationships.md`
+  (reference stub: `references/relationships-spec.md`)
+- Full events specification: `md-ddl-specification/6-Events.md`
+  (reference stub: `references/events-spec.md`)
 - Cross-skill conceptual/physical guidance: `../entity-modelling/conceptual-to-physical-realisation.md`
   (use when cardinality/ownership decisions affect dimensional realization and
   `existence` interpretation)

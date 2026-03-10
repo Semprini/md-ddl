@@ -105,6 +105,9 @@ governance:
 
    The attributes block should focus on the delta (what changed) and the context (why it changed), rather than a full copy of the entity.
 
+   Event payload attributes use the same dictionary format as entity attributes.
+   Use key-value entries under `attributes:` rather than list-of-single-key maps.
+
 9. **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
 
@@ -123,9 +126,9 @@ Triggered when a customer changes one or more preferences.
 actor: Customer
 entity: Customer Preference
 attributes:
-  - updated fields:
+   updated_fields:
       type: array
-  - timestamp:
+   timestamp:
       type: datetime
 ```
 ````

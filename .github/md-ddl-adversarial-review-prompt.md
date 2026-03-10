@@ -20,8 +20,8 @@ Read these files first:
 1. `md-ddl-specification/1-Foundation.md` — core principles
 2. `md-ddl-specification/MD-DDL-Complete.md` — full spec (skim for breadth)
 3. All 5 agent files: `agents/agent-guide/AGENT.md`, `agents/agent-ontology/AGENT.md`,
-   `agents/agent-artifact/AGENT.md`, `agents/agent-dataproduct/AGENT.md`,
-   `agents/agent-regulation/AGENT.md`
+   `agents/agent-artifact/AGENT.md`, `agents/agent-architect/AGENT.md`,
+   `agents/agent-governance/AGENT.md`
 4. `examples/Financial Crime/domain.md` — the reference example
 5. `.github/copilot-instructions.md` — contributor guidance
 
@@ -69,7 +69,7 @@ architecture would cause incorrect output. Not theoretical — concrete.
 Simulate a handoff that goes wrong. Identify:
 
 - What context is lost between agents (stateless sessions)?
-- What happens when Agent Regulation flags a gap that Agent Ontology disagrees with?
+- What happens when Agent Governance flags a gap that Agent Ontology disagrees with?
 - What happens when a product design reveals missing entities but the user doesn't
   switch to Agent Ontology?
 - Where do circular handoffs occur (A defers to B, B defers back to A)?

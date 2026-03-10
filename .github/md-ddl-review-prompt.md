@@ -28,8 +28,8 @@ Read these files first, in this order. Do not skip ahead.
 1. `md-ddl-specification/1-Foundation.md` — the core principles
 2. `agents/agent-ontology/AGENT.md` — identity, lifecycle stage, skill index
 3. `agents/agent-artifact/AGENT.md` — identity, lifecycle stage, skill index
-4. `agents/agent-dataproduct/AGENT.md` — identity, lifecycle stage, skill index
-5. `agents/agent-regulation/AGENT.md` — identity, lifecycle stage, skill index
+4. `agents/agent-architect/AGENT.md` — identity, lifecycle stage, skill index
+5. `agents/agent-governance/AGENT.md` — identity, lifecycle stage, skill index
 6. `README.md` — the public face and integration guide
 
 This gives you the mental model you need to evaluate everything else correctly.
@@ -57,20 +57,20 @@ here. No other file has the right to define language rules.
 
 **Purpose:** Define the identity, lifecycle stage, behaviour modes, and skill index
 for each agent. Agent Ontology owns Discovery and Design. Agent Artifact owns
-Physical Artifact Generation. Agent Data Product owns Data Product Design and
-Publication. Agent Regulation owns Governance Assurance. These are distinct —
+Physical Artifact Generation. Agent Architect owns Strategic Design and Data Product
+Publication. Agent Governance owns Standards Conformance and Compliance Assurance. These are distinct —
 they must not overlap.
 
 **Review lens:**
 
 - Does each agent's stated lifecycle stage and capabilities stay within its
   ownership boundary?
-- Does Agent Regulation defer structural modelling to Agent Ontology?
-- Does Agent Ontology defer ongoing compliance assurance to Agent Regulation?
+- Does Agent Governance defer structural modelling to Agent Ontology?
+- Does Agent Ontology defer ongoing compliance assurance to Agent Governance?
 - Does Agent Ontology defer physical generation to Agent Artifact?
-- Does Agent Data Product defer physical generation to Agent Artifact and
+- Does Agent Architect defer physical generation to Agent Artifact and
   structural modelling to Agent Ontology?
-- Does Agent Artifact defer product design to Agent Data Product?
+- Does Agent Artifact defer product design to Agent Architect?
 - Does each skill index accurately describe the skills that exist on disk?
 - Do the non-negotiable output rules in each AGENT.md align with the spec?
 - Are behaviour modes clearly distinct and correctly triggered?
@@ -154,7 +154,7 @@ product framing. It is read by people deciding whether to adopt md-ddl.
 - Do all agent SKILL.md files use `flag` / `note` / `suggest` / `observe` language for convention and quality concerns (Levels 3–5)?
 - Is `error` / `reject` / `fail` language in agent prompts limited to syntax-level failures (Level 1)?
 - Does the domain-review SKILL.md (Agent Ontology) explicitly state it is a contextual quality review, not a lint pass?
-- Does the compliance-audit SKILL.md (Agent Regulation) distinguish between structurally missing governance (structural absence) and substantively incomplete governance (quality concern)?
+- Does the compliance-audit SKILL.md (Agent Governance) distinguish between structurally missing governance (structural absence) and substantively incomplete governance (quality concern)?
 - Does the compliance-audit SKILL.md treat governance vocabulary deviations as Advisory observations rather than Critical gaps?
 
 Flag any agent prompt where enforcement language is used for convention or quality issues — this is a prompt bug.
@@ -199,7 +199,7 @@ Duplication is technical debt — it means a spec update may not propagate.
 ### Lifecycle boundary audit
 
 For each agent, list the capabilities it claims. Check that no capability claimed
-by Agent Ontology overlaps with Agent Regulation's ownership, and vice versa.
+by Agent Ontology overlaps with Agent Governance's ownership, and vice versa.
 
 ### Dead reference audit
 

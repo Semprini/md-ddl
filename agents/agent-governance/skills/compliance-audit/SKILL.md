@@ -142,7 +142,7 @@ Before logging a gap, determine *why* a `governance:` block is absent:
 
 **Type A — Not yet applied:** The entity has no `governance:` block and no
 `# No specific regulatory requirements identified` annotation. Treat as a gap.
-Recommend: full governance pass by Agent Regulation.
+Recommend: full governance pass by Agent Governance.
 
 **Type B — Explicitly excluded:** The entity has a `# No specific regulatory
 requirements identified` annotation. Do not log as a gap. Note in the audit
@@ -271,7 +271,7 @@ automatically until the conflict section is reviewed.
 
 ## Producing the Gap Report
 
-Use the gap report format defined in `agents/agent-regulation/AGENT.md`.
+Use the gap report format defined in `agents/agent-governance/AGENT.md`.
 Apply these severity rules when classifying gaps:
 
 ### Critical

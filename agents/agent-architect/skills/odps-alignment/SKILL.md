@@ -19,11 +19,11 @@ what requires additional business input.
 
 ## Load ODPS Reference
 
-Read the ODPS v4.0 structure reference before generating manifests:
+Read `skills/odps-alignment/references/odps-v4.0.md` before generating manifests.
 
-<odps_reference>
-{{INCLUDE: references/odps-v4.0.md}}
-</odps_reference>
+Platform note: `{{INCLUDE}}` blocks are only processed by include-aware
+platforms (for example, VS Code Copilot custom agents). In other platforms,
+open the reference file directly.
 
 ## Pre-Requisites
 

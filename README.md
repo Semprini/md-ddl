@@ -78,7 +78,7 @@ your-project/
 3. **Map** sources in `sources/<system>/source.md` + `sources/<system>/transforms/table_<source-table>.md`
 4. **Publish** data products — source-aligned, domain-aligned, or consumer-aligned
 5. **Generate** schemas, lineage, and pipeline artefacts
-6. **Govern** continuously with Agent Regulation
+6. **Govern** continuously with Agent Governance
 
 ---
 
@@ -127,8 +127,8 @@ Agent | Purpose
 **Agent Guide** | Learning companion and navigator — start here
 **Agent Ontology** | Domain discovery, entity modelling, source mapping
 **Agent Artifact** | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher)
-**Agent Data Product** | Data product design and ODPS manifest generation
-**Agent Regulation** | Compliance auditing and governance assurance
+**Agent Architect** | Strategic design, data product design, and ODPS manifest generation
+**Agent Governance** | Standards conformance, compliance auditing, and governance assurance
 
 > Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 

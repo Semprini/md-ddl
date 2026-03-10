@@ -16,7 +16,7 @@ downstream_impact:
   - Product and servicing rules can be applied under the active agreement
   - Contract lifecycle and compliance timelines are started
 attributes:
-  - event timestamp:
-      type: datetime
-      description: Time the agreement became active
+  event_timestamp:
+    type: datetime
+    description: Time the agreement became active
 ```

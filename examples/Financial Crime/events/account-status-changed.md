@@ -16,7 +16,7 @@ downstream_impact:
   - Transaction permissions and servicing controls may be recalculated
   - Compliance and customer notification workflows may be initiated
 attributes:
-  - event timestamp:
-      type: datetime
-      description: Time the account status change was recorded
+  event_timestamp:
+    type: datetime
+    description: Time the account status change was recorded
 ```

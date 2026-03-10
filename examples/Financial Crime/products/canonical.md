@@ -26,4 +26,10 @@ entities:
   - Customer
   - Contact Address
   - Address
+
+sla:
+  freshness: "< 1 hour"
+  availability: "99.95%"
+
+refresh: hourly
 ```

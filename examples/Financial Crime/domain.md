@@ -139,6 +139,7 @@ Name | Description | Reference
 [Address Purpose](enums.md#address-purpose) | Business purpose for which a party uses an address. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Address Verification Status](enums.md#address-verification-status) | Current verification state of a contact address association. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Verification Method](enums.md#verification-method) | Method used to verify an address. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
+[Currency Code](enums.md#currency-code) | ISO 4217 currency codes for transaction and account values. | [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
 
 ## Relationships
 
@@ -160,6 +161,8 @@ Name | Description | Reference
 [Branch Services Account](entities/branch.md#branch-services-account) | Accounts are serviced by a specific Branch (Location). | [BIAN BOM - Location](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Location)
 [Product In Terms Of Agreement](entities/product.md#product-in-terms-of-agreement) | A Product is defined in terms of an Agreement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
 [Contact Address References Address](entities/contact_address.md#contact-address-references-address) | Each Contact Address references a canonical Address record. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
+[Branch Transaction Summary](entities/branch.md#branch-transaction-summary) | Grouped relationship from Branch to Transactions for branch-level fraud analysis. | -
+[Party Role At Point In Time](entities/party_role.md#party-role-at-point-in-time) | Period snapshot of Party Role state for regulatory reporting. | -
 
 ## Events
 
@@ -180,5 +183,6 @@ Name | Class | Consumers | Status
 [Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Production
 [Transaction Risk Summary](products/analytics.md#transaction-risk-summary) | consumer-aligned | Financial Crime Analytics | Production
 [Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Production
+[Party Risk Report (Legacy)](products/party-risk-report-legacy.md#party-risk-report-legacy) | consumer-aligned | Financial Crime Analytics | Deprecated
 
 ---

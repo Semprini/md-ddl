@@ -175,6 +175,7 @@ Entity reference consistency | Entity names in relationships, events, products, 
 Domain version field | The `version:` key exists in domain metadata | Versionless domains cannot participate in maturity tracking or change management
 
 **What is explicitly not checked mechanically:**
+
 - Presence or absence of optional YAML keys (mutability, temporal, governance fields)
 - Naming conventions or vocabulary choices
 - Governance metadata completeness or correctness
@@ -195,7 +196,7 @@ Any tool implementing pre-flight checks must conform to this interface:
 
 ### Agent-Driven Quality Review
 
-Everything above Level 1 is the responsibility of agents. Agent Ontology's domain-review skill, Agent Regulation's compliance-audit skill, and the structured review prompts in `.github/` handle structural, convention, quality, and domain-fitness concerns. They understand context and intent. They flag deviations as observations, not errors.
+Everything above Level 1 is the responsibility of agents. Agent Ontology's domain-review skill, Agent Governance's compliance-audit skill, and the structured review prompts in `.github/` handle structural, convention, quality, and domain-fitness concerns. They understand context and intent. They flag deviations as observations, not errors.
 
 When an agent encounters an organisational vocabulary deviation — a field named `phi` instead of `pii`, `data_class` instead of `classification` — the correct response is to note it as a **potential spec vocabulary gap** and work with it, not reject the file.
 

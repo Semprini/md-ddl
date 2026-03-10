@@ -10,8 +10,9 @@ and the modelling strategy decision (Canonical vs. Domain-Driven).
 
 ## MD-DDL Reference
 
-The full Domains specification is in `references/domains-spec.md`. Read it before
-drafting any domain file. Key sections to apply:
+Load the full Domains specification from `md-ddl-specification/2-Domains.md`
+(reference stub: `references/domains-spec.md`) before drafting any domain file.
+Key sections to apply:
 
 - **Domain Declaration and Description** — H1 heading, free-text before H2
 - **Domain Metadata** — YAML block under `## Metadata`, fields and categories
@@ -189,3 +190,45 @@ Before handing a domain file to the user for review, confirm:
 - [ ] `Specializes` column populated for all subtypes
 - [ ] No H3 headings in the domain file (H3 is reserved for detail files)
 - [ ] Modelling strategy stated in description and tags
+
+---
+
+## Domain Authoring Checklist
+
+When creating a complete domain from scratch, follow this sequence. Each step
+references the skill that owns detailed guidance.
+
+1. **Domain file** - `domain.md`
+  - Metadata, governance, overview diagram, summary tables
+  - Guidance: this skill (Domain File Checklist)
+  - Standards: load standards-alignment when industry standards apply
+
+2. **Entity detail files** - `entities/*.md` (one per entity)
+  - Attributes, existence, mutability, temporal, governance, diagrams
+  - Guidance: `../entity-modelling/SKILL.md` (Entity and Enum checklists)
+  - Decisions: concept realisation framework and inheritance reasoning
+
+3. **Enumerations file** - `enums.md`
+  - Domain enum declarations (or co-located enum sections where appropriate)
+  - Guidance: `../entity-modelling/SKILL.md` (Enum checklist)
+  - External standards: representative subset (5 to 15 values) plus standard reference
+
+4. **Relationship YAML** - co-located in entity files
+  - Type, cardinality, granularity, constraints
+  - Guidance: `../relationship-events/SKILL.md` (Relationship checklist)
+
+5. **Event files** - `events/*.md` (one per event)
+  - Actor, entity, emitted_on, payload, governance
+  - Guidance: `../relationship-events/SKILL.md` (Event checklist)
+
+6. **Source system files** - `sources/*/source.md`
+  - Change model, feeds table, data quality tier
+  - Guidance: `../source-mapping/SKILL.md` (Source File checklist)
+
+7. **Data product files** - `products/*.md`
+  - Class, entities, SLA, governance overrides, masking
+  - Guidance: `../../agent-architect/skills/product-design/SKILL.md`
+
+8. **Update `domain.md` summary tables**
+  - Ensure Entities, Enums, Relationships, Events, and Data Products reflect
+    all created detail files

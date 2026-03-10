@@ -103,9 +103,9 @@ Check both product files for:
 
 ### Step 7: Agent walkthrough validation
 
-- Run Agent Data Product against both cross-domain products to verify it can interpret the `cross_domain:` block
+- Run Agent Architect against both cross-domain products to verify it can interpret the `cross_domain:` block
 - Run Agent Artifact to verify it can generate physical artifacts from a cross-domain product (it should pull entity definitions from both domains)
-- Run Agent Regulation to verify governance conflict resolution is flagged as complete (no audit gaps)
+- Run Agent Governance to verify governance conflict resolution is flagged as complete (no audit gaps)
 
 ### Step 8: Update coverage matrix
 
@@ -133,7 +133,7 @@ Cross-domain product | | ✓ (patient-fraud-detection) | ✓ (billing-fraud-dete
 3. Confirm all `entities:` listed in `cross_domain:` blocks have corresponding entity files in the referenced domain
 4. Verify governance resolution is explicit (no silent inheritance) — each conflict must have a declared resolution
 5. Verify masking covers all PII/PHI attributes from both contributing domains
-6. Run Agent Data Product interpretation check on both products
+6. Run Agent Architect interpretation check on both products
 7. Confirm spec clarifications in `9-Data-Products.md` don't contradict existing rules
 
 ## Decisions

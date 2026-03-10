@@ -10,8 +10,9 @@ workflow mapping to agents, and concrete next-step recommendations.
 
 ## MD-DDL Reference
 
-The foundation principles are in `references/foundation-spec.md`. Load it when
-the user asks *why* MD-DDL is designed the way it is or wants the full principles.
+Load foundation principles from `md-ddl-specification/1-Foundation.md`
+(reference stub: `references/foundation-spec.md`) when the user asks *why* MD-DDL
+is designed the way it is or wants the full principles.
 
 For overview-level questions, the principles below are sufficient.
 
@@ -67,7 +68,7 @@ into the user's world:
 > "MD-DDL puts governance metadata *inside* the model — classification, PII flags,
 > retention policies, ownership, and regulatory scope live right next to the data
 > definitions. You do not need a separate catalogue to know what is sensitive or
-> who owns it. Agent Regulation can then audit everything in one pass."
+> who owns it. Agent Governance can then audit everything in one pass."
 
 **For a Data Engineer:**
 > "MD-DDL is the contract between the logical model and your physical schemas.
@@ -77,14 +78,14 @@ into the user's world:
 
 **For a Compliance Manager:**
 > "MD-DDL captures regulatory scope, data classification, PII, retention, and
-> access controls directly in the data model. Agent Regulation audits the model
+> access controls directly in the data model. Agent Governance audits the model
 > against frameworks like APRA CPS 234, GDPR, HIPAA, or FATF and produces
 > prioritised compliance gap reports."
 
 **For a Data Product Owner:**
 > "MD-DDL lets you declare data products right inside the model — who the consumers
 > are, what schema type they need, what governance and masking rules apply, and what
-> SLA they get. Agent Data Product helps you design these, and Agent Artifact
+> SLA they get. Agent Architect helps you design these, and Agent Artifact
 > generates the physical artifacts scoped by your product declarations."
 
 **For a Healthcare Architect:**
@@ -119,9 +120,9 @@ Step | What happens | Agent
 **Discover** | Interview stakeholders, identify concepts, set domain boundaries | Agent Ontology
 **Model** | Draft domain files — entities, attributes, relationships, events, enums | Agent Ontology
 **Map** | Declare source systems and write transformation rules | Agent Ontology
-**Publish** | Design data products — audience, schema type, governance, masking | Agent Data Product
+**Publish** | Design data products — audience, schema type, governance, masking | Agent Architect
 **Generate** | Produce physical schemas (DDL, JSON Schema, Parquet, Cypher) | Agent Artifact
-**Govern** | Audit and maintain compliance metadata over time | Agent Regulation
+**Govern** | Audit and maintain compliance metadata over time | Agent Governance
 
 > "You can start at any step. Most people start with **Discover + Model** using
 > Agent Ontology. Where would you like to begin?"

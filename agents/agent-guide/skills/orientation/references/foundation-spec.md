@@ -1,3 +1,5 @@
+<!-- This stub is processed by {{INCLUDE}}-aware platforms. Other platforms: load the path below directly. -->
+
 # Foundation Specification Reference
 
 The full MD-DDL foundation principles are defined in the canonical specification.

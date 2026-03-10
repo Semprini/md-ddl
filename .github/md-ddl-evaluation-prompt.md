@@ -53,12 +53,13 @@ Read these files in order. You need the full context to simulate authentic inter
 9. `agents/agent-artifact/skills/normalized/SKILL.md`
 10. `agents/agent-artifact/skills/wide-column/SKILL.md`
 11. `agents/agent-artifact/skills/knowledge-graph/SKILL.md`
-12. `agents/agent-dataproduct/AGENT.md` — data product design and publication agent
-13. `agents/agent-dataproduct/skills/product-design/SKILL.md`
-14. `agents/agent-dataproduct/skills/odps-alignment/SKILL.md`
-15. `agents/agent-regulation/AGENT.md` — governance assurance agent
-16. `agents/agent-regulation/skills/compliance-audit/SKILL.md`
-17. `agents/agent-regulation/skills/regulatory-compliance/SKILL.md`
+12. `agents/agent-architect/AGENT.md` — strategic design and data product publication agent
+13. `agents/agent-architect/skills/product-design/SKILL.md`
+14. `agents/agent-architect/skills/odps-alignment/SKILL.md`
+15. `agents/agent-governance/AGENT.md` — standards conformance and compliance assurance agent
+16. `agents/agent-governance/skills/standards-conformance/SKILL.md`
+17. `agents/agent-governance/skills/compliance-audit/SKILL.md`
+18. `agents/agent-governance/skills/regulatory-compliance/SKILL.md`
 
 ### Reference examples (read domain + at least 3 entity files + 1 source + 1 product)
 
@@ -132,7 +133,7 @@ developer but reads YAML comfortably. Works at a mid-size bank.
 - Needs to reconcile multi-jurisdiction requirements without legal expertise
 - Wants a single view of "what is published and for whom" across the domain
 
-**Primary agents:** Agent Regulation, Agent Data Product
+**Primary agents:** Agent Governance, Agent Architect
 **Secondary agent:** Agent Ontology (for governance metadata during entity review)
 
 ---
@@ -160,8 +161,8 @@ Works at a large Australian bank with NZ subsidiary.
 - Will reject vague findings like "consider adding governance" — needs specific references
 - Wants to understand cross-jurisdiction conflicts (where AU and NZ requirements diverge)
 
-**Primary agent:** Agent Regulation
-**Secondary agent:** Agent Data Product (to review product-level governance)
+**Primary agent:** Agent Governance
+**Secondary agent:** Agent Architect (to review product-level governance)
 
 ---
 
@@ -189,7 +190,7 @@ shared via Confluence.
 - Wants deterministic output — running the same request twice should produce the same DDL
 
 **Primary agent:** Agent Artifact
-**Secondary agent:** Agent Data Product (to understand product-scoped generation)
+**Secondary agent:** Agent Architect (to understand product-scoped generation)
 
 ---
 
@@ -217,8 +218,8 @@ Familiar with Data Mesh concepts.
 - Expects clear handoff guidance between agents (when to use which)
 - Wants the ODPS manifest to be as complete as possible, with clear gaps flagged
 
-**Primary agent:** Agent Data Product
-**Secondary agents:** Agent Artifact (for generation), Agent Regulation (for governance review)
+**Primary agent:** Agent Architect
+**Secondary agents:** Agent Artifact (for generation), Agent Governance (for governance review)
 
 ---
 
@@ -248,7 +249,7 @@ above her existing FHIR-based data lake.
 - Will push back if MD-DDL can't express FHIR's polymorphic reference types
 
 **Primary agent:** Agent Ontology
-**Secondary agents:** Agent Regulation (HIPAA compliance), Agent Artifact (clinical data warehouse)
+**Secondary agents:** Agent Governance (HIPAA compliance), Agent Artifact (clinical data warehouse)
 
 ---
 
@@ -295,7 +296,7 @@ work. Uses MD-DDL daily and knows the spec well. Works at a large telco.
 - Run a full quality review of a completed domain before signing it off
 - Check structural conformance, decision quality, and standards alignment
 - Verify that the domain model is ready for downstream consumption by Agent Artifact
-  and Agent Data Product
+  and Agent Architect
 - Identify modelling anti-patterns (over-entity-ing, missing temporal tracking,
   inconsistent granularity)
 
@@ -307,7 +308,7 @@ work. Uses MD-DDL daily and knows the spec well. Works at a large telco.
 - Expects the review to surface issues the original modeller missed
 
 **Primary agent:** Agent Ontology (Domain Review skill)
-**Secondary agents:** Agent Regulation (governance review)
+**Secondary agents:** Agent Governance (governance review)
 
 ---
 
@@ -486,7 +487,7 @@ a gap in the skills for non-DDL output formats?
 
 ---
 
-### Agent Data Product — Design and Publication
+### Agent Architect — Design and Publication
 
 **Scenario D1 — Design products for multiple consumers (Aisha, Data Product Owner)**
 > "The Financial Crime domain needs to serve three consumer groups: (1) the
@@ -550,7 +551,7 @@ communicating changes to downstream consumers? Is this a gap in the spec or agen
 
 ---
 
-### Agent Regulation — Governance Assurance
+### Agent Governance — Standards Conformance and Compliance Assurance
 
 **Scenario R1 — Multi-jurisdiction compliance audit (Priya, Data Risk Manager)**
 > "Audit the Financial Crime domain against APRA CPS 234, RBNZ BS11, and FATF
@@ -573,7 +574,7 @@ Evaluate: Does the agent use the Level 4 Product Governance audit protocol? Does
 it understand the relationship between domain defaults and product overrides? Does
 it cross-reference masking strategies against each entity's PII characteristics
 using the masking adequacy protocol? Does it flag if a source-aligned product with
-raw PII has insufficient governance? Does the Regulation → Data Product handoff
+raw PII has insufficient governance? Does the Governance → Architect handoff
 work correctly for any gaps found?
 
 **Scenario R3 — Remediation with structural implications (Priya, Data Risk Manager)**
@@ -609,15 +610,15 @@ full workflow, including handoff quality and context continuity.
 
 Simulate this four-step journey:
 
-1. Aisha asks Agent Data Product to design a new consumer-aligned product from
+1. Aisha asks Agent Architect to design a new consumer-aligned product from
    the Financial Crime domain for the fraud analytics team
 2. Aisha's product needs a `schema_type: dimensional` — she hands off to James
 3. James asks Agent Artifact to generate a Snowflake star schema scoped to the product
-4. Priya asks Agent Regulation to audit the product's governance posture
+4. Priya asks Agent Governance to audit the product's governance posture
 
 Evaluate: Do the handoff scripts between agents produce enough context for the
 receiving agent? Does the product declaration serve as a clean input contract for
-Agent Artifact? Does Agent Regulation's Level 4 audit cover the product that was
+Agent Artifact? Does Agent Governance's Level 4 audit cover the product that was
 just designed? Would this workflow feel like a coherent pipeline or a series of
 disconnected interactions?
 
@@ -625,16 +626,16 @@ disconnected interactions?
 
 Simulate this three-step journey:
 
-1. Agent Regulation audits the Financial Crime domain and identifies that the
+1. Agent Governance audits the Financial Crime domain and identifies that the
    Party entity needs a `consent_basis` attribute to satisfy GDPR's lawful basis
    requirement
-2. The gap is flagged as structural — Agent Regulation defers to Agent Ontology
+2. The gap is flagged as structural — Agent Governance defers to Agent Ontology
 3. Sarah adds the attribute via Agent Ontology, which triggers a review of all
    data products that expose Party
 
-Evaluate: Does Agent Regulation produce a clear structural-change recommendation
+Evaluate: Does Agent Governance produce a clear structural-change recommendation
 that Agent Ontology can act on? Does Agent Ontology's narrow-scope shortcut work
-for adding a single attribute? After the model change, does Agent Data Product
+for adding a single attribute? After the model change, does Agent Architect
 know to check whether its products need masking updates for the new attribute?
 Is the chain of custody clear — who changed what and why?
 
@@ -644,7 +645,7 @@ Simulate this journey:
 
 1. Tomás asks Agent Ontology to declare a new source system (Shopify POS) and map
    its tables to existing Customer domain entities
-2. After source mapping is complete, Aisha asks Agent Data Product whether the
+2. After source mapping is complete, Aisha asks Agent Architect whether the
    new source changes any existing products
 
 Evaluate: Does Agent Ontology handle source file creation and transformation
@@ -876,7 +877,7 @@ for improvement]
 **Persona feedback (James):** [what James would say]
 **Persona feedback (Sarah):** [what Sarah would say]
 
-#### Agent Data Product
+#### Agent Architect
 | Scenario | Skill Loading | Behaviour Mode | Output Quality | Boundary Respect | Persona Fit | Avg |
 | --- | --- | --- | --- | --- | --- | --- |
 | D1 — Multi-consumer design | /5 | /5 | /5 | /5 | /5 | /5 |
@@ -891,7 +892,7 @@ for improvement]
 **Persona feedback (Aisha):** [what Aisha would say]
 **Persona feedback (Marcus):** [what Marcus would say]
 
-#### Agent Regulation
+#### Agent Governance
 | Scenario | Skill Loading | Behaviour Mode | Output Quality | Boundary Respect | Persona Fit | Avg |
 | --- | --- | --- | --- | --- | --- | --- |
 | R1 — Multi-jurisdiction audit | /5 | /5 | /5 | /5 | /5 | /5 |

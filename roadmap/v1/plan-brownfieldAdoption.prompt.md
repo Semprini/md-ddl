@@ -338,7 +338,157 @@ Create `agents/agent-ontology/skills/baseline-capture/SKILL.md`
 5. **Propose canonical structure** — Suggest which canonical entities could be created from the baseline, with mapping notes
 6. **Set domain adoption metadata** — Set `adoption.maturity: documented` in domain.md
 
-**Key rule:** The baseline-capture skill documents existing state; it does NOT create canonical entity files. That's the domain-scoping/entity-modelling skill's job. Clear handoff.
+**Key rule:** The baseline-capture skill documents existing state; it does NOT create canonical entity files. That's the domain-scoping/entity-modelling skill's job (or the schema-import skill for the fast-track path). Clear handoff.
+
+### Step 10b: New skill — Agent Ontology "schema-import"
+
+Create `agents/agent-ontology/skills/schema-import/SKILL.md`
+
+This is the fast-track brownfield path — the skill that makes adopting MD-DDL feel immediate and guided. A user pastes (or describes) their existing database schema and the agent produces a draft domain with canonical entities, relationships, and enums, asking only the questions the schema can't answer.
+
+**Trigger:** User wants to quickly get from an existing database to a draft MD-DDL domain; user mentions "import schema," "reverse engineer," "I have a database," "here's my DDL," "start from existing tables," "convert my schema"
+
+#### Part 1 — Schema Export Guidance
+
+Before the agent can infer anything, the user needs to get their schema out of their platform. The skill includes practical, copy-paste-ready extraction commands for each supported platform:
+
+**Snowflake:**
+```sql
+-- Export all tables and views in a schema
+SELECT GET_DDL('SCHEMA', 'MY_DATABASE.MY_SCHEMA');
+
+-- Or export a single table
+SELECT GET_DDL('TABLE', 'MY_DATABASE.MY_SCHEMA.MY_TABLE');
+
+-- Include foreign keys and constraints
+SHOW IMPORTED KEYS IN SCHEMA MY_DATABASE.MY_SCHEMA;
+SHOW PRIMARY KEYS IN SCHEMA MY_DATABASE.MY_SCHEMA;
+```
+
+**PostgreSQL:**
+```bash
+# Export schema DDL (tables, constraints, indexes)
+pg_dump --schema-only --schema=my_schema -d my_database > schema.sql
+
+# Or use psql for a single table
+\d+ my_table
+```
+
+**SQL Server:**
+```sql
+-- Using SSMS: right-click database → Tasks → Generate Scripts
+-- Or programmatically:
+SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE,
+       CHARACTER_MAXIMUM_LENGTH, COLUMN_DEFAULT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'dbo'
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+
+-- Foreign keys
+SELECT fk.name, tp.name AS parent_table, cp.name AS parent_column,
+       tr.name AS referenced_table, cr.name AS referenced_column
+FROM sys.foreign_keys fk
+JOIN sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
+JOIN sys.tables tp ON fkc.parent_object_id = tp.object_id
+JOIN sys.columns cp ON fkc.parent_object_id = cp.object_id AND fkc.parent_column_id = cp.column_id
+JOIN sys.tables tr ON fkc.referenced_object_id = tr.object_id
+JOIN sys.columns cr ON fkc.referenced_object_id = cr.object_id AND fkc.referenced_column_id = cr.column_id;
+```
+
+**Databricks / Unity Catalog:**
+```sql
+-- List tables in a schema
+SHOW TABLES IN my_catalog.my_schema;
+
+-- Describe table structure
+DESCRIBE EXTENDED my_catalog.my_schema.my_table;
+
+-- Show create statement
+SHOW CREATE TABLE my_catalog.my_schema.my_table;
+```
+
+The agent presents the relevant platform's commands when the user says what database they're using. If the user doesn't know, ask — don't guess.
+
+The agent should also accept:
+- Raw DDL pasted directly (any SQL dialect)
+- dbt `schema.yml` or model SQL files
+- ERD descriptions in natural language
+- CSV/table descriptions (column name, type, nullable, description)
+
+#### Part 2 — Schema Inference Protocol
+
+Once the user provides their schema, the agent infers as much as possible before asking anything:
+
+**What the agent infers from the schema (no questions needed):**
+
+Schema signal | MD-DDL inference | Confidence
+--- | --- | ---
+Table name | Candidate entity name (de-snake-cased, singularised) | High
+Column names + types | Candidate attributes with MD-DDL types | High
+Primary key | `identifier: true` attribute | High
+Foreign keys | Candidate relationships (direction, cardinality from constraint type) | Medium-High
+Nullability | `required: true/false` | High
+Unique constraints | Candidate identifier or alternate key | Medium
+Enum-like columns (low cardinality, varchar, FK to lookup table) | Candidate enums | Medium
+Junction/bridge tables (composite PK of two FKs) | Many-to-many relationship | High
+Timestamp columns (`created_at`, `updated_at`, `deleted_at`) | Mutability signal (mutable if `updated_at` exists), soft-delete pattern | Medium
+Audit columns (`created_by`, `modified_by`) | Governance signal but not canonical attributes | Medium
+Naming patterns (`dim_*`, `fact_*`, `stg_*`) | Dimensional vs staging vs operational classification | High
+Column prefixes matching table names (`customer_id`, `customer_name`) | Table-scoped naming convention (strip prefix in canonical) | Medium
+
+**What the agent CANNOT infer (must ask):**
+
+This is the minimal interview — the smallest set of questions that unlocks what the schema doesn't tell you:
+
+**Question 1 — Domain identity and purpose:**
+> "What business area does this schema serve? Who uses this data and for what decisions?"
+
+This gives the domain name, description, and data owner context. A schema of tables tells you structure but never *why* it exists.
+
+**Question 2 — Concept refinement (asked per ambiguous table, not globally):**
+> "I see tables X, Y, Z that look like [interpretation]. Is that right, or are some of these [alternative]?"
+
+The agent shows its inferences and asks for corrections. Examples:
+- "I see `customer` and `customer_type` — is `customer_type` an enum (fixed list of types) or does it have its own lifecycle?"
+- "I see `order_line` with FKs to `order` and `product` — is this a dependent entity of Order, or is it a relationship between Order and Product?"
+- "I see `dim_customer` and `fact_transaction` — this looks like a star schema. Are you looking to model the business concepts behind it (Customer, Transaction) or document the star schema as-is?"
+
+Only ask about genuinely ambiguous structures. If the schema is clear, don't ask.
+
+**Question 3 — Governance posture:**
+> "Does this data have regulatory or compliance requirements? (e.g., PII, retention rules, specific regulations like GDPR/APRA/HIPAA)"
+
+Governance cannot be inferred from DDL. One question covers it.
+
+That's it — three questions (sometimes two if governance isn't relevant). Everything else comes from the schema.
+
+#### Part 3 — Draft Output
+
+From the schema + minimal interview answers, the agent produces:
+
+1. **Draft `domain.md`** — domain name, description, metadata (with `adoption.maturity: mapped`), overview diagram (Mermaid), and all four summary tables (Entities, Enums, Relationships, Events) inferred from the schema
+2. **Draft entity detail files** — one per inferred entity, with attributes, types, constraints, and identifier. Attributes use MD-DDL naming (de-snake-cased, business-semantic). Technical/audit columns are noted but excluded from canonical attributes.
+3. **Draft enum files** — for any identified lookup tables or low-cardinality columns
+4. **Inferred relationships** — from foreign keys, with cardinality, direction, and whether identifying
+5. **Uncertainty markers** — anything the agent inferred with medium confidence gets a `# INFERRED: [rationale] — confirm or correct` comment so the user can review
+
+The draft is explicitly marked as a starting point:
+> "This is a draft inferred from your schema. Review it — the structure should be close, but the business meaning is yours to confirm. Tell me what to change, and I'll refine."
+
+#### Part 4 — Refinement Loop
+
+After producing the draft, the agent enters a conversational refinement loop:
+- User reviews, corrects, adds business context
+- Agent applies changes, re-explains trade-offs when relevant
+- When the user is satisfied, the agent sets `adoption.maturity: mapped` and hands off to domain-review or entity-modelling for deeper work
+
+This loop should feel collaborative, not interrogative. The agent has already done the heavy lifting; the user is steering, not answering a questionnaire.
+
+#### Relationship to other skills
+
+- **baseline-capture** is for documenting existing state faithfully (Level 1 — Documented). schema-import is for jumping straight to a draft canonical model (Level 2 — Mapped). They serve different purposes: baseline-capture preserves what exists; schema-import infers what should exist.
+- **domain-scoping** is the full greenfield interview protocol. schema-import replaces most of it when a schema already exists — the schema answers Steps 2 (candidate concepts), 3 (boundaries — tables already in the schema are in scope), and partially Step 4 (governance — if catalog metadata is present). Only Step 1 (business purpose) and the remaining governance questions need asking.
+- **entity-modelling** handles deeper modelling decisions (inheritance, type hierarchies, attribute trade-offs) that schema-import defers to once the draft exists.
 
 ### Step 11: Enhanced skill — Agent Ontology "domain-scoping" brownfield path
 
@@ -350,6 +500,8 @@ Currently the brownfield path handles "add entity to existing domain." Extend it
 - Propose entity structure derived from baseline
 - Track which baseline files each entity maps to
 - Update domain adoption maturity as entities are created (documented → mapped)
+
+Note: the schema-import skill (Step 10b) provides the fast-track path for users who have DDL and want to jump straight to a draft domain. Domain-scoping's brownfield path remains the deeper, interview-driven route for translating baselines that aren't raw DDL (ETL pipelines, catalog metadata, natural-language descriptions).
 
 ### Step 12: New skill — Agent Artifact "reconciliation"
 
@@ -444,11 +596,12 @@ Update `.github/md-ddl-review-prompt.md` to include adoption maturity validation
 - [md-ddl-specification/9-Data-Products.md](md-ddl-specification/9-Data-Products.md) — Add brownfield product lifecycle note
 - `md-ddl-specification/10-Adoption.md` — **NEW** — Core adoption spec
 - [agents/agent-guide/AGENT.md](agents/agent-guide/AGENT.md) — Add adoption-planning skill to index
-- [agents/agent-ontology/AGENT.md](agents/agent-ontology/AGENT.md) — Add baseline-capture skill to index
+- [agents/agent-ontology/AGENT.md](agents/agent-ontology/AGENT.md) — Add baseline-capture and schema-import skills to index
 - [agents/agent-ontology/skills/domain-scoping/SKILL.md](agents/agent-ontology/skills/domain-scoping/SKILL.md) — Enhance brownfield path
 - [agents/agent-artifact/AGENT.md](agents/agent-artifact/AGENT.md) — Add reconciliation skill to index
 - `agents/agent-guide/skills/adoption-planning/SKILL.md` — **NEW**
 - `agents/agent-ontology/skills/baseline-capture/SKILL.md` — **NEW**
+- `agents/agent-ontology/skills/schema-import/SKILL.md` — **NEW** — Fast-track schema-to-domain inference
 - `agents/agent-artifact/skills/reconciliation/SKILL.md` — **NEW**
 - `.github/copilot-instructions.md` — Update repo layout, agent boundaries
 - `.github/scripts/concat-md-ddl-specs.ps1` — Include section 10
@@ -464,7 +617,9 @@ Update `.github/md-ddl-review-prompt.md` to include adoption maturity validation
 5. **Maturity model coherence** — Walk through each maturity level transition with the brownfield example and verify exit criteria are achievable
 6. **No spec duplication** — Verify 10-Adoption.md doesn't duplicate rules from other sections; cross-references use file-relative paths
 7. **Concatenation** — Regenerate MD-DDL-Complete.md and verify section 10 is included correctly
-8. **Agent boundary compliance** — Verify baseline-capture doesn't create canonical entities (that's domain-scoping's job), reconciliation doesn't modify canonical model (that's ontology's job)
+8. **Agent boundary compliance** — Verify baseline-capture doesn't create canonical entities (that's domain-scoping's job), schema-import produces drafts (not baselines), reconciliation doesn't modify canonical model (that's ontology's job)
+9. **Schema-import demo path** — Paste a Snowflake `GET_DDL` export of 8–12 tables with FKs into Agent Ontology. Verify: (a) agent asks ≤3 questions, (b) draft domain.md and entity files are produced, (c) inferred relationships match FK structure, (d) technical/audit columns are excluded from canonical attributes, (e) ambiguous structures are marked with `# INFERRED:` comments
+10. **Platform coverage** — Verify schema export guidance exists and is correct for Snowflake, PostgreSQL, SQL Server, and Databricks
 
 ---
 
@@ -474,6 +629,8 @@ Update `.github/md-ddl-review-prompt.md` to include adoption maturity validation
 - **Coexistence is transitional** — baselines exist to be superseded. The goal is always Declarative or Automated. Baseline files get marked `superseded` then `archived`.
 - **Baselines are documentation, not generation inputs** — Agent Artifact never generates from baselines. They're reference material for humans and for the reconciliation skill.
 - **Reverse engineering is secondary** — We support capturing and translating existing state, but the primary workflow remains top-down canonical modelling. Baseline capture is a structured way to document what exists; canonical entity creation is still a modelling activity guided by Agent Ontology.
+- **Schema-import is the fast-track, not the only path** — schema-import gives the best demo experience (paste DDL → get a draft domain in minutes), but it's one of several brownfield routes. Baseline-capture + domain-scoping is the deeper route for ETL pipelines, catalog metadata, or situations where the schema doesn't represent the target canonical model. Both paths converge at Level 2 (Mapped).
+- **Minimal interview, not no interview** — The schema-import skill infers everything it can from the DDL and asks only what it can't infer: business purpose, ambiguous structure clarification, and governance posture. Three questions or fewer for a typical schema. This keeps the interaction guided and efficient without pretending the agent can guess business meaning.
 - **Four starting-point patterns** — Dimensional, Canonical, ETL, Catalog. Each has a defined journey in 10-Adoption.md.
 - **Structured baseline bodies** — Each baseline type has a required YAML block (columns, grain, tool, etc.) ensuring agent-parseable consistency, plus free-form Markdown for context. This balances reliability with flexibility.
 - **Mapping block at Level 2** — The baseline→canonical translation is captured as a structured `mapping` block on each baseline file, not as unstructured notes. This gives agents and reviewers a traceable record of which baseline fields became which canonical attributes, and which were intentionally excluded.
@@ -482,13 +639,15 @@ Update `.github/md-ddl-review-prompt.md` to include adoption maturity validation
 
 ## Further Considerations
 
-1. **Baseline import tooling** — Should we define a machine-readable baseline format (e.g., paste DDL and have an agent create the baseline file)? Recommendation: Yes, the baseline-capture agent skill should accept DDL, dbt YAML, catalog API exports and create structured baseline files. This is agent behaviour, not spec — the spec defines the target format; the agent handles the translation.
+1. **Baseline import tooling** — Should we define a machine-readable baseline format (e.g., paste DDL and have an agent create the baseline file)? Recommendation: The schema-import skill (Step 10b) now handles the fast-track DDL-to-domain path directly. The baseline-capture skill handles DDL-to-baseline for teams that want the documentation-first approach. Both accept pasted DDL, dbt YAML, and catalog exports.
 
 2. **Multi-domain adoption** — Large enterprises might adopt MD-DDL domain-by-domain over years. Should there be a portfolio-level adoption tracker (across all domains)? Recommendation: Defer for now. Each domain has its own maturity. A portfolio view can be assembled by reading all domain.md files. Add this as a future consideration in 10-Adoption.md without specifying it.
 
 3. **Drift detection implementation** — At Level 4, the spec should define what drift means (generated artifact hash vs deployed artifact hash? schema diff? column-level comparison?) and what metadata to capture (last verified date, drift status). Leave the mechanism (CI/CD hooks, database introspection scripts, scheduled agent runs) to implementers since MD-DDL has no runtime.
 
 4. **Baseline→source transform alignment** — The mapping block on baselines documents the *design translation* (existing artifact → canonical model). Source transforms (Section 8) document the *operational data flow* (source system → canonical model). In some cases these overlap (e.g., an ETL baseline's source is the same system declared in `sources/`). The spec should clarify the relationship: mapping blocks are retrospective (what existed → what we designed); transforms are prospective (how data flows going forward).
+
+5. **Schema-import for non-relational sources** — The current schema-import skill targets relational DDL. Future iterations could extend to: document databases (MongoDB schema inference from sample documents), event schemas (Avro/Protobuf → entity + event inference), API specs (OpenAPI → entity inference). Recommendation: defer until the relational path is proven.
 
 ## Review Attribution
 

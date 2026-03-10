@@ -197,3 +197,35 @@ values:
   Third Party Attestation:
     description: Verified via trusted attestation from an approved third party
 ```
+
+---
+
+### Currency Code
+
+ISO 4217 alphabetic currency codes used across account balances and transaction amounts. This is a representative subset — the full ISO 4217 code list is the normative reference.
+
+Standard: [ISO 4217 — Currency codes](https://www.iso.org/iso-4217-currency-codes.html)
+
+```yaml
+values:
+  AUD:
+    description: Australian Dollar
+  NZD:
+    description: New Zealand Dollar
+  USD:
+    description: United States Dollar
+  EUR:
+    description: Euro
+  GBP:
+    description: Pound Sterling
+  JPY:
+    description: Japanese Yen
+  SGD:
+    description: Singapore Dollar
+  HKD:
+    description: Hong Kong Dollar
+  CHF:
+    description: Swiss Franc
+  CAD:
+    description: Canadian Dollar
+```

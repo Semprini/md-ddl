@@ -1,8 +1,8 @@
-# Plan: Architecture Skill for Agent Guide
+# Plan: Architecture Skill for Agent Architect
 
 ## TL;DR
 
-Add an "architecture" skill to Agent Guide that enables architectural discussion about the philosophy underpinning MD-DDL — Data Autonomy, model-driven generation, canonical data models, data products as architecture quantum, and the 13 tenets distilled from the blog series. The skill operates in two modes: **Teach** (for users learning the concepts) and **Discuss** (for architects who want to explore, challenge, position, and present the ideas in their organisational context). Architects preparing material for governance councils or CIOs get presentation-ready outputs — talking points, comparison tables, adaptable Mermaid diagrams, and executive summaries. The blog source material is intentionally opinionated; the skill should make the agent an informed discussion partner, not dogmatic. Also embed the architectural philosophy into copilot-instructions, CLAUDE.md, and the review process so the thinking is discoverable and reviewable.
+Add an "architecture" skill to Agent Architect that enables architectural discussion about the philosophy underpinning MD-DDL — Data Autonomy, model-driven generation, canonical data models, data products as architecture quantum, and the 13 tenets distilled from the blog series. The skill operates in two modes: **Teach** (for users learning the concepts) and **Discuss** (for architects who want to explore, challenge, position, and present the ideas in their organisational context). Architects preparing material for governance councils or CIOs get presentation-ready outputs — talking points, comparison tables, adaptable Mermaid diagrams, and executive summaries. The blog source material is intentionally opinionated; the skill should make the agent an informed discussion partner, not dogmatic. Also embed the architectural philosophy into copilot-instructions, CLAUDE.md, and the review process so the thinking is discoverable and reviewable.
 
 ---
 
@@ -25,7 +25,7 @@ The posts are in `references/architecture/` as markdown files (17 files, ~50K wo
 
 ### Step 1: Create skill folder and SKILL.md
 
-Create `agents/agent-guide/skills/architecture/SKILL.md` with:
+Create `agents/agent-architect/skills/architecture/SKILL.md` with:
 - Frontmatter trigger: questions about "architecture", "data autonomy", "why does MD-DDL work this way", "what's the philosophy behind", "canonical data model", "data products architecture", "model-driven generation", "why not [alternative approach]", "what problems does MD-DDL solve", "compare to Data Mesh/Data Fabric/TOGAF", "position for governance council", "CIO presentation", "architecture decision record"
 - Two interaction modes: **Teach** (for concept learners — follows concept-explorer Step 1–5 pattern) and **Discuss** (for architects — follows the Discussion Protocol in Step 1b)
 - Mode selection: If the user is asking "what is..." or "explain...", use Teach mode. If the user is positioning, comparing, debating, preparing material, or framing for a specific audience, use Discuss mode. When in doubt, ask.
@@ -105,7 +105,7 @@ Help the user produce outputs for their target audience (see Step 4b for format 
 
 ### Step 2: Create reference stubs
 
-Create `agents/agent-guide/skills/architecture/references/` with reference stubs pointing to the blog posts. Group posts thematically rather than one stub per post to keep context loading manageable:
+Create `agents/agent-architect/skills/architecture/references/` with reference stubs pointing to the blog posts. Group posts thematically rather than one stub per post to keep context loading manageable:
 
 Reference | Posts included | Teaches
 --- | --- | ---
@@ -280,7 +280,7 @@ Add a new section to `.github/copilot-instructions.md` — "Architectural philos
 
 Add a brief entry to `CLAUDE.md`:
 
-- MD-DDL implements the Data Autonomy architectural style. See `references/architecture/` for foundational blog posts and `agents/agent-guide/skills/architecture/SKILL.md` for the distilled tenets.
+- MD-DDL implements the Data Autonomy architectural style. See `references/architecture/` for foundational blog posts and `agents/agent-architect/skills/architecture/SKILL.md` for the distilled tenets.
 
 **Relevant file:** `CLAUDE.md`
 
@@ -293,7 +293,7 @@ Add a brief entry to `CLAUDE.md`:
 Add to `.github/md-ddl-review-prompt.md`:
 
 - Check: Do spec rules trace to at least one architectural tenet? Flag rules that appear to have no architectural justification — they may be correct but should have documented rationale.
-- Check: Does the Agent Guide architecture skill's tenet list match the current architectural tenets? Flag drift.
+- Check: Does the Agent Architect architecture skill's tenet list match the current architectural tenets? Flag drift.
 
 **Relevant file:** `.github/md-ddl-review-prompt.md`
 
@@ -309,17 +309,17 @@ Add to `.github/md-ddl-adversarial-review-prompt.md`:
 
 ---
 
-## Phase 5: Update Agent Guide AGENT.md
+## Phase 5: Update Agent Architect AGENT.md
 
 ### Step 10: Add architecture skill to skill table
 
-Add the architecture skill to the skill index in `agents/agent-guide/AGENT.md`:
+Add the architecture skill to the skill index in `agents/agent-architect/AGENT.md`:
 
 Skill | Trigger | Path
 --- | --- | ---
 **Architecture** | "why does MD-DDL"; "what's the philosophy"; "architecture"; "data autonomy"; "canonical data model"; "what problems does this solve"; "why not [alternative]"; "how does this fit enterprise architecture"; "compare to Data Mesh / Data Fabric"; "governance council"; "CIO presentation"; "position for"; "architecture decision"; any question about design rationale, architectural positioning, or comparison with alternative approaches | `skills/architecture/SKILL.md`
 
-**Relevant file:** `agents/agent-guide/AGENT.md`
+**Relevant file:** `agents/agent-architect/AGENT.md`
 
 ### Step 11: Update archetype table with architecture entry points
 
@@ -331,17 +331,17 @@ Add an "Architecture entry point" column to the User Archetypes table, or add no
 - Data Steward: tenets 5, 9, 13 most relevant; typically Teach mode
 - Product Owner: tenets 9, 10 most relevant; case study $150M; may use Discuss mode for business case framing
 
-**Relevant file:** `agents/agent-guide/AGENT.md`
+**Relevant file:** `agents/agent-architect/AGENT.md`
 
 ---
 
 ## Relevant Files
 
-- `agents/agent-guide/skills/architecture/SKILL.md` — new skill (Steps 1, 1b, 3, 4, 4b, 4c)
-- `agents/agent-guide/skills/architecture/references/` — new reference stubs (Step 2)
+- `agents/agent-architect/skills/architecture/SKILL.md` — new skill (Steps 1, 1b, 3, 4, 4b, 4c)
+- `agents/agent-architect/skills/architecture/references/` — new reference stubs (Step 2)
 - `references/architecture/*.md` — 17 blog posts (source material, already in repo)
 - `references/architecture/diagrams_converted/*.md` — 7 Mermaid diagram conversions (already in repo)
-- `agents/agent-guide/AGENT.md` — skill table + archetype updates (Steps 10, 11)
+- `agents/agent-architect/AGENT.md` — skill table + archetype updates (Steps 10, 11)
 - `.github/copilot-instructions.md` — architecture philosophy section (Step 6)
 - `CLAUDE.md` — architecture reference (Step 7)
 - `.github/md-ddl-review-prompt.md` — tenet alignment check (Step 8)
@@ -349,16 +349,16 @@ Add an "Architecture entry point" column to the User Archetypes table, or add no
 
 ## Verification
 
-1. Confirm `agents/agent-guide/skills/architecture/SKILL.md` has both Teach and Discuss protocols — frontmatter, dual-mode selection guidance, tenet table with counter-positions, reference table, comparison framework, output formats
+1. Confirm `agents/agent-architect/skills/architecture/SKILL.md` has both Teach and Discuss protocols — frontmatter, dual-mode selection guidance, tenet table with counter-positions, reference table, comparison framework, output formats
 2. Confirm reference stubs use `{{INCLUDE:}}` with relative paths that resolve correctly from the skill's `references/` directory
 3. Confirm all 13 tenets are present in SKILL.md with Counter-position and Context dependency columns, and each maps to at least one MD-DDL spec concept
 4. Confirm skill table in AGENT.md includes architecture with appropriate triggers including "governance council", "CIO", "compare to Data Mesh"
 5. Confirm `.github/copilot-instructions.md` architecture section references the tenets and `references/architecture/`
-6. **Teach mode test:** Ask Agent Guide "why does MD-DDL use canonical models instead of application-specific schemas?" — verify it loads the architecture skill, selects Teach mode, and explains using tenets 1, 3, 4, 11
-7. **Discuss mode test:** Ask Agent Guide "I need to position Data Autonomy for my governance council next week — we're currently running a centralised EDW and the CIO has heard about Data Mesh" — verify it selects Discuss mode, asks about organisational context, positions relevant tenets with counter-arguments, and offers to produce talking points or a comparison table
-8. **Non-dogmatic test:** Ask Agent Guide "I don't think canonical models work for us — our domains are too small and too integrated" — verify it engages with the objection using the Context dependency column rather than re-asserting the tenet
-9. **Presentation output test:** Ask Agent Guide "can you give me a CIO executive summary for adopting a model-driven approach?" — verify it produces a structured executive summary (Context, Position, Evidence, Trade-offs, Next steps)
-10. **Comparison test:** Ask Agent Guide "how does Data Autonomy differ from Data Mesh?" — verify it gives an honest, non-dismissive comparison acknowledging Data Mesh's strengths
+6. **Teach mode test:** Ask Agent Architect "why does MD-DDL use canonical models instead of application-specific schemas?" — verify it loads the architecture skill, selects Teach mode, and explains using tenets 1, 3, 4, 11
+7. **Discuss mode test:** Ask Agent Architect "I need to position Data Autonomy for my governance council next week — we're currently running a centralised EDW and the CIO has heard about Data Mesh" — verify it selects Discuss mode, asks about organisational context, positions relevant tenets with counter-arguments, and offers to produce talking points or a comparison table
+8. **Non-dogmatic test:** Ask Agent Architect "I don't think canonical models work for us — our domains are too small and too integrated" — verify it engages with the objection using the Context dependency column rather than re-asserting the tenet
+9. **Presentation output test:** Ask Agent Architect "can you give me a CIO executive summary for adopting a model-driven approach?" — verify it produces a structured executive summary (Context, Position, Evidence, Trade-offs, Next steps)
+10. **Comparison test:** Ask Agent Architect "how does Data Autonomy differ from Data Mesh?" — verify it gives an honest, non-dismissive comparison acknowledging Data Mesh's strengths
 11. Run structural review — verify tenet alignment check is present and passes
 12. Grep all blog posts for `semprini.me/media/images` — confirm zero broken external image links remain (all replaced with Mermaid inlines or text descriptions)
 13. Confirm `references/architecture/diagrams_converted/` Mermaid files are referenced from the correct blog posts
@@ -366,7 +366,7 @@ Add an "Architecture entry point" column to the User Archetypes table, or add no
 
 ## Decisions
 
-- **Skill lives in Agent Guide, not a standalone agent.** Architecture discussion is a teaching and navigation concern — users ask "why" and "how do I position this" questions. Production architectural work (domain design) is Agent Ontology's job. The boundary rule holds: Guide teaches and discusses, Ontology builds.
+- **Skill lives in Agent Architect.** Architecture discussion, strategic positioning, and comparison with alternative approaches are Agent Architect's responsibility. Agent Guide may teach basic concepts and hand off to Agent Architect for deeper architectural discussion. Production domain modelling is Agent Ontology's job. The boundary rule holds: Architect discusses and positions, Ontology builds.
 - **Dual-mode: Teach + Discuss.** Teach mode follows concept-explorer's progressive-depth pattern for users learning the concepts. Discuss mode follows a peer-discussion protocol for architects who already understand the space and need to explore, challenge, contextualise, and present. Mode is selected by user signal, not role — a Data Architect may sometimes want Teach mode for an unfamiliar concept.
 - **Informed positions, not dogma.** The blog source is intentionally opinionated. The skill should present tenets as positions with rationale and acknowledged counter-positions. An architect needs to make their own case to their organisation; the agent's job is to help them think, not to convert them.
 - **13 tenets distilled, not 17 blog posts summarised.** Users need principles they can discuss and apply, not a reading list. The tenets are the discussion core; blog posts are the reference material loaded on demand.
@@ -391,10 +391,10 @@ Add an "Architecture entry point" column to the User Archetypes table, or add no
 
 2. **Blog post versioning.** The blog posts are a snapshot of thinking at a point in time. If the architectural philosophy evolves, should the tenets be updated? Recommendation: Yes — the tenets in SKILL.md are the living version; blog posts are historical references. When a tenet changes, update SKILL.md and add a note to the blog post reference explaining the evolution.
 
-3. **Should tenets appear in 1-Foundation.md?** The spec's Foundation section describes core principles. The 13 tenets are more granular than the current principles but align with them. Recommendation: Defer for now — the tenets are teaching artefacts (Agent Guide territory), not normative spec rules. If the spec wants architectural rationale, a "Design Rationale" appendix or section could reference the tenets without making them normative.
+3. **Should tenets appear in 1-Foundation.md?** The spec's Foundation section describes core principles. The 13 tenets are more granular than the current principles but align with them. Recommendation: Defer for now — the tenets are teaching artefacts (Agent Architect territory), not normative spec rules. If the spec wants architectural rationale, a "Design Rationale" appendix or section could reference the tenets without making them normative.
 
 4. **Discuss mode boundary with Agent Ontology.** When an architect in Discuss mode says "let's start modelling my domain" — that's a handoff to Agent Ontology, not a continuation of the architecture discussion. The Discussion Protocol should recognise production-work triggers and hand off explicitly, just as the Teaching Protocol does.
 
-5. **Governance council materials vs production artifacts.** The presentation outputs (talking points, comparison tables, executive summaries) are Agent Guide territory — they're communication artifacts, not MD-DDL artifacts. If an architect wants to create actual domain files, data products, or physical schemas, that's Agent Ontology / Agent Data Product / Agent Artifact. The boundary is: Guide helps you *think about and communicate* the architecture; specialist agents help you *implement* it.
+5. **Governance council materials vs production artifacts.** The presentation outputs (talking points, comparison tables, executive summaries) are Agent Architect territory — they're communication artifacts supporting architectural positioning, not MD-DDL modelling artifacts. If an architect wants to create actual domain files, entity details, or physical schemas, that's Agent Ontology / Agent Artifact. The boundary is: Architect helps you *think about, position, and communicate* the architecture; Ontology and Artifact help you *implement* it.
 
 6. **Comparison framework maintenance.** The alternative architecture comparison table will need updating as the industry evolves (new patterns, new vendor claims). Treat it like the tenet table — living content in SKILL.md, updated when new references arrive or the landscape shifts.

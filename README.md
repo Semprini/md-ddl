@@ -1,136 +1,176 @@
-﻿# Markdown Data Definition Language (md-ddl)
+# Markdown Data Definition Language (MD-DDL)
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.9.0** (Latest)
+> **Version 0.9.0**
 
 **Model once. Reuse everywhere.**
 
-MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — then generating the physical artifacts your platforms need — all in one format for humans and AI agents.
+MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — then generating physical artifacts from a single source of truth that humans and AI agents share.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
-**Read the spec**: [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md) for single-file AI context.
-
-**Learn by conversation**: MD-DDL includes an AI learning companion. Set up md-ddl (below), then start **Agent Guide** (`@agent-guide` in VS Code Copilot, or via CLAUDE.md in Claude Code) — it adapts to your role and teaches the standard through discussion, not documentation.
+**Read the spec**: [1-Foundation.md](./md-ddl-specification/1-Foundation.md) or [MD-DDL-Complete.md](./md-ddl-specification/MD-DDL-Complete.md) for single-file AI context
 
 ---
 
-## 🔌 Integrating md-ddl into your project
+## What MD-DDL covers
 
-Use md-ddl as a dependency (recommended: git submodule), and keep your own model files outside `.md-ddl/`.
+- **Domain layer** — domains, entities, enums, relationships, events, and constraints
+- **Source layer** — source system declarations and column-level transformation rules (direct, derived, conditional, lookup, reconciliation, aggregation)
+- **Data products** — source-aligned, domain-aligned, and consumer-aligned products declaring scope, shape, consumers, SLA, governance, and masking — driving automated artifact generation
+- **Governance** — classification, PII, retention, regulatory scope, access roles, and masking strategies living with the model, not in a separate system
+- **Physical artifacts** — dimensional star schemas, normalized 3NF DDL, wide-column schemas, knowledge graph (Cypher), JSON Schema, Parquet contracts
 
-### 1) Add/update md-ddl
+---
+
+## Quick Start
+
+**Start a new project** using the bootstrap script — it sets up git, adds MD-DDL as a submodule, and installs the agent wrappers for your AI tool in one step.
+
+Bash (macOS / Linux / WSL):
 
 ```bash
-git submodule add https://github.com/[org]/md-ddl .md-ddl
+bash <(curl -fsSL https://raw.githubusercontent.com/Semprini/md-ddl/main/start-project.sh)
+```
+
+PowerShell (Windows):
+
+```powershell
+Invoke-Expression (Invoke-WebRequest https://raw.githubusercontent.com/Semprini/md-ddl/main/start-project.ps1).Content
+```
+
+Or download [start-project.sh](./start-project.sh) / [start-project.ps1](./start-project.ps1) and run them locally.
+
+---
+
+**Learn by conversation**: MD-DDL includes **Agent Guide** an AI learning companion available from the repo via Claude or CoPilot in VS Code. It adapts to your role and goals, teaches through discussion rather than documentation, and routes you to the right specialist agent when you're ready to work.
+
+Example prompts (Claude AI uses `/agent-guide`, CoPilot uses `@agent-guide`):
+
+```text
+/agent-guide I'm new to MD-DDL — walk me through the key concepts and help me get started.
+```
+
+```text
+@agent-guide I'm a data architect at a retail bank. We have 15+ legacy source systems and no canonical data model. Give me an overview of MD-DDL and help me decide where to start.
+```
+
+```text
+/agent-guide I need to model a Customer domain. We track individuals and business accounts. Walk me through the MD-DDL approach.
+```
+
+---
+
+## Workflow
+
+**md-ddl** is not rigid or dogmatic. A typical flow is:
+
+1. **Discover** — scope the domain with Agent Ontology: identify entities, relationships, events, and governance posture
+2. **Model** — write domain.md, entity files, enums, and events
+3. **Map sources** — declare source systems and column-level transforms
+4. **Publish** — declare data products with scope, shape, SLA, and masking
+5. **Generate** — produce physical artifacts with Agent Artifact
+6. **Govern** — audit standards conformance and regulatory posture with Agent Governance
+
+Agent Guide helps you navigate between these stages and explains any concept along the way.
+
+---
+
+## Using MD-DDL in your project
+
+MD-DDL is designed to be used as a git submodule dependency. Your model files live in your own repository; MD-DDL provides the specification, agents, and examples.
+
+### Manual setup
+
+If you prefer not to use the scripts and set up manually:
+
+```bash
+mkdir myproject
+cd myproject
+git init
+git submodule add https://github.com/Semprini/md-ddl .md-ddl
 git submodule update --init
 ```
 
-Update later with:
+Then copy the agent wrappers for your AI tool:
+
+- **Copilot**: `.md-ddl/.github/agents/*.agent.md` → `.github/agents/`
+- **Claude**: `.md-ddl/.claude/commands/*.md` → `.claude/commands/`
+
+If you use Claude, you need to update `./claude/commands/*.md` files. The `agents/` path needs to be `.md-ddl/agents`
+
+Next, create your `copilot-instructions.md` or `CLAUDE.md`. See the start project scripts for examples.
+
+Update MD-DDL to a new release later:
 
 ```bash
 git submodule update --remote .md-ddl
 ```
 
-### 2) Copy integration files into your project `.github`
-
-Copy these files from `.md-ddl` into your repository (same relative paths):
-
-- `.md-ddl/.github/agents/*` → `.github/agents/*`
-
-This keeps setup simple and lets you refresh from upstream when md-ddl updates.
-
-### 3) Keep your model files in your project
+### Suggested project layout
 
 ```text
 your-project/
-  .md-ddl/                 ← dependency
-  .github/                 ← copied wrapper/instruction files
+  .md-ddl/                   ← submodule (this repo)
+  .github/agents/            ← Copilot agent wrappers  (Copilot users)
+  .claude/commands/          ← Claude slash commands    (Claude users)
   domains/
     customer/
       domain.md
       entities/
-  transforms/
+      products/
+  sources/
     salesforce-crm/
       source.md
-      table_account.md
+      transforms/
 ```
 
 ---
 
-## 🌟 Why md-ddl
+## Examples
 
-- **AI + human collaboration:** one shared language for SMEs, architects, and agents.
-- **Standards-aligned:** practical patterns for BIAN, ISO 20022, and regulatory mapping.
-- **Governance in-model:** classification, PII, retention, access roles, and regulatory scope live with definitions — with formal inheritance from domain to entity.
-- **Source-to-canonical clarity:** source files + table transforms make mapping explicit and auditable.
-- **Data products built in:** declare what you publish, for whom, in what shape, under what governance — right next to the model.
-- **Multi-platform generation:** target Snowflake, Databricks, PostgreSQL, Neo4j, and more from one model.
+Five reference domains at increasing complexity:
 
----
+Example | Focus | Complexity
+--- | --- | ---
+[Simple Customer](examples/Simple%20Customer/domain.md) | Minimal — one domain, three entities, one event | Starter
+[Financial Crime](examples/Financial%20Crime/domain.md) | AML/KYC/CTF — BIAN alignment, 15+ entities, sources, products, generated artifacts | Intermediate
+[Healthcare](examples/Healthcare/domain.md) | FHIR R4 — HIPAA governance, source transforms, knowledge-graph product | Intermediate
+[Telecom](examples/Telecom/domain.md) | TM Forum ODA — PCI-DSS, associative entities, new relationship types, dimensional product | Advanced
+[Retail Sales + Retail Service](examples/Retail%20Sales/domain.md) | Bounded Context — two greenfield domains defining Customer differently, cross-domain Customer 360 | Advanced
 
-## 🛠 Workflow
-
-0. **Orient** with Agent Guide — understand the standard, explore concepts, find the right agent
-1. **Discover** with Agent Ontology
-2. **Model** domains/entities/relationships/events
-3. **Map** sources in `sources/<system>/source.md` + `sources/<system>/transforms/table_<source-table>.md`
-4. **Publish** data products — source-aligned, domain-aligned, or consumer-aligned
-5. **Generate** schemas, lineage, and pipeline artefacts
-6. **Govern** continuously with Agent Governance
+The [feature coverage matrix](examples/README.md) maps every spec feature to the example that demonstrates it.
 
 ---
 
-## 📐 Scope
-
-- **Domain layer:** domains, entities, enums, relationships, events, constraints
-- **Source layer:** source files and transformation rules (direct, derived, lookup, reconciliation, conditional, aggregation)
-- **Data products:** three classes (source-aligned, domain-aligned, consumer-aligned) declare publication scope, shape, audience, SLA, and masking — driving automated artifact generation
-- **Governance layer:** ownership, classification, PII, retention, regulatory scope, access roles, masking strategies, lineage
-- **Physical artifacts:** dimensional star schemas, normalized 3NF, wide-column reporting schemas, knowledge graph (Cypher), JSON Schema, Parquet contracts
-
----
-
-## 📁 Repository layout
+## Repository layout
 
 ```text
-md-ddl-specification/         Normative standard
-  1-Foundation.md
-  ...                         Sections 2–9
-  MD-DDL-Complete.md
+md-ddl-specification/        Normative standard
+  1-Foundation.md            Start here to understand the model
+  2-Domains.md … 9-Data-Products.md
+  MD-DDL-Complete.md         Single-file version for AI context windows
 
-agents/                       Canonical agent prompts and skills
-examples/                     Reference examples (Financial Crime, Simple Customer)
-references/                    Architecture + industry standards reference data
+agents/                      Canonical agent prompts and skills
+  agent-guide/               Learning companion and navigator
+  agent-ontology/            Domain modelling and source mapping
+  agent-artifact/            Physical schema generation
+  agent-architect/           Data product design and architecture
+  agent-governance/          Standards conformance and compliance auditing
+
+examples/                    Reference examples
+  Simple Customer/
+  Financial Crime/
+  Healthcare/
+  Telecom/
+  Retail Sales/
+  Retail Service/
+
+references/                  Architecture and industry reference data
+  industry_standards/        BIAN, FHIR, TM Forum reference datasets
+  architecture/              Architecture blog posts and diagrams
 ```
-
-### BIAN reference datasets
-
-BIAN sources are maintained side-by-side by release under `references/industry_standards/bian/`
-(`v13/`, `v14/`). New modelling defaults to v14; v13 remains for compatibility.
-
-Refresh generated BIAN reference files with:
-
-```powershell
-python references/industry_standards/bian/extract-references.py --version 14.0.0
-python references/industry_standards/bian/extract-references.py --version 13.0.0
-```
-
-Record file provenance in `references/industry_standards/bian/source-manifest.md` whenever
-source snapshots are updated.
-
-### Agents
-
-Agent | Purpose
---- | ---
-**Agent Guide** | Learning companion and navigator — start here
-**Agent Ontology** | Domain discovery, entity modelling, source mapping
-**Agent Artifact** | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher)
-**Agent Architect** | Strategic design, data product design, and ODPS manifest generation
-**Agent Governance** | Standards conformance, compliance auditing, and governance assurance
-
-> Maintainer note (this repo): `.github/agents/*.agent.md` wrappers are intentionally submodule-targeted (`.md-ddl/...`) templates for consumer projects. They are not intended to resolve local `agents/...` paths when editing/publishing this spec repository.
 
 ---
 

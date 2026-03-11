@@ -155,5 +155,7 @@ Name | Class | Consumers | Status
 --- | --- | --- | ---
 [Clinical Patient Record](products/canonical.md#clinical-patient-record) | domain-aligned | Cross-domain Integration | Production
 [Clinical Outcomes Dashboard](products/analytics.md#clinical-outcomes-dashboard) | consumer-aligned | Clinical Analytics | Production
+[Clinical Billing Fraud Detection](products/billing-fraud-detection.md#clinical-billing-fraud-detection) | consumer-aligned | Revenue Integrity; Clinical Compliance; Financial Crime Operations | Production
+[Lab Results Raw Feed](products/source-feeds.md#lab-results-raw-feed) | source-aligned | Data Engineering | Production
 
 ---

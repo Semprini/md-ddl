@@ -10,7 +10,7 @@ Example | Description | Complexity
 --- | --- | ---
 [Simple Customer](Simple%20Customer/domain.md) | Minimal 2-file example — one domain, three entities, one enum, one event | Starter
 [Financial Crime](Financial%20Crime/domain.md) | Comprehensive AML/fraud domain — 15+ entities, sources, products, BIAN alignment | Intermediate
-[Healthcare](Healthcare/domain.md) | FHIR-aligned clinical domain — 12 entities, HIPAA governance, knowledge-graph product | Intermediate
+[Healthcare](Healthcare/domain.md) | FHIR-aligned clinical domain — 12 entities, HIPAA governance, source transforms, knowledge-graph product | Intermediate
 
 ## Feature Coverage Matrix
 
@@ -42,7 +42,7 @@ Feature | Simple Customer | Financial Crime | Healthcare
 `mutability: slowly_changing` | ✓ | ✓ | ✓
 `mutability: append_only` | — | ✓ | ✓
 `mutability: reference` | — | ✓ | ✓
-`mutability: frequently_changing` | — | ✓ | —
+`mutability: frequently_changing` | — | ✓ | ✓
 `temporal: valid_time` | ✓ | ✓ | ✓
 `temporal: transaction_time` | — | — | ✓
 `temporal: bitemporal` | — | ✓ | ✓
@@ -76,9 +76,12 @@ Feature | Simple Customer | Financial Crime | Healthcare
 Source system declaration | — | ✓ | ✓
 `change_model: real-time-cdc` | — | ✓ | ✓
 `change_model: event-driven` | — | — | ✓
-`change_model: batch` | — | ✓ | —
+`change_model: batch` | — | ✓ | ✓
 Domain feeds table | — | ✓ | ✓
 Multiple source systems | — | ✓ | ✓
+Transform files (column-level mapping) | — | ✓ | ✓
+Transform type: `conditional` | — | ✓ | ✓
+Transform type: `direct` | — | ✓ | ✓
 
 ### Data Products (Spec §9)
 
@@ -86,9 +89,10 @@ Feature | Simple Customer | Financial Crime | Healthcare
 --- | --- | --- | ---
 `class: domain-aligned` | — | ✓ | ✓
 `class: consumer-aligned` | — | ✓ | ✓
-`class: source-aligned` | — | ✓ | —
+`class: source-aligned` | — | ✓ | ✓
+Cross-domain product | — | ✓ (patient-financial-fraud-detection) | ✓ (clinical-billing-fraud-detection)
 SLA block (freshness, availability) | — | ✓ | ✓
-Masking rules | — | — | ✓
+Masking rules | — | ✓ | ✓
 `schema_type: knowledge-graph` | — | — | ✓
 Product lifecycle (`status: Deprecated`) | — | ✓ | —
 

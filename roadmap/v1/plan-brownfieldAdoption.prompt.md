@@ -589,16 +589,16 @@ Update `.github/md-ddl-review-prompt.md` to include adoption maturity validation
 
 ## Relevant Files
 
-- [md-ddl-specification/1-Foundation.md](md-ddl-specification/1-Foundation.md) — Add adoption principle, update two-layer model
-- [md-ddl-specification/2-Domains.md](md-ddl-specification/2-Domains.md) — Add `adoption` metadata block to domain schema
-- [md-ddl-specification/7-Sources.md](md-ddl-specification/7-Sources.md) — Add baseline→source migration note
-- [md-ddl-specification/8-Transformations.md](md-ddl-specification/8-Transformations.md) — Add baseline→transform migration note
-- [md-ddl-specification/9-Data-Products.md](md-ddl-specification/9-Data-Products.md) — Add brownfield product lifecycle note
+- [md-ddl-specification/1-Foundation.md](../../md-ddl-specification/1-Foundation.md) — Add adoption principle, update two-layer model
+- [md-ddl-specification/2-Domains.md](../../md-ddl-specification/2-Domains.md) — Add `adoption` metadata block to domain schema
+- [md-ddl-specification/7-Sources.md](../../md-ddl-specification/7-Sources.md) — Add baseline→source migration note
+- [md-ddl-specification/8-Transformations.md](../../md-ddl-specification/8-Transformations.md) — Add baseline→transform migration note
+- [md-ddl-specification/9-Data-Products.md](../../md-ddl-specification/9-Data-Products.md) — Add brownfield product lifecycle note
 - `md-ddl-specification/10-Adoption.md` — **NEW** — Core adoption spec
-- [agents/agent-guide/AGENT.md](agents/agent-guide/AGENT.md) — Add adoption-planning skill to index
-- [agents/agent-ontology/AGENT.md](agents/agent-ontology/AGENT.md) — Add baseline-capture and schema-import skills to index
-- [agents/agent-ontology/skills/domain-scoping/SKILL.md](agents/agent-ontology/skills/domain-scoping/SKILL.md) — Enhance brownfield path
-- [agents/agent-artifact/AGENT.md](agents/agent-artifact/AGENT.md) — Add reconciliation skill to index
+- [agents/agent-guide/AGENT.md](../../agents/agent-guide/AGENT.md) — Add adoption-planning skill to index
+- [agents/agent-ontology/AGENT.md](../../agents/agent-ontology/AGENT.md) — Add baseline-capture and schema-import skills to index
+- [agents/agent-ontology/skills/domain-scoping/SKILL.md](../../agents/agent-ontology/skills/domain-scoping/SKILL.md) — Enhance brownfield path
+- [agents/agent-artifact/AGENT.md](../../agents/agent-artifact/AGENT.md) — Add reconciliation skill to index
 - `agents/agent-guide/skills/adoption-planning/SKILL.md` — **NEW**
 - `agents/agent-ontology/skills/baseline-capture/SKILL.md` — **NEW**
 - `agents/agent-ontology/skills/schema-import/SKILL.md` — **NEW** — Fast-track schema-to-domain inference

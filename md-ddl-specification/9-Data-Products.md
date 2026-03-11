@@ -209,6 +209,39 @@ governance:
 
 Cross-domain references create edges in the Knowledge Graph linking the data product to entities it does not own. The owning domain retains governance authority over those entities — the consuming product inherits their governance posture unless explicit overrides are declared.
 
+#### Domain Name Resolution
+
+The `cross_domain.domain` value must match the domain name declared in the
+referenced domain's `domain.md` level-1 heading.
+
+- Example: `domain: Healthcare` resolves to a domain file headed `# Healthcare`.
+- Domain folder names may differ from display names; the level-1 heading is
+  authoritative for resolution.
+
+#### Entity Name Resolution
+
+Each name listed under `cross_domain.entities` must match an entity declared in
+the referenced domain's `## Entities` summary table. Entity detail file location
+is resolved by that domain's own links and conventions.
+
+#### Masking Precedence
+
+For cross-domain products, product-level `masking` declarations are authoritative
+for the published output. If contributing domains use different masking strategies
+for similar attributes, the consuming product must explicitly declare the strategy
+it will publish.
+
+#### SLA Scope
+
+SLA metadata is a product-level publication contract. It does not imply per-entity
+freshness or source-level cadence guarantees for each contributing domain.
+
+#### Inverse References
+
+Cross-domain references are unidirectional declarations on the consuming product.
+Declaring `cross_domain` in one domain does not modify the referenced domain and
+does not create an inverse reference entry automatically.
+
 ---
 
 ### **Masking Strategies**

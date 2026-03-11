@@ -8,6 +8,8 @@ A booking of a healthcare event among patients, practitioners, related persons, 
 
 Appointments use a period-granularity relationship to Encounters — the appointment captures scheduled time (when the visit is planned) while the encounter captures actual time (when the visit occurred). Comparing scheduled versus actual enables wait time analysis and scheduling efficiency reporting.
 
+Appointment records change frequently throughout their lifecycle. In high-volume outpatient departments, a single appointment may be rescheduled multiple times, confirmed, cancelled, and re-booked before reaching a terminal state (Fulfilled or No Show). This high-churn pattern — driven by patient availability, practitioner schedules, and urgent clinical reprioritisation — makes Appointment a `frequently_changing` entity, distinct from clinical records like Patient or Condition which change infrequently.
+
 ```mermaid
 ---
 config:
@@ -35,13 +37,14 @@ classDiagram
 
 ```yaml
 existence: dependent
-mutability: slowly_changing
+mutability: frequently_changing
 temporal:
   tracking: valid_time
   description: >
     Valid time tracks the scheduled appointment window from Scheduled Start
-    to Scheduled End. Appointments may be rescheduled, changing the valid
-    time window, or cancelled.
+    to Scheduled End. Appointments are frequently rescheduled — each reschedule
+    changes the valid time window. Full history of reschedules is retained for
+    scheduling variance analysis and no-show pattern detection.
 attributes:
   Appointment Identifier:
     type: string

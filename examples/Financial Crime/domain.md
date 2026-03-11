@@ -182,6 +182,7 @@ Name | Class | Consumers | Status
 --- | --- | --- | ---
 [Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Production
 [Transaction Risk Summary](products/analytics.md#transaction-risk-summary) | consumer-aligned | Financial Crime Analytics | Production
+[Patient Financial Fraud Detection](products/patient-fraud-detection.md#patient-financial-fraud-detection) | consumer-aligned | Financial Crime Analytics; Enterprise Fraud Operations; Clinical Revenue Integrity | Production
 [Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Production
 [Party Risk Report (Legacy)](products/party-risk-report-legacy.md#party-risk-report-legacy) | consumer-aligned | Financial Crime Analytics | Deprecated
 

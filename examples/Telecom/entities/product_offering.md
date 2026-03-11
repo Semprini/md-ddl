@@ -111,7 +111,7 @@ governance:
 
 ### Product Offering Supersedes Product Offering
 
-A new Product Offering may supersede an earlier version, replacing it in the active catalog. Existing subscribers on the superseded offering are not automatically migrated — they remain on their original terms.
+A new Product Offering may supersede an earlier version, replacing it in the active catalog. Cardinality is many-to-one: when a legacy plan is split into multiple variants (e.g., Prepaid Plus and Prepaid Lite both replacing the old Prepaid Standard), each successor independently supersedes the same predecessor. Existing subscribers on the superseded offering are not automatically migrated — they remain on their original terms.
 
 ```yaml
 source: Product Offering

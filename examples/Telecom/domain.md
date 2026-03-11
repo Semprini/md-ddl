@@ -98,6 +98,7 @@ Name | Specializes | Description | Reference
 
 Name | Description | Reference
 --- | --- | ---
+[Party Type](enums.md#party-type) | Discriminator identifying whether a Party is an Individual or Organization. | [TM Forum TMF632](https://www.tmforum.org/oda/open-apis/)
 [Customer Status](enums.md#customer-status) | Lifecycle status of a customer record. | [TM Forum TMF629](https://www.tmforum.org/oda/open-apis/)
 [Subscription Status](enums.md#subscription-status) | Lifecycle status of a subscription. | [TM Forum TMF637](https://www.tmforum.org/oda/open-apis/)
 [Service Status](enums.md#service-status) | Operational status of a provisioned service. | [TM Forum TMF638](https://www.tmforum.org/oda/open-apis/)
@@ -115,7 +116,7 @@ Name | Description | Reference
 [Customer Owns Billing Account](entities/customer.md#customer-owns-billing-account) | A Customer owns one or more Billing Accounts. | [TM Forum TMF666](https://www.tmforum.org/oda/open-apis/)
 [Billing Account Assigned To Customer](entities/billing_account.md#billing-account-assigned-to-customer) | Each Billing Account is assigned to its responsible Customer. | [TM Forum TMF666](https://www.tmforum.org/oda/open-apis/)
 [Customer Has Subscriptions](entities/customer.md#customer-has-subscriptions) | A Customer holds one or more Subscriptions over time. | [TM Forum TMF637](https://www.tmforum.org/oda/open-apis/)
-[Subscription Activates Product Offering](entities/subscription.md#subscription-activates-product-offering) | Each Subscription is bound to exactly one Product Offering at point of sale. | [TM Forum TMF637](https://www.tmforum.org/oda/open-apis/)
+[Subscription References Product Offering](entities/subscription.md#subscription-references-product-offering) | Each Subscription is bound to exactly one Product Offering at point of sale. | [TM Forum TMF637](https://www.tmforum.org/oda/open-apis/)
 [Product Offering Supersedes Product Offering](entities/product_offering.md#product-offering-supersedes-product-offering) | A Product Offering may supersede an earlier version, replacing it in the active catalog. | [TM Forum TMF620](https://www.tmforum.org/oda/open-apis/)
 [Subscription Triggers Service Order](entities/subscription.md#subscription-triggers-service-order) | Activating or modifying a Subscription triggers a Service Order to provision or change the underlying Service. | [TM Forum TMF641](https://www.tmforum.org/oda/open-apis/)
 [Service Order Provisions Service](entities/service_order.md#service-order-provisions-service) | A completed Service Order results in a provisioned or modified Service. | [TM Forum TMF641](https://www.tmforum.org/oda/open-apis/)

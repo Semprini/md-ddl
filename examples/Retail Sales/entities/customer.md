@@ -4,7 +4,7 @@
 
 ### Customer
 
-A buyer — an individual or household that places purchase orders. This is the Sales domain's definition of Customer, focused on purchase history, loyalty tier, and marketing preferences.
+A buyer — an individual or household that places purchase orders. This is the Sales domain's definition of Customer, focused on identity, loyalty tier, and marketing preferences. Aggregated purchase metrics (lifetime spend, last purchase date) belong in consumer-aligned analytics products, not the canonical entity.
 
 **Bounded Context note:** This entity intentionally differs from Customer in the Retail Service domain. In the Sales domain, Customer is a buyer identity optimised for marketing segmentation, loyalty management, and purchase analytics. In the Service domain, Customer is a contact identity optimised for case management and support history. The two domains own their definitions independently. Integration happens at the product layer via the Customer 360 product.
 
@@ -20,8 +20,6 @@ classDiagram
     Given Name : string
     Family Name : string
     Loyalty Tier : enum~CustomerTier~
-    Total Lifetime Spend : decimal
-    Last Purchase Date : date
     Marketing Opt In : boolean
   }
 
@@ -61,14 +59,6 @@ attributes:
   Loyalty Tier:
     type: enum:Customer Tier
     description: Current loyalty tier based on cumulative spend (Standard, Silver, Gold, Platinum).
-
-  Total Lifetime Spend:
-    type: decimal
-    description: Cumulative value of all confirmed orders. Drives loyalty tier calculation.
-
-  Last Purchase Date:
-    type: date
-    description: Date of the most recent confirmed order.
 
   Marketing Opt In:
     type: boolean

@@ -32,6 +32,12 @@ classDiagram
 ```yaml
 existence: associative
 mutability: append_only
+temporal:
+  tracking: transaction_time
+  description: >
+    Transaction time records when this order line was committed at point of sale.
+    Order lines are never modified after creation — the agreed price and quantity
+    at the moment of purchase are preserved permanently.
 attributes:
   Order Line Identifier:
     type: string

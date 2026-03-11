@@ -81,6 +81,10 @@ Name | Description | Reference
 [Order Contains Order Lines](entities/order.md#order-contains-order-lines) | An Order contains one or more Order Lines. | —
 [Order Line References Product](entities/order_line.md#order-line-references-product) | Each Order Line references the Product being purchased. | —
 
+## Source Systems
+
+This is a greenfield domain — data originates here and is not ingested from a legacy source system. No source transforms are defined by design.
+
 ## Events
 
 Name | Actor | Entity | Description

@@ -101,7 +101,7 @@ governance:
 
 ## Relationships
 
-### Subscription Activates Product Offering
+### Subscription References Product Offering
 
 Each Subscription is bound to exactly one Product Offering at point of sale. The Product Offering defines the service entitlements and base price; the Subscription records what was actually agreed.
 

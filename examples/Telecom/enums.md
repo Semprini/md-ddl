@@ -2,6 +2,17 @@
 
 ## Enums
 
+### Party Type
+
+Discriminator identifying whether a Party is an Individual or Organization.
+
+```yaml
+type: enum
+values:
+  - Individual
+  - Organization
+```
+
 ### Customer Status
 
 Lifecycle status of a customer record.

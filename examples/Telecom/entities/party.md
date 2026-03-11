@@ -20,6 +20,8 @@ classDiagram
     Party Type : enum~PartyType~
   }
 
+  class PartyType["<a href='../enums.md#party-type'>Party Type</a>"]{<<enumeration>>}
+
   class Individual
   class Organization
 
@@ -28,7 +30,6 @@ classDiagram
 
   Party "1" --> "0..*" Customer : has
 
-  class PartyType["<a href='../enums.md'>Party Type</a>"]{<<enumeration>>}
   class Customer["<a href='customer.md'>Customer</a>"]
 ```
 
@@ -42,7 +43,7 @@ attributes:
     description: Globally unique identifier for the party, assigned at creation and never reused.
 
   Party Type:
-    type: string
+    type: enum:Party Type
     description: Discriminator identifying whether this party is an Individual or Organization.
 ```
 

@@ -82,6 +82,10 @@ Name | Description | Reference
 [Service Request Escalates To Service Case](entities/service_request.md#service-request-escalates-to-service-case) | A Service Request may escalate to a Service Case for complex issues. | —
 [Service Case Resolved By Knowledge Article](entities/service_case.md#service-case-resolved-by-knowledge-article) | A Service Case may be resolved by referencing a Knowledge Article. | —
 
+## Source Systems
+
+This is a greenfield domain — data originates here and is not ingested from a legacy source system. No source transforms are defined by design.
+
 ## Events
 
 Name | Actor | Entity | Description

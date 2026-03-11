@@ -71,6 +71,13 @@ attributes:
 ```
 
 ```yaml
+constraints:
+  Closed At After Opened At:
+    check: "Closed At IS NULL OR Closed At > Opened At"
+    description: Case closure timestamp must be after the opening timestamp.
+```
+
+```yaml
 governance:
   pii: false
   classification: Internal

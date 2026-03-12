@@ -27,18 +27,20 @@ for every engagement.
 
 ## Skills
 
-You have six specialist skills. Before responding to any modelling request, identify
+You have eight specialist skills. Before responding to any modelling request, identify
 which skill applies and read its SKILL.md. Multiple skills may apply in a single
 conversation — load them as needed.
 
 | Skill | Trigger | Path |
 | --- | --- | --- |
-| **Domain Scoping** | Starting a new domain; "model this domain"; scoping or boundary questions; choosing canonical vs bounded context | `skills/domain-scoping/SKILL.md` |
+| **Domain Scoping** | Starting a new domain; "model this domain"; scoping or boundary questions; choosing canonical vs bounded context; translating baselines to canonical entities | `skills/domain-scoping/SKILL.md` |
 | **Entity Modelling** | Modelling entities or attributes; "types of" / "kinds of"; inheritance questions; deciding between entity, enum, or attribute | `skills/entity-modelling/SKILL.md` |
 | **Relationship & Events** | Connecting entities; "what happens when"; modelling business events; cardinality or ownership questions | `skills/relationship-events/SKILL.md` |
 | **Standards Alignment** | User mentions a named standard (BIAN, ISO 20022, FHIR, etc.); modelling an industry domain; adding Reference column values; finalizing existence/mutability/granularity/temporal choices that may be standard-constrained | `skills/standards-alignment/SKILL.md` |
 | **Domain Review** | User asks to review/audit/validate an existing domain and its detail files; readiness checks before declaring complete; quality review of structural and modelling decisions | `skills/domain-review/SKILL.md` |
 | **Source Mapping** | User wants to declare source systems, create source.md files, author domain feed tables, define field-level transformations, or map source fields to canonical entities; "where does this data come from?"; connecting an operational system to the domain model | `skills/source-mapping/SKILL.md` |
+| **Baseline Capture** | User wants to document existing schemas, models, ETL pipelines, or catalog metadata as baselines; "capture", "import", "document existing", "baseline", "record current state" | `skills/baseline-capture/SKILL.md` |
+| **Schema Import** | Fast-track brownfield path; "import schema", "reverse engineer", "I have a database", "here's my DDL", "start from existing tables", "convert my schema"; user provides CREATE TABLE or dbt schema.yml expecting a canonical domain | `skills/schema-import/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.
@@ -56,6 +58,13 @@ For extending or modifying an existing domain (brownfield modelling):
 - Load `skills/domain-scoping/SKILL.md` — the brownfield interview path applies when entities, relationships, or governance already exist.
 - Load the skill(s) relevant to the requested change (Entity Modelling, Relationship & Events, Source Mapping, etc.).
 - Do not re-interview the full domain. Focus on the delta and its impact on existing artifacts.
+
+For brownfield adoption (documenting existing systems and migrating to MD-DDL):
+
+- If the user wants to **document** existing assets as baselines → load `skills/baseline-capture/SKILL.md`
+- If the user wants to **fast-track** from DDL to a draft domain → load `skills/schema-import/SKILL.md`
+- If the user wants to **translate** baselines to canonical entities → load `skills/domain-scoping/SKILL.md` (Brownfield Step 5)
+- Reference `md-ddl-specification/10-Adoption.md` for the adoption maturity model and journey patterns.
 
 For source system integration and field-level mapping:
 

@@ -49,7 +49,7 @@ here. No other file has the right to define language rules.
 **Review lens:**
 
 - Are rules stated once, in the owning section, and nowhere else?
-- Is `MD-DDL-Complete.md` a faithful concatenation of sections 1–9 in order?
+- Is `MD-DDL-Complete.md` a faithful concatenation of sections 1–10 in order?
 - Is the version number consistent across all section files?
 - Are there rules implied by examples or agents that are missing from the spec?
 
@@ -122,6 +122,15 @@ both human reference and AI context (agents are instructed to use
   you would point a new user to?
 - If `examples/Simple Customer/` exists, is it genuinely simpler and correct,
   not just shorter?
+- If `examples/Brownfield Retail/` exists, does it correctly demonstrate the
+  adoption maturity model from Section 10?
+  - Does the domain have an `adoption` block if `baselines/` exists?
+  - Are baseline files using the required metadata format (baseline type,
+    source_system, captured_date, captured_by, status)?
+  - Is `maturity` consistent with the actual state of the domain (e.g., if
+    canonical entities exist and baselines have mapping blocks, maturity
+    should be at least `mapped`)?
+  - Do baseline `superseded_by` links point to existing canonical entity files?
 
 ### README (`README.md`)
 

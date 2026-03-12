@@ -37,8 +37,11 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 5. **Graph‑Powered**  
    The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
 
-6. **Natural‑Language Naming**  
+6. **Natural‑Language Naming**
    Entities, attributes, and relationships use human‑readable names rather than code‑style casing.
+
+7. **Adoption is Incremental**
+   MD-DDL supports incremental adoption. Organisations can begin by documenting their existing data landscape — dimensional models, canonical models, ETL pipelines, governance metadata — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state; the adoption maturity model tracks the journey; the canonical model is the destination. See [Section 10 — Adoption](./10-Adoption.md) for the full maturity model and adoption workflow.
 
 ---
 
@@ -54,11 +57,18 @@ MD‑DDL is composed of several logical components:
 - [Sources](./7-Sources.md)
 - [Transformations](./8-Transformations.md)
 - [Data Products](./9-Data-Products.md)
+- [Adoption](./10-Adoption.md)
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition** in the domain file  
-2. A **detailed definition** in a separate file  
+1. A **summary definition** in the domain file
+2. A **detailed definition** in a separate file
+
+During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
+
+- **Layer 0 — Baselines** (existing state documentation) — transitional; captured in `baselines/` subfolders within the domain
+
+Baselines document what exists today. They are not part of the canonical model and are never used for generation. They are superseded as the domain advances through adoption maturity levels.
 
 This structure supports both human readability and AI context management.
 

@@ -37,8 +37,11 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 5. **Graph‑Powered**  
    The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
 
-6. **Natural‑Language Naming**  
+6. **Natural‑Language Naming**
    Entities, attributes, and relationships use human‑readable names rather than code‑style casing.
+
+7. **Adoption is Incremental**
+   MD-DDL supports incremental adoption. Organisations can begin by documenting their existing data landscape — dimensional models, canonical models, ETL pipelines, governance metadata — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state; the adoption maturity model tracks the journey; the canonical model is the destination. See [Section 10 — Adoption](./10-Adoption.md) for the full maturity model and adoption workflow.
 
 ---
 
@@ -54,11 +57,18 @@ MD‑DDL is composed of several logical components:
 - [Sources](./7-Sources.md)
 - [Transformations](./8-Transformations.md)
 - [Data Products](./9-Data-Products.md)
+- [Adoption](./10-Adoption.md)
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition** in the domain file  
-2. A **detailed definition** in a separate file  
+1. A **summary definition** in the domain file
+2. A **detailed definition** in a separate file
+
+During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
+
+- **Layer 0 — Baselines** (existing state documentation) — transitional; captured in `baselines/` subfolders within the domain
+
+Baselines document what exists today. They are not part of the canonical model and are never used for generation. They are superseded as the domain advances through adoption maturity levels.
 
 This structure supports both human readability and AI context management.
 
@@ -132,6 +142,74 @@ Paths must be relative to the file containing the directive. Do not use workspac
 
 This mechanism enables the spec reference stub pattern: skill reference files contain a brief description and an `{{INCLUDE}}` pointing to the canonical spec section, so that spec updates propagate automatically without duplicating content across agent files.
 
+---
+
+## **Validation Model**
+
+MD-DDL uses a two-tier validation model: **mechanical pre-flight checks** and **agent-driven quality review**. These tiers are deliberately separate because different categories of problem require different kinds of intelligence to detect.
+
+### Why Not a Traditional Linter
+
+MD-DDL is an AI-native standard. The primary consumer of an MD-DDL model is an AI agent that already understands intent, domain context, and organisational conventions — capabilities that no rule-based linter can match. Applying rigid pass/fail enforcement above the syntax level would:
+
+- Reject legitimate organisational vocabulary differences (e.g., `phi` instead of `pii`) that agents understand and can work with
+- Suppress feedback that drives spec evolution — when organisations adapt MD-DDL to their context, that signal is valuable
+- Produce false positives for intentional exceptions (governance inheritance, minimal reference domains) that require domain context to evaluate correctly
+
+Traditional linters assume the checker is smarter than the thing being checked. For MD-DDL, the inverse is true.
+
+### Validation Levels
+
+Five categories of check exist across the MD-DDL model. Only Level 1 benefits from mechanical tooling:
+
+Level | Category | Example | Mechanically checked?
+--- | --- | --- | ---
+1 | Syntax | YAML parses, Mermaid renders, markdown links resolve | Yes — broken syntax silently corrupts agent interpretation with no wiggle room
+2 | Structure | Required sections present, required YAML keys present | Partially — legitimate exceptions exist; structural checks need domain context to avoid false positives
+3 | Convention | Naming patterns, column order, heading hierarchy | No — organisational vocabulary differences are signal, not errors
+4 | Quality | Governance completeness, relationship coverage, event payloads | No — this is judgment; agents handle it through domain-review and compliance-audit
+5 | Domain fitness | Is this the right model for the business? | Never — requires human domain expertise by definition
+
+**The split:** Level 1 gets mechanical pre-flight checks. Levels 2–5 stay with agents and humans, where context and judgment live.
+
+### Pre-Flight Check Scope
+
+The following checks are the complete set of mechanical validation that MD-DDL endorses. No additional checks should be added without a spec version bump.
+
+Check | What it validates | Why it is mechanical
+--- | --- | ---
+YAML syntax | All YAML code blocks parse without syntax errors | A YAML parse error silently corrupts agent interpretation of every attribute in the block
+Mermaid syntax | All Mermaid code blocks use valid diagram syntax | A Mermaid syntax error breaks every rendering of the domain or entity diagram
+Internal link integrity | All markdown links (`[text](path)`) resolve to existing files or headings | Dead links break navigation for both humans and agents
+Entity reference consistency | Entity names in relationships, events, products, and source mappings match an entity defined in the domain | A typo in an entity name creates a silent reference to nothing
+Domain version field | The `version:` key exists in domain metadata | Versionless domains cannot participate in maturity tracking or change management
+
+**What is explicitly not checked mechanically:**
+
+- Presence or absence of optional YAML keys (mutability, temporal, governance fields)
+- Naming conventions or vocabulary choices
+- Governance metadata completeness or correctness
+- Relationship granularity or cardinality appropriateness
+- Event payload structure completeness
+- Standards alignment accuracy
+- Any modelling judgment
+
+### Pre-Flight Check Tool Interface
+
+Any tool implementing pre-flight checks must conform to this interface:
+
+- **Input:** a domain folder path
+- **Output:** a list of findings, each with file path, line number, check name, and message
+- **Exit behaviour:** report all findings; do not stop on first error
+- **Severity:** all findings are a single severity ("pre-flight failure") — there is no warning/error distinction because all checks are binary
+- **Configuration:** none — the checks are fixed and minimal; there are no rules to enable or disable
+
+### Agent-Driven Quality Review
+
+Everything above Level 1 is the responsibility of agents. Agent Ontology's domain-review skill, Agent Governance's compliance-audit skill, and the structured review prompts in `.github/` handle structural, convention, quality, and domain-fitness concerns. They understand context and intent. They flag deviations as observations, not errors.
+
+When an agent encounters an organisational vocabulary deviation — a field named `phi` instead of `pii`, `data_class` instead of `classification` — the correct response is to note it as a **potential spec vocabulary gap** and work with it, not reject the file.
+
 ## **Domains**
 
 In MD-DDL, the Domain file acts as the router for the Knowledge Graph. While detail files provide the DNA (Attributes/Constraints), the Domain file provides the Anatomy (How entities, events, and relationships sit together).
@@ -169,6 +247,8 @@ Governance & Security|classification, pii|The default security posture for the e
 Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
 Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
 Discovery|tags|Searchability
+Adoption|adoption (maturity, adoption_started, target_maturity, target_date, progress, notes)|Brownfield adoption tracking. Required when `baselines/` exists. See [Section 10 — Adoption](./10-Adoption.md).
+Platform|platform (posture, technologies, product_scope, notes)|How data products relate to infrastructure. See [Section 9 — Data Products](./9-Data-Products.md#platform-posture).
 
 #### **Metadata Format**
 
@@ -1107,6 +1187,31 @@ values:
 - Normalization: Physical artifact generation handles the translation of these values into machine-readable codes (e.g., PART_TIME) if required by the target system.
 - Global Reference: Once defined in a Domain, an Enum can be referenced by any Entity or Event using the enum:Enum Name type syntax.
 
+### External Standard Enumerations
+
+When an enum's values are defined by an external standard (for example ISO 4217
+currencies, HL7 FHIR value sets, or BIAN enumerations), include a representative
+subset of 5 to 15 values sufficient to demonstrate the pattern. Reference the
+authoritative source using a `standard` metadata field.
+
+```yaml
+values:
+  AUD:
+    description: Australian Dollar
+  USD:
+    description: United States Dollar
+  EUR:
+    description: Euro
+standard:
+  name: ISO 4217
+  version: "2024"
+  url: https://www.iso.org/iso-4217-currency-codes.html
+  note: Representative subset - full standard defines 180+ active currency codes
+```
+
+Physical artifact generation should support loading the full external value set
+when the representative subset is insufficient for the target use case.
+
 ## **Relationships**
 
 Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
@@ -1298,6 +1403,9 @@ governance:
 
    The attributes block should focus on the delta (what changed) and the context (why it changed), rather than a full copy of the entity.
 
+   Event payload attributes use the same dictionary format as entity attributes.
+   Use key-value entries under `attributes:` rather than list-of-single-key maps.
+
 9. **Temporal Priority**
    Every event MUST have a timestamp or a sequence attribute to ensure the Knowledge Graph can reconstruct the timeline of an entity's life.
 
@@ -1316,9 +1424,9 @@ Triggered when a customer changes one or more preferences.
 actor: Customer
 entity: Customer Preference
 attributes:
-  - updated fields:
+   updated_fields:
       type: array
-  - timestamp:
+   timestamp:
       type: datetime
 ```
 ````
@@ -1784,6 +1892,12 @@ source:
 
 ---
 
+### **Brownfield Adoption Note**
+
+When adopting MD-DDL into an existing environment, source declarations may initially reference baseline ETL documentation in `baselines/etl/` to capture the current transformation logic before formalising it as MD-DDL transform files. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow and baseline-to-source migration path.
+
+---
+
 ### **Source Rules**
 
 1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
@@ -2079,6 +2193,12 @@ grain:
 
 ---
 
+### **Brownfield Adoption Note**
+
+Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference for creating MD-DDL transformation YAML. The transformation spec defines the target state; the baseline documents the current state. Reconciliation between the two is part of the adoption journey. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow.
+
+---
+
 ### **Transformation Rules**
 
 1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and generated output.
@@ -2208,6 +2328,67 @@ A consumer-aligned product reshapes domain data for a specific audience or use c
 - **Cross-domain dependencies:** Permitted — consumer-aligned products may reference entities from other domains when the consumer's use case spans domain boundaries
 
 Consumer-aligned products are the primary trigger for physical artifact generation. The `schema_type` declared on a consumer-aligned product determines which Agent Artifact skill produces the output.
+
+---
+
+### **Platform Posture**
+
+Organisations differ fundamentally in how they relate data products to platforms. This architectural decision shapes which product classes apply, what artifacts get generated, and what infrastructure is assumed. The platform posture must be established before designing data products.
+
+MD-DDL defines three platform postures:
+
+#### Single-Platform
+
+All data products are self-contained on one platform (e.g., Snowflake, Databricks, BigQuery). Source ingestion, transformation, canonical storage, and consumer access all happen within the same platform.
+
+- **Effect on classes:** All three classes (source-aligned, domain-aligned, consumer-aligned) are typically recognised as data products
+- **Effect on artifacts:** Agent Artifact generates for one target platform; `schema_type` maps directly to platform-native constructs
+- **Effect on infrastructure:** Minimal integration complexity; the platform provides compute, storage, and access control
+- **Typical pattern:** Source-aligned = raw/staging schemas; domain-aligned = curated schemas; consumer-aligned = materialized views or denormalized tables
+
+#### Polyglot
+
+Different product classes leverage different platforms and technologies depending on the data's lifecycle stage and access pattern. The organisation accepts that data products span infrastructure boundaries.
+
+- **Effect on classes:** Each class may target a different platform stack:
+  - **Source-aligned** — CDC, streaming (Kafka, Flink), operational data stores, event buses
+  - **Domain-aligned / foundational** — polyglot persistence (relational + document + graph), analytical and operational interfaces, potentially spanning OLTP and OLAP stores
+  - **Consumer-aligned** — purpose-built for the consumer's query engine (data warehouse, API layer, search index, dashboard cache)
+- **Effect on artifacts:** Agent Artifact may need to generate for multiple target platforms per domain; `schema_type` maps to platform-appropriate constructs for each product
+- **Effect on infrastructure:** Higher integration complexity; requires cross-platform lineage tracking, consistent governance enforcement, and potentially different access control mechanisms per platform
+
+#### Selective Scope
+
+The organisation does not consider all classes as "data products." Some layers are treated as infrastructure or engineering concerns rather than governed, published products.
+
+- **Common pattern:** Source-aligned feeds are infrastructure (CDC pipelines, staging areas) managed by data engineering — not declared as data products. Only domain-aligned and consumer-aligned outputs are governed as products.
+- **Alternative pattern:** Only consumer-aligned outputs are products. Domain-aligned canonical models are internal reference architectures, not published products.
+- **Effect on MD-DDL:** Product classes that fall outside the org's product scope are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms still exist in `sources/` regardless of whether source-aligned products are declared.
+
+#### Declaring Platform Posture
+
+Platform posture is declared in domain metadata under the `platform` block:
+
+```yaml
+platform:
+  posture: single-platform | polyglot | selective
+  technologies:
+    - "Snowflake"
+  product_scope:
+    - source-aligned
+    - domain-aligned
+    - consumer-aligned
+  notes: "All data products are self-contained in Snowflake."
+```
+
+Field | Required | Purpose
+--- | --- | ---
+`posture` | Yes (when `platform` block exists) | The organisation's platform strategy for this domain
+`technologies` | No | List of platforms and technologies used by data products in this domain
+`product_scope` | No | Which product classes the organisation recognises as data products. Defaults to all three. If omitted, all classes are in scope.
+`notes` | No | Free-text context on platform decisions, constraints, or migration plans
+
+Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy. When all domains share the same posture, use consistent values across domain files.
 
 ---
 
@@ -2353,6 +2534,39 @@ governance:
 
 Cross-domain references create edges in the Knowledge Graph linking the data product to entities it does not own. The owning domain retains governance authority over those entities — the consuming product inherits their governance posture unless explicit overrides are declared.
 
+#### Domain Name Resolution
+
+The `cross_domain.domain` value must match the domain name declared in the
+referenced domain's `domain.md` level-1 heading.
+
+- Example: `domain: Healthcare` resolves to a domain file headed `# Healthcare`.
+- Domain folder names may differ from display names; the level-1 heading is
+  authoritative for resolution.
+
+#### Entity Name Resolution
+
+Each name listed under `cross_domain.entities` must match an entity declared in
+the referenced domain's `## Entities` summary table. Entity detail file location
+is resolved by that domain's own links and conventions.
+
+#### Masking Precedence
+
+For cross-domain products, product-level `masking` declarations are authoritative
+for the published output. If contributing domains use different masking strategies
+for similar attributes, the consuming product must explicitly declare the strategy
+it will publish.
+
+#### SLA Scope
+
+SLA metadata is a product-level publication contract. It does not imply per-entity
+freshness or source-level cadence guarantees for each contributing domain.
+
+#### Inverse References
+
+Cross-domain references are unidirectional declarations on the consuming product.
+Declaring `cross_domain` in one domain does not modify the referenced domain and
+does not create an inverse reference entry automatically.
+
 ---
 
 ### **Masking Strategies**
@@ -2482,6 +2696,16 @@ Product detail files follow the same structural rules as entity detail files:
 
 ---
 
+### **Brownfield Adoption Note**
+
+In brownfield adoption contexts (see [Section 10 — Adoption](./10-Adoption.md)):
+
+- At maturity levels 1–2, data products may reference existing physical artifacts that are not yet MD-DDL-generated
+- At maturity level 4+, all data products should be generated from MD-DDL declarations
+- Products can begin their lifecycle at `Draft` even when based on existing physical artifacts — the product declaration documents intent while the underlying assets are being migrated to declarative MD-DDL
+
+---
+
 ### **Product Lifecycle**
 
 Data products progress through defined lifecycle states. The `status` field declares the current state; optional date fields document transition timing.
@@ -2544,3 +2768,339 @@ Field | Conflict Exists When
 3. **PII: union of obligations.** If any contributing domain declares `pii: true`, the product must either declare `pii: true` with appropriate masking entries, or demonstrate that all PII attributes are masked to a level where PII obligations no longer apply.
 
 4. **Regulatory scope: union of frameworks.** The product is subject to the combined regulatory scope of all contributing domains. The owning domain's `regulatory_scope` does not shield the product from obligations in the referenced domains.
+
+*Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
+
+---
+
+## **Adoption**
+
+MD-DDL supports incremental adoption. Organisations can begin by importing existing schemas — DDL, dbt models, catalog exports — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state for reference; the adoption maturity model tracks the journey; the canonical model is the destination.
+
+The primary brownfield path is **schema-import**: paste your DDL, answer two or three questions, and receive a draft canonical domain. Baseline capture is an optional secondary path for organisations that need to document existing state before modelling.
+
+Coexistence between baseline documentation and canonical entities is transitional. The goal is always full conversion to declarative MD-DDL, but the timeline may span months or years depending on organisational readiness, domain complexity, and the number of existing systems to absorb.
+
+---
+
+### **Adoption Maturity Model**
+
+Maturity is tracked at the domain level. Individual entities do not carry their own maturity — the domain advances as a whole. Domain maturity equals the lowest level all entities have reached. The `progress` field in domain metadata shows forward momentum within a level as a structured count.
+
+#### Maturity Levels
+
+Level | Name | Description | Characteristics
+--- | --- | --- | ---
+1 | Documented | Existing state captured as MD-DDL baseline files | `baselines/` folder populated; no canonical entities yet; existing schemas, ETLs, catalog entries recorded as-is
+2 | Mapped | Canonical entities defined; mappings derivable from source transforms | `entities/` folder populated; `sources/` with transform files define the lineage from source fields to canonical attributes; baseline-to-canonical mappings are auto-generated from transforms, not manually authored
+3 | Governed | Governance metadata complete on all canonical entities | Classification, PII, retention, regulatory scope, compliance relevance all populated; domain review passed
+4 | Declarative | MD-DDL is the source of truth; physical artifacts generated and drift-monitored | Agent Artifact generates DDL/schemas from MD-DDL; existing physical artifacts replaced or reconciled; baselines superseded; basic drift detection flags divergence between declarations and deployed state. **Requires external tooling** — drift detection mechanisms (CI/CD hooks, database introspection, scheduled agent runs) must be implemented outside MD-DDL
+5 | Automated | CI/CD generates, deploys, and enforces from MD-DDL | Pipeline generates, deploys, and monitors physical artifacts; automated drift detection with remediation triggers; baseline folder can be removed. **Requires external tooling** — CI/CD pipeline integration, automated deployment, and remediation infrastructure must be implemented outside MD-DDL
+
+#### Advancement Criteria
+
+Each level has explicit exit criteria that must be satisfied before advancing. These are structural checks (verifiable by agents) plus SME attestations.
+
+**Level 1 → Level 2:**
+
+- All known existing assets documented as baseline files in `baselines/`
+- Each baseline file has the required `baseline:` metadata header
+- Domain metadata contains an `adoption` block with `maturity: documented`
+- Candidate canonical entities identified (documented in baseline file notes or a separate assessment)
+
+**Level 2 → Level 3:**
+
+- Canonical entity files exist in `entities/` for all business concepts identified from baselines
+- Source transform files in `sources/*/transforms/` define mappings from source fields to canonical attributes (see [Section 8 — Transformations](./8-Transformations.md))
+- Domain metadata updated to `maturity: mapped`
+
+**Level 3 → Level 4:**
+
+- All canonical entities have complete governance metadata (classification, PII, retention, regulatory scope)
+- Domain review passed (Agent Ontology domain-review skill)
+- Domain metadata updated to `maturity: governed`
+
+**Level 4 → Level 5:**
+
+- Agent Artifact generates physical artifacts from canonical entities
+- Generated artifacts reconciled against existing state — differences are intentional
+- Baseline files marked `status: superseded` with `superseded_by:` pointing to canonical entities
+- Basic drift detection in place: divergence between MD-DDL declarations and deployed physical state is flagged
+- External tooling operational for drift detection
+- Domain metadata updated to `maturity: declarative`
+
+**Level 5 exit (Automated):**
+
+- CI/CD pipeline generates, deploys, and monitors physical artifacts from MD-DDL
+- Automated drift detection with remediation triggers operational
+- Baseline files may be `status: archived` or removed entirely
+- External tooling operational for deployment and remediation
+- Domain metadata updated to `maturity: automated`
+
+#### Regression Rules
+
+A domain cannot regress to a lower maturity level. If structural changes invalidate a level (e.g., new entities added without governance), the domain stays at its current level but is flagged as "incomplete at current level" until gaps are resolved.
+
+#### Staleness Rule
+
+If a domain's `target_date` has passed and `maturity` has not reached `target_maturity`, agents flag the domain as "adoption stalled." The adoption-planning skill prompts a review: reassess timeline, identify blockers, or adjust target. This prevents Level 1 sprawl where teams document legacy but never progress.
+
+---
+
+### **Baselines**
+
+The `baselines/` folder captures existing state documentation within a domain. Baseline files are reference documentation only — they are never used as inputs for physical artifact generation. Agent Artifact generates exclusively from canonical entities in `entities/`.
+
+**Baselines are agent-generated, not human-authored.** Users provide raw input — DDL, dbt models, catalog exports, pipeline descriptions, natural-language notes — and the agent produces the baseline file. The human effort is providing the raw material; the structuring is the agent's job.
+
+#### Folder Structure
+
+```text
+<domain>/
+  domain.md
+  baselines/                    # Existing state documentation
+    dimensional/                # Existing dimensional models
+      fact_transaction.md       # Star schema fact table documented
+      dim_customer.md           # Dimension table documented
+    canonical/                  # Existing enterprise/canonical models
+      enterprise_customer.md    # Existing canonical entity documented
+    etl/                        # Existing ETL/ELT pipeline inventory
+      customer_load.md          # Pipeline documented
+    catalog/                    # Governance catalog imports
+      customer_governance.md    # Collibra/Purview metadata captured
+  entities/
+  sources/
+  ...
+```
+
+#### Baseline File Format
+
+Each baseline file has two parts: a short YAML metadata header and a free-form body. There are no type-specific YAML templates — the body holds whatever content best describes the existing asset.
+
+##### Metadata Header
+
+Every baseline file must include this metadata block:
+
+```yaml
+baseline:
+  type: dimensional | canonical | etl | catalog
+  source_system: "Snowflake DW" | "Informatica" | "Collibra" | etc.
+  captured_date: 2024-01-15
+  captured_by: "Jane Smith"
+  status: active | superseded | archived
+  superseded_by: "entities/customer.md"  # populated at Level 4+
+```
+
+- `type` identifies the baseline category and determines the subfolder
+- `source_system` names the platform or tool where the existing asset lives
+- `captured_date` is the date the baseline was documented (ISO 8601)
+- `captured_by` identifies who documented the baseline (person or agent)
+- `status` tracks the baseline's lifecycle: `active` (in use), `superseded` (replaced by canonical entity), or `archived` (retained for history)
+- `superseded_by` links to the canonical entity file that replaced this baseline (populated at Level 4+)
+
+##### Free-Form Body
+
+Below the metadata header, the body may contain any combination of:
+
+- Verbatim DDL in fenced code blocks (CREATE TABLE, ALTER TABLE, etc.)
+- dbt model SQL or schema.yml excerpts
+- Column listings (as Markdown tables, YAML, or plain text)
+- Catalog export data (classification, ownership, quality scores, lineage)
+- ETL/pipeline descriptions (schedule, dependencies, transformation logic)
+- Known data quality issues
+- Business context, historical notes, ERD fragments
+
+The format is deliberately flexible. Agents parse the body to extract structured information when needed — humans should not be required to structure it manually. Paste what you have; the agent handles the rest.
+
+##### What Baselines Do NOT Contain
+
+- **No type-specific YAML templates.** Earlier versions of this spec defined `dimensional:`, `canonical:`, `etl:`, and `catalog:` YAML blocks. These are no longer required. If an agent generates structured YAML from raw input, it appears in the free-form body as documentation — not as a required schema.
+- **No mapping blocks.** Baseline-to-canonical mappings are derived from source transforms (see below). Baselines do not carry `mapping:` blocks.
+
+---
+
+### **Mapping: Auto-Generated from Source Transforms**
+
+When a domain advances from Level 1 (Documented) to Level 2 (Mapped), the intellectual translation from existing assets to canonical entities is captured in **source transform files** ([Section 8 — Transformations](./8-Transformations.md)), not in baseline mapping blocks.
+
+This means mappings are derived from operational data flow definitions — the same transforms that will eventually generate ETL/ELT code. There is no separate "mapping" artifact to maintain.
+
+#### How Mappings Are Derived
+
+Source transform files in `sources/*/transforms/` define how source system fields map to canonical entity attributes. Each transform's `target` field points to a canonical attribute; each transform's `source` field points to a source system field. Together, these define the complete lineage from source to canonical model.
+
+For brownfield adoption, agents parse existing ETL logic to **propose** transform files:
+
+Input format | What the agent parses | Output
+--- | --- | ---
+SQL (SELECT, INSERT, MERGE) | Column aliases, JOIN conditions, WHERE filters, CASE expressions | `direct`, `derived`, `lookup`, `conditional` transforms
+dbt models (SQL + schema.yml) | ref() calls, column descriptions, tests, source() macros | Transforms + source declarations
+Stored procedures | Parameter mappings, cursor logic, conditional branches | Transforms with `derived` and `conditional` types
+Informatica / SSIS mappings | Source-to-target field maps, expression transforms, lookup transforms | Transforms matching the ETL tool's logic
+Natural-language descriptions | Entity and field references, business rules | Draft transforms marked with `# INFERRED` comments
+
+The agent produces draft transform files from existing ETL code. The human reviews and refines. This replaces the manual `mapping:` block — the transform file *is* the mapping, and it is also the specification for generating new ETL code.
+
+#### Reconciling Baseline Fields to Canonical Attributes
+
+To understand how a baseline's columns relate to canonical attributes, agents read the transform files and produce a **mapping view** on demand. This is a generated report, not a stored artifact:
+
+```text
+Baseline: baselines/dimensional/fact_transaction.md
+Canonical Entity: Transaction
+
+Baseline Column     | Transform Type | Canonical Attribute     | Transform File
+---                 | ---            | ---                     | ---
+transaction_id      | direct         | Transaction Identifier  | sources/cbs/transforms/table_transactions.md
+customer_key        | lookup         | Customer                | sources/cbs/transforms/table_transactions.md
+amount              | direct         | Amount                  | sources/cbs/transforms/table_transactions.md
+risk_score          | conditional    | Risk Rating             | sources/cbs/transforms/table_transactions.md
+etl_batch_id        | —              | (unmapped: technical)   | —
+dw_load_timestamp   | —              | (unmapped: technical)   | —
+```
+
+This view is generated by cross-referencing baseline column names against transform source fields. It is not stored in baseline files — it is computed when needed.
+
+---
+
+### **Adoption Journey Patterns**
+
+Four starting-point patterns cover the most common brownfield scenarios. **Pattern A is the recommended default** — most brownfield adoptions start with existing schemas.
+
+#### Pattern A: Starting from Existing Schemas (Primary Path)
+
+1. Provide existing DDL, dbt models, or schema descriptions to the **schema-import** skill
+2. Agent infers canonical entities, relationships, and enums — asks 2-3 clarifying questions
+3. Review and refine the draft canonical model
+4. Provide existing ETL code (SQL, dbt, stored procedures) — agent generates draft transform files
+5. Review transforms; agent produces a mapping view showing baseline-to-canonical coverage
+6. Establish governance metadata
+7. Use Agent Artifact to generate new physical artifacts from canonical model
+8. Reconcile generated vs existing — iterate until equivalent
+9. Cut over to MD-DDL-generated artifacts
+
+#### Pattern B: Starting from Existing Canonical/Enterprise Models
+
+1. Document existing canonical model as `baselines/canonical/` files
+2. Translate canonical entities to MD-DDL entity files (may be 1:1 or require restructuring)
+3. Validate against MD-DDL rules (attribute types, constraints, relationships)
+4. Map source systems via transform files
+5. Establish governance metadata
+6. Generate physical artifacts and reconcile with existing
+
+#### Pattern C: Starting from ETL/ELT Pipelines
+
+1. Document existing pipelines as `baselines/etl/` files
+2. Agent parses pipeline logic to extract entity patterns and propose transform files
+3. Create canonical entities from the target patterns
+4. Review and refine generated transforms
+5. Map source systems from pipeline sources
+6. Generate physical artifacts from canonical model
+
+#### Pattern D: Starting from Governance Catalog
+
+1. Export governance metadata as `baselines/catalog/` files
+2. Use classification, PII, ownership as seed data for domain and entity governance blocks
+3. Create canonical entities using catalog entity/table definitions
+4. Map source systems using catalog lineage; create transform files
+5. Generate physical artifacts from canonical model
+
+---
+
+### **Coexistence and Cutover**
+
+- **Coexistence is transitional** — the goal is always to reach Declarative or Automated maturity
+- While at maturity levels 1–3, both baseline files and canonical entities may coexist
+- At level 4 (Declarative), baseline files should be marked `status: superseded` with `superseded_by:` pointing to the canonical entity
+- At level 5 (Automated), baseline files may be `status: archived` or removed entirely
+- **No generation from baselines** — baselines are documentation only; Agent Artifact only generates from canonical entities in `entities/`
+- **Reconciliation** — at the level 3→4 transition, generated artifacts must be compared against existing state; differences must be intentional
+
+---
+
+### **Drift Detection**
+
+Drift detection becomes relevant at Level 4 (Declarative) when MD-DDL becomes the source of truth.
+
+#### Level 4 — Basic Drift Detection
+
+At Declarative maturity, the domain must have a mechanism to detect divergence between MD-DDL declarations and deployed physical state. The spec defines *what* drift means; the *mechanism* (CI/CD hooks, database introspection scripts, scheduled agent runs) is left to implementers since MD-DDL has no runtime.
+
+Drift exists when:
+
+- A deployed schema contains columns, tables, or constraints not declared in the MD-DDL model
+- The MD-DDL model declares attributes, entities, or constraints not present in the deployed schema
+- Data types, nullability, or constraint definitions differ between declaration and deployment
+
+When drift is detected, it should be flagged with:
+
+- The entity or attribute where drift occurred
+- The nature of the divergence (added, removed, modified)
+- A timestamp of when drift was detected
+
+#### Level 5 — Automated Drift Enforcement
+
+At Automated maturity, drift detection is integrated into CI/CD with remediation triggers:
+
+- Drift detection runs automatically on deployment and on a schedule
+- Detected drift blocks deployment or triggers automated remediation
+- Drift history is retained for audit
+
+---
+
+### **Domain Adoption Metadata**
+
+Domain metadata (defined in [Section 2 — Domains](./2-Domains.md)) is extended with an `adoption` block when a domain uses the brownfield adoption workflow.
+
+```yaml
+adoption:
+  maturity: documented | mapped | governed | declarative | automated
+  adoption_started: 2024-01-15
+  target_maturity: declarative
+  target_date: 2025-06-30
+  progress:
+    at_level: 12
+    total: 15
+  notes: "Phase 1 captured existing DW star schema. Next: complete governance metadata for Level 3."
+```
+
+Field | Required | Purpose
+--- | --- | ---
+`maturity` | Yes (when any baseline file exists) | Current adoption maturity level
+`adoption_started` | Yes | ISO 8601 date when the first baseline was captured
+`target_maturity` | No | The maturity level the domain is targeting
+`target_date` | No | ISO 8601 date by which the target maturity should be reached
+`progress` | No | Structured count of advancement within the current level. `at_level` is the number of entities/assets that have reached the current level's criteria. `total` is the total number of entities/assets in the domain. Agents use `at_level / total` to compute percentage and detect stalls.
+`notes` | No | Free-text migration context
+
+The `adoption` block is required once any baseline file exists in the domain. It is optional for greenfield domains that start directly at canonical modelling.
+
+---
+
+### **Portfolio-Level Adoption**
+
+Large enterprises may adopt MD-DDL domain-by-domain over months or years. Each domain tracks its own maturity independently. A portfolio-level adoption view can be assembled by reading all `domain.md` files and aggregating their `adoption` blocks. No portfolio-level metadata structure is defined in this version of the spec — this is deferred to a future version if demand warrants it.
+
+---
+
+### **Adoption Rules**
+
+1. **Maturity is domain-level.** Entities do not individually track maturity. The domain advances as a whole. Domain maturity equals the lowest level all entities have reached.
+
+2. **Baselines are documentation, not generation inputs.** Agent Artifact never generates from baselines. They are reference material for humans and for the reconciliation skill.
+
+3. **Baselines are agent-generated.** Users provide raw input (DDL, dbt models, catalog exports, descriptions). Agents produce the structured baseline file. Humans should not be expected to author YAML templates manually.
+
+4. **Coexistence is transitional.** Baselines exist to be superseded. The goal is always Declarative or Automated. Baseline files progress through `active` → `superseded` → `archived`.
+
+5. **No regression.** A domain cannot move to a lower maturity level. New entities or structural changes that create gaps are flagged as "incomplete at current level."
+
+6. **Mappings are derived from transforms.** Baseline-to-canonical mappings are not manually authored. They are derived from source transform files ([Section 8](./8-Transformations.md)) which define the operational data flow. The transform file *is* the mapping.
+
+7. **Schema-import is the primary brownfield path.** For organisations with existing schemas (DDL, dbt, catalog exports), schema-import produces a draft canonical model directly. Baseline-capture is an optional secondary path for audit, history, or when no schema is available.
+
+8. **Staleness prevents adoption decay.** Domains with a `target_date` that has passed without reaching `target_maturity` are flagged as "adoption stalled."
+
+9. **Drift detection starts at Level 4.** When MD-DDL becomes the source of truth, basic drift detection is required to maintain that status. Level 5 upgrades to automated enforcement.
+
+10. **Levels 4–5 require external tooling.** MD-DDL has no runtime. Drift detection, CI/CD integration, and automated deployment require tooling outside the spec. The spec defines what these levels mean; implementers build the infrastructure.

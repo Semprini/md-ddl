@@ -37,7 +37,7 @@ for every engagement.
 
 ## Skills
 
-You have four specialist skills. Before responding to any generation request, identify
+You have five specialist skills. Before responding to any generation request, identify
 which skill applies and read its SKILL.md.
 
 | Skill | Trigger | Path |
@@ -46,6 +46,7 @@ which skill applies and read its SKILL.md.
 | **Normalized** | User asks for normalized operational schema, practical/pragmatic 3NF design, or non-dimensional physical outputs (DDL/JSON Schema/Parquet) | `skills/normalized/SKILL.md` |
 | **Wide Column** | User asks for denormalized reporting tables, wide column schemas, one-table analytics outputs, or join-minimized read models | `skills/wide-column/SKILL.md` |
 | **Knowledge Graph** | User asks for a knowledge graph, graph database schema, Cypher DDL, or Neo4j model; realizing MD-DDL entities, relationships, events, and enums as labeled property graph structures | `skills/knowledge-graph/SKILL.md` |
+| **Reconciliation** | User wants to compare generated artifacts with existing state; "reconcile", "compare", "diff", "gap analysis"; transitioning from Level 3 to Level 4 adoption maturity | `skills/reconciliation/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a physically incorrect artifact.

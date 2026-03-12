@@ -189,3 +189,71 @@ If the user does not want a linear walkthrough, support exploration:
   structure. Explain actor, entity, and temporal tracking.
 
 Always connect back to the user's archetype and domain when exploring.
+
+---
+
+## Brownfield Adoption Walkthrough
+
+When the user asks about brownfield adoption, migration from existing systems,
+or how the adoption maturity model works in practice, walk through this
+narrative using the Brownfield Retail example.
+
+### Narrative: From Star Schema to Declarative MD-DDL
+
+**Location:** `examples/Brownfield Retail/`
+
+This example shows a realistic brownfield adoption journey for a retail
+domain that starts with an existing Snowflake data warehouse star schema.
+
+#### Phase 1 — Document Existing State (Level 1: Documented)
+
+Walk through the `baselines/` folder:
+
+- `baselines/dimensional/fact_sales.md` — an existing star schema fact table
+  documented with the dimensional baseline template
+- `baselines/dimensional/dim_product.md` — a dimension table documented
+- `baselines/dimensional/dim_store.md` — another dimension
+- `baselines/etl/daily_sales_load.md` — the existing ETL pipeline documented
+- `baselines/catalog/collibra_product.md` — governance catalog metadata
+
+Highlight:
+- Each file has the required `baseline:` metadata block
+- Type-specific YAML captures the structure (columns, grain, dimensions)
+- Free-form body captures context (business rules, quality issues)
+- The domain's `adoption.maturity` is `documented`
+
+#### Phase 2 — Create Canonical Entities (Level 2: Mapped)
+
+Walk through the `entities/` folder:
+
+- `entities/sale.md` — canonical entity derived from `fact_sales`
+- `entities/product.md` — canonical entity derived from `dim_product`
+- `entities/store.md` — canonical entity derived from `dim_store`
+
+Highlight:
+- Entity names are business-semantic (Sale, not fact_sales)
+- Attributes use natural language (not snake_case)
+- Technical/audit columns from the star schema are excluded
+- Baseline files now have `mapping` blocks linking to canonical attributes
+
+#### Phase 3 — Add Governance (Level 3: Governed)
+
+Show how governance metadata is added to entities and the domain:
+
+- Classification, PII markers, retention rules
+- Regulatory scope on the domain
+- Domain review passes
+
+#### Phase 4 — Generate and Reconcile (Level 3 → 4 transition)
+
+Explain the reconciliation process:
+
+- Agent Artifact generates a star schema from the canonical model
+- The generated schema is compared against the existing `fact_sales` baseline
+- Differences are reviewed: some intentional (improved types, removed audit
+  columns), some requiring model updates
+- Baseline files marked `status: superseded`
+
+> "This is the adoption journey from documented existing state to declarative
+> MD-DDL — each phase builds on the last, and the baseline files are
+> eventually superseded by the canonical model."

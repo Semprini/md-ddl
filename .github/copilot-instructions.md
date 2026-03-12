@@ -42,18 +42,21 @@ agents/
     skills/
       orientation/             Role profiling, MD-DDL overview, workflow mapping
       concept-explorer/        Interactive spec teaching with analogies
-      worked-examples/         Simple Customer + Financial Crime walkthroughs
+      worked-examples/         Simple Customer + Financial Crime + Brownfield Retail walkthroughs
+      adoption-planning/       Brownfield adoption assessment and roadmap planning
       platform-setup/          VS Code Copilot + Claude Code setup and workflow
 
   agent-ontology/             Discovery and design agent
     AGENT.md                  Core prompt — identity, modes, skill index
     skills/
-      domain-scoping/         Interview protocol + Domains spec
+      domain-scoping/         Interview protocol + Domains spec (includes brownfield baseline-to-canonical path)
       entity-modelling/       Concept realisation + Entities + Enumerations spec
       relationship-events/    Relationships + Events spec
       standards-alignment/    Industry standards mapping (self-contained)
       source-mapping/         Source system declaration + field-level transformations
       domain-review/          Structural and decision-quality review protocol
+      baseline-capture/       Document existing schemas, ETL, catalog as baselines
+      schema-import/          Fast-track DDL-to-domain inference (brownfield)
 
   agent-artifact/             Physical artifact generation agent
     AGENT.md                  Core prompt — identity, modes, skill index
@@ -62,6 +65,7 @@ agents/
       normalized/                      Normalized operational schema, DDL/JSON Schema/Parquet
       wide-column/                     Denormalized wide-column reporting schemas
       knowledge-graph/                 Knowledge graph schema, Neo4j Cypher DDL
+      reconciliation/                  Compare generated artifacts against existing state
 
   agent-architect/            Strategic design and data product publication agent
     AGENT.md                  Core prompt — identity, modes, skill index

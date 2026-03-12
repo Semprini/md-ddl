@@ -67,6 +67,67 @@ Consumer-aligned products are the primary trigger for physical artifact generati
 
 ---
 
+### **Platform Posture**
+
+Organisations differ fundamentally in how they relate data products to platforms. This architectural decision shapes which product classes apply, what artifacts get generated, and what infrastructure is assumed. The platform posture must be established before designing data products.
+
+MD-DDL defines three platform postures:
+
+#### Single-Platform
+
+All data products are self-contained on one platform (e.g., Snowflake, Databricks, BigQuery). Source ingestion, transformation, canonical storage, and consumer access all happen within the same platform.
+
+- **Effect on classes:** All three classes (source-aligned, domain-aligned, consumer-aligned) are typically recognised as data products
+- **Effect on artifacts:** Agent Artifact generates for one target platform; `schema_type` maps directly to platform-native constructs
+- **Effect on infrastructure:** Minimal integration complexity; the platform provides compute, storage, and access control
+- **Typical pattern:** Source-aligned = raw/staging schemas; domain-aligned = curated schemas; consumer-aligned = materialized views or denormalized tables
+
+#### Polyglot
+
+Different product classes leverage different platforms and technologies depending on the data's lifecycle stage and access pattern. The organisation accepts that data products span infrastructure boundaries.
+
+- **Effect on classes:** Each class may target a different platform stack:
+  - **Source-aligned** — CDC, streaming (Kafka, Flink), operational data stores, event buses
+  - **Domain-aligned / foundational** — polyglot persistence (relational + document + graph), analytical and operational interfaces, potentially spanning OLTP and OLAP stores
+  - **Consumer-aligned** — purpose-built for the consumer's query engine (data warehouse, API layer, search index, dashboard cache)
+- **Effect on artifacts:** Agent Artifact may need to generate for multiple target platforms per domain; `schema_type` maps to platform-appropriate constructs for each product
+- **Effect on infrastructure:** Higher integration complexity; requires cross-platform lineage tracking, consistent governance enforcement, and potentially different access control mechanisms per platform
+
+#### Selective Scope
+
+The organisation does not consider all classes as "data products." Some layers are treated as infrastructure or engineering concerns rather than governed, published products.
+
+- **Common pattern:** Source-aligned feeds are infrastructure (CDC pipelines, staging areas) managed by data engineering — not declared as data products. Only domain-aligned and consumer-aligned outputs are governed as products.
+- **Alternative pattern:** Only consumer-aligned outputs are products. Domain-aligned canonical models are internal reference architectures, not published products.
+- **Effect on MD-DDL:** Product classes that fall outside the org's product scope are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms still exist in `sources/` regardless of whether source-aligned products are declared.
+
+#### Declaring Platform Posture
+
+Platform posture is declared in domain metadata under the `platform` block:
+
+```yaml
+platform:
+  posture: single-platform | polyglot | selective
+  technologies:
+    - "Snowflake"
+  product_scope:
+    - source-aligned
+    - domain-aligned
+    - consumer-aligned
+  notes: "All data products are self-contained in Snowflake."
+```
+
+Field | Required | Purpose
+--- | --- | ---
+`posture` | Yes (when `platform` block exists) | The organisation's platform strategy for this domain
+`technologies` | No | List of platforms and technologies used by data products in this domain
+`product_scope` | No | Which product classes the organisation recognises as data products. Defaults to all three. If omitted, all classes are in scope.
+`notes` | No | Free-text context on platform decisions, constraints, or migration plans
+
+Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy. When all domains share the same posture, use consistent values across domain files.
+
+---
+
 ### **Data Product Declaration**
 
 A data product is declared using a **level-3 Markdown heading** inside a detail file stored in the `products/` subfolder of the domain:
@@ -368,6 +429,16 @@ Product detail files follow the same structural rules as entity detail files:
 9. **Two-layer compliance.** Every data product must appear in both the domain file summary table and a detail file. The domain file is the index; the detail file is the contract.
 
 10. **Name uniqueness.** Data product names must be unique within a domain. The level-3 heading is the product's identity in the Knowledge Graph.
+
+---
+
+### **Brownfield Adoption Note**
+
+In brownfield adoption contexts (see [Section 10 — Adoption](./10-Adoption.md)):
+
+- At maturity levels 1–2, data products may reference existing physical artifacts that are not yet MD-DDL-generated
+- At maturity level 4+, all data products should be generated from MD-DDL declarations
+- Products can begin their lifecycle at `Draft` even when based on existing physical artifacts — the product declaration documents intent while the underlying assets are being migrated to declarative MD-DDL
 
 ---
 

@@ -17,7 +17,8 @@ $sectionFiles = @(
     "6-Events.md",
     "7-Sources.md",
     "8-Transformations.md",
-    "9-Data-Products.md"
+    "9-Data-Products.md",
+    "10-Adoption.md"
 )
 
 $files = foreach ($name in $sectionFiles) {

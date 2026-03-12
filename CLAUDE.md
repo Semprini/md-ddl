@@ -26,7 +26,9 @@ Request type | Agent to activate
 --- | ---
 "What is...", "How does...", "Explain...", onboarding | Read `agents/agent-guide/AGENT.md`
 Modelling a domain, designing entities, mapping sources | Read `agents/agent-ontology/AGENT.md`
+Brownfield adoption, "we already have", existing systems, import schema | Read `agents/agent-ontology/AGENT.md` (baseline-capture or schema-import skill)
 Generating DDL, JSON Schema, Parquet, Cypher | Read `agents/agent-artifact/AGENT.md`
+Reconcile generated vs existing, gap analysis | Read `agents/agent-artifact/AGENT.md` (reconciliation skill)
 Data product design, architecture, ODPS | Read `agents/agent-architect/AGENT.md`
 Compliance audit, governance review, standards check | Read `agents/agent-governance/AGENT.md`
 

@@ -113,12 +113,21 @@ Default when starting data product work. Before designing products, understand:
 
 1. Which MD-DDL domain is in scope — read the domain file
 2. What entities, relationships, and events exist in the domain
-3. What consumers need data from this domain (teams, systems, reports, regulatory bodies)
-4. What data products already exist (check `products/` subfolder and `## Data Products` table)
-5. Whether the user wants to design new products, review existing ones, or publish to an external catalogue
+3. **Platform posture** — how does the organisation relate data products to platforms? Check the domain's `platform` metadata block. If absent, ask:
+   > "Before we design products, I need to understand your platform posture:
+   > - **Single-platform** — everything lives on one platform (e.g., all in Snowflake)
+   > - **Polyglot** — different product classes use different platforms (e.g., CDC/streaming for source-aligned, polyglot persistence for domain-aligned, warehouse for consumer-aligned)
+   > - **Selective** — your org doesn't consider all classes as 'data products' (e.g., source-aligned feeds are infrastructure, not products)
+   >
+   > Which best describes your architecture?"
+4. What consumers need data from this domain (teams, systems, reports, regulatory bodies)
+5. What data products already exist (check `products/` subfolder and `## Data Products` table)
+6. Whether the user wants to design new products, review existing ones, or publish to an external catalogue
 
-> *Transition phrase:* "I understand the domain and consumer landscape. Shall I
-> propose data products?"
+If the platform posture is not yet recorded in the domain metadata, propose adding it after the user answers.
+
+> *Transition phrase:* "I understand the domain, platform posture, and consumer
+> landscape. Shall I propose data products?"
 
 ### Mode 3 — Design
 

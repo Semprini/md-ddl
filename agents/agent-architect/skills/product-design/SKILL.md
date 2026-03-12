@@ -36,7 +36,27 @@ Read the domain file and build a mental model:
 - What governance defaults are declared?
 - Do any data products already exist?
 
-### Step 2 — Identify Consumers
+### Step 2 — Establish Platform Posture
+
+Check the domain's `platform` metadata block. If present, use it to scope the
+design. If absent, ask the platform posture question (see Agent Architect
+Mode 2 — Assessment).
+
+Platform posture affects design decisions throughout this process:
+
+- **Single-platform:** All product classes generate for the same target. Schema
+  type choices map directly to platform-native constructs.
+- **Polyglot:** Each product class may target a different platform. Source-aligned
+  products may use streaming/CDC constructs rather than batch tables.
+  Domain-aligned products may need both analytical and operational interfaces.
+  Consumer-aligned products target the consumer's query engine.
+- **Selective:** Skip product classes the org does not recognise. If
+  `product_scope` excludes `source-aligned`, do not propose source-aligned
+  products — the source layer is infrastructure, not a governed product.
+
+If the platform posture is not yet in the domain metadata, propose adding it.
+
+### Step 3 — Identify Consumers
 
 Ask the user:
 
@@ -48,7 +68,7 @@ Ask the user:
 
 Group consumers by access pattern — consumers with similar needs may share a product.
 
-### Step 3 — Choose Product Class
+### Step 4 — Choose Product Class
 
 For each distinct consumer group, determine the product class:
 
@@ -68,7 +88,7 @@ Does the consumer need data reshaped, denormalized, aggregated, or combined from
 - **Consumer-aligned** is where most design effort goes. This is where you choose
   schema type, masking, and cross-domain scope.
 
-### Step 4 — Scope Entities
+### Step 5 — Scope Entities
 
 For each product, determine which entities to include:
 
@@ -86,7 +106,7 @@ For each product, determine which entities to include:
 - Every entity in the list must exist in the domain's `## Entities` table or in a
   declared `cross_domain` domain.
 
-### Step 5 — Choose Schema Type
+### Step 6 — Choose Schema Type
 
 For consumer-aligned products, recommend a `schema_type` based on the consumption pattern:
 
@@ -104,7 +124,7 @@ Domain-aligned products typically do not declare `schema_type` because their sha
 matches the canonical model. If a domain-aligned product needs physical generation,
 `normalized` is the default.
 
-### Step 6 — Set Governance Overrides
+### Step 7 — Set Governance Overrides
 
 Products inherit governance from the domain by default. Only declare overrides when
 the product requires different controls:
@@ -148,7 +168,7 @@ Strategy | Use When
 `tokenize` | Need reversible masking with a tokenization service
 `null` | Value should not appear at all in the published output
 
-### Step 7 — Declare SLA and Refresh
+### Step 8 — Declare SLA and Refresh
 
 For products serving operational consumers, declare:
 
@@ -166,7 +186,7 @@ runtime enforcement.
 
 Refresh options: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
 
-### Step 8 — Write the Product Declaration
+### Step 9 — Write the Product Declaration
 
 Produce the MD-DDL product declaration following this structure:
 
@@ -210,7 +230,7 @@ cross_domain:                # only for consumer-aligned spanning domains
 ```
 ````
 
-### Step 9 — Update the Domain Summary Table
+### Step 10 — Update the Domain Summary Table
 
 Add or update the entry in the domain file's `## Data Products` section:
 

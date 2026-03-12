@@ -59,7 +59,7 @@ Ask:
 
 This surfaces the canonical vs. bounded context decision (see Modelling Strategy).
 
-### Step 4 — Governance Posture
+### Step 4 — Governance and Platform Posture
 Capture the metadata inputs. These cannot be inferred.
 
 Ask:
@@ -68,8 +68,13 @@ Ask:
 - Are there regulatory frameworks that apply (GDPR, AML, APRA, SOX, etc.)?
 - How long does data in this domain need to be retained?
 - What source systems feed this domain?
+- How does the organisation relate data products to platforms? (single-platform, polyglot, or selective — see Section 9, Platform Posture)
 
 If the user does not know, mark the relevant YAML fields with `# TODO:` and proceed.
+
+Platform posture is typically an organisation-wide decision that shapes
+downstream data product design. Recording it early in domain scoping ensures
+Agent Architect has the context it needs.
 
 ### Step 5 — Standards Check
 Before drafting, check whether Standards Alignment applies.
@@ -136,6 +141,63 @@ Source Mapping, etc.) for just the change in question. Update:
 2. The relevant summary tables in the domain file
 3. The domain `version` field per version-bump rules
 4. The domain overview diagram if entities or relationships changed
+
+### Brownfield Step 5 — Baseline-to-Canonical Translation
+
+Use this step when the user has baseline files (in `baselines/`) and wants to
+create canonical entities from them. This extends the brownfield path for
+adoption scenarios. See `md-ddl-specification/10-Adoption.md` for the full
+adoption maturity model.
+
+**Triggers:**
+
+- "Translate baseline to canonical"
+- "Create entities from baselines"
+- "We have documented our existing state, now we want to model it"
+- User has baselines and wants to advance from Level 1 (Documented) to
+  Level 2 (Mapped)
+
+**Process:**
+
+1. **Read baseline files** as input context. Load the relevant `baselines/`
+   files to understand what existing assets have been documented.
+
+2. **Propose entity structure** derived from baselines:
+   - From dimensional baselines: facts → business process entities,
+     dimensions → business entities
+   - From canonical baselines: existing entities → MD-DDL entities (may be
+     1:1 or require restructuring)
+   - From ETL baselines: pipeline targets → candidate entities
+   - From catalog baselines: catalog assets → candidate entities
+
+3. **Apply entity-modelling skill** for each proposed entity. Use the
+   standard Entity Modelling skill for attribute decisions, type choices,
+   and structural patterns.
+
+4. **Create source transform files.** For each canonical entity, create
+   transform files in `sources/*/transforms/` that define how source fields
+   map to canonical attributes. If existing ETL code is available, parse it
+   to generate draft transforms (see schema-import skill, Part 4). The
+   transform file *is* the mapping — no separate mapping block is needed.
+
+5. **Update domain adoption maturity.** When all identified entities have
+   been created and transform files exist, update the domain metadata:
+   `adoption.maturity: mapped`
+
+6. **Propose mapping blocks.** For each baseline file, suggest the `mapping`
+   block content linking baseline fields to canonical attributes. Include
+   `unmapped_fields` for technical/audit columns that have no canonical
+   equivalent.
+
+**Boundary:** This step creates canonical entities and proposes mapping blocks.
+It does not create baseline files (that is the baseline-capture skill's job)
+and does not generate physical artifacts (that is Agent Artifact's job).
+
+**Relationship to schema-import:** The schema-import skill provides a
+fast-track path for users who have DDL and want to jump straight to a draft
+domain. This brownfield step is the deeper, interview-driven route for
+translating baselines that are not raw DDL (ETL pipelines, catalog metadata,
+natural-language descriptions). Both paths converge at Level 2 (Mapped).
 
 ---
 

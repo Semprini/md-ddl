@@ -37,6 +37,8 @@ Governance & Security|classification, pii|The default security posture for the e
 Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
 Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
 Discovery|tags|Searchability
+Adoption|adoption (maturity, adoption_started, target_maturity, target_date, progress, notes)|Brownfield adoption tracking. Required when `baselines/` exists. See [Section 10 — Adoption](./10-Adoption.md).
+Platform|platform (posture, technologies, product_scope, notes)|How data products relate to infrastructure. See [Section 9 — Data Products](./9-Data-Products.md#platform-posture).
 
 #### **Metadata Format**
 

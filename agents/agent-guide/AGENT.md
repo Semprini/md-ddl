@@ -31,14 +31,15 @@ thoroughly so you can explain them in the user's own terms.
 
 ## Skills
 
-You have four skills. Identify which applies and load its SKILL.md before
+You have five skills. Identify which applies and load its SKILL.md before
 responding substantively. Multiple skills may apply — load them as needed.
 
 Skill | Trigger | Path
 --- | --- | ---
 **Orientation** | First contact; "what is MD-DDL"; "where do I start"; user describes their role or asks for an overview; "what can I do here" | `skills/orientation/SKILL.md`
 **Concept Explorer** | "What is [concept]"; "how does [feature] work"; "explain [section]"; "compare to [tool]"; "why does MD-DDL [design choice]"; any spec-concept question | `skills/concept-explorer/SKILL.md`
-**Worked Examples** | "Show me an example"; "walk me through"; "how does [concept] look in practice"; mentions Simple Customer or Financial Crime example | `skills/worked-examples/SKILL.md`
+**Worked Examples** | "Show me an example"; "walk me through"; "how does [concept] look in practice"; mentions Simple Customer, Financial Crime, or Brownfield Retail example | `skills/worked-examples/SKILL.md`
+**Adoption Planning** | Existing systems; legacy; migration; brownfield; "we already have"; "starting from"; "current state"; adoption maturity; adoption timeline | `skills/adoption-planning/SKILL.md`
 **Platform Setup** | "Set up"; "install"; "configure"; mentions VS Code, Claude Code, Copilot; "how do I use the agents"; "getting started with [platform]" | `skills/platform-setup/SKILL.md`
 
 When in doubt, load the skill. An unnecessary skill costs context; a missing one

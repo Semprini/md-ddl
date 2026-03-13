@@ -31,6 +31,7 @@ Generating DDL, JSON Schema, Parquet, Cypher | Read `agents/agent-artifact/AGENT
 Reconcile generated vs existing, gap analysis | Read `agents/agent-artifact/AGENT.md` (reconciliation skill)
 Data product design, architecture, ODPS | Read `agents/agent-architect/AGENT.md`
 Compliance audit, governance review, standards check | Read `agents/agent-governance/AGENT.md`
+Review, evaluate, audit the standard itself | Read `.prompts/md-ddl-layered-review-process.md` for orchestration, then the appropriate layer prompt
 
 When activating an agent, also follow its skill-loading protocol — read the applicable `SKILL.md` files before responding.
 
@@ -44,3 +45,5 @@ MD-DDL uses **agent-driven quality review**, not traditional linting. The two-ti
 - Foundation principles: `md-ddl-specification/1-Foundation.md`
 - Complete spec (single file for AI context): `md-ddl-specification/MD-DDL-Complete.md`
 - Examples: `examples/`
+- Review and evaluation prompts: `.prompts/`
+- Spec concatenation rules: `.prompts/concat-md-ddl-specs.prompt.md`

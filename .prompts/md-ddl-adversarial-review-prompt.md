@@ -23,7 +23,7 @@ Read these files first:
    `agents/agent-artifact/AGENT.md`, `agents/agent-architect/AGENT.md`,
    `agents/agent-governance/AGENT.md`
 4. `examples/Financial Crime/domain.md` — the reference example
-5. `.github/copilot-instructions.md` — contributor guidance
+5. Contributor instructions — `.github/copilot-instructions.md` or `CLAUDE.md`
 
 ---
 
@@ -64,6 +64,10 @@ architecture would cause incorrect output. Not theoretical — concrete.
 - What happens when the user knows more than the agent about their domain?
 - Where do the non-negotiable rules conflict with each other?
 
+Include Agent Guide in this analysis — probe whether onboarding flows correctly
+route users to specialist agents, and whether the Guide's demonstrations could
+be mistaken for production artifacts.
+
 ### 3. Cross-Agent Handoff Failures — Where Do Things Fall Through?
 
 Simulate a handoff that goes wrong. Identify:
@@ -73,8 +77,9 @@ Simulate a handoff that goes wrong. Identify:
 - What happens when a product design reveals missing entities but the user doesn't
   switch to Agent Ontology?
 - Where do circular handoffs occur (A defers to B, B defers back to A)?
+- What happens when Agent Guide hands off to a specialist but the user isn't ready?
 
-### 4. Example Quality — What's Wrong with the Financial Crime Example?
+### 4. Example Quality — What's Wrong with the Examples?
 
 The Financial Crime example is the project's quality benchmark. Find its weaknesses:
 
@@ -86,6 +91,15 @@ The Financial Crime example is the project's quality benchmark. Find its weaknes
 - Are the source mappings and transformations realistic?
 - Are the data products well-designed for real consumer needs?
 
+Also probe the other examples (Healthcare, Telecom, Retail Sales, Retail Service,
+Brownfield Retail, Simple Customer):
+
+- Do industry-specific examples use accurate industry standards references?
+- Does the Brownfield Retail example genuinely demonstrate the adoption maturity
+  model from Section 10, or is it superficial?
+- Are newer examples at the same quality level as Financial Crime, or are there
+  visible gaps?
+
 ### 5. Validation Philosophy Robustness
 
 The standard explicitly rejects traditional linting above syntax level (see `1-Foundation.md` "Validation Model"). Probe whether this philosophy holds up in practice:
@@ -95,8 +109,6 @@ The standard explicitly rejects traditional linting above syntax level (see `1-F
 - **Pre-flight check scope creep risk.** The spec defines exactly 5 pre-flight checks. What prevents a sixth check being added casually? Is there a mechanism (spec version bump requirement) that makes scope expansion a deliberate decision rather than a silent accumulation? If the mechanism exists only as text in the spec, how would a contributor know to check?
 - **Agents as quality layer — can they actually deliver?** The spec defers Levels 2–5 entirely to agents. Is there any category of structural gap (e.g., completely missing `governance:` block) where no agent would currently catch it? Is the handoff between pre-flight checks and agent review gapless?
 - **Vocabulary deviation pathway.** When an agent flags "potential spec vocabulary gap", where does that signal go? Is there a community contribution mechanism? If not, the feedback loop the philosophy depends on does not yet exist.
-
----
 
 ### 6. Specification Internal Contradictions
 
@@ -108,7 +120,7 @@ Search for rules in the spec that contradict each other or create ambiguity:
 - Where the spec is silent on something that a rule implies should be addressed
 - Where examples in the spec demonstrate patterns that conflict with stated rules
 
-### 6. Scalability Stress Test
+### 7. Scalability Stress Test
 
 Evaluate how the standard and agents would handle scale:
 
@@ -118,7 +130,7 @@ Evaluate how the standard and agents would handle scale:
 - A single entity with 50+ attributes — does the YAML format scale?
 - 10+ data products from a single domain — does the product layer scale?
 
-### 7. Governance Model Stress Test
+### 8. Governance Model Stress Test
 
 Push the governance model to its limits:
 
@@ -128,7 +140,19 @@ Push the governance model to its limits:
 - A source system that feeds PII into a domain that doesn't declare PII handling
 - Governance metadata that is technically valid but operationally meaningless
 
-### 8. Where Would AI Evaluation Miss the Problem?
+### 9. Adoption Model Stress Test
+
+Probe the brownfield adoption model (Section 10):
+
+- What happens when baseline capture reveals a schema too messy to map cleanly?
+- Does the maturity ladder (documented → mapped → governed → canonical) reflect
+  real-world adoption patterns, or does it impose an unrealistic linear progression?
+- When baseline files are superseded by canonical entities, is the transition
+  traceable or does it create orphaned references?
+- Can the adoption model handle partial adoption — some domains canonical,
+  others still at baseline — without inconsistency?
+
+### 10. Where Would AI Evaluation Miss the Problem?
 
 This is the meta-question. For each finding above, annotate:
 

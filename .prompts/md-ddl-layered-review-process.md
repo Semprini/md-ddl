@@ -26,7 +26,7 @@ declaring what each layer cannot assess.
 
 ### Layer 1 — Structural Review (Boolean / Mechanical)
 
-**Prompt:** `.github/md-ddl-review-prompt.md`
+**Prompt:** `.prompts/md-ddl-review-prompt.md`
 
 **Lens:** "Is the repository internally consistent?"
 
@@ -54,7 +54,7 @@ declaring what each layer cannot assess.
 
 ### Layer 2 — Adversarial Review (Find What's Wrong)
 
-**Prompt:** `.github/md-ddl-adversarial-review-prompt.md`
+**Prompt:** `.prompts/md-ddl-adversarial-review-prompt.md`
 
 **Lens:** "What would break, fail, or mislead?"
 
@@ -84,7 +84,7 @@ the one that produced the content being reviewed.
 
 ### Layer 3 — Stakeholder Simulation (Fitness for Purpose)
 
-**Prompt:** `.github/md-ddl-evaluation-prompt.md`
+**Prompt:** `.prompts/md-ddl-evaluation-prompt.md`
 
 **Lens:** "Would real people find this useful?"
 

@@ -15,7 +15,7 @@ of the standard, agents, skills, and examples.
 Read the layered review process document:
 
 <review_process>
-{{INCLUDE: ../md-ddl-layered-review-process.md}}
+{{INCLUDE: ../../.prompts/md-ddl-layered-review-process.md}}
 </review_process>
 
 ## Determining which layer to run
@@ -24,9 +24,9 @@ Based on the user's request, select the appropriate layer:
 
 Request pattern | Layer | Prompt to load
 --- | --- | ---
-"Review" / "check" / "structural review" | Layer 1 | `.github/md-ddl-review-prompt.md`
-"Find weaknesses" / "adversarial" / "stress test" / "what's wrong" | Layer 2 | `.github/md-ddl-adversarial-review-prompt.md`
-"Evaluate" / "stakeholder" / "would users adopt" / "personas" | Layer 3 | `.github/md-ddl-evaluation-prompt.md`
+"Review" / "check" / "structural review" | Layer 1 | `.prompts/md-ddl-review-prompt.md`
+"Find weaknesses" / "adversarial" / "stress test" / "what's wrong" | Layer 2 | `.prompts/md-ddl-adversarial-review-prompt.md`
+"Evaluate" / "stakeholder" / "would users adopt" / "personas" | Layer 3 | `.prompts/md-ddl-evaluation-prompt.md`
 "Full review" / "layered review" / "comprehensive" | All layers | Run 1 → 2 → 3 in order
 
 If ambiguous, ask the user which layer they want. If they say "just review it,"

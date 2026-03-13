@@ -39,27 +39,39 @@ Read these files in order. You need the full context to simulate authentic inter
 7. `md-ddl-specification/7-Sources.md` — source system declarations
 8. `md-ddl-specification/8-Transformations.md` — transformation vocabulary
 9. `md-ddl-specification/9-Data-Products.md` — data product classes and declarations
+10. `md-ddl-specification/10-Adoption.md` — brownfield adoption and maturity model
 
 ### Agents (read AGENT.md and each skill's SKILL.md)
 
-1. `agents/agent-ontology/AGENT.md` — discovery and design agent
-2. `agents/agent-ontology/skills/domain-scoping/SKILL.md`
-3. `agents/agent-ontology/skills/entity-modelling/SKILL.md`
-4. `agents/agent-ontology/skills/relationship-events/SKILL.md`
-5. `agents/agent-ontology/skills/standards-alignment/SKILL.md`
-6. `agents/agent-ontology/skills/domain-review/SKILL.md`
-7. `agents/agent-artifact/AGENT.md` — physical artifact generation agent
-8. `agents/agent-artifact/skills/dimensional/SKILL.md`
-9. `agents/agent-artifact/skills/normalized/SKILL.md`
-10. `agents/agent-artifact/skills/wide-column/SKILL.md`
-11. `agents/agent-artifact/skills/knowledge-graph/SKILL.md`
-12. `agents/agent-architect/AGENT.md` — strategic design and data product publication agent
-13. `agents/agent-architect/skills/product-design/SKILL.md`
-14. `agents/agent-architect/skills/odps-alignment/SKILL.md`
-15. `agents/agent-governance/AGENT.md` — standards conformance and compliance assurance agent
-16. `agents/agent-governance/skills/standards-conformance/SKILL.md`
-17. `agents/agent-governance/skills/compliance-audit/SKILL.md`
-18. `agents/agent-governance/skills/regulatory-compliance/SKILL.md`
+1. `agents/agent-guide/AGENT.md` — learning and navigation agent
+2. `agents/agent-guide/skills/orientation/SKILL.md`
+3. `agents/agent-guide/skills/concept-explorer/SKILL.md`
+4. `agents/agent-guide/skills/worked-examples/SKILL.md`
+5. `agents/agent-guide/skills/adoption-planning/SKILL.md`
+6. `agents/agent-guide/skills/platform-setup/SKILL.md`
+7. `agents/agent-ontology/AGENT.md` — discovery and design agent
+8. `agents/agent-ontology/skills/domain-scoping/SKILL.md`
+9. `agents/agent-ontology/skills/entity-modelling/SKILL.md`
+10. `agents/agent-ontology/skills/relationship-events/SKILL.md`
+11. `agents/agent-ontology/skills/standards-alignment/SKILL.md`
+12. `agents/agent-ontology/skills/source-mapping/SKILL.md`
+13. `agents/agent-ontology/skills/domain-review/SKILL.md`
+14. `agents/agent-ontology/skills/baseline-capture/SKILL.md`
+15. `agents/agent-ontology/skills/schema-import/SKILL.md`
+16. `agents/agent-ontology/skills/preflight/SKILL.md`
+17. `agents/agent-artifact/AGENT.md` — physical artifact generation agent
+18. `agents/agent-artifact/skills/dimensional/SKILL.md`
+19. `agents/agent-artifact/skills/normalized/SKILL.md`
+20. `agents/agent-artifact/skills/wide-column/SKILL.md`
+21. `agents/agent-artifact/skills/knowledge-graph/SKILL.md`
+22. `agents/agent-artifact/skills/reconciliation/SKILL.md`
+23. `agents/agent-architect/AGENT.md` — strategic design and data product publication agent
+24. `agents/agent-architect/skills/product-design/SKILL.md`
+25. `agents/agent-architect/skills/odps-alignment/SKILL.md`
+26. `agents/agent-governance/AGENT.md` — standards conformance and compliance assurance agent
+27. `agents/agent-governance/skills/standards-conformance/SKILL.md`
+28. `agents/agent-governance/skills/compliance-audit/SKILL.md`
+29. `agents/agent-governance/skills/regulatory-compliance/SKILL.md`
 
 ### Reference examples (read domain + at least 3 entity files + 1 source + 1 product)
 
@@ -69,6 +81,14 @@ Read these files in order. You need the full context to simulate authentic inter
 4. `examples/Financial Crime/entities/account.md`
 5. `examples/Financial Crime/products/analytics.md`
 6. `examples/Financial Crime/sources/salesforce-crm/source.md`
+
+### Additional examples (skim for breadth)
+
+7. `examples/Brownfield Retail/domain.md` — adoption maturity model demonstration
+8. `examples/Healthcare/domain.md` — FHIR-aligned industry example
+9. `examples/Telecom/domain.md` — TM Forum SID-aligned industry example
+10. `examples/Retail Sales/domain.md` — retail domain example
+11. `examples/Retail Service/domain.md` — retail service domain example
 
 ---
 
@@ -90,13 +110,13 @@ industry-neutral or implicitly biased toward any one sector.
 **Role:** Senior Data Modeller, Enterprise Data Architecture
 **Background:** 12 years modelling experience. Fluent in ER diagrams, UML, and 3NF.
 Has used Erwin, PowerDesigner, and dbt. New to MD-DDL but experienced with
-Markdown-native tooling. Works in a large insurance company.
+Markdown-native tooling (docs-as-code). Works at a mid-size insurer.
 
 **Goals:**
 
-- Model a new Claims domain from scratch using MD-DDL
-- Understand how MD-DDL handles inheritance (Person → Employee → Adjuster)
-- Decide when to use an entity vs an enum vs an attribute
+- Understand MD-DDL's conceptual model and how it maps to what she knows
+- Model a Claims domain from scratch using Agent Ontology
+- Validate her model against industry standards (ACORD for insurance)
 - Produce a domain file and entity detail files that pass peer review
 
 **Pain points:**
@@ -141,62 +161,61 @@ developer but reads YAML comfortably. Works at a mid-size bank.
 ### Persona 3 — The Data Risk Manager
 
 **Name:** Priya Sharma
-**Role:** Head of Data Risk, Group Risk Function
-**Background:** 15 years in risk management and regulatory compliance. Reports to
-CRO. Responsible for ensuring the organisation's data assets comply with prudential
-standards. Not hands-on with data modelling but reviews and approves governance postures.
-Works at a large Australian bank with NZ subsidiary.
+**Role:** Head of Data Risk, Group Risk Office
+**Background:** 10 years in risk and compliance, 5 years focused on data risk.
+Responsible for regulatory compliance across AU/NZ operations. Reviews data
+domains for regulatory coverage. Not a modeller — reads the output, not the process.
 
 **Goals:**
 
-- Audit the Financial Crime domain's compliance posture against APRA CPS 234, RBNZ, and FATF
-- Identify gaps where entities contain PII without adequate governance metadata
-- Assess whether data products expose sensitive data with insufficient masking
-- Get a board-ready summary of compliance gaps and remediation priorities
+- Audit an existing MD-DDL domain against APRA CPS 234, RBNZ BS11, and FATF Recommendations
+- Verify that PII handling meets both AU and NZ requirements
+- Identify gaps that would be flagged in a regulatory examination
+- Produce a structured finding report for the risk committee
 
 **Pain points:**
 
-- Time-poor — needs findings in priority order, not a raw list
-- Expects the agent to cite specific regulatory requirements, not general best practice
-- Will reject vague findings like "consider adding governance" — needs specific references
-- Wants to understand cross-jurisdiction conflicts (where AU and NZ requirements diverge)
+- Doesn't model — needs the agent to audit, not create
+- Expects regulatory specificity — "add governance" is not actionable; "add APRA CPS 234 Annex C data classification" is
+- Needs severity levels that match regulatory risk language (Critical, High, Medium, Advisory)
+- Wants to know what's missing, not what's present
 
 **Primary agent:** Agent Governance
-**Secondary agent:** Agent Architect (to review product-level governance)
+**Secondary agent:** Agent Ontology (for understanding model structure during audit)
 
 ---
 
 ### Persona 4 — The Data Engineer
 
-**Name:** James Reeves
-**Role:** Senior Data Engineer, Analytics Platform Team
-**Background:** 10 years building data pipelines. Expert in SQL, Spark, dbt, and
-Parquet. Responsible for translating logical models into physical schemas on
-Snowflake and Databricks. Evaluates MD-DDL as a replacement for ad-hoc ERDs
-shared via Confluence.
+**Name:** James Taylor
+**Role:** Senior Data Engineer, Data Platform Team
+**Background:** 7 years in data engineering. Expert in Snowflake, Databricks, dbt,
+and Kafka. Responsible for implementing physical schemas from conceptual models.
+Evaluating MD-DDL as the upstream contract for his pipeline team. Works at a
+retail bank.
 
 **Goals:**
 
-- Generate a dimensional star schema from the Financial Crime domain for Snowflake
-- Produce JSON Schema contracts for API validation
-- Create a wide-column denormalised table for a real-time transaction monitoring dashboard
-- Understand how MD-DDL data products control what gets generated and what doesn't
+- Generate a Snowflake dimensional star schema from an existing MD-DDL domain
+- Generate Databricks Delta tables for a wide-column reporting use case
+- Understand how MD-DDL entity metadata (existence, mutability) maps to physical design decisions
+- Validate that generated DDL is production-ready (indexes, constraints, partitioning)
 
 **Pain points:**
 
-- Impatient with "chatty" agents — wants to get to generation quickly
-- Cares about dialect-specific details (Snowflake VARIANT columns, Databricks DELTA)
-- Will test edge cases: what happens with many-to-many relationships, multi-table inheritance, temporal attributes?
-- Wants deterministic output — running the same request twice should produce the same DDL
+- Wants the physical output to be directly executable, not a template
+- Needs platform-specific features (Snowflake VARIANT, Databricks TBLPROPERTIES)
+- Will reject output that ignores physical realities (missing indexes, wrong data types)
+- Expects the mapping from conceptual to physical to be documented and auditable
 
 **Primary agent:** Agent Artifact
-**Secondary agent:** Agent Architect (to understand product-scoped generation)
+**Secondary agent:** Agent Architect (for product-scoped generation requirements)
 
 ---
 
 ### Persona 5 — The Data Product Owner
 
-**Name:** Aisha Rahman
+**Name:** Aisha Patel
 **Role:** Data Product Owner, Retail Banking Analytics
 **Background:** 6 years in product management, transitioned to data products 2 years
 ago. Responsible for defining what data is published, for whom, and under what terms.
@@ -312,6 +331,62 @@ work. Uses MD-DDL daily and knows the spec well. Works at a large telco.
 
 ---
 
+### Persona 9 — The Brownfield Adoption Lead
+
+**Name:** Rachel Kim
+**Role:** Data Platform Lead, Enterprise Data Management
+**Background:** 10 years in enterprise data, currently leading a modernisation
+initiative. Her organisation has 200+ tables across 8 source systems with no
+canonical model. She needs to adopt MD-DDL incrementally without stopping
+production pipelines.
+
+**Goals:**
+
+- Capture existing schemas as baselines without disrupting current systems
+- Plan an incremental adoption roadmap using the maturity model (documented →
+  mapped → governed → canonical)
+- Import existing DDL to bootstrap domain models rather than modelling from scratch
+- Understand how baseline files transition to canonical entities over time
+
+**Pain points:**
+
+- Cannot do a big-bang migration — needs incremental adoption
+- Existing schemas are messy and inconsistent — the adoption model must handle imperfection
+- Needs clear guidance on what "good enough" looks like at each maturity stage
+- Wants the agents to help plan the adoption, not just execute individual modelling tasks
+
+**Primary agents:** Agent Guide (adoption planning), Agent Ontology (baseline capture, schema import)
+**Secondary agent:** Agent Governance (governance gap assessment during adoption)
+
+---
+
+### Persona 10 — The New User
+
+**Name:** Alex Torres
+**Role:** Junior Data Analyst, transitioning to Data Engineering
+**Background:** 2 years as a data analyst using SQL and Python. Heard about MD-DDL
+at a conference and wants to evaluate it for their team. Has no prior exposure to
+formal data modelling standards. Comfortable with Markdown and YAML.
+
+**Goals:**
+
+- Understand what MD-DDL is and whether it's relevant to their team
+- Get a guided walkthrough of the standard's core concepts
+- See a worked example and understand how the pieces fit together
+- Set up their development environment (VS Code or Claude Code) to use MD-DDL
+
+**Pain points:**
+
+- Overwhelmed by the spec — needs a guided entry point, not a reference manual
+- Doesn't know which agent to start with
+- Needs concepts explained in terms they already understand (SQL tables, CSV files)
+- Wants to see something working quickly before investing time in learning
+
+**Primary agent:** Agent Guide
+**Secondary agent:** Agent Ontology (once ready to try modelling)
+
+---
+
 ## Evaluation Method
 
 For each agent, simulate **the assigned interactions** using the personas specified
@@ -344,6 +419,64 @@ each scenario effectively. Consider:
 ---
 
 ## Evaluation Scenarios
+
+### Agent Guide — Learning and Navigation
+
+**Scenario G1 — First contact: what is MD-DDL? (Alex, New User)**
+> "I heard about MD-DDL at a conference. What is it? Is it like a database
+> schema language? How is it different from just writing CREATE TABLE statements?"
+
+Evaluate: Does the agent enter its orientation/teaching mode? Does it load the
+Orientation skill? Does it explain MD-DDL in terms a SQL-familiar analyst would
+understand? Does it avoid jargon overload? Does it offer a natural next step
+(concept exploration or worked example)?
+
+**Scenario G2 — Guided walkthrough of an example (Alex, New User)**
+> "Show me a complete example. Walk me through the Financial Crime domain —
+> what are the files, how do they connect, and what does each piece do?"
+
+Evaluate: Does the agent load the Worked Examples skill? Does it walk through
+the example progressively (domain file → entities → relationships → sources →
+products) rather than dumping everything at once? Does it use the Financial Crime
+example as its reference? Does Alex finish understanding the overall structure?
+
+**Scenario G3 — Concept exploration: entities vs enums (Alex, New User)**
+> "I don't understand the difference between an entity and an enum in MD-DDL.
+> In SQL I'd just make a lookup table. When should I use which?"
+
+Evaluate: Does the agent load the Concept Explorer skill? Does it explain the
+distinction using analogies the persona would understand (SQL lookup tables,
+reference data vs transactional data)? Does it reference the spec correctly
+without quoting it verbatim?
+
+**Scenario G4 — Platform setup (Alex, New User)**
+> "I want to try MD-DDL. I use VS Code. How do I set it up? Do I need to
+> install anything?"
+
+Evaluate: Does the agent load the Platform Setup skill? Does it provide clear,
+step-by-step setup instructions? Does it cover both VS Code Copilot and Claude
+Code options? Is the guidance current with the actual integration approach
+(submodule pattern)?
+
+**Scenario G5 — Adoption planning for brownfield (Rachel, Brownfield Adoption Lead)**
+> "We have 200+ tables across 8 source systems. No canonical model. I can't
+> stop production. How do I adopt MD-DDL incrementally? What does a realistic
+> roadmap look like?"
+
+Evaluate: Does the agent load the Adoption Planning skill? Does it explain the
+maturity model from Section 10? Does it help Rachel think about which domains
+to start with and what "good enough" looks like at each stage? Does it hand off
+to Agent Ontology for actual baseline capture work?
+
+**Scenario G6 — Agent navigation: which agent do I need? (Alex, New User)**
+> "I've learned the concepts. Now I want to actually model my team's data.
+> Which agent should I use? What's the difference between all of them?"
+
+Evaluate: Does the agent clearly explain the five specialist agents and their
+lifecycle stages? Does it recommend starting with Agent Ontology for modelling?
+Does it provide a concrete handoff prompt the user can use?
+
+---
 
 ### Agent Ontology — Discovery and Design
 
@@ -421,6 +554,25 @@ standard's domain metadata support version tracking for evolution? Does the agen
 reference the domain-boundaries guidance for deciding whether Reinsurance belongs
 in the Claims domain or warrants its own domain?
 
+**Scenario O7 — Brownfield baseline capture (Rachel, Brownfield Adoption Lead)**
+> "Here's our main customer database DDL — 45 tables across 3 schemas. I want to
+> capture this as a baseline in MD-DDL format. Don't try to model it perfectly —
+> just document what exists so we have a starting point."
+
+Evaluate: Does the agent load the Baseline Capture skill? Does it understand the
+difference between baseline documentation and canonical modelling? Does it create
+baseline files with the correct metadata (baseline type, source_system, captured_date,
+status)? Does it set an appropriate maturity level? Does it resist the urge to
+refactor or normalise the existing schema?
+
+**Scenario O8 — Schema import: DDL to domain (Rachel, Brownfield Adoption Lead)**
+> "Import this Snowflake DDL and infer a domain model. I know it won't be perfect —
+> I want a starting point that I can refine. Flag anything you're unsure about."
+
+Evaluate: Does the agent load the Schema Import skill? Does it handle DDL parsing
+and produce reasonable entity/attribute mappings? Does it flag ambiguities rather
+than guessing silently? Does it produce output that conforms to the current spec?
+
 ---
 
 ### Agent Artifact — Physical Generation
@@ -484,6 +636,15 @@ Evaluate: Does the agent handle JSON Schema generation? Which skill covers this
 handle relationships as `$ref` references? Does it map `not_null` constraints to
 `required` arrays? Does it handle enums as `enum` values in JSON Schema? Is there
 a gap in the skills for non-DDL output formats?
+
+**Scenario A6 — Reconciliation: generated vs existing (James, Data Engineer)**
+> "I already have a Snowflake schema for Financial Crime — 30 tables deployed
+> 6 months ago. Generate the dimensional schema from the current MD-DDL model
+> and show me the differences. What's been added, removed, or changed?"
+
+Evaluate: Does the agent load the Reconciliation skill? Does it compare generated
+output against existing state? Does it produce a clear diff report showing additions,
+removals, and modifications? Does it help James plan a migration path?
 
 ---
 
@@ -654,6 +815,34 @@ mapping? Does the spec's transformation vocabulary cover the mappings Tomás nee
 mechanism to propagate changes to data products? Is the source → canonical →
 product lineage traceable?
 
+**Scenario X4 — Brownfield adoption: baseline → mapping → canonical (Rachel)**
+
+Simulate this journey:
+
+1. Rachel uses Agent Guide to plan her adoption roadmap
+2. Rachel uses Agent Ontology (Baseline Capture) to document her existing schemas
+3. Rachel uses Agent Ontology (Schema Import) to bootstrap canonical entities
+4. Rachel uses Agent Governance to assess governance gaps in the newly canonical domain
+
+Evaluate: Does Agent Guide provide actionable adoption planning that correctly
+references the maturity model? Is the handoff from Guide to Ontology clear? Does
+the baseline → canonical transition work smoothly? Does Agent Governance assess
+a domain that has just transitioned from baseline maturity?
+
+**Scenario X5 — New user onboarding → first model (Alex)**
+
+Simulate this journey:
+
+1. Alex asks Agent Guide what MD-DDL is and gets oriented
+2. Alex walks through the Financial Crime example with Agent Guide
+3. Alex is ready to model — Agent Guide hands off to Agent Ontology
+4. Alex models a simple domain with Agent Ontology's help
+
+Evaluate: Is the learning path from zero to first model smooth? Does Agent Guide
+build enough understanding before handoff? Does Agent Ontology handle a less
+experienced user who may need more explanation? Is there a gap between learning
+and doing?
+
 ---
 
 ## Scoring Rubric
@@ -708,17 +897,22 @@ Are there stages where the practitioner falls off a cliff — the standard has
 nothing to say and the agent has nothing to offer?
 
 Specifically assess: discovery → entity design → relationships → events →
-sources → transformations → data products → physical generation → external publication.
+sources → transformations → data products → physical generation → external
+publication → brownfield adoption.
 
 Pay particular attention to the sources and transformations stages — these are
 specified in the standard but receive less agent support than other stages. Are there
 agent skills missing for source onboarding and transformation authoring?
+
+Also assess the adoption lifecycle: does the maturity model (Section 10) provide
+a complete path from brownfield to canonical? Are there gaps between maturity stages?
 
 ### 2. Learning Curve
 
 How much does each persona need to learn before being productive? Is the
 investment justified by the value? Consider:
 
+- Alex (New User) — starting from zero. Does Agent Guide provide a viable on-ramp?
 - Sarah (Data Modeller) — already knows ER/UML. How much does MD-DDL add vs substitute?
 - James (Data Engineer) — cares about physical output. Is the conceptual layer overhead or valuable?
 - Marcus (Data Steward) — not technical. Can he contribute meaningfully through the agents?
@@ -729,6 +923,7 @@ investment justified by the value? Consider:
 - Tomás (Integration Engineer) — source-system focused. Does the source/transform
   layer match his workflow?
 - Kenji (Domain Review Lead) — expert user. Does MD-DDL support systematic review?
+- Rachel (Brownfield Lead) — existing systems. Does the adoption path feel achievable?
 
 ### 3. Agent Handoff Friction
 
@@ -739,7 +934,7 @@ missing entity), how smooth is the handoff? Consider:
 - Does the receiving agent have enough context to continue without re-explaining?
 - Is the handoff pattern consistent across all agent-to-agent transitions?
 - Would a persona find the multi-agent pattern natural or frustrating?
-- Evaluate the specific handoff chains tested in scenarios X1, X2, and X3.
+- Evaluate the specific handoff chains tested in scenarios X1–X5.
 
 ### 4. Governance Integration
 
@@ -814,6 +1009,17 @@ Real domains change over time. Evaluate:
 - Do data products have lifecycle states (draft, active, deprecated, retired)?
 - When a model change affects a published product, is the impact traceable?
 
+### 10. Brownfield Adoption
+
+Evaluate the adoption model (Section 10) holistically:
+
+- Is the maturity ladder realistic for organisations with messy existing systems?
+- Does the baseline → canonical transition lose information or create orphaned references?
+- Can partial adoption coexist with production systems without disruption?
+- Does Agent Guide's adoption planning align with Agent Ontology's baseline capture
+  and schema import capabilities?
+- Is the adoption model industry-neutral or implicitly biased toward greenfield?
+
 ---
 
 ## Report Format
@@ -824,7 +1030,7 @@ and spec sections when referencing evidence.
 ```markdown
 ## MD-DDL Agent & Standard Effectiveness Report — [date]
 **Spec version evaluated:** [version from 1-Foundation.md]
-**Agents evaluated:** Guide, Ontology, Artifact, Data Product, Regulation
+**Agents evaluated:** Guide, Ontology, Artifact, Architect, Governance
 
 ---
 
@@ -844,6 +1050,22 @@ for improvement]
 
 ### Agent Scorecards
 
+#### Agent Guide
+| Scenario | Skill Loading | Behaviour Mode | Output Quality | Boundary Respect | Persona Fit | Avg |
+| --- | --- | --- | --- | --- | --- | --- |
+| G1 — What is MD-DDL | /5 | /5 | /5 | /5 | /5 | /5 |
+| G2 — Walkthrough | /5 | /5 | /5 | /5 | /5 | /5 |
+| G3 — Concept exploration | /5 | /5 | /5 | /5 | /5 | /5 |
+| G4 — Platform setup | /5 | /5 | /5 | /5 | /5 | /5 |
+| G5 — Adoption planning | /5 | /5 | /5 | /5 | /5 | /5 |
+| G6 — Agent navigation | /5 | /5 | /5 | /5 | /5 | /5 |
+| **Average** | | | | | | **/5** |
+
+**Strengths:** [what works well]
+**Gaps:** [what's missing or weak]
+**Persona feedback (Alex):** [what Alex would say]
+**Persona feedback (Rachel):** [what Rachel would say]
+
 #### Agent Ontology
 | Scenario | Skill Loading | Behaviour Mode | Output Quality | Boundary Respect | Persona Fit | Avg |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -853,6 +1075,8 @@ for improvement]
 | O4 — Healthcare FHIR | /5 | /5 | /5 | /5 | /5 | /5 |
 | O5 — Domain review | /5 | /5 | /5 | /5 | /5 | /5 |
 | O6 — Model evolution | /5 | /5 | /5 | /5 | /5 | /5 |
+| O7 — Baseline capture | /5 | /5 | /5 | /5 | /5 | /5 |
+| O8 — Schema import | /5 | /5 | /5 | /5 | /5 | /5 |
 | **Average** | | | | | | **/5** |
 
 **Strengths:** [what works well]
@@ -861,6 +1085,7 @@ for improvement]
 **Persona feedback (Marcus):** [what Marcus would say]
 **Persona feedback (Dr. Kowalski):** [what Dr. Kowalski would say]
 **Persona feedback (Kenji):** [what Kenji would say]
+**Persona feedback (Rachel):** [what Rachel would say]
 
 #### Agent Artifact
 | Scenario | Skill Loading | Behaviour Mode | Output Quality | Boundary Respect | Persona Fit | Avg |
@@ -870,6 +1095,7 @@ for improvement]
 | A3 — Inheritance DDL | /5 | /5 | /5 | /5 | /5 | /5 |
 | A4 — Knowledge graph | /5 | /5 | /5 | /5 | /5 | /5 |
 | A5 — JSON Schema contracts | /5 | /5 | /5 | /5 | /5 | /5 |
+| A6 — Reconciliation | /5 | /5 | /5 | /5 | /5 | /5 |
 | **Average** | | | | | | **/5** |
 
 **Strengths:** [what works well]
@@ -916,6 +1142,8 @@ for improvement]
 | X1 — Full lifecycle | /5 | /5 | /5 | /5 |
 | X2 — Compliance → model change | /5 | /5 | /5 | /5 |
 | X3 — Source onboarding → product | /5 | /5 | /5 | /5 |
+| X4 — Brownfield adoption | /5 | /5 | /5 | /5 |
+| X5 — New user onboarding | /5 | /5 | /5 | /5 |
 | **Average** | | | | **/5** |
 
 **Strongest workflow:** [which X scenario worked best and why]
@@ -928,17 +1156,26 @@ for improvement]
 
 | Scenario | Expressiveness | Completeness | Learnability | Avg |
 | --- | --- | --- | --- | --- |
+| G1 | /5 | /5 | /5 | /5 |
+| G2 | /5 | /5 | /5 | /5 |
+| G3 | /5 | /5 | /5 | /5 |
+| G4 | /5 | /5 | /5 | /5 |
+| G5 | /5 | /5 | /5 | /5 |
+| G6 | /5 | /5 | /5 | /5 |
 | O1 | /5 | /5 | /5 | /5 |
 | O2 | /5 | /5 | /5 | /5 |
 | O3 | /5 | /5 | /5 | /5 |
 | O4 | /5 | /5 | /5 | /5 |
 | O5 | /5 | /5 | /5 | /5 |
 | O6 | /5 | /5 | /5 | /5 |
+| O7 | /5 | /5 | /5 | /5 |
+| O8 | /5 | /5 | /5 | /5 |
 | A1 | /5 | /5 | /5 | /5 |
 | A2 | /5 | /5 | /5 | /5 |
 | A3 | /5 | /5 | /5 | /5 |
 | A4 | /5 | /5 | /5 | /5 |
 | A5 | /5 | /5 | /5 | /5 |
+| A6 | /5 | /5 | /5 | /5 |
 | D1 | /5 | /5 | /5 | /5 |
 | D2 | /5 | /5 | /5 | /5 |
 | D3 | /5 | /5 | /5 | /5 |
@@ -981,6 +1218,9 @@ for improvement]
 #### 9. Model Evolution and Lifecycle — [Strong / Adequate / Needs Work]
 [Evidence and analysis]
 
+#### 10. Brownfield Adoption — [Strong / Adequate / Needs Work]
+[Evidence and analysis]
+
 ---
 
 ### Stakeholder Verdict
@@ -989,6 +1229,7 @@ For each persona, summarise: would they adopt MD-DDL?
 
 | Persona | Would Adopt? | Why / Why Not | Key Improvement Needed |
 | --- | --- | --- | --- |
+| Alex (New User) | Yes/Maybe/No | [reason] | [specific improvement] |
 | Sarah (Modeller) | Yes/Maybe/No | [reason] | [specific improvement] |
 | Marcus (Steward) | Yes/Maybe/No | [reason] | [specific improvement] |
 | Priya (Risk Manager) | Yes/Maybe/No | [reason] | [specific improvement] |
@@ -997,6 +1238,7 @@ For each persona, summarise: would they adopt MD-DDL?
 | Dr. Kowalski (Healthcare) | Yes/Maybe/No | [reason] | [specific improvement] |
 | Tomás (Integration) | Yes/Maybe/No | [reason] | [specific improvement] |
 | Kenji (Review Lead) | Yes/Maybe/No | [reason] | [specific improvement] |
+| Rachel (Brownfield Lead) | Yes/Maybe/No | [reason] | [specific improvement] |
 
 ---
 

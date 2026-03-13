@@ -26,11 +26,12 @@ Write the findings to the review.md file
 Read these files first, in this order. Do not skip ahead.
 
 1. `md-ddl-specification/1-Foundation.md` — the core principles
-2. `agents/agent-ontology/AGENT.md` — identity, lifecycle stage, skill index
-3. `agents/agent-artifact/AGENT.md` — identity, lifecycle stage, skill index
-4. `agents/agent-architect/AGENT.md` — identity, lifecycle stage, skill index
-5. `agents/agent-governance/AGENT.md` — identity, lifecycle stage, skill index
-6. `README.md` — the public face and integration guide
+2. `agents/agent-guide/AGENT.md` — identity, user archetypes, skill index
+3. `agents/agent-ontology/AGENT.md` — identity, lifecycle stage, skill index
+4. `agents/agent-artifact/AGENT.md` — identity, lifecycle stage, skill index
+5. `agents/agent-architect/AGENT.md` — identity, lifecycle stage, skill index
+6. `agents/agent-governance/AGENT.md` — identity, lifecycle stage, skill index
+7. `README.md` — the public face and integration guide
 
 This gives you the mental model you need to evaluate everything else correctly.
 
@@ -56,15 +57,17 @@ here. No other file has the right to define language rules.
 ### Agents (`agents/*/AGENT.md`)
 
 **Purpose:** Define the identity, lifecycle stage, behaviour modes, and skill index
-for each agent. Agent Ontology owns Discovery and Design. Agent Artifact owns
-Physical Artifact Generation. Agent Architect owns Strategic Design and Data Product
-Publication. Agent Governance owns Standards Conformance and Compliance Assurance. These are distinct —
-they must not overlap.
+for each agent. Agent Guide owns Learning and Navigation. Agent Ontology owns
+Discovery and Design. Agent Artifact owns Physical Artifact Generation. Agent
+Architect owns Strategic Design and Data Product Publication. Agent Governance owns
+Standards Conformance and Compliance Assurance. These are distinct — they must not
+overlap.
 
 **Review lens:**
 
 - Does each agent's stated lifecycle stage and capabilities stay within its
   ownership boundary?
+- Does Agent Guide defer production modelling to the specialist agents?
 - Does Agent Governance defer structural modelling to Agent Ontology?
 - Does Agent Ontology defer ongoing compliance assurance to Agent Governance?
 - Does Agent Ontology defer physical generation to Agent Artifact?
@@ -131,6 +134,9 @@ both human reference and AI context (agents are instructed to use
     canonical entities exist and baselines have mapping blocks, maturity
     should be at least `mapped`)?
   - Do baseline `superseded_by` links point to existing canonical entity files?
+- For industry-specific examples (Healthcare, Telecom, Retail Sales, Retail Service),
+  do they demonstrate correct spec application for their respective industries?
+  Are industry standards references (FHIR, TM Forum SID, etc.) accurate?
 
 ### README (`README.md`)
 
@@ -147,8 +153,6 @@ product framing. It is read by people deciding whether to adopt md-ddl.
   current for VS Code Copilot, Claude Code, and Claude.ai Projects?
 - Does the Domains as Data Products section accurately reflect the current mapping
   between MD-DDL concepts and data product concepts?
-- Is the v0.8.0 forward signal (output port declarations, inter-domain contracts)
-  still the right framing, or has any spec work begun that should update it?
 - Are there any capability claims in the README that are not yet supported by
   the spec or agents (promises without implementation)?
 
@@ -159,7 +163,6 @@ product framing. It is read by people deciding whether to adopt md-ddl.
 **Review lens:**
 
 - Does `md-ddl-specification/1-Foundation.md` contain a "Validation Model" section that defines the two-tier model and lists exactly 5 pre-flight checks?
-- Does `.github/copilot-instructions.md` contain a "Validation philosophy" section that references `1-Foundation.md`?
 - Do all agent SKILL.md files use `flag` / `note` / `suggest` / `observe` language for convention and quality concerns (Levels 3–5)?
 - Is `error` / `reject` / `fail` language in agent prompts limited to syntax-level failures (Level 1)?
 - Does the domain-review SKILL.md (Agent Ontology) explicitly state it is a contextual quality review, not a lint pass?
@@ -170,11 +173,11 @@ Flag any agent prompt where enforcement language is used for convention or quali
 
 ---
 
-### Copilot Instructions (`.github/copilot-instructions.md`)
+### Contributor Guidance
 
-**Purpose:** Developer guidance for contributors working on the standard itself —
-not for users of the standard. It tells Copilot how to work on the spec, agents,
-skills, and examples correctly.
+**Purpose:** Developer guidance for contributors working on the standard itself.
+This may exist in multiple platform-specific locations (`.github/copilot-instructions.md`
+for Copilot, `CLAUDE.md` for Claude Code) and shared locations (`.prompts/`).
 
 **Review lens:**
 
@@ -202,13 +205,13 @@ After reviewing each area individually, run these checks across the whole projec
 ### Rule duplication audit
 
 Pick five rules from the spec at random. Search for those rules in agent prompts,
-skills, and copilot instructions. Are any stated verbatim in more than one place?
+skills, and contributor instructions. Are any stated verbatim in more than one place?
 Duplication is technical debt — it means a spec update may not propagate.
 
 ### Lifecycle boundary audit
 
 For each agent, list the capabilities it claims. Check that no capability claimed
-by Agent Ontology overlaps with Agent Governance's ownership, and vice versa.
+by one agent overlaps with another agent's ownership.
 
 ### Dead reference audit
 
@@ -218,7 +221,7 @@ Check all Markdown links in:
 - Mermaid diagram hyperlinks
 - AGENT.md skill index paths
 - SKILL.md `references/` paths
-- Copilot instructions file references
+- Contributor instructions file references
 
 Flag any link that points to a file or anchor that does not exist on disk.
 

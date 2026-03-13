@@ -34,6 +34,7 @@ md-ddl-specification/         Normative spec — source of truth for all rules
   7-Sources.md                Source system declarations and source-layer structure
   8-Transformations.md        Transformation vocabulary and mapping types
   9-Data-Products.md          Data product classes, declaration, and generation rules
+  10-Adoption.md              Brownfield adoption, maturity model, baseline-to-canonical path
   MD-DDL-Complete.md          Concatenated single-file version (generated)
 
 agents/
@@ -90,11 +91,15 @@ agents/
     agent-artifact.agent.md   Frontmatter + include of canonical `agents/agent-artifact/AGENT.md`
     agent-architect.agent.md  Frontmatter + include of canonical `agents/agent-architect/AGENT.md`
     agent-governance.agent.md Frontmatter + include of canonical `agents/agent-governance/AGENT.md`
-  copilot-instructions.md     Repo-wide contributor and modelling guidance
-  md-ddl-review-prompt.md     Layer 1: Structural review prompt
+    review-md-ddl.agent.md    Copilot review agent wrapper
+  copilot-instructions.md     Copilot-specific contributor guidance
+
+.prompts/
+  md-ddl-review-prompt.md              Layer 1: Structural review prompt
   md-ddl-adversarial-review-prompt.md  Layer 2: Adversarial review prompt
-  md-ddl-evaluation-prompt.md Layer 3: Stakeholder simulation prompt
-  md-ddl-layered-review-process.md    Review process orchestration
+  md-ddl-evaluation-prompt.md          Layer 3: Stakeholder simulation prompt
+  md-ddl-layered-review-process.md     Review process orchestration
+  concat-md-ddl-specs.prompt.md        Spec concatenation rules
 
 examples/
   Financial Crime/            Primary reference example (most current)
@@ -127,6 +132,7 @@ File | Owns
 `7-Sources.md` | Source file format, change models, domain feed tables, source-layer rules
 `8-Transformations.md` | Transformation types, YAML syntax, expression language, generation behaviour
 `9-Data-Products.md` | Data product classes, declaration syntax, governance, masking, product-driven generation
+`10-Adoption.md` | Brownfield adoption maturity model, baseline capture format, baseline-to-canonical transition
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
@@ -134,15 +140,15 @@ When adding or changing a rule, edit the owning section only. Do not duplicate r
 
 Never edit the `MD-DDL-Complete.md` directly, as we will join this from the individual spec files when we are about to push to github.
 
-This is a generated file — a concatenation of sections 1–9 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly.
+This is a generated file — a concatenation of sections 1–10 in order. It exists for AI context loading (single-file spec injection into agent prompts). Do not edit it directly.
 
 Regenerate with the repo script:
 
 `powershell -ExecutionPolicy Bypass -File .\.github\scripts\concat-md-ddl-specs.ps1`
 
-Canonical generation rules are maintained in `.github/concat-md-ddl-specs.prompt.md`. Keep concatenation behavior defined there and avoid duplicating detailed algorithm rules in multiple files.
+Canonical generation rules are maintained in `.prompts/concat-md-ddl-specs.prompt.md`. Keep concatenation behavior defined there and avoid duplicating detailed algorithm rules in multiple files.
 
-After regeneration, run the verification checklist defined in `.github/concat-md-ddl-specs.prompt.md` before committing.
+After regeneration, run the verification checklist defined in `.prompts/concat-md-ddl-specs.prompt.md` before committing.
 
 ### Versioning
 
@@ -328,17 +334,17 @@ Rules for contributors:
 
 ## Reviewing the standard
 
-When a user asks to review, evaluate, audit, or assess the MD-DDL standard, agents, or examples, use the layered review process defined in `.github/md-ddl-layered-review-process.md`.
+When a user asks to review, evaluate, audit, or assess the MD-DDL standard, agents, or examples, use the layered review process defined in `.prompts/md-ddl-layered-review-process.md`.
 
 ### Quick reference
 
 Request | What to do
 --- | ---
-"Review the standard" / "check for issues" / "run a review" | Load `.github/md-ddl-review-prompt.md` (Layer 1 — structural). Run it. Report findings.
-"Find weaknesses" / "what's wrong" / "stress test" / "adversarial review" | Load `.github/md-ddl-adversarial-review-prompt.md` (Layer 2 — adversarial). Run it. Report findings.
-"Evaluate for users" / "would people adopt this" / "stakeholder review" | Load `.github/md-ddl-evaluation-prompt.md` (Layer 3 — stakeholder simulation). Run it. Report findings.
-"Full review" / "layered review" / "comprehensive review" | Load `.github/md-ddl-layered-review-process.md` for the orchestration protocol, then run layers 1 → 2 → 3 in order, cross-referencing findings between layers.
-Review from a specific viewpoint (e.g. "review as a data engineer") | Load `.github/md-ddl-layered-review-process.md`, check the Ad-Hoc Viewpoint Reviews table, and frame the review from the requested perspective.
+"Review the standard" / "check for issues" / "run a review" | Load `.prompts/md-ddl-review-prompt.md` (Layer 1 — structural). Run it. Report findings.
+"Find weaknesses" / "what's wrong" / "stress test" / "adversarial review" | Load `.prompts/md-ddl-adversarial-review-prompt.md` (Layer 2 — adversarial). Run it. Report findings.
+"Evaluate for users" / "would people adopt this" / "stakeholder review" | Load `.prompts/md-ddl-evaluation-prompt.md` (Layer 3 — stakeholder simulation). Run it. Report findings.
+"Full review" / "layered review" / "comprehensive review" | Load `.prompts/md-ddl-layered-review-process.md` for the orchestration protocol, then run layers 1 → 2 → 3 in order, cross-referencing findings between layers.
+Review from a specific viewpoint (e.g. "review as a data engineer") | Load `.prompts/md-ddl-layered-review-process.md`, check the Ad-Hoc Viewpoint Reviews table, and frame the review from the requested perspective.
 
 ### Key rules for reviews
 

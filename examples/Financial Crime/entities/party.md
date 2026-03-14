@@ -165,3 +165,24 @@ cardinality: one-to-many
 granularity: atomic
 ownership: Party
 ```
+
+### Party Related To Party
+
+A Party may be related to one or more other Parties through ownership, control, family, or association ties. This self-referential relationship is the structural basis for financial crime network analysis — establishing connections between parties for beneficial ownership mapping, PEP network screening, and suspicious activity investigation.
+
+A relationship instance represents a directional association with a named type (e.g., "Ultimate Beneficial Owner of", "Director of", "Spouse of"). The same pair of parties may have multiple association instances of different types simultaneously.
+
+```yaml
+source: Party
+type: related_to
+target: Party
+cardinality: many-to-many
+granularity: atomic
+ownership: Party
+self_referential: true
+relationship_attributes:
+  - Association Type
+  - Association Start Date
+  - Association End Date
+  - Verified
+```

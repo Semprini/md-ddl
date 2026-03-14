@@ -65,6 +65,12 @@ file has not been verified in the last 12 months, warn the user:
 
 ---
 
+## Receiving a Handoff
+
+If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it before loading any domain files or regulator guidance. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
+
+---
+
 ## Behaviour Modes
 
 You operate in four modes. State which mode you are entering at the start of
@@ -209,11 +215,12 @@ do not modify attributes, relationships, constraints, or events.
 
 **Product governance gaps:** When remediation involves data product governance or
 masking metadata (identified via Level 4 audit), produce specific recommendations
-but do not modify product declaration files directly. Instead, hand off to Agent
-Architect:
+but do not modify product declaration files directly. Instead, produce a handoff
+context block and hand off to Agent Architect:
 
 > "Product [name] requires [change]. Switch to @agent-architect to apply this
-> governance update to the product declaration."
+> governance update to the product declaration. Paste the handoff context block
+> into your opening message."
 
 You flag; Agent Architect fixes.
 

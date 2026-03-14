@@ -298,6 +298,7 @@ These fields may appear in an entity's `governance:` YAML block. Only include fi
 Field | Type | Required | Description
 --- | --- | --- | ---
 `pii` | boolean | No | Override the domain's PII flag for this entity.
+`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. This field name is standardised — do not use alternatives such as `pii_attributes` or `personal_data_fields`.
 `classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
 `retention` | string | No | Override the domain's retention period for this entity.
 `retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.

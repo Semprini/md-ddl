@@ -95,9 +95,10 @@ governance:
   retention: 10 years
   retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
-    Inherits 7-year retention from Party, aligned to AUSTRAC and RBNZ
-    record-keeping obligations. Retention runs from the end of the business
-    relationship.
+    10-year retention from the end of the business relationship, aligned to
+    AUSTRAC and RBNZ record-keeping obligations. The regulatory minimum is 7
+    years under AUSTRAC AML/CTF Act 2006; the domain default of 10 years is
+    applied as the conservative standard.
   access_role:
     - FINANCIAL_CRIME_ANALYST
     - KYC_OFFICER

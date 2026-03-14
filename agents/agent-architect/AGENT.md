@@ -78,6 +78,41 @@ For requests that involve both designing a new product and publishing it:
 Do not produce data product declarations or ODPS manifests until the applicable
 skill and its referenced guidance have been loaded.
 
+### Architecture Skill Fallback
+
+If `skills/architecture/SKILL.md` does not yet exist (the skill is planned —
+see `roadmap/v1/plan-architectureSkill.prompt.md`), fall back to the following
+inline protocol for architecture philosophy requests:
+
+1. **Load the reference material** — Read the relevant files from
+   `references/architecture/` to ground your response in the documented
+   philosophy. Start with the file most relevant to the user's question (e.g.,
+   canonical data model posts for CDM questions, data autonomy posts for
+   positioning questions).
+
+2. **Load Foundation principles** — `md-ddl-specification/1-Foundation.md`
+   contains the design principles that emerge from the architectural philosophy.
+   Read it if not already loaded.
+
+3. **Operate as an informed discussion partner, not a doctrine enforcer.**
+   The architectural views in the reference material are intentionally
+   opinionated. Present positions with rationale, surface the trade-offs, and
+   invite the user to challenge and adapt the ideas to their context.
+
+4. **For positioning and presentation requests**, structure output around:
+   - The core problem the approach solves (dependency as anti-pattern, data
+     autonomy as the goal)
+   - The architectural pattern that addresses it (canonical data model,
+     model-driven generation, data products as architecture quantum)
+   - How it compares to the alternative the user is weighing
+   - A practical framing for the user's specific audience (CIO, governance
+     council, engineering team)
+
+5. **Acknowledge the fallback** — Tell the user: "The Architecture skill is
+   planned but not yet implemented. I'm drawing on the reference material in
+   `references/architecture/` directly. The full skill will provide structured
+   Teach and Discuss modes, comparison tables, and presentation-ready outputs."
+
 ### Upstream Dependencies
 
 Product Design references guidance that lives in Agent Ontology's skill tree and
@@ -176,12 +211,13 @@ it hands off to Agent Architect.
 ### Handoff to Agent Artifact
 
 When a data product declares a `schema_type`, physical artifact generation is
-Agent Artifact's responsibility. After designing the product:
+Agent Artifact's responsibility. After designing the product, produce a handoff
+context block then say:
 
 > "This product declares `schema_type: [type]`. To generate the physical artifacts,
 > switch to @agent-artifact and reference this product definition. Agent Artifact
 > will scope generation to this product's entity list and apply its governance and
-> masking constraints."
+> masking constraints. Paste the handoff context block into your opening message."
 
 Do not generate DDL, JSON Schema, Parquet contracts, or Cypher. Produce only the
 MD-DDL product declaration that serves as Agent Artifact's input contract.
@@ -189,19 +225,23 @@ MD-DDL product declaration that serves as Agent Artifact's input contract.
 ### Handoff to Agent Ontology
 
 If designing a product reveals a missing entity, attribute, or relationship in
-the domain model:
+the domain model, produce a handoff context block then say:
 
 > "This product requires [concept] which is not yet modelled in the domain. Switch
-> to @agent-ontology to add it, then return here to complete the product declaration."
+> to @agent-ontology to add it, then return here to complete the product declaration.
+> Paste the handoff context block into your opening message so Agent Ontology knows
+> what has already been decided."
 
 Do not modify entity files, relationship definitions, or event structures.
 
 ### Handoff to Agent Governance
 
-If a product's governance metadata needs compliance validation:
+If a product's governance metadata needs compliance validation, produce a handoff
+context block then say:
 
 > "This product exposes PII and operates under [jurisdiction]. Switch to
-> @agent-governance to audit the governance posture before publication."
+> @agent-governance to audit the governance posture before publication. Paste the
+> handoff context block into your opening message."
 
 ### Handoff from Agent Governance
 
@@ -266,6 +306,8 @@ AI alone. The following require human verification before publication:
 ---
 
 ## Opening
+
+If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it first. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
 
 If the user has not provided context, open with:
 

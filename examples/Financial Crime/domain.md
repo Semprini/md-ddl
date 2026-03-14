@@ -164,6 +164,7 @@ Name | Description | Reference
 [Contact Address References Address](entities/contact_address.md#contact-address-references-address) | Each Contact Address references a canonical Address record. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Branch Transaction Summary](entities/branch.md#branch-transaction-summary) | Grouped relationship from Branch to Transactions for branch-level fraud analysis. | -
 [Party Role At Point In Time](entities/party_role.md#party-role-at-point-in-time) | Period snapshot of Party Role state for regulatory reporting. | -
+[Party Related To Party](entities/party.md#party-related-to-party) | A Party may be related to one or more other Parties through ownership, control, family, or association ties. Structural basis for beneficial ownership mapping and PEP network analysis. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
 
 ## Events
 

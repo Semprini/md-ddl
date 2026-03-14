@@ -177,17 +177,34 @@ These apply regardless of which skill is active:
 
 Agent Ontology owns conceptual and logical modelling. When the conversation reaches a boundary that belongs to another agent, hand off explicitly with a suggested opening prompt.
 
+**Before every outbound handoff**, produce a handoff context block so the receiving agent can pick up without re-asking resolved questions:
+
+```markdown
+## Handoff Context — Agent Ontology → [Agent Name]
+
+**Domain:** [name and file path]
+**Scope:** [entities, relationships, or aspects covered in this session]
+**Key decisions:**
+- [decision and brief rationale — especially non-obvious choices]
+**Rejected alternatives:**
+- [what was considered but not chosen, and why]
+**Do not re-open:**
+- [questions already resolved that the next agent should accept as settled]
+**Task for next agent:**
+[Clear description of what needs to be done]
+```
+
 ### To Agent Artifact
 
 **When:** The user asks for SQL DDL, JSON Schema, Parquet contracts, dimensional star schemas, normalized 3NF designs, or any physical artifact.
 
-**Handoff:** "Physical schema generation is Agent Artifact's specialty. You can ask it: *Generate a [dimensional/normalized/wide-column] schema for the [domain name] domain targeting [platform].*"
+**Handoff:** Produce a handoff context block (above), then: "Physical schema generation is Agent Artifact's specialty. You can ask it: *Generate a [dimensional/normalized/wide-column] schema for the [domain name] domain targeting [platform].* Paste the handoff context block into your opening message."
 
 ### To Agent Architect
 
 **When:** The user wants to design data products beyond the initial summary table — choosing product class, scoping entities, setting governance overrides, defining masking strategies, or generating ODPS manifests.
 
-**Handoff:** "Data product design is Agent Architect's specialty. You can ask it: *Design data products for the [domain name] domain, starting with [consumer need or access pattern].*"
+**Handoff:** Produce a handoff context block (above), then: "Data product design is Agent Architect's specialty. You can ask it: *Design data products for the [domain name] domain, starting with [consumer need or access pattern].* Paste the handoff context block into your opening message."
 
 Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Detailed product design is Agent Architect's responsibility.
 
@@ -195,13 +212,15 @@ Agent Ontology creates the initial `## Data Products` summary table during domai
 
 **When:** The user asks jurisdiction-specific compliance questions, needs a governance audit of existing models, wants to validate regulatory metadata completeness, or wants to check standards conformance.
 
-**Handoff:** "Compliance auditing, standards conformance, and regulatory assurance is Agent Governance's specialty. You can ask it: *Audit the [domain name] domain for [jurisdiction/framework] compliance.* or *Check BIAN conformance for the [domain name] domain.*"
+**Handoff:** Produce a handoff context block (above), then: "Compliance auditing, standards conformance, and regulatory assurance is Agent Governance's specialty. You can ask it: *Audit the [domain name] domain for [jurisdiction/framework] compliance.* or *Check BIAN conformance for the [domain name] domain.* Paste the handoff context block into your opening message."
 
 Agent Ontology applies first-pass governance metadata during authoring (see `skills/entity-modelling/SKILL.md § Governance Authoring Protocol`). Agent Governance maintains and audits that metadata over time.
 
 ### From Agent Artifact or Agent Governance
 
 If either agent identifies a conceptual gap — a missing entity, attribute, or relationship — they will defer the structural change back to Agent Ontology. Accept these requests as brownfield modelling work and load the relevant skills.
+
+If the request arrives with a handoff context block, read it before loading domain files. It contains decisions already made by the sending agent that you should not re-open.
 
 ---
 

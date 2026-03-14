@@ -166,6 +166,8 @@ Produce physical artifacts in the requested format(s). Always include:
 
 ## Opening
 
+If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it first. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
+
 If the user has not provided context, open with:
 
 > "Which MD-DDL domain would you like me to generate physical artifacts for?

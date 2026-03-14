@@ -39,10 +39,6 @@ Field | Type | Required | Description
 --- | --- | --- | ---
 `status` | enum:DomainStatus | No | Current lifecycle state of the domain definition
 `version` | semver string | No | Semantic version of the domain definition
-`deprecated_at` | date | No | Date on which the domain was deprecated. Only valid when `status: deprecated`
-`deprecated_reason` | string | No | Human-readable reason for deprecation. Required when `deprecated_at` is set
-`superseded_by` | string | No | Name or path of the domain definition that supersedes this one. Set when deprecated due to consolidation or rename
-`consumers` | string[] | No | Known downstream consumers of this domain (data products, pipelines, teams). Informational — drives change notification
 
 **DomainStatus enum values:**
 
@@ -90,9 +86,6 @@ Create `agents/agent-ontology/skills/lifecycle/SKILL.md` with:
   `review` → `active`. Runs a pre-promotion checklist (all entities have
   required fields, all relationships have targets, governance is complete).
   Outputs a promotion summary.
-- **Deprecate** mode: Sets `status: deprecated`, requires `deprecated_at` and
-  `deprecated_reason`, recommends setting `superseded_by`, and generates a
-  consumer notification draft.
 - **Version bump** mode: Analyses what changed since the last tagged version,
   suggests the appropriate semver bump (major/minor/patch), and offers to
   update the `version` field and `CHANGELOG.md`.
@@ -102,7 +95,6 @@ Create `agents/agent-ontology/skills/lifecycle/SKILL.md` with:
 Extend the governance agent's compliance audit to check:
 
 - Domains with `status: active` must have a `version` field
-- Deprecated domains must have `deprecated_at` and `deprecated_reason`
 - Entity `status` values must not be more advanced than the parent domain
   (an entity cannot be `active` in a `draft` domain)
 - Warn when `version` is `1.0.0` or unset for a domain that has been in
@@ -116,8 +108,6 @@ Update Agent Architect's data product skill to:
   built on a `deprecated` domain should be flagged)
 - Recommend versioning strategy for data products that parallels the domain
   versioning model
-- Flag when a product consumes an entity with `status: deprecated` or
-  `breaking_in` set
 
 ### 7 — Update Financial Crime Example
 
@@ -142,14 +132,9 @@ reference.
 - [ ] `DomainStatus` enum is documented (in spec or as a cross-domain
       reference enum)
 - [ ] Versioning semantics (major/minor/patch triggers) are documented
-- [ ] Deprecation fields (`deprecated_at`, `deprecated_reason`,
-      `superseded_by`) are documented
-- [ ] Agent Ontology lifecycle skill exists and covers promote, deprecate,
-      and version-bump modes
+- [ ] Agent Ontology lifecycle skill exists and covers promote and version-bump modes
 - [ ] Agent Governance compliance check includes lifecycle field validation
 - [ ] Financial Crime example uses canonical lifecycle field values
-- [ ] At least one `deprecated` entity example exists (can be added to
-      Financial Crime — e.g., the legacy Party Risk Report product)
 
 ---
 
@@ -172,3 +157,4 @@ reference.
   responsibility
 - Automatic breaking-change detection from git diff — out of scope for v1;
   the version bump skill assists but does not automate this
+- Deprecation

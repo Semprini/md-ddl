@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.0)
+# MD‑DDL Specification (Draft 0.9.1)
 
 ## **Entities**
 
@@ -354,6 +354,58 @@ When an entity's governance posture matches the domain default exactly, no `gove
 ```yaml
 governance:
   retention_basis: Inherited from domain default retention of 10 years post relationship end
+```
+
+---
+
+### Entity Lifecycle Fields
+
+Entities within a domain may have their own lifecycle state independent of the domain. For example, a domain may be `Active` while a newly added entity is still in `Draft`.
+
+#### Lifecycle Properties
+
+Property | Type | Required | Description
+--- | --- | --- | ---
+`status` | enum | No | Lifecycle state of this entity definition. Uses the same values as domain status: `Draft`, `Review`, `Active`, `Deprecated`, `Retired`. Defaults to the domain status if omitted.
+`since` | semver string | No | The domain version in which this entity was introduced (e.g., `"1.2.0"`).
+`deprecated_at` | semver string | No | The domain version in which this entity was deprecated (e.g., `"2.0.0"`).
+`breaking_in` | semver string | No | The domain version in which a breaking change affecting this entity will take effect. Used as advance notice to consumers.
+
+#### Lifecycle Rules
+
+- An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
+- When `status` is omitted, the entity inherits the domain's status.
+- The `since` field is informational — it records provenance and aids changelog generation.
+- The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
+- The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
+
+#### Example
+
+```yaml
+extends: Party Role
+status: Active
+since: "1.0.0"
+existence: independent
+mutability: slowly_changing
+attributes:
+  Customer Number:
+    type: string
+    identifier: primary
+```
+
+#### Example: Deprecated Entity
+
+```yaml
+status: Deprecated
+since: "1.0.0"
+deprecated_at: "2.0.0"
+existence: independent
+mutability: reference
+attributes:
+  Legacy Code:
+    type: string
+    identifier: primary
+    description: "Replaced by the new Classification entity introduced in v2.0.0."
 ```
 
 ---

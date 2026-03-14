@@ -14,7 +14,7 @@ owner: data.engineering@bank.com
 consumers:
   - Data Engineering
   - Audit & Compliance
-status: Production
+status: Active
 version: "1.0.0"
 
 governance:

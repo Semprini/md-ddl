@@ -16,7 +16,7 @@ consumers:
   - Financial Crime Analytics
   - Enterprise Fraud Operations
   - Clinical Revenue Integrity
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:

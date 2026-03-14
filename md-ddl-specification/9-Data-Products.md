@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.0)
+# MD‑DDL Specification (Draft 0.9.1)
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -155,7 +155,7 @@ owner: retail.analytics@example.com
 consumers:
   - Retail Analytics Team
   - Customer Insights Dashboard
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:
@@ -183,7 +183,7 @@ Field | Purpose
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
-`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
+`status` | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
 `entities` | List of canonical entity names included in this product.
 
 #### Optional Metadata Fields
@@ -215,7 +215,7 @@ owner: data.engineering@example.com
 consumers:
   - Data Engineering
   - Audit & Compliance
-status: Production
+status: Active
 
 governance:
   classification: Internal
@@ -244,7 +244,7 @@ owner: compliance.team@example.com
 consumers:
   - Regulatory Reporting System
   - FATF Compliance
-status: Production
+status: Active
 
 entities:
   - Transaction
@@ -381,9 +381,9 @@ Example:
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
-[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Production
-[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Production
+[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
+[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Active
+[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Active
 ```
 
 #### Detail File Structure
@@ -451,14 +451,14 @@ Data products progress through defined lifecycle states. The `status` field decl
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Production` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Active` | Product is live and governed. Changes follow the domain's version-bump rules.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
 #### Transition Rules
 
-- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Architect's design process).
-- `Production` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
+- `Draft` → `Active`: Product has passed quality review (all checklist items in Agent Architect's design process).
+- `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
 - `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
 - `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
 

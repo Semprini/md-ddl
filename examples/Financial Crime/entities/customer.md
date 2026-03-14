@@ -19,7 +19,7 @@ classDiagram
   }
 
   Customer --|> PartyRole
-  Customer "1" --> "0..*" Account : holds
+  Customer "0..*" --> "0..*" Account : holds
   Customer "1" --> "0..1" CustomerPreferences : has
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
@@ -55,15 +55,20 @@ governance:
 
 ### Customer Holds Account
 
-A Customer can hold one or more Accounts used for products and transactions.
+A Customer can hold one or more Accounts, and an Account can be held by one or more Customers. Joint accounts, business accounts with multiple authorized signatories, and beneficial ownership structures all require many-to-many cardinality. In the Financial Crime domain this is the structural basis for network analysis — connecting Customers through shared Accounts.
 
 ```yaml
 source: Customer
 type: has
 target: Account
-cardinality: one-to-many
+cardinality: many-to-many
 granularity: atomic
 ownership: Customer
+relationship_attributes:
+  - Holder Type
+  - Holder Start Date
+  - Holder End Date
+  - Is Primary Holder
 ```
 
 ### Customer Has Preferences

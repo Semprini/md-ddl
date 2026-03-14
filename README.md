@@ -2,7 +2,7 @@
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.9.0**
+> **Version 0.9.1**
 
 **Model once. Reuse everywhere.**
 

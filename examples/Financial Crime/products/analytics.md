@@ -15,7 +15,7 @@ owner: fincrime.analytics@bank.com
 consumers:
   - Financial Crime Analytics
   - Transaction Monitoring Dashboard
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:

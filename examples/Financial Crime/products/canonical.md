@@ -15,7 +15,7 @@ consumers:
   - Cross-domain Integration
   - Customer Domain
   - Regulatory Reporting
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:

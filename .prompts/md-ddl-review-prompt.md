@@ -121,6 +121,15 @@ both human reference and AI context (agents are instructed to use
 
 - Do all internal links (table Name columns, Mermaid hyperlinks) resolve to
   files and anchors that exist?
+- **Cardinality conflicts (Mermaid vs YAML):** When a diagram and YAML disagree
+  on cardinality, do **not** recommend a specific correction. State the conflict
+  as a structural observation and flag it as requiring domain semantics review —
+  the diagram may be correct and the YAML wrong, or vice versa, and the answer
+  depends on business meaning that a structural review cannot determine.
+  Recommend Agent Ontology review before any fix is applied. Exception: if one
+  representation is an isolated transcription error obvious from context (e.g.,
+  a `"1"` vs `"0..1"` on a clearly optional field), note the likely error but
+  still flag for confirmation.
 - Does `examples/Financial Crime/` remain the highest-quality example — the one
   you would point a new user to?
 - If `examples/Simple Customer/` exists, is it genuinely simpler and correct,

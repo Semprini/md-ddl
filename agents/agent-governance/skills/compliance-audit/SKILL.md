@@ -79,6 +79,7 @@ Level 1: Domain Metadata          (domain.md → ## Metadata → YAML block)
 Level 2: Entity Governance Block  (entity detail file → ## Entities → ### Entity → governance: YAML)
 Level 3: Attribute-Level Flags    (entity detail file → attributes: → individual fields)
 Level 4: Product Governance       (products/*.md → ### Product → governance: + masking: YAML)
+Level 5: Lifecycle Validation     (domain.md + entity files → status/version consistency)
 ```
 
 **Inheritance rule:** Domain-level metadata sets the default posture. Entities
@@ -237,6 +238,54 @@ membership, genetic data, biometric data, health data, sex life or orientation d
 
 If any such attributes are present without explicit GDPR special category
 governance metadata, log as a critical gap.
+
+---
+
+## Level 5 — Lifecycle Field Validation
+
+Evaluate domain and entity lifecycle metadata for consistency and completeness.
+This level checks the structural integrity of lifecycle fields — it does not
+assess whether the domain is *ready* for promotion (that is Agent Ontology's
+lifecycle skill responsibility).
+
+### When to run Level 5
+
+Level 5 is triggered by:
+
+- Full domain audit (always include)
+- User asks about lifecycle compliance or version consistency
+- After a lifecycle promotion or version bump
+
+### Domain-level lifecycle checks
+
+Check | What to verify | Gap if failed
+--- | --- | ---
+**Status present** | `status` field exists in domain metadata | Domain lifecycle state unknown
+**Status valid** | `status` value is one of: `Draft`, `Review`, `Active`, `Deprecated`, `Retired` | Invalid lifecycle state
+**Version present when Active** | Domains with `status: Active` must have a `version` field | Active domain without version tracking
+**Version format** | `version` field follows semantic versioning (`MAJOR.MINOR.PATCH`) | Invalid version format
+**Version ≥ 1.0.0 when Active** | Domains with `status: Active` should have `version` ≥ `1.0.0` | Pre-release version on active domain
+**Deprecated has superseded_by** | Domains with `status: Deprecated` should declare `superseded_by` | Deprecated domain with no migration path (Advisory)
+
+### Entity-level lifecycle checks
+
+Check | What to verify | Gap if failed
+--- | --- | ---
+**Entity status consistency** | Entity `status` must not be more advanced than domain `status` (e.g., entity `Active` in `Draft` domain) | Entity lifecycle more advanced than domain
+**Deprecated entity fields** | Entities with `status: Deprecated` should have `deprecated_at` set | Deprecated entity without version provenance
+**Since field on new entities** | Entities added after the initial release should have `since` set | New entity without version provenance (Advisory)
+
+### Lifecycle severity rules
+
+Gap | Severity
+--- | ---
+Active domain without `version` | Critical
+Entity status more advanced than domain | Critical
+Invalid `status` value | Critical
+Pre-release version on active domain | Advisory
+Missing `since` on post-1.0.0 entity | Advisory
+Missing `superseded_by` on deprecated domain | Advisory
+Missing `deprecated_at` on deprecated entity | Advisory
 
 ---
 
@@ -424,6 +473,7 @@ Frameworks assessed: [list]
 Regulator files loaded: [list]
 Entities assessed: [n] of [n] (note any not assessed)
 Attribute-level audit: [run / not run — reason if not run]
+Lifecycle audit: [run / not run — reason if not run]
 Gaps identified: [n] critical, [n] advisory, [n] not assessed
 Conflicts detected: [n — list frameworks in conflict if any]
 

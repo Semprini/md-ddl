@@ -41,6 +41,7 @@ conversation — load them as needed.
 | **Source Mapping** | User wants to declare source systems, create source.md files, author domain feed tables, define field-level transformations, or map source fields to canonical entities; "where does this data come from?"; connecting an operational system to the domain model | `skills/source-mapping/SKILL.md` |
 | **Baseline Capture** | User wants to document existing schemas, models, ETL pipelines, or catalog metadata as baselines; "capture", "import", "document existing", "baseline", "record current state" | `skills/baseline-capture/SKILL.md` |
 | **Schema Import** | Fast-track brownfield path; "import schema", "reverse engineer", "I have a database", "here's my DDL", "start from existing tables", "convert my schema"; user provides CREATE TABLE or dbt schema.yml expecting a canonical domain | `skills/schema-import/SKILL.md` |
+| **Lifecycle** | Promoting a domain through lifecycle stages; "promote to active"; "bump version"; "deprecate this domain"; version management; changelog generation | `skills/lifecycle/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.
@@ -71,6 +72,12 @@ For source system integration and field-level mapping:
 - Load `skills/source-mapping/SKILL.md` first.
 - If transformation types or expression syntax questions arise, the skill references the Transformations spec.
 - Confirm the domain model and entity detail files exist before authoring source files. If they don't, defer to Domain Scoping and Entity Modelling first.
+
+For lifecycle management (promotion, versioning, deprecation):
+
+- Load `skills/lifecycle/SKILL.md` first.
+- If promoting to `Active`, also load `skills/domain-review/SKILL.md` to run pre-promotion checks.
+- After a version bump that affects entities in data products, flag the affected products for review.
 
 For any review or readiness-validation request:
 

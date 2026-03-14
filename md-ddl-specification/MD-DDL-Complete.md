@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.0)
+# MD‑DDL Specification (Draft 0.9.1)
 
 *A Markdown‑native Data Definition Language for human-AI collaboration.*
 
@@ -245,7 +245,7 @@ Category|Metadata Keys|Purpose
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
 Governance & Security|classification, pii|The default security posture for the entire domain.
 Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
-Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
+Lifecycle|status, version|The lifecycle state and semantic version of the domain definition. See [Domain Lifecycle](#domain-lifecycle) below.
 Discovery|tags|Searchability
 Adoption|adoption (maturity, adoption_started, target_maturity, target_date, progress, notes)|Brownfield adoption tracking. Required when `baselines/` exists. See [Section 10 — Adoption](./10-Adoption.md).
 Platform|platform (posture, technologies, product_scope, notes)|How data products relate to infrastructure. See [Section 9 — Data Products](./9-Data-Products.md#platform-posture).
@@ -275,7 +275,7 @@ regulatory_scope:
 default_retention: "7 years"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "2.1.0"
 tags:
   - Core
@@ -534,7 +534,7 @@ Column | Purpose
 **Name** | The product name, linked to its detail definition.
 **Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
 **Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
+**Status** | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
 
 ---
 
@@ -547,6 +547,41 @@ Column | Purpose
 - The description must include a short natural‑language description. A longer description will be included in the detail file.
 
 This allows the domain file to act as a semantic index of the domain.
+
+---
+
+### **Domain Lifecycle**
+
+Every domain definition has a lifecycle — it moves from initial authoring through validation to production use, and eventually to deprecation and retirement. The `status` and `version` fields in domain metadata track this progression.
+
+#### Domain Status
+
+The `status` field declares the current lifecycle state of the domain definition. Valid values:
+
+Value | Description
+--- | ---
+`Draft` | Under active development. Not yet validated. Do not consume.
+`Review` | Under structured review (Layer 1/2/3 process). Stable enough for early feedback; breaking changes possible.
+`Active` | Validated and available for consumption. Stability guaranteed within major version.
+`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition. No new consumers should onboard.
+`Retired` | No longer maintained. Historical record only.
+
+**Transition rules:**
+
+- A domain may only move forward through lifecycle states: `Draft` → `Review` → `Active` → `Deprecated` → `Retired`.
+- Reverting from `Active` to `Draft` or `Review` is permitted only when a major version bump accompanies the change (the previous active version is effectively superseded).
+- `Deprecated` domains should declare a `superseded_by` field in metadata pointing to the replacement domain (if one exists).
+- `Retired` domains are immutable records. They remain in the repository for lineage and audit purposes.
+
+#### Domain Version
+
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the domain definition. See [Domain Evolution](#domain-evolution) for version bump rules.
+
+**Lifecycle and version interaction:**
+
+- A domain in `Draft` status may use version `0.x.y` to signal pre-release instability. The `0.x` convention indicates that breaking changes may occur without a major bump.
+- A domain in `Active` status must have version `1.0.0` or higher. Stability guarantees apply from the first major release.
+- When a domain transitions from `Review` to `Active` for the first time, its version should be set to `1.0.0`.
 
 ---
 
@@ -583,6 +618,39 @@ When modifying an existing domain:
 3. If breaking: review all data products that reference the affected entities and update them accordingly.
 4. If additive: update the relevant summary tables and create/update detail files.
 5. If corrective: fix the error in place.
+
+#### Change Log Convention
+
+A domain may include a `CHANGELOG.md` file adjacent to `domain.md`. This file is optional but recommended for domains at `Active` status or higher.
+
+The changelog follows [Keep a Changelog](https://keepachangelog.com/) conventions:
+
+````markdown
+# Changelog
+
+All notable changes to the Financial Crime domain are documented here.
+
+## [1.1.0] - 2026-03-14
+
+### Added
+- Exchange Rate entity for multi-currency transaction analysis
+- Currency entity as reference data
+
+### Changed
+- Transaction entity: added `Exchange Rate` attribute
+
+## [1.0.0] - 2025-11-01
+
+### Added
+- Initial domain release with Party, Account, Transaction, and Agreement entity families
+````
+
+**Rules:**
+
+- Each version entry must correspond to the `version` field in domain metadata.
+- Use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` as section headings within each version entry.
+- Agents should offer to generate or update the changelog when the domain version is bumped.
+- The changelog is informational — it aids human understanding and is not consumed by physical artifact generation.
 
 ---
 
@@ -644,7 +712,7 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
+[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
 
 ````
 
@@ -946,6 +1014,7 @@ These fields may appear in an entity's `governance:` YAML block. Only include fi
 Field | Type | Required | Description
 --- | --- | --- | ---
 `pii` | boolean | No | Override the domain's PII flag for this entity.
+`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. This field name is standardised — do not use alternatives such as `pii_attributes` or `personal_data_fields`.
 `classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
 `retention` | string | No | Override the domain's retention period for this entity.
 `retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.
@@ -1001,6 +1070,58 @@ When an entity's governance posture matches the domain default exactly, no `gove
 ```yaml
 governance:
   retention_basis: Inherited from domain default retention of 10 years post relationship end
+```
+
+---
+
+### Entity Lifecycle Fields
+
+Entities within a domain may have their own lifecycle state independent of the domain. For example, a domain may be `Active` while a newly added entity is still in `Draft`.
+
+#### Lifecycle Properties
+
+Property | Type | Required | Description
+--- | --- | --- | ---
+`status` | enum | No | Lifecycle state of this entity definition. Uses the same values as domain status: `Draft`, `Review`, `Active`, `Deprecated`, `Retired`. Defaults to the domain status if omitted.
+`since` | semver string | No | The domain version in which this entity was introduced (e.g., `"1.2.0"`).
+`deprecated_at` | semver string | No | The domain version in which this entity was deprecated (e.g., `"2.0.0"`).
+`breaking_in` | semver string | No | The domain version in which a breaking change affecting this entity will take effect. Used as advance notice to consumers.
+
+#### Lifecycle Rules
+
+- An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
+- When `status` is omitted, the entity inherits the domain's status.
+- The `since` field is informational — it records provenance and aids changelog generation.
+- The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
+- The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
+
+#### Example
+
+```yaml
+extends: Party Role
+status: Active
+since: "1.0.0"
+existence: independent
+mutability: slowly_changing
+attributes:
+  Customer Number:
+    type: string
+    identifier: primary
+```
+
+#### Example: Deprecated Entity
+
+```yaml
+status: Deprecated
+since: "1.0.0"
+deprecated_at: "2.0.0"
+existence: independent
+mutability: reference
+attributes:
+  Legacy Code:
+    type: string
+    identifier: primary
+    description: "Replaced by the new Classification entity introduced in v2.0.0."
 ```
 
 ---
@@ -1266,6 +1387,7 @@ governance:
 - `owns`: Strongest link. The target entity's life is bound to the source. Example: Customer owns Account. (If the customer is deleted, the account must be too).
 - `has` / `associates_with`: A loose connection where both entities can exist independently. Example: Contact has Location.
 - `references`: Used when one entity points to another for lookup purposes. Example: Transaction references Currency.
+- `related_to`: A symmetric or near-symmetric association where neither entity owns or depends on the other. Used for peer-level connections and self-referential networks (e.g., Party related to Party for ownership structures, Account related to Account for parent/sub-account hierarchies). Most commonly paired with `self_referential: true`.
 - `assigned_to`: Denotes a functional link or responsibility. Example: Claim assigned_to Adjuster.
 - `triggers`: Used when one entity or event initiates another. Example: Application Submitted triggers Credit Check.
 - `produces` / `results_in`: Describes the outcome of a process. Example: Assessment produces Risk Score.
@@ -1284,6 +1406,60 @@ group|the related entity represents a collection or summary of instances on the 
 period|the relationship captures the state of one entity as it stood at a specific point in time rather than recording an event|Emits snapshot or point-in-time join logic accordingly.
 
 If not specified, the default is atomic.
+
+### Self-Referential Relationships
+
+A self-referential relationship connects instances of the same entity type to each other — `source` and `target` both name the same entity. Use this pattern for ownership networks, hierarchies, family or social ties, and any associative structure within a single entity population.
+
+#### Declaration
+
+Set `self_referential: true` in the relationship YAML:
+
+```yaml
+source: Party
+type: related_to
+target: Party
+cardinality: many-to-many
+granularity: atomic
+ownership: Party
+self_referential: true
+```
+
+#### Edge Attributes
+
+When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. These become columns on the bridge table in physical generation:
+
+```yaml
+self_referential: true
+relationship_attributes:
+  - Association Type
+  - Association Start Date
+  - Association End Date
+  - Verified
+```
+
+`relationship_attributes` names follow standard MD-DDL attribute naming (natural language, title case). They are attributes of the association instance, not of either participant entity.
+
+#### Source and Target Semantics
+
+When `self_referential: true`, directionality is preserved in the physical model by generating two FK columns pointing to the same entity table:
+
+- `source_[entity_identifier]` — FK referencing the source instance
+- `target_[entity_identifier]` — FK referencing the target instance
+
+For a Party with identifier `Party Identifier`, the bridge table would contain `source_party_identifier` and `target_party_identifier`. For bidirectional relationships where direction is not meaningful (e.g., "sibling of"), the generating agent should document that either column may be treated as the source.
+
+The `ownership` field names the entity that owns the relationship definition — typically the entity the relationship most naturally describes from. For self-referential relationships this is always the same entity as `source` and `target`.
+
+#### Generation Guidance
+
+Self-referential relationships always generate a bridge/association table — even at one-to-many cardinality — to avoid a self-referencing FK on the entity's own primary key column:
+
+Cardinality | Physical pattern
+--- | ---
+`many-to-many` | Bridge table with `source_[pk]`, `target_[pk]`, and `relationship_attributes` columns
+`one-to-many` (hierarchy) | Bridge table preferred; adjacency list (parent FK on entity) is acceptable for shallow hierarchies where generation skill supports it explicitly
+Any | Unbounded recursion depth is the default; document when depth is bounded and recommend recursive CTE query patterns in platform-specific notes
 
 ### Relationship Rules
 
@@ -1361,13 +1537,20 @@ downstream_impact:
   - Compliance audit trail is maintained
 
 constraints:
-  Ownership Validation:
-    check: "Customer.ID == Customer Preference.Customer ID"
-    description: Preference change must be for the acting customer
-  
   Active Customer Only:
     check: "Customer.Status == 'Active'"
     description: Only active customers can update preferences
+
+  Preference Must Be Active:
+    check: "Customer Preference.Status == 'Active'"
+    description: >
+      The preference record must be in an active state before it can be
+      updated. Ownership of the preference by the acting Customer is
+      structural — enforced by the Customer Has Preferences relationship,
+      not by an attribute check. Do not write FK-style checks such as
+      Customer.ID == Customer Preference.Customer ID; FK attributes do
+      not exist in canonical MD-DDL entities and are handled by
+      relationship definitions.
 
 governance:
    classification: Confidential
@@ -2419,7 +2602,7 @@ owner: retail.analytics@example.com
 consumers:
   - Retail Analytics Team
   - Customer Insights Dashboard
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:
@@ -2447,7 +2630,7 @@ Field | Purpose
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
-`status` | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
+`status` | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
 `entities` | List of canonical entity names included in this product.
 
 #### Optional Metadata Fields
@@ -2479,7 +2662,7 @@ owner: data.engineering@example.com
 consumers:
   - Data Engineering
   - Audit & Compliance
-status: Production
+status: Active
 
 governance:
   classification: Internal
@@ -2508,7 +2691,7 @@ owner: compliance.team@example.com
 consumers:
   - Regulatory Reporting System
   - FATF Compliance
-status: Production
+status: Active
 
 entities:
   - Transaction
@@ -2645,9 +2828,9 @@ Example:
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
-[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Production
-[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Production
+[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
+[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Active
+[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Active
 ```
 
 #### Detail File Structure
@@ -2715,14 +2898,14 @@ Data products progress through defined lifecycle states. The `status` field decl
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Production` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Active` | Product is live and governed. Changes follow the domain's version-bump rules.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
 #### Transition Rules
 
-- `Draft` → `Production`: Product has passed quality review (all checklist items in Agent Architect's design process).
-- `Production` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
+- `Draft` → `Active`: Product has passed quality review (all checklist items in Agent Architect's design process).
+- `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
 - `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
 - `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
 

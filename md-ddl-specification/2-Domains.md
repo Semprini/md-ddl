@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.0)
+# MD‑DDL Specification (Draft 0.9.1)
 
 ## **Domains**
 
@@ -35,7 +35,7 @@ Category|Metadata Keys|Purpose
 Accountability|owners, stewards, technical_leads|Who is responsible for the business vs. technical health.
 Governance & Security|classification, pii|The default security posture for the entire domain.
 Compliance|regulatory_scope, default_retention|Legal and regulatory frameworks governing this data and its retention obligations.
-Lifecycle|status (Draft/Production/Deprecated), version|The maturity of the data domain.
+Lifecycle|status, version|The lifecycle state and semantic version of the domain definition. See [Domain Lifecycle](#domain-lifecycle) below.
 Discovery|tags|Searchability
 Adoption|adoption (maturity, adoption_started, target_maturity, target_date, progress, notes)|Brownfield adoption tracking. Required when `baselines/` exists. See [Section 10 — Adoption](./10-Adoption.md).
 Platform|platform (posture, technologies, product_scope, notes)|How data products relate to infrastructure. See [Section 9 — Data Products](./9-Data-Products.md#platform-posture).
@@ -65,7 +65,7 @@ regulatory_scope:
 default_retention: "7 years"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "2.1.0"
 tags:
   - Core
@@ -324,7 +324,7 @@ Column | Purpose
 **Name** | The product name, linked to its detail definition.
 **Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
 **Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state: `Draft`, `Production`, `Deprecated`, `Retired`.
+**Status** | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
 
 ---
 
@@ -337,6 +337,41 @@ Column | Purpose
 - The description must include a short natural‑language description. A longer description will be included in the detail file.
 
 This allows the domain file to act as a semantic index of the domain.
+
+---
+
+### **Domain Lifecycle**
+
+Every domain definition has a lifecycle — it moves from initial authoring through validation to production use, and eventually to deprecation and retirement. The `status` and `version` fields in domain metadata track this progression.
+
+#### Domain Status
+
+The `status` field declares the current lifecycle state of the domain definition. Valid values:
+
+Value | Description
+--- | ---
+`Draft` | Under active development. Not yet validated. Do not consume.
+`Review` | Under structured review (Layer 1/2/3 process). Stable enough for early feedback; breaking changes possible.
+`Active` | Validated and available for consumption. Stability guaranteed within major version.
+`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition. No new consumers should onboard.
+`Retired` | No longer maintained. Historical record only.
+
+**Transition rules:**
+
+- A domain may only move forward through lifecycle states: `Draft` → `Review` → `Active` → `Deprecated` → `Retired`.
+- Reverting from `Active` to `Draft` or `Review` is permitted only when a major version bump accompanies the change (the previous active version is effectively superseded).
+- `Deprecated` domains should declare a `superseded_by` field in metadata pointing to the replacement domain (if one exists).
+- `Retired` domains are immutable records. They remain in the repository for lineage and audit purposes.
+
+#### Domain Version
+
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the domain definition. See [Domain Evolution](#domain-evolution) for version bump rules.
+
+**Lifecycle and version interaction:**
+
+- A domain in `Draft` status may use version `0.x.y` to signal pre-release instability. The `0.x` convention indicates that breaking changes may occur without a major bump.
+- A domain in `Active` status must have version `1.0.0` or higher. Stability guarantees apply from the first major release.
+- When a domain transitions from `Review` to `Active` for the first time, its version should be set to `1.0.0`.
 
 ---
 
@@ -373,6 +408,39 @@ When modifying an existing domain:
 3. If breaking: review all data products that reference the affected entities and update them accordingly.
 4. If additive: update the relevant summary tables and create/update detail files.
 5. If corrective: fix the error in place.
+
+#### Change Log Convention
+
+A domain may include a `CHANGELOG.md` file adjacent to `domain.md`. This file is optional but recommended for domains at `Active` status or higher.
+
+The changelog follows [Keep a Changelog](https://keepachangelog.com/) conventions:
+
+````markdown
+# Changelog
+
+All notable changes to the Financial Crime domain are documented here.
+
+## [1.1.0] - 2026-03-14
+
+### Added
+- Exchange Rate entity for multi-currency transaction analysis
+- Currency entity as reference data
+
+### Changed
+- Transaction entity: added `Exchange Rate` attribute
+
+## [1.0.0] - 2025-11-01
+
+### Added
+- Initial domain release with Party, Account, Transaction, and Agreement entity families
+````
+
+**Rules:**
+
+- Each version entry must correspond to the `version` field in domain metadata.
+- Use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` as section headings within each version entry.
+- Agents should offer to generate or update the changelog when the domain version is bumped.
+- The changelog is informational — it aids human understanding and is not consumed by physical artifact generation.
 
 ---
 
@@ -434,7 +502,7 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Production
+[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
 
 ````
 

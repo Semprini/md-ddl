@@ -202,7 +202,7 @@ owner: [team or individual email]
 consumers:
   - [Consumer 1]
   - [Consumer 2]
-status: [Draft | Production | Deprecated]
+status: [Draft | Active | Deprecated]
 version: "[semver]"
 
 entities:                    # or 'source:' for source-aligned
@@ -242,6 +242,52 @@ Name | Class | Consumers | Status
 
 The anchor is the product name in lowercase with spaces replaced by hyphens.
 
+## Domain Lifecycle Awareness
+
+Data products inherit lifecycle context from their parent domain. When designing
+or reviewing products, apply these lifecycle-aware rules:
+
+### Status Propagation
+
+- A product's `status` should not be more advanced than its parent domain's `status`.
+  A product cannot be `Active` (Production) in a `Draft` domain.
+- When a domain transitions to `Deprecated`, flag all products within that domain.
+  Products built on a deprecated domain should either be deprecated themselves or
+  have a documented migration plan to a successor domain.
+- When a domain transitions to `Retired`, all products must be `Retired`.
+
+### Domain Status and Product Design
+
+Domain Status | Product Design Guidance
+--- | ---
+`Draft` | Products may be sketched for planning but should be `Draft`. Do not declare `Production` products against a draft domain.
+`Review` | Products may be declared as `Draft` to support review feedback. Warn the user that breaking changes to the domain are still possible.
+`Active` | Normal product design applies. Products may be `Draft` or `Production`.
+`Deprecated` | Do not create new products. Existing products should be reviewed for migration. Flag any `Production` product on a deprecated domain as a lifecycle inconsistency.
+`Retired` | No products should be active. All must be `Retired`.
+
+### Cross-Domain Lifecycle Checks
+
+For consumer-aligned products with `cross_domain` references:
+
+- Check the `status` of each referenced domain. If any referenced domain is
+  `Deprecated`, warn the user that the product depends on a deprecated domain
+  and recommend planning for migration.
+- If a referenced domain is `Retired`, the cross-domain reference is invalid.
+  The product must remove the reference or be retired itself.
+
+### Version Alignment
+
+- Products should declare their own `version` field using semantic versioning.
+- When the parent domain undergoes a major version bump (breaking change), review
+  all products for impact. Products that include affected entities will likely
+  need their own version bump.
+- Recommend that product versioning follows the same semantic conventions as
+  domain versioning (major = breaking consumer contract change, minor = additive,
+  patch = corrective).
+
+---
+
 ## Quality Checklist
 
 Before declaring a product complete, verify:
@@ -256,7 +302,9 @@ Before declaring a product complete, verify:
 - [ ] Product appears in both domain summary table and detail file
 - [ ] Product name is unique within the domain
 - [ ] Description clearly states what the product provides and for whom
-- [ ] Status is a valid lifecycle state (`Draft`, `Production`, `Deprecated`, `Retired`)
+- [ ] Status is a valid lifecycle state (`Draft`, `Active`, `Deprecated`, `Retired`)
+- [ ] Product status is not more advanced than the parent domain status
+- [ ] No cross-domain references point to `Deprecated` or `Retired` domains without justification
 - [ ] Deprecated products include `deprecated_date` and ideally `successor`
 
 ## Product Review

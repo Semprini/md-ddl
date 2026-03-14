@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.0)
+# MD‑DDL Specification (Draft 0.9.1)
 
 ## **Events**
 
@@ -63,13 +63,20 @@ downstream_impact:
   - Compliance audit trail is maintained
 
 constraints:
-  Ownership Validation:
-    check: "Customer.ID == Customer Preference.Customer ID"
-    description: Preference change must be for the acting customer
-  
   Active Customer Only:
     check: "Customer.Status == 'Active'"
     description: Only active customers can update preferences
+
+  Preference Must Be Active:
+    check: "Customer Preference.Status == 'Active'"
+    description: >
+      The preference record must be in an active state before it can be
+      updated. Ownership of the preference by the acting Customer is
+      structural — enforced by the Customer Has Preferences relationship,
+      not by an attribute check. Do not write FK-style checks such as
+      Customer.ID == Customer Preference.Customer ID; FK attributes do
+      not exist in canonical MD-DDL entities and are handled by
+      relationship definitions.
 
 governance:
    classification: Confidential

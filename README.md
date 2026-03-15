@@ -66,12 +66,13 @@ Example prompts (Claude AI uses `/agent-guide`, CoPilot uses `@agent-guide`):
 
 **md-ddl** is not rigid or dogmatic. A typical flow is:
 
-1. **Discover** — scope the domain with Agent Ontology: identify entities, relationships, events, and governance posture
-2. **Model** — write domain.md, entity files, enums, and events
-3. **Map sources** — declare source systems and column-level transforms
-4. **Publish** — declare data products with scope, shape, SLA, and masking
-5. **Generate** — produce physical artifacts with Agent Artifact
-6. **Govern** — audit standards conformance and regulatory posture with Agent Governance
+1. **Position** — discuss the architectural approach with Agent Architect: compare to alternatives, prepare material for governance councils or CIOs
+2. **Discover** — scope the domain with Agent Ontology: identify entities, relationships, events, and governance posture
+3. **Model** — write domain.md, entity files, enums, and events
+4. **Map sources** — declare source systems and column-level transforms
+5. **Publish** — declare data products with scope, shape, SLA, and masking
+6. **Generate** — produce physical artifacts with Agent Artifact
+7. **Govern** — audit standards conformance and regulatory posture with Agent Governance
 
 Agent Guide helps you navigate between these stages and explains any concept along the way.
 
@@ -149,14 +150,14 @@ The [feature coverage matrix](examples/README.md) maps every spec feature to the
 ```text
 md-ddl-specification/        Normative standard
   1-Foundation.md            Start here to understand the model
-  2-Domains.md … 9-Data-Products.md
+  2-Domains.md … 10-Adoption.md
   MD-DDL-Complete.md         Single-file version for AI context windows
 
 agents/                      Canonical agent prompts and skills
   agent-guide/               Learning companion and navigator
   agent-ontology/            Domain modelling and source mapping
   agent-artifact/            Physical schema generation
-  agent-architect/           Data product design and architecture
+  agent-architect/           Architecture philosophy, data product design, ODPS
   agent-governance/          Standards conformance and compliance auditing
 
 examples/                    Reference examples
@@ -169,7 +170,7 @@ examples/                    Reference examples
 
 references/                  Architecture and industry reference data
   industry_standards/        BIAN, FHIR, TM Forum reference datasets
-  architecture/              Architecture blog posts and diagrams
+  architecture/              Data Autonomy blog series, external references, Mermaid diagrams
 ```
 
 ---

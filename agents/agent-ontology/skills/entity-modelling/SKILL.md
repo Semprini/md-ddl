@@ -134,6 +134,45 @@ When relationship cardinality/ownership materially affects dimensional realizati
 
 ---
 
+## User Story to Modelling Signals
+
+When user stories are available (from a BA, product owner, or requirements doc),
+parse each story before deciding existence, mutability, and temporal tracking.
+User stories encode the *why* behind these decisions; deriving them from
+structural abstractions alone misses the business intent.
+
+### Story Pattern → Modelling Decision
+
+Story pattern | Existence signal | Mutability signal | Other signal
+--- | --- | --- | ---
+"…see all [X]s for a [Y] over time" | X is `dependent` on Y | X is `append_only` or `immutable` | Temporal tracking likely needed on X
+"…reconstruct what [X] looked like at [date]" | — | `append_only` or bi-temporal | Temporal tracking required; flag for compliance review
+"…query [X] with [Y] and [Z] context in real time" | X is likely `dependent` | X is `append_only` or `immutable` | Consumer-aligned product; SLA required; relationship granularity between X–Y and X–Z matters
+"…analyse trends in [X] over [period]" | X is `independent` or `dependent` | `append_only` | Analytical product; wide-column or dimensional schema type
+"…manage [X]" (CRUD operations) | X is `independent` | `frequently_changing` or `slowly_changing` | Operational product; normalized schema type
+"…look up [X] by [identifier]" | X is `independent` | `reference` or `slowly_changing` | Lookup / reference data pattern
+"…flag [X] when [condition]" | — | — | Constraint or event on X; consider an event rather than a polling pattern
+"…see current [X] for [Y]" | X is `dependent` | `frequently_changing` | Current-state product; no temporal tracking needed
+"…audit who changed [X] and when" | — | — | `audit` stereotype on X; governance `compliance_relevance` field
+
+### How to Apply
+
+1. Before deciding existence and mutability, collect all user stories that mention
+   the entity.
+2. Apply the table to each story. If stories conflict (e.g., one needs current state,
+   another needs history), surface the tension to the user explicitly — it often
+   signals two separate data products from one canonical entity.
+3. Where a story implies a product access pattern, note it for Agent Architect:
+   the entity's existence and mutability decisions should align with the product
+   class and schema type the story implies.
+
+> "I see two user stories that conflict: one needs current state of [X], the other
+> needs full history. The canonical entity can support both — `append_only` mutability
+> with a current-state view in one product and a history view in another. Shall I
+> model it that way?"
+
+---
+
 ## Governance Authoring Protocol
 
 Apply governance metadata to every entity during drafting — do not defer governance to a later pass. The spec defines the authoritative schema in `3-Entities.md § Governance Metadata Schema`.

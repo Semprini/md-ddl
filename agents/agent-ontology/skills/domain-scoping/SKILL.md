@@ -36,6 +36,21 @@ Ask:
 - Who consumes the data from this domain, and what do they do with it?
 - What goes wrong if this domain is missing or wrong?
 
+**If the user describes downstream product requirements** (e.g., "this canonical
+model will feed financial crime screening, transaction monitoring, and fraud
+analytics"), extract canonical model constraints *before* beginning the entity
+interview. Product consumer needs drive existence, mutability, and granularity
+decisions — do not discover them after the fact:
+
+- Real-time screening / sub-second query → `append_only` or `immutable`; SLA signal
+- Historical state reconstruction (audit, replay) → temporal tracking required
+- Cross-entity context in a single query (e.g., transaction + customer + account) → relationship granularity and entity scope decisions
+- Regulatory re-presentation at a point in time → bi-temporal tracking
+
+Note these as modelling constraints and carry them into Steps 2–4. Use the user
+story mapping table in `../entity-modelling/SKILL.md § User Story to Modelling
+Signals` to formalise the derivation if user stories are available.
+
 ### Step 2 — Candidate Concepts
 Surface the nouns and verbs of the domain without committing to a structure yet.
 
@@ -82,6 +97,92 @@ Before drafting, check whether Standards Alignment applies.
 If the domain maps to an industry (banking, insurance, healthcare, payments, telecom):
 load `skills/standards-alignment/SKILL.md` and run the standards check in parallel
 with drafting.
+
+---
+
+## Requirements Intake Path
+
+Use this path when the user brings **structured artefacts** rather than starting
+from a blank conversation — business requirements documents, spreadsheets of
+concepts, user stories, regulatory obligation lists, or process maps. This
+complements (and feeds into) the standard interview protocol; it does not replace it.
+
+**Triggers:**
+
+- "I have a spreadsheet / requirements doc / BRD with concepts"
+- "Here are our user stories"
+- "Our regulatory team gave us a list of obligations"
+- "We have a business requirements document for this domain"
+- User pastes or uploads a structured list of concepts, rules, or stories
+
+### Requirements Step 1 — Extract Vocabulary
+
+Ask the user to share the document or its key contents. Parse it for:
+
+- **Nouns** → candidate entities or enums
+- **Verbs and processes** → candidate relationships or events
+- **Rules and conditions** → candidate constraints
+- **Regulatory obligations** → governance metadata and temporal tracking signals
+- **Consumer roles and access patterns** → data product requirements; existence and mutability signals
+
+Reflect the extracted vocabulary back to the user before categorising it:
+
+> "I can see these key concepts: [list]. Before I classify them, does this capture
+> the vocabulary you work with, or are there important terms missing?"
+
+### Requirements Step 2 — Map Requirements to Modelling Decisions
+
+For each extracted item, apply this mapping:
+
+Requirement type | Modelling signal
+--- | ---
+Business concept with its own identity and lifecycle | Candidate entity
+Classification or controlled vocabulary | Candidate enum
+Rule applying only when two things are connected | Candidate relationship attribute
+"Must be able to reconstruct [X] at any point in time" | Temporal tracking on X; consider bi-temporal
+"Must retain [X] for [period] for [regulation]" | `retention` override on entity; `regulatory_reporting` field
+"[Role] must be able to query [X] in real time" | Consumer-aligned product; SLA signal; mutability → `append_only` or `immutable`
+"[X] changes frequently; current value is what matters" | mutability → `frequently_changing`
+"[X] is created once and never modified" | mutability → `immutable`; existence → `independent`
+"[X] only makes sense in the context of [Y]" | existence → `dependent`; candidate fact entity
+"[X] connects [A] to [B] and carries its own attributes" | existence → `associative`
+
+### Requirements Step 3 — Map User Stories to Model Signals
+
+If the user provides user stories in `as an X I want Y so that Z` format, parse each
+story for modelling signals:
+
+Story element | Modelling signal
+--- | ---
+**X** (the role) | Consumer archetype; informs data product `consumers` field and access controls
+**Y** (the capability) | Access pattern → schema type; entity and relationship scope; product class
+**Z** (the outcome / "so that") | Non-functional requirement → SLA, mutability, temporal tracking, retention
+
+Apply the full mapping table in the entity-modelling skill: `../entity-modelling/SKILL.md § User Story to Modelling Signals`.
+
+> "You have [N] user stories. I am reading each one for entity scope, access patterns,
+> and non-functional requirements that drive modelling decisions. Let me summarise
+> what I found before we proceed."
+
+### Requirements Step 4 — Identify Gaps
+
+After extracting and mapping, identify what the requirements document does *not* answer
+and flag them before starting the interview:
+
+- Governance posture (classification, PII, retention basis) unless stated
+- Domain ownership (steward, technical owner)
+- Source systems that feed the domain
+- Boundaries — concepts that may belong to a neighbouring domain
+- Modelling strategy (Canonical vs. BoundedContext) if not implied
+
+> "I have mapped the requirements to candidate modelling decisions. Before I start
+> drafting, I still need to confirm: [gaps list]. I will ask about these in the
+> interview, or you can tell me now if you know the answers."
+
+### Requirements Step 5 — Transition to Interview
+
+Continue with the standard interview protocol (Steps 1–5 above) to fill the gaps.
+Skip any interview question already answered by the requirements artefact.
 
 ---
 

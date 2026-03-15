@@ -346,7 +346,9 @@ Every domain definition has a lifecycle — it moves from initial authoring thro
 
 #### Domain Status
 
-The `status` field declares the current lifecycle state of the domain definition. Valid values:
+The `status` field declares the current lifecycle state of the domain definition. They govern the lifecycle of the domain definition.
+
+Valid values:
 
 Value | Description
 --- | ---
@@ -383,9 +385,9 @@ Domains are living artifacts. They evolve as business understanding deepens, new
 
 Change Type | Version Impact | Examples
 --- | --- | ---
-**Breaking** — changes meaning or removes concepts | Major bump | Removing an entity; renaming an entity; changing a relationship's cardinality, granularity, or direction; removing an attribute that downstream products consume
-**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, enum, relationship, or event; adding attributes to existing entities; declaring a new source system or data product
-**Corrective** — fixes errors without changing intended meaning | Patch bump | Fixing a typo in a description; correcting a broken link; updating a `# TODO:` with the resolved value; adjusting formatting
+**Breaking** — changes meaning or removes consumer-visible structure | Major bump | Removing an entity or attribute; changing an attribute type incompatibly; reducing relationship cardinality; changing an identifier; removing or renaming an enum used by consumers
+**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, attribute, relationship, event, enum value, or constraint; declaring a new source system or data product
+**Corrective** — fixes errors without changing intended meaning | Patch bump | Clarifying descriptions; correcting broken links; updating governance metadata without changing logical structure; clarifying a constraint description without changing its logic
 
 #### Breaking vs Non-Breaking Changes
 
@@ -405,22 +407,62 @@ When modifying an existing domain:
 
 1. Identify the change and classify it as breaking, additive, or corrective.
 2. Bump the `version` field in metadata according to the rules above.
-3. If breaking: review all data products that reference the affected entities and update them accordingly.
-4. If additive: update the relevant summary tables and create/update detail files.
-5. If corrective: fix the error in place.
+3. Record the logical change in `LIFECYCLE.md` if the domain maintains one. Include a machine-readable change manifest and any affected products.
+4. If breaking: review all data products that reference the affected entities and update them accordingly.
+5. If additive: update the relevant summary tables and create/update detail files.
+6. If corrective: fix the error in place.
 
-#### Change Log Convention
+#### Lifecycle File Convention
 
-A domain may include a `CHANGELOG.md` file adjacent to `domain.md`. This file is optional but recommended for domains at `Active` status or higher.
+A domain may include a `LIFECYCLE.md` file adjacent to `domain.md`. This file is optional, but recommended from the first version bump onward and strongly recommended for domains at `Active` status or higher.
 
-The changelog follows [Keep a Changelog](https://keepachangelog.com/) conventions:
+`LIFECYCLE.md` replaces the narrower `CHANGELOG.md` convention used in earlier drafts. It combines a machine-readable change manifest with a human-readable changelog so the same file supports both agent workflows and human review.
+
+Suggested structure:
 
 ````markdown
-# Changelog
+# Lifecycle - Financial Crime
 
-All notable changes to the Financial Crime domain are documented here.
+## Current State
 
-## [1.1.0] - 2026-03-14
+```yaml
+domain_version: "1.1.0"
+domain_status: Active
+
+products:
+  - name: Customer 360 Profile
+    status: Active
+    version: "1.0.0"
+  - name: Suspicious Activity Report
+    status: Draft
+    version: "0.2.0"
+```
+
+## Version History
+
+### Domain 1.1.0 - 2026-03-14
+
+#### Change Manifest
+
+```yaml
+changes:
+  - type: additive
+    scope: entity
+    entity: Exchange Rate
+    description: "Added Exchange Rate entity for multi-currency analysis"
+  - type: additive
+    scope: attribute
+    entity: Transaction
+    attribute: Exchange Rate
+    description: "Added Exchange Rate attribute to Transaction"
+
+affected_products:
+  - name: Suspicious Activity Report
+    impact: additive
+    reason: "Transaction schema extended with exchange-rate context"
+```
+
+#### Changelog
 
 ### Added
 - Exchange Rate entity for multi-currency transaction analysis
@@ -429,7 +471,9 @@ All notable changes to the Financial Crime domain are documented here.
 ### Changed
 - Transaction entity: added `Exchange Rate` attribute
 
-## [1.0.0] - 2025-11-01
+### Domain 1.0.0 - 2025-11-01
+
+#### Changelog
 
 ### Added
 - Initial domain release with Party, Account, Transaction, and Agreement entity families
@@ -437,10 +481,12 @@ All notable changes to the Financial Crime domain are documented here.
 
 **Rules:**
 
-- Each version entry must correspond to the `version` field in domain metadata.
-- Use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` as section headings within each version entry.
-- Agents should offer to generate or update the changelog when the domain version is bumped.
-- The changelog is informational — it aids human understanding and is not consumed by physical artifact generation.
+- `LIFECYCLE.md` is domain-scoped and may also record product status/version snapshots in the `## Current State` section.
+- Each domain version entry must correspond to a semantic version used in the domain metadata.
+- The `#### Change Manifest` block is the machine-readable section. It may be consumed by reconciliation and impact-analysis workflows.
+- The `#### Changelog` section is the human-readable section and should use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` headings where applicable.
+- Agents should offer to create or update `LIFECYCLE.md` whenever the domain version is bumped or a product is promoted, deprecated, or retired.
+- `LIFECYCLE.md` is the authoritative lifecycle history file. If an older `CHANGELOG.md` exists, it should be migrated or treated as legacy documentation.
 
 ---
 

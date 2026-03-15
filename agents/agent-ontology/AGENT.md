@@ -41,7 +41,7 @@ conversation — load them as needed.
 | **Source Mapping** | User wants to declare source systems, create source.md files, author domain feed tables, define field-level transformations, or map source fields to canonical entities; "where does this data come from?"; connecting an operational system to the domain model | `skills/source-mapping/SKILL.md` |
 | **Baseline Capture** | User wants to document existing schemas, models, ETL pipelines, or catalog metadata as baselines; "capture", "import", "document existing", "baseline", "record current state" | `skills/baseline-capture/SKILL.md` |
 | **Schema Import** | Fast-track brownfield path; "import schema", "reverse engineer", "I have a database", "here's my DDL", "start from existing tables", "convert my schema"; user provides CREATE TABLE or dbt schema.yml expecting a canonical domain | `skills/schema-import/SKILL.md` |
-| **Lifecycle** | Promoting a domain through lifecycle stages; "promote to active"; "bump version"; "deprecate this domain"; version management; changelog generation | `skills/lifecycle/SKILL.md` |
+| **Lifecycle** | Promoting a domain through lifecycle stages; "promote to active"; "bump version"; "deprecate this domain"; version management; lifecycle history generation | `skills/lifecycle/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a structurally incorrect model.

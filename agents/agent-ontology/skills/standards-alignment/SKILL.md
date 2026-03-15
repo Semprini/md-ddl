@@ -38,7 +38,7 @@ For BIAN BOM, use the dedicated guidance in [BIAN standard guidance](./standards
 It defines the deterministic lookup sequence, local reference files for name matching
 and attribute inspection, candidate disambiguation rules, version parameters,
 and no-guess policy.
-Default to BIAN v14 unless the user is explicitly maintaining a v13-aligned model.
+Default to BIAN v13 until v14 snapshots are available — see the version selection rules in [BIAN standard guidance](./standards/bian/README.md).
 
 For TM Forum SID, use the dedicated guidance in [TM Forum standard guidance](./standards/tmforum/README.md).
 It defines the deterministic lookup sequence, local reference files for entity
@@ -182,7 +182,7 @@ from re-asking the same question.
 
 This example demonstrates the standards alignment process applied to core entities
 from the `examples/Financial Crime/` domain, mapping against the BIAN Business
-Object Model (use v14 by default; keep v13 only for backward compatibility cases).
+Object Model (v13 — current production baseline; v14 pending snapshot availability).
 
 ### Step 1 — Identify candidate mappings
 

@@ -39,7 +39,7 @@ Use local files first. API lookup is fallback for unresolved details only.
 
 ## Deterministic Lookup Process
 
-1. Pick target BIAN version (v14 default).
+1. Pick target BIAN version (v13 default — see Version Selection Rules above).
 2. Search `v{n}/bo-classes.md` for exact/near class candidates.
 3. Validate inheritance and attributes in `v{n}/bo-classes-detail.md` when available.
 4. Use `v{n}/hierarchy.md` to verify taxonomy context.

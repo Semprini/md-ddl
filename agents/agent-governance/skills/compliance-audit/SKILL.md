@@ -79,7 +79,7 @@ Level 1: Domain Metadata          (domain.md → ## Metadata → YAML block)
 Level 2: Entity Governance Block  (entity detail file → ## Entities → ### Entity → governance: YAML)
 Level 3: Attribute-Level Flags    (entity detail file → attributes: → individual fields)
 Level 4: Product Governance       (products/*.md → ### Product → governance: + masking: YAML)
-Level 5: Lifecycle Validation     (domain.md + entity files → status/version consistency)
+Level 5: Lifecycle Validation     (domain.md + entity files + products/*.md → status/version consistency)
 ```
 
 **Inheritance rule:** Domain-level metadata sets the default posture. Entities
@@ -243,7 +243,7 @@ governance metadata, log as a critical gap.
 
 ## Level 5 — Lifecycle Field Validation
 
-Evaluate domain and entity lifecycle metadata for consistency and completeness.
+Evaluate domain, entity, and product lifecycle metadata for consistency and completeness.
 This level checks the structural integrity of lifecycle fields — it does not
 assess whether the domain is *ready* for promotion (that is Agent Ontology's
 lifecycle skill responsibility).
@@ -275,17 +275,33 @@ Check | What to verify | Gap if failed
 **Deprecated entity fields** | Entities with `status: Deprecated` should have `deprecated_at` set | Deprecated entity without version provenance
 **Since field on new entities** | Entities added after the initial release should have `since` set | New entity without version provenance (Advisory)
 
+### Product-level lifecycle checks
+
+Check | What to verify | Gap if failed
+--- | --- | ---
+**Product status consistency** | Product `status` must not be more advanced than the owning domain `status` | Product lifecycle more advanced than domain
+**Product version present when Active** | Products with `status: Active` should declare a `version` field | Active product without version tracking
+**Product version format** | Product `version` follows semantic versioning (`MAJOR.MINOR.PATCH`) when present | Invalid product version format
+**Deprecated upstream handling** | Products referencing deprecated entities or deprecated `cross_domain` dependencies are themselves `Deprecated` or declare `migration_note` | Active product with no migration path for deprecated upstream dependency
+**Deprecated product fields** | Products with `status: Deprecated` should declare `deprecated_date` and should declare `successor` when one exists | Deprecated product without retirement provenance
+
 ### Lifecycle severity rules
 
 Gap | Severity
 --- | ---
 Active domain without `version` | Critical
 Entity status more advanced than domain | Critical
+Product status more advanced than domain | Critical
 Invalid `status` value | Critical
+Invalid product `status` value | Critical
+Active product without `version` | Advisory
+Invalid product `version` format | Advisory
+Active product with deprecated upstream dependency and no `migration_note` | Advisory
 Pre-release version on active domain | Advisory
 Missing `since` on post-1.0.0 entity | Advisory
 Missing `superseded_by` on deprecated domain | Advisory
 Missing `deprecated_at` on deprecated entity | Advisory
+Missing `deprecated_date` on deprecated product | Advisory
 
 ---
 

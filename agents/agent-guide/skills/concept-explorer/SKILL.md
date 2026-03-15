@@ -49,6 +49,9 @@ MD-DDL Concept | ER / UML analogy | dbt / SQL analogy | Data Mesh analogy | FHIR
 **Source** | — | Source in dbt, raw table | External system feed | Integration endpoint | System of record
 **Transformation** | — | dbt transformation, SQL expression | Mapping rule | ConceptMap | ETL specification
 **Data Product** | — | Exposure in dbt | Data product / data contract | — | Published data asset
+**Version / Lifecycle** | Schema version in migration tool | dbt project version, model deprecation | Domain version, contract versioning | Resource version history | Change control record
+**Change Manifest** | Change log with typed impacts | dbt `state:modified` selector | Contract change record | — | Audit change register
+**Reconciliation** | Schema compare tool | Compare generated model to deployed relation | Contract compatibility check | — | Control attestation compare
 
 > "In ER modelling, you would call this an entity with attributes. In MD-DDL, it is
 > the same idea — but defined in Markdown with YAML blocks, version-controlled, and
@@ -205,6 +208,63 @@ The key insight: **the primary consumer of an MD-DDL model is more sophisticated
 When an organisation uses `phi` instead of `pii`, or `data_class` instead of `classification`, that is not an error — it is signal. Agents work with deviations and flag them as potential spec vocabulary gaps. This is how the standard improves.
 
 > "In your domain, what terminology do you use for data sensitivity classification? MD-DDL uses `classification`, but if you have existing vocabulary, your agents will understand it and can note the gap for spec consideration."
+
+---
+
+## Explaining Lifecycle and Evolution
+
+When a user asks about versioning, lifecycle, change history, migration planning,
+or how model changes propagate to generated artifacts, load both
+`md-ddl-specification/2-Domains.md` and `md-ddl-specification/9-Data-Products.md`.
+
+### Core explanation to give
+
+MD-DDL separates **logical evolution** from **physical regeneration**.
+
+- **Logical evolution** is the intentional change to the domain model: adding an
+  entity, deprecating an entity, changing a relationship, or updating a product
+  contract. This is what domain and product semantic versions describe.
+- **Physical regeneration** is the act of generating a new schema, graph, or file
+  contract from the updated logical model. Generated output may differ physically
+  even when the logical meaning has not changed.
+
+The key teaching point is: **the authoritative diff lives at the logical layer, not
+the physical layer**.
+
+### Workflow to explain
+
+Use this sequence whenever the user asks how MD-DDL handles change:
+
+1. Make the logical change in the MD-DDL model.
+2. Classify it as breaking, additive, or corrective.
+3. Bump the domain or product version accordingly.
+4. Record the change in `LIFECYCLE.md`, including the machine-readable change manifest.
+5. Regenerate physical artifacts from the updated model.
+6. Reconcile generated output against deployed or baseline state.
+7. Use the change manifest to distinguish intentional changes from regeneration noise.
+8. Hand the annotated gap report to the user's migration toolchain if a deployment change is needed.
+
+### Product and Domain Lifecycle Relationship
+
+Explain the relationship this way:
+
+- Domains and products both have lifecycle states and versions.
+- Products can lag behind a domain. A product may stay `Draft` while its domain is `Active`.
+- Products cannot lead a domain. A product cannot be `Active` if its domain is still `Draft` or `Review`.
+- Products referencing deprecated entities or deprecated upstream domains need either deprecation or an explicit migration note.
+
+### Handoff Guidance
+
+When the user moves from explanation to action, route them explicitly:
+
+- **Domain promotion, version bump, entity lifecycle** → Agent Ontology
+- **Product promotion, product version bump, deprecation planning** → Agent Architect
+- **Generated vs deployed schema comparison** → Agent Artifact
+- **Lifecycle consistency or governance audit** → Agent Governance
+
+### Short analogy to use
+
+> "Think of MD-DDL like source code plus release notes for data meaning. The model is the source, `LIFECYCLE.md` is the typed release history, and reconciliation is the step where you compare the newly built artifact to what is already running."
 
 ---
 

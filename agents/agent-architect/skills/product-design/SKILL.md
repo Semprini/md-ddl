@@ -250,20 +250,20 @@ or reviewing products, apply these lifecycle-aware rules:
 ### Status Propagation
 
 - A product's `status` should not be more advanced than its parent domain's `status`.
-  A product cannot be `Active` (Production) in a `Draft` domain.
+  A product cannot be `Active` in a `Draft` or `Review` domain.
 - When a domain transitions to `Deprecated`, flag all products within that domain.
   Products built on a deprecated domain should either be deprecated themselves or
-  have a documented migration plan to a successor domain.
+  declare a documented `migration_note`.
 - When a domain transitions to `Retired`, all products must be `Retired`.
 
 ### Domain Status and Product Design
 
 Domain Status | Product Design Guidance
 --- | ---
-`Draft` | Products may be sketched for planning but should be `Draft`. Do not declare `Production` products against a draft domain.
+`Draft` | Products may be sketched for planning but should be `Draft`. Do not declare `Active` products against a draft domain.
 `Review` | Products may be declared as `Draft` to support review feedback. Warn the user that breaking changes to the domain are still possible.
-`Active` | Normal product design applies. Products may be `Draft` or `Production`.
-`Deprecated` | Do not create new products. Existing products should be reviewed for migration. Flag any `Production` product on a deprecated domain as a lifecycle inconsistency.
+`Active` | Normal product design applies. Products may be `Draft` or `Active`.
+`Deprecated` | Do not create new products. Existing products should be reviewed for migration. Flag any `Active` product on a deprecated domain as a lifecycle inconsistency unless it carries a `migration_note`.
 `Retired` | No products should be active. All must be `Retired`.
 
 ### Cross-Domain Lifecycle Checks
@@ -282,9 +282,12 @@ For consumer-aligned products with `cross_domain` references:
 - When the parent domain undergoes a major version bump (breaking change), review
   all products for impact. Products that include affected entities will likely
   need their own version bump.
-- Recommend that product versioning follows the same semantic conventions as
-  domain versioning (major = breaking consumer contract change, minor = additive,
-  patch = corrective).
+- Use product versioning semantics from the Data Products spec:
+  - major = breaking consumer contract change
+  - minor = additive schema or contract expansion
+  - patch = corrective or descriptive change with no consumer break
+- Record promotions, version bumps, deprecations, and retirements in the owning
+  domain's `LIFECYCLE.md` when that file exists.
 
 ---
 
@@ -313,22 +316,42 @@ When reviewing existing products, check for:
 
 - **Scope creep:** Products that include entities the consumer doesn't actually need
 - **Missing products:** Consumer groups that don't have a product serving them
-- **Stale status:** Products marked Production that are no longer consumed
+- **Stale status:** Products marked `Active` that are no longer consumed
+- **Version drift:** Products whose version does not reflect a known upstream domain change
 - **Governance drift:** Products whose governance overrides no longer match current policy
 - **Orphaned products:** Products in detail files that are missing from the domain summary table (or vice versa)
 
-## Product Lifecycle Management
+## Product Lifecycle Mode
 
 When managing existing products, apply the lifecycle rules from the Data Products
 specification:
+
+### Mode Triggers
+
+Use lifecycle mode when the user asks to promote a product, bump a product version,
+deprecate or retire a product, or assess the impact of an upstream domain version bump.
 
 ### Status Transitions
 
 Transition | Required Actions
 --- | ---
-Draft → Production | All quality checklist items pass; governance overrides reviewed
-Production → Deprecated | Add `deprecated_date` to metadata; add `successor` if a replacement exists; notify declared consumers
+Draft → Active | All quality checklist items pass; governance overrides reviewed; parent domain status supports activation; product version is `1.0.0` or higher; at least one named consumer is declared
+Active → Deprecated | Add `deprecated_date` to metadata; add `successor` if a replacement exists; add `migration_note` when consumers need an interim migration path
 Deprecated → Retired | Add `sunset_date` to metadata; confirm no active consumers remain; product remains in detail file for audit
+
+### Version Bump Workflow
+
+When a user changes a product directly, or when Agent Ontology provides an
+`affected_products` block after a domain version bump:
+
+1. Identify the contract change:
+  - removing an entity or reducing scope = breaking
+  - adding an entity or additive upstream change = additive
+  - masking/SLA/consumer change without contract break = minor or patch
+2. Propose the new product version.
+3. Update product metadata and the domain summary table if status changes.
+4. If the domain maintains `LIFECYCLE.md`, append or update the product's current
+  status/version snapshot there.
 
 ### Managing Deprecation
 
@@ -336,8 +359,9 @@ When a user deprecates a product:
 
 1. Set `status: Deprecated` and add `deprecated_date`
 2. If a replacement exists, add `successor: "[New Product Name]"`
-3. Update the domain summary table status
-4. Identify consumers that need to migrate — review the `consumers` list
+3. If the product remains available while upstream domains or entities are deprecated, add `migration_note`
+4. Update the domain summary table status
+5. Identify consumers that need to migrate — review the `consumers` list
 
 ### Retired Products
 

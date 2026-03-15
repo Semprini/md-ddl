@@ -375,9 +375,11 @@ Property | Type | Required | Description
 
 - An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
 - When `status` is omitted, the entity inherits the domain's status.
-- The `since` field is informational — it records provenance and aids changelog generation.
+- The `since`, `deprecated_at`, and `breaking_in` fields refer to domain semantic versions as defined in [2-Domains.md](./2-Domains.md#domain-version).
+- The `since` field is informational — it records provenance and aids lifecycle history generation.
 - The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
 - The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
+- When an entity is introduced, deprecated, or flagged with `breaking_in`, the domain's `LIFECYCLE.md` should be updated if that file is maintained.
 
 #### Example
 

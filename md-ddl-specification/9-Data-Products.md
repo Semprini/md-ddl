@@ -451,13 +451,13 @@ Data products progress through defined lifecycle states. The `status` field decl
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Active` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Active` | Product is live and governed. Changes follow the product versioning and consistency rules defined below.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
 #### Transition Rules
 
-- `Draft` → `Active`: Product has passed quality review (all checklist items in Agent Architect's design process).
+- `Draft` → `Active`: Product has passed quality review, names at least one consumer, and declares version `1.0.0` or higher.
 - `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
 - `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
 - `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
@@ -468,6 +468,7 @@ Field | Required | Purpose
 --- | --- | ---
 `deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
 `successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
+`migration_note` | Advisory when the product remains active during upstream deprecation | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
 `sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
 
 Example:
@@ -477,6 +478,36 @@ status: Deprecated
 deprecated_date: "2025-03-15"
 successor: "Customer 360 Profile v2"
 ```
+
+#### Product Versioning
+
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract. Product versions are independent from domain versions: a product may remain `Draft` while its domain is `Active`, and a product may lag behind the latest domain version while consumers migrate.
+
+Trigger | Version Impact
+--- | ---
+Domain breaking change affecting an entity referenced by the product | Major bump
+Domain additive change affecting an entity referenced by the product and published by the product | Minor bump
+Product removes an entity from its `entities` list | Major bump
+Product adds an entity to its `entities` list | Minor bump
+Product changes masking rules, SLA, consumers, or other governance contract details without reducing schema scope | Minor or patch bump depending on consumer impact
+Corrective documentation or descriptive fixes with no contract impact | Patch bump
+
+Use a major bump when a correctly-authored consumer must change to keep working. Use a minor bump when the published contract is extended but existing consumers can continue unchanged. Use a patch bump for non-breaking clarifications or corrective metadata changes.
+
+#### Product-Domain Lifecycle Consistency
+
+Products evolve independently, but they cannot be more mature than the model they publish.
+
+- A product's `status` must not be more advanced than the owning domain's status. A product cannot be `Active` if its domain is `Draft` or `Review`.
+- Products may lag the domain. A product may remain `Draft` while its domain is `Active`.
+- Promoting a domain to `Active` does not automatically promote any products declared within it.
+- An `Active` product should declare version `1.0.0` or higher.
+- If a product references deprecated entities or draws from a deprecated cross-domain dependency, it must either move to `Deprecated` or declare a `migration_note` explaining the consumer migration path.
+- When a domain version bump changes referenced entities, affected products should evaluate their own version independently using the rules above and record the result in the domain's `LIFECYCLE.md` when that file is maintained.
+
+#### Lifecycle History Recording
+
+Product promotions, version bumps, deprecations, and retirements should be recorded in the owning domain's `LIFECYCLE.md` file when present. The domain owns the lifecycle history file because product lifecycle is part of the domain's publication history.
 
 ---
 

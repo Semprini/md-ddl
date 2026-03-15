@@ -556,7 +556,9 @@ Every domain definition has a lifecycle — it moves from initial authoring thro
 
 #### Domain Status
 
-The `status` field declares the current lifecycle state of the domain definition. Valid values:
+The `status` field declares the current lifecycle state of the domain definition. They govern the lifecycle of the domain definition.
+
+Valid values:
 
 Value | Description
 --- | ---
@@ -593,9 +595,9 @@ Domains are living artifacts. They evolve as business understanding deepens, new
 
 Change Type | Version Impact | Examples
 --- | --- | ---
-**Breaking** — changes meaning or removes concepts | Major bump | Removing an entity; renaming an entity; changing a relationship's cardinality, granularity, or direction; removing an attribute that downstream products consume
-**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, enum, relationship, or event; adding attributes to existing entities; declaring a new source system or data product
-**Corrective** — fixes errors without changing intended meaning | Patch bump | Fixing a typo in a description; correcting a broken link; updating a `# TODO:` with the resolved value; adjusting formatting
+**Breaking** — changes meaning or removes consumer-visible structure | Major bump | Removing an entity or attribute; changing an attribute type incompatibly; reducing relationship cardinality; changing an identifier; removing or renaming an enum used by consumers
+**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, attribute, relationship, event, enum value, or constraint; declaring a new source system or data product
+**Corrective** — fixes errors without changing intended meaning | Patch bump | Clarifying descriptions; correcting broken links; updating governance metadata without changing logical structure; clarifying a constraint description without changing its logic
 
 #### Breaking vs Non-Breaking Changes
 
@@ -615,22 +617,62 @@ When modifying an existing domain:
 
 1. Identify the change and classify it as breaking, additive, or corrective.
 2. Bump the `version` field in metadata according to the rules above.
-3. If breaking: review all data products that reference the affected entities and update them accordingly.
-4. If additive: update the relevant summary tables and create/update detail files.
-5. If corrective: fix the error in place.
+3. Record the logical change in `LIFECYCLE.md` if the domain maintains one. Include a machine-readable change manifest and any affected products.
+4. If breaking: review all data products that reference the affected entities and update them accordingly.
+5. If additive: update the relevant summary tables and create/update detail files.
+6. If corrective: fix the error in place.
 
-#### Change Log Convention
+#### Lifecycle File Convention
 
-A domain may include a `CHANGELOG.md` file adjacent to `domain.md`. This file is optional but recommended for domains at `Active` status or higher.
+A domain may include a `LIFECYCLE.md` file adjacent to `domain.md`. This file is optional, but recommended from the first version bump onward and strongly recommended for domains at `Active` status or higher.
 
-The changelog follows [Keep a Changelog](https://keepachangelog.com/) conventions:
+`LIFECYCLE.md` replaces the narrower `CHANGELOG.md` convention used in earlier drafts. It combines a machine-readable change manifest with a human-readable changelog so the same file supports both agent workflows and human review.
+
+Suggested structure:
 
 ````markdown
-# Changelog
+# Lifecycle - Financial Crime
 
-All notable changes to the Financial Crime domain are documented here.
+## Current State
 
-## [1.1.0] - 2026-03-14
+```yaml
+domain_version: "1.1.0"
+domain_status: Active
+
+products:
+  - name: Customer 360 Profile
+    status: Active
+    version: "1.0.0"
+  - name: Suspicious Activity Report
+    status: Draft
+    version: "0.2.0"
+```
+
+## Version History
+
+### Domain 1.1.0 - 2026-03-14
+
+#### Change Manifest
+
+```yaml
+changes:
+  - type: additive
+    scope: entity
+    entity: Exchange Rate
+    description: "Added Exchange Rate entity for multi-currency analysis"
+  - type: additive
+    scope: attribute
+    entity: Transaction
+    attribute: Exchange Rate
+    description: "Added Exchange Rate attribute to Transaction"
+
+affected_products:
+  - name: Suspicious Activity Report
+    impact: additive
+    reason: "Transaction schema extended with exchange-rate context"
+```
+
+#### Changelog
 
 ### Added
 - Exchange Rate entity for multi-currency transaction analysis
@@ -639,7 +681,9 @@ All notable changes to the Financial Crime domain are documented here.
 ### Changed
 - Transaction entity: added `Exchange Rate` attribute
 
-## [1.0.0] - 2025-11-01
+### Domain 1.0.0 - 2025-11-01
+
+#### Changelog
 
 ### Added
 - Initial domain release with Party, Account, Transaction, and Agreement entity families
@@ -647,10 +691,12 @@ All notable changes to the Financial Crime domain are documented here.
 
 **Rules:**
 
-- Each version entry must correspond to the `version` field in domain metadata.
-- Use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` as section headings within each version entry.
-- Agents should offer to generate or update the changelog when the domain version is bumped.
-- The changelog is informational — it aids human understanding and is not consumed by physical artifact generation.
+- `LIFECYCLE.md` is domain-scoped and may also record product status/version snapshots in the `## Current State` section.
+- Each domain version entry must correspond to a semantic version used in the domain metadata.
+- The `#### Change Manifest` block is the machine-readable section. It may be consumed by reconciliation and impact-analysis workflows.
+- The `#### Changelog` section is the human-readable section and should use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` headings where applicable.
+- Agents should offer to create or update `LIFECYCLE.md` whenever the domain version is bumped or a product is promoted, deprecated, or retired.
+- `LIFECYCLE.md` is the authoritative lifecycle history file. If an older `CHANGELOG.md` exists, it should be migrated or treated as legacy documentation.
 
 ---
 
@@ -1091,9 +1137,11 @@ Property | Type | Required | Description
 
 - An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
 - When `status` is omitted, the entity inherits the domain's status.
-- The `since` field is informational — it records provenance and aids changelog generation.
+- The `since`, `deprecated_at`, and `breaking_in` fields refer to domain semantic versions as defined in [2-Domains.md](./2-Domains.md#domain-version).
+- The `since` field is informational — it records provenance and aids lifecycle history generation.
 - The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
 - The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
+- When an entity is introduced, deprecated, or flagged with `breaking_in`, the domain's `LIFECYCLE.md` should be updated if that file is maintained.
 
 #### Example
 
@@ -2898,13 +2946,13 @@ Data products progress through defined lifecycle states. The `status` field decl
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Active` | Product is live and governed. Changes follow the domain's version-bump rules.
+`Active` | Product is live and governed. Changes follow the product versioning and consistency rules defined below.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
 #### Transition Rules
 
-- `Draft` → `Active`: Product has passed quality review (all checklist items in Agent Architect's design process).
+- `Draft` → `Active`: Product has passed quality review, names at least one consumer, and declares version `1.0.0` or higher.
 - `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
 - `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
 - `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
@@ -2915,6 +2963,7 @@ Field | Required | Purpose
 --- | --- | ---
 `deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
 `successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
+`migration_note` | Advisory when the product remains active during upstream deprecation | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
 `sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
 
 Example:
@@ -2924,6 +2973,36 @@ status: Deprecated
 deprecated_date: "2025-03-15"
 successor: "Customer 360 Profile v2"
 ```
+
+#### Product Versioning
+
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract. Product versions are independent from domain versions: a product may remain `Draft` while its domain is `Active`, and a product may lag behind the latest domain version while consumers migrate.
+
+Trigger | Version Impact
+--- | ---
+Domain breaking change affecting an entity referenced by the product | Major bump
+Domain additive change affecting an entity referenced by the product and published by the product | Minor bump
+Product removes an entity from its `entities` list | Major bump
+Product adds an entity to its `entities` list | Minor bump
+Product changes masking rules, SLA, consumers, or other governance contract details without reducing schema scope | Minor or patch bump depending on consumer impact
+Corrective documentation or descriptive fixes with no contract impact | Patch bump
+
+Use a major bump when a correctly-authored consumer must change to keep working. Use a minor bump when the published contract is extended but existing consumers can continue unchanged. Use a patch bump for non-breaking clarifications or corrective metadata changes.
+
+#### Product-Domain Lifecycle Consistency
+
+Products evolve independently, but they cannot be more mature than the model they publish.
+
+- A product's `status` must not be more advanced than the owning domain's status. A product cannot be `Active` if its domain is `Draft` or `Review`.
+- Products may lag the domain. A product may remain `Draft` while its domain is `Active`.
+- Promoting a domain to `Active` does not automatically promote any products declared within it.
+- An `Active` product should declare version `1.0.0` or higher.
+- If a product references deprecated entities or draws from a deprecated cross-domain dependency, it must either move to `Deprecated` or declare a `migration_note` explaining the consumer migration path.
+- When a domain version bump changes referenced entities, affected products should evaluate their own version independently using the rules above and record the result in the domain's `LIFECYCLE.md` when that file is maintained.
+
+#### Lifecycle History Recording
+
+Product promotions, version bumps, deprecations, and retirements should be recorded in the owning domain's `LIFECYCLE.md` file when present. The domain owns the lifecycle history file because product lifecycle is part of the domain's publication history.
 
 ---
 

@@ -7,7 +7,10 @@ description: Use this skill when the user wants to compare generated MD-DDL arti
 
 Compares physical artifacts generated from canonical MD-DDL entities against
 existing baseline documentation or deployed schemas. Produces a structured gap
-report and recommends resolution for each difference.
+report and recommends resolution for each difference. When a domain lifecycle
+change manifest is available, this skill correlates physical gaps back to their
+logical cause so intentional schema evolution can be separated from regeneration
+noise.
 
 ## MD-DDL Reference
 
@@ -15,6 +18,10 @@ Load before responding:
 
 - `md-ddl-specification/10-Adoption.md` — Adoption maturity model, coexistence
   and cutover rules, drift detection
+- `md-ddl-specification/2-Domains.md` — Domain evolution and `LIFECYCLE.md`
+  change manifest convention
+- `md-ddl-specification/9-Data-Products.md` — Product versioning and
+  product-scoped lifecycle context
 - The applicable generation skill (`skills/dimensional/SKILL.md`,
   `skills/normalized/SKILL.md`, etc.) for producing the generated artifacts
 
@@ -27,6 +34,8 @@ Load before responding:
 Ask:
 
 - Which domain and entities are being reconciled?
+- Is there a `LIFECYCLE.md` entry or standalone change manifest for the version
+  being reconciled? If yes, load it before diffing.
 - What is being compared against? Options:
   - Baseline files in `baselines/` (documented existing state)
   - Live deployed schema (user provides current DDL)
@@ -54,7 +63,19 @@ Load the comparison source:
 ### Step 4 — Produce Gap Report
 
 Compare the generated artifacts against the comparison source. Report
-differences in a structured table:
+differences in a structured table.
+
+When a change manifest is available, correlate each physical difference to the
+logical change that caused it before finalising the report:
+
+- **Manifest match:** The physical change is explained by a declared logical
+  change in `changes:`. Record the matching change type, scope, entity, and
+  description.
+- **Regeneration noise:** The physical difference has no logical counterpart and
+  is consistent with regeneration artefacts such as column reordering,
+  constraint reformulation, or naming normalisation.
+- **Unexplained:** The physical difference has no logical counterpart and cannot
+  be reasonably explained as regeneration noise. Flag for review.
 
 #### Gap Report Format
 
@@ -75,12 +96,12 @@ differences in a structured table:
 
 ### Differences
 
-Entity | Item | Type | In Generated | In Existing | Resolution
---- | --- | --- | --- | --- | ---
-Customer | date_of_birth | Column type | DATE | VARCHAR(10) | Update source to use DATE
-Customer | etl_batch_id | Column | Not present | Present | Technical column — exclude from canonical
-Customer | Email Verified | Attribute | Present | Not present | New attribute added in canonical model
-Sale | discount_pct | Column | DECIMAL(5,2) | DECIMAL(3,2) | Precision increase — intentional
+Entity | Item | Type | In Generated | In Existing | Logical Cause | Migration Relevance | Product Version | Resolution
+--- | --- | --- | --- | --- | --- | --- | --- | ---
+Customer | date_of_birth | Column type | DATE | VARCHAR(10) | corrective attribute change in Customer.Date of Birth | Intentional — corrective | Customer 360 Profile v1.2.1 | Update existing state
+Customer | etl_batch_id | Column | Not present | Present | none | Regeneration noise | n/a | Accept difference
+Customer | Email Verified | Attribute | Present | Not present | additive attribute change in Customer.Email Verified | Intentional — additive | Customer 360 Profile v1.3.0 | Update existing state
+Sale | discount_pct | Column | DECIMAL(5,2) | DECIMAL(3,2) | breaking attribute change in Sale.Discount Percentage | Intentional — breaking | Sales Summary v2.0.0 | Flag for SME review
 ```
 
 #### Difference Types
@@ -92,6 +113,23 @@ Column present in generated but not in existing | New addition from canonical mo
 Type mismatch | Data type differs between generated and existing
 Constraint mismatch | Nullability, primary key, unique constraint, or foreign key differs
 Name mismatch | Column/table naming convention differs (e.g., snake_case vs natural language)
+
+#### Migration Relevance Values
+
+Relevance | Meaning
+--- | ---
+**Intentional — breaking** | Physical change caused by a breaking logical change. Migration required.
+**Intentional — additive** | Physical change caused by an additive logical change. Schema extension only.
+**Intentional — corrective** | Physical change caused by a corrective logical change. No structural migration expected.
+**Regeneration noise** | Physical difference not caused by any logical change. Safe to ignore or normalise.
+**Unexplained** | Physical difference with no logical change and no obvious regeneration cause. Flag for review.
+
+#### Product Version Scope
+
+If reconciliation is performed for a product-scoped generation, include the
+product name and version from the product declaration or from the matching
+`affected_products` entry in the change manifest. If the comparison is not
+product-scoped, use `n/a`.
 
 ### Step 5 — Recommend Resolution
 
@@ -105,6 +143,23 @@ Resolution | When to use
 **Update existing state** | Generated artifact is correct; existing state should be migrated
 
 Present recommendations in the gap report table's Resolution column.
+
+If a change manifest is present, use it as the primary guide for whether a gap is
+intentional. Do not treat every physical diff as a migration candidate.
+
+### Why Reconciliation Uses Logical Intent
+
+MD-DDL generates complete physical artifacts from a logical model. Two versions of
+generated output may differ physically even when their logical meaning is unchanged.
+For that reason:
+
+1. Diff the logical model first and record change intent in `LIFECYCLE.md`
+2. Regenerate physical artifacts from the updated model
+3. Reconcile generated output against deployed state
+4. Use the change manifest to annotate which physical gaps matter for migration
+
+This skill does not generate migrations. Its output is an annotated gap report that
+the user can hand to platform-native migration tooling.
 
 ---
 
@@ -127,5 +182,7 @@ Present recommendations in the gap report table's Resolution column.
 After reconciliation:
 
 - **To fix canonical model gaps** → Agent Ontology (brownfield modelling)
+- **To review product version impact** → Agent Architect (product lifecycle)
 - **To update baseline status** → baseline-capture skill
-- **To proceed with deployment** → outside MD-DDL scope; user's CI/CD process
+- **To proceed with deployment or migration execution** → outside MD-DDL scope;
+  user's CI/CD or migration tooling

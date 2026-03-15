@@ -1,4 +1,4 @@
-# MD‑DDL Specification (Draft 0.9.1)
+# MD‑DDL Specification (Draft 0.9.2)
 
 ## **Domains**
 

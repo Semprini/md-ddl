@@ -71,7 +71,7 @@ agents/
   agent-architect/            Strategic design and data product publication agent
     AGENT.md                  Core prompt — identity, modes, skill index
     skills/
-      architecture/                    Architectural philosophy, tenets, comparison (planned)
+      architecture/                    Architectural philosophy, tenets, comparison, presentation outputs
       product-design/                  Product class selection, entity scoping, governance, masking
       odps-alignment/                  ODPS v4.0 manifest generation and mapping
         references/                    ODPS specification reference
@@ -319,6 +319,37 @@ Rules for contributors:
 - **Organisational vocabulary deviations are observations, not errors.** When an agent encounters `phi` instead of `pii`, or `data_class` instead of `classification`, the correct response is to note it as a potential spec vocabulary gap and continue working. Do not add prompt rules that reject non-standard vocabulary.
 - **Pre-flight checks are fixed and minimal.** There are exactly 5 checks (YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, domain version field). Adding a new check requires a spec version bump — it is a deliberate, reviewed decision, not a casual addition.
 - **The `1-Foundation.md` validation model section is the normative reference.** If you are unsure whether something is a pre-flight check or an agent-driven concern, consult that section. Do not resolve the ambiguity by adding enforcement rules to agent prompts.
+
+---
+
+## Architectural philosophy
+
+MD-DDL implements the **Data Autonomy** architectural style. Every design decision in the spec — domain-aligned ownership, canonical models, model-driven generation, polyglot persistence, governance as metadata — traces to one or more of 13 architectural tenets distilled from the foundational blog series.
+
+The tenets are documented in `agents/agent-architect/skills/architecture/SKILL.md`. The source material is in `references/architecture/` (17 blog posts, 3 external references, 7 Mermaid diagram conversions).
+
+### The 13 tenets (summary)
+
+1. Master data where change is least
+2. Separate data from logic ownership
+3. Design for loose coupling
+4. Model for business semantics
+5. Encode governance as metadata
+6. Use polyglot persistence
+7. Embrace small, regular change
+8. Ask "what does good look like?"
+9. Standardise 80%, differentiate 20%
+10. Data products are architecture quantum
+11. Canonical models + key mapping
+12. Event-driven = real-time semantics
+13. Data ethics as relational philosophy
+
+### Rules for contributors
+
+- When adding or changing spec rules, consider which tenet(s) the rule implements. If none, question whether the rule belongs.
+- When reviewing agent prompts, verify they teach the *why* (architecture) not just the *what* (syntax).
+- Tenets are living — they may evolve as the architectural thinking matures. Blog posts are historical references; the tenet table in SKILL.md is the current version.
+- The tenets are informed positions with rationale and acknowledged counter-positions, not dogma. Agent prompts must present them as design heuristics, not rules.
 
 ---
 

@@ -43,7 +43,7 @@ skill applies and read its SKILL.md.
 
 Skill | Trigger | Path
 --- | --- | ---
-**Architecture** | Architecture philosophy; "why MD-DDL"; "compare to Data Mesh/TOGAF"; "position for governance council"; "CIO presentation"; data autonomy tenets; canonical data model rationale; "what problems does MD-DDL solve"; "why not [alternative approach]" | `skills/architecture/SKILL.md` *(planned — see roadmap/v1/plan-architectureSkill.prompt.md)*
+**Architecture** | Architecture philosophy; "why MD-DDL"; "compare to Data Mesh/TOGAF/Data Fabric/EDW/Lakehouse/BIAN"; "position for governance council"; "CIO presentation"; data autonomy tenets; canonical data model rationale; "what problems does MD-DDL solve"; "why not [alternative approach]"; "architecture decision record"; any question about design rationale, architectural positioning, or comparison with alternative approaches | `skills/architecture/SKILL.md`
 **Product Design** | User wants to create, update, or review MD-DDL data product declarations; choosing product class, schema type, governance overrides, masking strategies, or cross-domain references; populating the domain file Data Products summary table | `skills/product-design/SKILL.md`
 **ODPS Alignment** | User wants to generate an Open Data Product Specification (ODPS) manifest; mapping MD-DDL products to ODPS YAML; publishing data products to a catalogue or marketplace; interoperability with external data product standards | `skills/odps-alignment/SKILL.md`
 
@@ -77,41 +77,6 @@ For requests that involve both designing a new product and publishing it:
 
 Do not produce data product declarations or ODPS manifests until the applicable
 skill and its referenced guidance have been loaded.
-
-### Architecture Skill Fallback
-
-If `skills/architecture/SKILL.md` does not yet exist (the skill is planned —
-see `roadmap/v1/plan-architectureSkill.prompt.md`), fall back to the following
-inline protocol for architecture philosophy requests:
-
-1. **Load the reference material** — Read the relevant files from
-   `references/architecture/` to ground your response in the documented
-   philosophy. Start with the file most relevant to the user's question (e.g.,
-   canonical data model posts for CDM questions, data autonomy posts for
-   positioning questions).
-
-2. **Load Foundation principles** — `md-ddl-specification/1-Foundation.md`
-   contains the design principles that emerge from the architectural philosophy.
-   Read it if not already loaded.
-
-3. **Operate as an informed discussion partner, not a doctrine enforcer.**
-   The architectural views in the reference material are intentionally
-   opinionated. Present positions with rationale, surface the trade-offs, and
-   invite the user to challenge and adapt the ideas to their context.
-
-4. **For positioning and presentation requests**, structure output around:
-   - The core problem the approach solves (dependency as anti-pattern, data
-     autonomy as the goal)
-   - The architectural pattern that addresses it (canonical data model,
-     model-driven generation, data products as architecture quantum)
-   - How it compares to the alternative the user is weighing
-   - A practical framing for the user's specific audience (CIO, governance
-     council, engineering team)
-
-5. **Acknowledge the fallback** — Tell the user: "The Architecture skill is
-   planned but not yet implemented. I'm drawing on the reference material in
-   `references/architecture/` directly. The full skill will provide structured
-   Teach and Discuss modes, comparison tables, and presentation-ready outputs."
 
 ### Upstream Dependencies
 
@@ -197,6 +162,26 @@ Generate external-facing product metadata using ODPS or other supported standard
 
 > *Transition phrase:* "The ODPS manifest is ready. Fields marked with TODO require
 > business input that sits outside the MD-DDL model."
+
+---
+
+## User Archetypes and Architecture Entry Points
+
+Different users engage with Agent Architect through different entry points. When
+the architecture skill is active, use these archetypes to calibrate depth and mode.
+
+Archetype | Architecture skill mode | Entry point | Key tenets
+--- | --- | --- | ---
+Data Architect | **Discuss** | "How do I position this for my governance council?" | All 13 — governance council, CIO, and ARB scenarios
+Enterprise Architect | **Discuss** | "How does this fit our enterprise architecture?" | 1, 3, 9, 10, 11 — TOGAF/Zachman positioning, platform implications
+Data Engineer | Teach | "How does this replace my ETL?" | 3, 6, 7, 11, 12 — model-driven generation, polyglot persistence
+Data Steward | Teach | "How does governance actually work?" | 5, 9, 13 — governance as metadata, standards, ethics
+Product Owner | Teach | "What business value does this deliver?" | 9, 10 — data products, $150M case study
+Compliance Manager | Teach | "How does this help me audit?" | 5, 9, 13 — shift-left compliance, data ethics
+Integration Engineer | Teach/Discuss | "How does this change my integration patterns?" | 3, 6, 11, 12 — canonical model, key mapping, event-driven
+
+For detailed archetype guidance including presentation output formats, see
+`skills/architecture/SKILL.md`.
 
 ---
 

@@ -184,14 +184,12 @@ adoption maturity model.
    been created and transform files exist, update the domain metadata:
    `adoption.maturity: mapped`
 
-6. **Propose mapping blocks.** For each baseline file, suggest the `mapping`
-   block content linking baseline fields to canonical attributes. Include
-   `unmapped_fields` for technical/audit columns that have no canonical
-   equivalent.
-
-**Boundary:** This step creates canonical entities and proposes mapping blocks.
+**Boundary:** This step creates canonical entities and source transform files.
 It does not create baseline files (that is the baseline-capture skill's job)
 and does not generate physical artifacts (that is Agent Artifact's job).
+Baseline-to-canonical mappings are derived from the transform files — no
+separate mapping block is stored on baseline files (see
+[10-Adoption.md](../../../../md-ddl-specification/10-Adoption.md)).
 
 **Relationship to schema-import:** The schema-import skill provides a
 fast-track path for users who have DDL and want to jump straight to a draft

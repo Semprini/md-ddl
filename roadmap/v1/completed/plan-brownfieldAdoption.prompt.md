@@ -1,5 +1,52 @@
 # Plan: Brownfield Adoption for MD-DDL
 
+## Implementation Status
+
+**Status: COMPLETE** — All 16 steps implemented as of 2026-03-15. Implementation evolved from the original plan in several areas (documented below as design evolutions). One cleanup item remains.
+
+### Step Completion Summary
+
+Step | Phase | Status | Notes
+--- | --- | --- | ---
+1 | Phase 1 | ✅ Complete | `10-Adoption.md` created with maturity model, advancement criteria, regression/staleness rules
+2 | Phase 1 | ✅ Complete (evolved) | `baselines/` folder structure defined. **Evolution:** Type-specific YAML templates (`dimensional:`, `canonical:`, `etl:`, `catalog:`) removed — baselines now use a minimal `baseline:` metadata header + free-form body. Baselines are described as agent-generated, not human-authored.
+2b | Phase 1 | ✅ Complete (evolved) | **Evolution:** `mapping:` blocks on baselines removed entirely. Mappings are now derived from source transform files (Section 8). The transform file *is* the mapping. See "Mapping: Auto-Generated from Source Transforms" in 10-Adoption.md.
+3 | Phase 1 | ✅ Complete (evolved) | `adoption` block added to domain metadata in 2-Domains.md. **Evolution:** `progress` field changed from free-text to structured `{ at_level, total }` for agent-parseable counts.
+4 | Phase 1 | ✅ Complete (evolved) | Four journey patterns defined. **Evolution:** Pattern A redesigned from "Starting from Dimensional Models" to "Starting from Existing Schemas (Primary Path)" centered on schema-import skill.
+5 | Phase 1 | ✅ Complete | Coexistence and cutover rules defined. Drift detection section added (Level 4 basic, Level 5 automated). "Levels 4–5 require external tooling" rule added.
+6 | Phase 2 | ✅ Complete | Principle 7 "Adoption is Incremental" added to 1-Foundation.md. Layer 0 baselines paragraph added to Document Structure.
+7 | Phase 2 | ✅ Complete | Brownfield adoption notes added to both 7-Sources.md and 8-Transformations.md.
+8 | Phase 2 | ✅ Complete | Brownfield adoption note added to 9-Data-Products.md.
+9 | Phase 3 | ✅ Complete | `agents/agent-guide/skills/adoption-planning/SKILL.md` created. Skill indexed in Agent Guide AGENT.md.
+10 | Phase 3 | ✅ Complete | `agents/agent-ontology/skills/baseline-capture/SKILL.md` created. Skill indexed in Agent Ontology AGENT.md.
+10b | Phase 3 | ✅ Complete | `agents/agent-ontology/skills/schema-import/SKILL.md` created with all four parts (export guidance, inference protocol, draft output, ETL parsing). Skill indexed in Agent Ontology AGENT.md.
+11 | Phase 3 | ✅ Complete | Brownfield Step 5 added to `agents/agent-ontology/skills/domain-scoping/SKILL.md`. **⚠️ Cleanup needed:** Step 6 in that section still references `mapping` blocks and `unmapped_fields`, which contradicts 10-Adoption.md's "No mapping blocks" rule. Remove Step 6 or rewrite it to reference source transforms.
+12 | Phase 3 | ✅ Complete | `agents/agent-artifact/skills/reconciliation/SKILL.md` created with lifecycle-aware gap report. Skill indexed in Agent Artifact AGENT.md.
+13 | Phase 3 | ✅ Complete | Brownfield Adoption Walkthrough added to `agents/agent-guide/skills/worked-examples/SKILL.md` as Track narrative using Brownfield Retail example.
+14 | Phase 4 | ✅ Complete | `examples/Brownfield Retail/` created with 10 files: domain.md, 3 baselines, 3 entities, 1 ETL baseline, 1 catalog baseline, 1 source. Example at Level 2 (Mapped) with source transforms.
+15 | Phase 5 | ✅ Complete | `10-Adoption.md` added to `$sectionFiles` array in `.github/scripts/concat-md-ddl-specs.ps1`.
+16 | Phase 5 | ✅ Complete | `.github/copilot-instructions.md` updated with 10-Adoption.md in repo layout, section ownership table, and example references. Review prompt files have been restructured (original `.prompts/md-ddl-review-prompt.md` deleted; review process lives in `.prompts/md-ddl-layered-review-process.md`).
+
+### Design Evolutions from Original Plan
+
+The implementation intentionally diverged from the original plan in five areas:
+
+1. **Simplified baseline format** — Type-specific YAML templates (dimensional, canonical, ETL, catalog blocks) were removed. Baselines now use a minimal metadata header + free-form body. Rationale: reduces human effort; agents parse free-form content to extract structure when needed.
+
+2. **Mappings derived from transforms** — The `mapping:` block on baseline files was replaced by deriving mappings from source transform files (Section 8). Rationale: eliminates a separate artifact to maintain; the transform file *is* the mapping and also the specification for generating ETL code.
+
+3. **Structured progress tracking** — Free-text `progress` changed to `{ at_level, total }`. Rationale: enables agents to compute percentage and detect stalls programmatically.
+
+4. **Schema-import as primary path** — Pattern A redesigned around schema-import rather than dimensional model documentation. Rationale: faster time-to-value; paste DDL → get a draft domain in minutes.
+
+5. **Agent-generated baselines** — Added the principle that baselines are agent-generated from raw input, not human-authored YAML templates. Rationale: reduces adoption friction.
+
+### Cleanup Items
+
+- **domain-scoping Brownfield Step 6** (`agents/agent-ontology/skills/domain-scoping/SKILL.md` lines 186-192): Still references `mapping` blocks and `unmapped_fields` on baseline files. This contradicts 10-Adoption.md line 149: "No mapping blocks." Should be removed or rewritten to reference source transforms.
+
+---
+
 ## TL;DR
 
 Extend the MD-DDL standard with a formal adoption maturity model, a `baselines/` folder structure for documenting existing state (dimensional models, ETL/ELT, canonical models, catalog metadata), and domain-level maturity tracking that guides organisations from "documented existing state" to "fully declarative." Add a new spec section (10-Adoption.md), extend domain metadata, and create new agent skills for baseline capture and adoption planning. Coexistence is transitional — the goal is always full conversion, but the timeline may span months/years.

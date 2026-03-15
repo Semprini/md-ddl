@@ -82,11 +82,17 @@ If the conversation starts mid-plan, or the user indicates work was cut off:
 This keeps incomplete work recoverable without re-reading the full conversation
 history or repeating already-finished steps.
 
+## Architectural Philosophy
+
+MD-DDL implements the **Data Autonomy** architectural style. See `references/architecture/` for foundational blog posts and external references, and `agents/agent-architect/skills/architecture/SKILL.md` for the distilled 13 tenets.
+
 ## Key References
 
 - MD-DDL specification: `md-ddl-specification/`
 - Foundation principles: `md-ddl-specification/1-Foundation.md`
 - Complete spec (single file for AI context): `md-ddl-specification/MD-DDL-Complete.md`
+- Architectural philosophy and tenets: `agents/agent-architect/skills/architecture/SKILL.md`
+- Architecture source material: `references/architecture/`
 - Examples: `examples/`
 - Review and evaluation prompts: `.prompts/`
 - Review outputs: `roadmap/review/`

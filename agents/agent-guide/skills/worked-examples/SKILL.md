@@ -234,7 +234,7 @@ Highlight:
 - Entity names are business-semantic (Sale, not fact_sales)
 - Attributes use natural language (not snake_case)
 - Technical/audit columns from the star schema are excluded
-- Baseline files now have `mapping` blocks linking to canonical attributes
+- Source transform files in `sources/pos-system/transforms/` define the lineage from baseline fields to canonical attributes
 
 #### Phase 3 — Add Governance (Level 3: Governed)
 

@@ -12,7 +12,52 @@ When we write software, we write it for the next person who must read our code. 
 
 What we need is a reusable architecture pattern and engineering patterns which help us implement this canonical view. Luckily, [Gregor Hohpe](https://www.linkedin.com/in/ghohpe?miniProfileUrn=urn%3Ali%3Afs_miniProfile%3AACoAAAADMZ0BDKCmI9lFuuQ_q31EDBKxnZA5igg&lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_all%3BphvYNh3KRkCQyiYpsjguwg%3D%3D), and Bobby Wolfe come to the rescue with: [Canonical Data Model](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html). Able to leap tall buildings in a single bound, and translate rom coms for blokes, this is the key architecture pattern which we can use to standardise data products.
 
-![Canonical Data Model Pattern](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/CanonicalDataModel2.width-800.png)
+```mermaid
+flowchart LR
+    subgraph Apps["Source Applications"]
+        A1["App A\n(Format A)"]
+        A2["App B\n(Format B)"]
+        A3["App C\n(Format C)"]
+    end
+
+    subgraph TranslateIn["Message Translators (→ CDM)"]
+        T1["Translator\nA → CDM"]
+        T2["Translator\nB → CDM"]
+        T3["Translator\nC → CDM"]
+    end
+
+    subgraph CDM["Canonical Data Model"]
+        CH["Common\nMessage Channel\n(CDM Format)"]
+    end
+
+    subgraph TranslateOut["Message Translators (CDM →)"]
+        T4["Translator\nCDM → A"]
+        T5["Translator\nCDM → B"]
+        T6["Translator\nCDM → C"]
+    end
+
+    subgraph Consumers["Target Applications"]
+        B1["App A\n(Format A)"]
+        B2["App B\n(Format B)"]
+        B3["App C\n(Format C)"]
+    end
+
+    A1 --> T1
+    A2 --> T2
+    A3 --> T3
+
+    T1 --> CH
+    T2 --> CH
+    T3 --> CH
+
+    CH --> T4
+    CH --> T5
+    CH --> T6
+
+    T4 --> B1
+    T5 --> B2
+    T6 --> B3
+```
 
 ---
 
@@ -52,7 +97,66 @@ This means our canonical data products can evolve from the proto product into th
 
 Now, my intrepid data pal, you may have noticed something that is missing between the proto products and the data assets - Key Management/MDM. Informatica has a good description of Master Data Management: "creating a single master record for each person, place, or thing in a business, from across internal and external data sources and applications ". However, there is a semantic misalignment between each application and our canonical model. I discuss this here: [Systems of Record. Bollocks.](./2021-04-24_systems-record-bollocks.md) To create a true master record, we need not only to create an enterprise Id, but we need to maintain key mapping between the various system viewpoints and relationships to allow efficient on-boarding via our abstraction data products.
 
-![Key Mapping](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/Key_Mapping.width-800.png)
+```mermaid
+classDiagram
+    class CanonicalKeyAttribute {
+        - AttributeName : String
+        - ObjectName : String
+        «auto»
+        - Id : int
+    }
+
+    class SourceToCanonicalMap {
+        - CanonicalIdValue : int
+        - SourceIdValue : int
+        «auto»
+        - Id : int
+    }
+
+    class SourceKey {
+        - SourceName : String
+        «auto»
+        - Id : int
+    }
+
+    class SourceKeyColumn {
+        - ColumnName : string
+        - TableName : string
+        - SourceKeyType : SourceKeyTypes
+        «auto»
+        - Id : int
+    }
+
+    class CanonicalEndpoint {
+        - Id : int
+        - ProtocolType : SourceKeyTypes
+    }
+
+    class SourceEndpoint {
+        - ProtocolType : ProtocolTypes
+        - EndpointName : String
+        «auto»
+        - Id : int
+    }
+
+    class ProtocolTypes {
+        <<enumeration>>
+        Topic
+        API
+    }
+
+    class SourceKeyTypes {
+        <<enumeration>>
+        Table
+        File
+    }
+
+    CanonicalKeyAttribute "1" --> "0..*" SourceToCanonicalMap
+    SourceToCanonicalMap "1" --> "0..*" CanonicalEndpoint
+    SourceKey "1" --> "0..*" SourceToCanonicalMap
+    SourceKey "1" --> "0..*" SourceKeyColumn
+    SourceKey "1" --> "0..*" SourceEndpoint
+```
 
 Our abstraction data products will need to look up the key mapping to publish it's data changes. Just like any other piece of required data, the abstraction can choose to read from the canonical data product via API or stream & cache the key mapping data.
 
@@ -66,7 +170,69 @@ What I'm doing here is taking Zhamak Deghani's Data Mesh thinking and combining 
 
 You'll see in this blog I have been deliberately agnostic of tech stack. It's all about capabilities and at this point we should start to see how our data platform, management and governance services need to be exposed to our engineers & stewards:
 
-![Data Products E2E](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/Data_Products_E2E.width-800.png)
+```mermaid
+flowchart TB
+    subgraph FDG["Federated Data Governance"]
+        direction LR
+        DL["Data Lineage"] ~~~ DQ["Data Quality"] ~~~ MDM["MDM"] ~~~ MKT["Marketplace"] ~~~ CAT["Catalog"]
+    end
+
+    subgraph FDM["Federated Domain Management Capabilities"]
+        direction LR
+        PIP["Pipelines"] ~~~ KEYS["Keys"] ~~~ IAM["I&AM"] ~~~ INFRA["Infra/Network"]
+    end
+
+    subgraph CORE["Data Product Integration"]
+        direction LR
+        subgraph SRC["Source Applications"]
+            direction TB
+            A1["App A\n(Format A)"]
+            A2["App B\n(Format B)"]
+            A3["App C\n(Format C)"]
+        end
+
+        subgraph SADP["Inbound Abstraction Data Products"]
+            direction TB
+            T1["Source A\nAbstraction Data Product"]
+            T2["Source B\nAbstraction Data Product"]
+            T3["Source C\nAbstraction Data Product"]
+        end
+
+        CDP[("Canonical\nData Product")]
+
+        subgraph TADP["Outbound Abstraction Data Products"]
+            direction TB
+            T4["Source A\nAbstraction Data Product"]
+            T5["Source B\nAbstraction Data Product"]
+            T6["Source C\nAbstraction Data Product"]
+        end
+
+        subgraph TGT["Target Applications"]
+            direction TB
+            B1["App A\n(Format A)"]
+            B2["App B\n(Format B)"]
+            B3["App C\n(Format C)"]
+        end
+
+        A1 --> T1
+        A2 --> T2
+        A3 --> T3
+        T1 & T2 & T3 --> CDP
+        CDP --> T4 & T5 & T6
+        T4 --> B1
+        T5 --> B2
+        T6 --> B3
+    end
+
+    subgraph DPC["Data Platform Capabilities"]
+        direction LR
+        DT["Data Transform"] ~~~ FD["File Delta"] ~~~ STR["Streaming"] ~~~ CDC["CDC"] ~~~ LH["Lakehouse"] ~~~ CRUD["CRUD API"] ~~~ AQ["Analytic Query"] ~~~ RTS["Real-Time Storage"]
+    end
+
+    FDG ~~~ CORE
+    FDM ~~~ CORE
+    CORE ~~~ DPC
+```
 
 As data products follow domain driven design, there will be multiple canonical data products. The granularity of these will likely be a negotiation between the product owners, engineering, modellers and governance. We should expect to get this wrong, which is Ok! We're setting up an ecosystem where the right data products can evolve as our understanding of our data evolves - be good at small regular change.
 

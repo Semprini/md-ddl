@@ -16,7 +16,70 @@ The pattern is to work recursively from the relationship owner to the relationsh
 
 From the data model point of view:
 
-![OP2ANL.png](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/OP2ANL.width-800.png)
+```mermaid
+classDiagram
+    class Customer {
+        <<auditable, notifiable>>
+        + customer_number : string
+        + legal_type : string
+        + status : CustomerStatus
+    }
+
+    class Account {
+        <<auditable, notifiable>>
+        + name : string
+        + number : string
+    }
+
+    class RiskReviewTask {
+        + name : string
+    }
+
+    class Transaction {
+        <<auditable>>
+        + code : string
+        + transaction_type : TransactionType
+    }
+
+    class Payment {
+        <<auditable, notifiable>>
+        + authorisation : string
+        + is_recurring : boolean
+        + amount : decimal
+    }
+
+    class Address {
+        + name : string
+        + address_type : AddressType
+        + id : int
+    }
+
+    class CustomerStatus {
+        <<enumeration>>
+    }
+
+    class AddressType {
+        <<enumeration>>
+        Postal
+    }
+
+    class TransactionType {
+        <<enumeration>>
+        Payment
+        Transfer
+    }
+
+    Transaction "1" --> "0..*" Account : step 1
+    Account "1" --> "0..*" Customer : step 2
+    Customer "1" --> "1" RiskReviewTask : step 3
+    RiskReviewTask "1" --> "1" Account : step 3
+    Customer "1" --> "0..*" Address : step 4
+    Customer "1" ..> "1" Customer : step 5
+    Transaction <|-- Payment : Extends
+    Customer ..> CustomerStatus
+    Address ..> AddressType
+    Transaction ..> TransactionType
+```
 
 We can implement this in the stream processor (I like [Delta Lake](https://github.com/delta-io/delta) on Spark here) or as auto generated SQL code to create materialised views. Our data model nomenclature should include everything stream transformation or code generation needs to understand the relationship traversal.
 
@@ -30,7 +93,23 @@ Denormalized, columnar data is performant for queries and storage and is rapidly
 
 Once we have created our nested view, we can simply flatten our data, remove links and shortcut names which ends up as:
 
-![Flatten Example.PNG](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/Flatten_Example.width-800.png)
+**Transaction & Account**
+
+| type | Authorisation | is_recurring | amount | code | transaction_type | source_account.type | source_account.name | source_account.number | source_account.customer.type | customer.customer_number | customer.legal_type | customer.status |
+|------|--------------|--------------|--------|------|-----------------|-------------------|-------------------|----------------------|----------------------------|------------------------|-------------------|----------------|
+| Payment | 12345 | FALSE | 12.34 | 123456 | Payment | Account | Test Account | 1 | Customer | 1 | test | Active |
+
+**Address & Region**
+
+| address.type | address.name | address.address_type | address.id | region.type | region.name | country.type | iso_code | country.name | country.type2 |
+|-------------|-------------|---------------------|-----------|------------|------------|-------------|---------|-------------|--------------|
+| Address | test address | Postal | 1 | Region | Auckland | Country | NZL | New Zealand | Country |
+
+**Individual & Customer**
+
+| individual.type | individual.date_of_birth | individual.first_name | individual.last_name | individual.name | individual.id | customer.organisation |
+|----------------|------------------------|----------------------|---------------------|----------------|--------------|----------------------|
+| Individual | 10/11/2020 | Test | McTest | Test McTest | 1 | |
 
 We perform this for all 'things that happen' and automatically produce a wide column format which adheres to the canonical model and will remove most joins required in reporting use cases.
 

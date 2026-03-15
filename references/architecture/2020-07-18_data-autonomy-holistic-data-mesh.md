@@ -18,7 +18,51 @@ I like to think of each domain as a "Semantic Hub" I.e. A realization of a domai
 
 To achieve eventual consistency, and support both events and real time queries, we must persist the data as it passes through the Hub in its canonical form.
 
-![BoundedContext.png](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/BoundedContext.width-800.png)
+```mermaid
+graph TB
+    subgraph Domain1["Domain 1"]
+        direction TB
+        SH1["Semantic Hub 1"]
+
+        subgraph Apps1["Apps & Services"]
+            App1A["App A"]
+            App1B["Service B"]
+            App1C["Service C"]
+        end
+
+        App1A <--> SH1
+        App1B <--> SH1
+        App1C <--> SH1
+    end
+
+    subgraph Domain2["Domain 2"]
+        direction TB
+        SH2["Semantic Hub 2"]
+
+        subgraph Apps2["Apps & Services"]
+            App2A["App D"]
+            App2B["Service E"]
+            App2C["Service F"]
+        end
+
+        App2A <--> SH2
+        App2B <--> SH2
+        App2C <--> SH2
+    end
+
+    DG["Domain Gateway"]
+
+    SH1 <--> DG
+    DG <--> SH2
+
+    style Domain1 fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style Domain2 fill:#f3e5f5,stroke:#4a148c,stroke-width:3px
+    style SH1 fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style SH2 fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style DG fill:#c8e6c9,stroke:#1b5e20,stroke-width:2px
+    style Apps1 fill:#ffffff,stroke:#757575,stroke-width:1px
+    style Apps2 fill:#ffffff,stroke:#757575,stroke-width:1px
+```
 
 The domain forms are exceptionally important. Please see Martin Fowlers discussion on [Bounded Context](https://www.martinfowler.com/bliki/BoundedContext.html). The Data Mesh has all the important business events passing through it, from and to a wide variety of systems but each event of the same type is now in the domain form, irrespective of its issuing or receiving system. It is not a neutral form; it is a chosen common form for that business domain.
 
@@ -38,7 +82,30 @@ The decoupling of systems established using a data mesh enables significant flex
 
 The Data Mesh is concerned with data in business form. It has access via API, streaming and analytic interfaces with Attribute Based Access Control (ABAC) based on data classification. Most applications don't natively talk in your business form or streaming protocols so we must do semantic and protocol transformation. The middleware responsible for this is an "application abstraction". Use whatever tech you like from Microservice to Mulesoft to Kafka filestream - as long as the application idiosyncrasies are abstracted and the semantic transform is agile and part of the automated regression testing with the application stubbed.
 
-![SH Integration.png](https://s3.ap-southeast-2.amazonaws.com/semprini.me/media/images/SH_Integration1.width-800.png)
+```mermaid
+graph TD
+    App["Application"]
+
+    subgraph Middleware["Middleware (Abstraction Layer)"]
+        ST["Semantic Transform"]
+        PT["Protocol Translation"]
+    end
+
+    subgraph SemHub["Semantic Hub"]
+        MB["Message Broker"]
+        API["API Layer"]
+        Gov["Governance"]
+        DB["DB"]
+    end
+
+    App --> ST
+    ST --> PT
+    PT --> MB
+    PT --> API
+    MB --> Gov
+    API --> Gov
+    Gov --> DB
+```
 
 Automated regression tests can be created by the data modelling process and we can examine the impact of schema changes via continuous delivery and containerisation. A good resource for this is CDAF: <http://cdaf.io/about>
 

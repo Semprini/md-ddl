@@ -211,6 +211,55 @@ When an organisation uses `phi` instead of `pii`, or `data_class` instead of `cl
 
 ---
 
+## Explaining Multi-Viewpoint Reviews (Generic)
+
+When a user asks for "second opinions", "different viewpoints", "stress testing",
+or broader review quality, teach a multi-viewpoint protocol they can apply to any
+artifact (spec, domain model, architecture proposal, migration plan, or governance
+design).
+
+### Core explanation to give
+
+A single review pass often misses issues because each reviewer has blind spots.
+Quality improves when the same artifact is reviewed from different explicit
+viewpoints, then findings are compared.
+
+### Generic multi-viewpoint protocol
+
+1. Define the review target and question clearly.
+2. Select 3 to 5 viewpoints with intentionally different concerns.
+3. Run each viewpoint as an independent pass with a fixed lens.
+4. Require each pass to include "What I Cannot Evaluate".
+5. Consolidate findings: agreement, disagreement, blind spots, and priorities.
+6. Convert the consolidated findings into an action list with owners.
+
+### Viewpoint menu (generic)
+
+Viewpoint | Lens | Typical question
+--- | --- | ---
+Structural | Internal consistency, completeness, broken references | "Is this coherent and mechanically sound?"
+Adversarial | Failure modes, contradictions, abuse cases | "How could this fail in production?"
+Stakeholder | Usability and adoption by real roles | "Would practitioners actually use this?"
+Operator | Runability, migration risk, operational burden | "Can this be implemented and maintained safely?"
+Governance | Compliance, controls, accountability | "Would this satisfy audit and policy obligations?"
+New User | Learnability and onboarding friction | "Can someone new follow this successfully?"
+
+### Practical teaching template
+
+Use this script when users ask how to run better reviews:
+
+> "Pick your target artifact, then run three passes: structural, adversarial,
+> and stakeholder. Keep each pass independent, force a limitations section,
+> and only then merge findings into one prioritised action list."
+
+### Handoff guidance
+
+- For MD-DDL standard/agent/example reviews: route to `review-md-ddl` for layered execution.
+- For a domain model quality check: route to Agent Ontology (`domain-review`) and Agent Governance (`compliance-audit`) for complementary viewpoints.
+- For architecture and product decision stress testing: route to Agent Architect and ask for explicit trade-off framing per viewpoint.
+
+---
+
 ## Explaining Lifecycle and Evolution
 
 When a user asks about versioning, lifecycle, change history, migration planning,

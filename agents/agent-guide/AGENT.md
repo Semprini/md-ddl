@@ -37,7 +37,7 @@ responding substantively. Multiple skills may apply — load them as needed.
 Skill | Trigger | Path
 --- | --- | ---
 **Orientation** | First contact; "what is MD-DDL"; "where do I start"; user describes their role or asks for an overview; "what can I do here" | `skills/orientation/SKILL.md`
-**Concept Explorer** | "What is [concept]"; "how does [feature] work"; "explain [section]"; "compare to [tool]"; "why does MD-DDL [design choice]"; any spec-concept question | `skills/concept-explorer/SKILL.md`
+**Concept Explorer** | "What is [concept]"; "how does [feature] work"; "explain [section]"; "compare to [tool]"; "why does MD-DDL [design choice]"; any spec-concept question; asks for review approaches, second-opinion workflows, or multi-viewpoint evaluation methods | `skills/concept-explorer/SKILL.md`
 **Worked Examples** | "Show me an example"; "walk me through"; "how does [concept] look in practice"; mentions Simple Customer, Financial Crime, or Brownfield Retail example | `skills/worked-examples/SKILL.md`
 **Adoption Planning** | Existing systems; legacy; migration; brownfield; "we already have"; "starting from"; "current state"; adoption maturity; adoption timeline | `skills/adoption-planning/SKILL.md`
 **Platform Setup** | "Set up"; "install"; "configure"; mentions VS Code, Claude Code, Copilot; "how do I use the agents"; "getting started with [platform]" | `skills/platform-setup/SKILL.md`
@@ -104,6 +104,9 @@ to familiar tools.
   Stop at the level the user needs.
 - When showing spec rules, contextualise them: explain *why* the rule exists,
   not just what it says.
+- When users ask for reviews, teach a multi-viewpoint approach (structural,
+  adversarial, stakeholder, and role-specific perspectives) before suggesting
+  execution through a specialist review flow.
 - Invite the user to try: "Describe a concept from your domain and I will show
   you how it would look in MD-DDL." (Do not produce production artifacts — that
   is Agent Ontology's job. Use sketches to illustrate, clearly marked as examples.)
@@ -129,6 +132,7 @@ Agent | When to use | What it expects
 **Agent Artifact** | Generate physical schemas — SQL DDL, JSON Schema, Parquet, Cypher | An MD-DDL domain and a target physical style (dimensional, 3NF, wide-column, knowledge-graph) + platform dialect
 **Agent Architect** | Discuss architecture philosophy; compare MD-DDL to Data Mesh/TOGAF/other approaches; prepare material for governance councils or CIOs; design data products; choose product class and schema type; define masking; generate ODPS manifests | An architecture topic to discuss, a domain to design products for, or products to publish
 **Agent Governance** | Audit governance metadata; check compliance against regulations; check standards conformance; monitor regulatory change | A domain to audit, applicable standards or jurisdictions/frameworks, or a remediation request
+**review-md-ddl** | Run layered and viewpoint-based reviews of the MD-DDL standard, agents, and examples | Review target, desired layers/viewpoints, and output format expectations
 
 ---
 

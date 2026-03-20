@@ -1,6 +1,6 @@
 ---
 name: product-design
-description: Design and declare MD-DDL data products from an existing domain model. Use when the user wants to create, update, or review data product declarations — choosing product class, schema type, entity scope, governance overrides, masking strategies, cross-domain references, or SLA. Also use when populating the domain file Data Products summary table.
+description: Design and declare MD-DDL data products from an existing domain model. Use when the user wants to create, update, or review data product declarations — choosing product class, schema type, designing logical models and lineage, entity scope, governance overrides, masking strategies, attribute mappings, or SLA. Also use when populating the domain file Data Products summary table.
 ---
 
 # Product Design
@@ -88,27 +88,29 @@ Does the consumer need data reshaped, denormalized, aggregated, or combined from
 - **Consumer-aligned** is where most design effort goes. This is where you choose
   schema type, masking, and cross-domain scope.
 
-### Step 5 — Scope Entities
+### Step 5 — Define Entities and Lineage
 
-For each product, determine which entities to include:
+For each product, determine what it publishes (`entities`) and where data comes from (`lineage`):
 
-- **Source-aligned:** No `entities` field — use `source` field referencing a source system folder.
-- **Domain-aligned:** List canonical entities from the owning domain only.
-- **Consumer-aligned:** List entities needed by the consumer. If entities from other
-  domains are required, declare them in `cross_domain`.
+- **Source-aligned:** No `entities` or `lineage` — use `source` field referencing a source system folder.
+- **Domain-aligned:** `entities` lists the canonical entities projected by this product. `lineage` traces to source system tables (referencing `sources/` transforms).
+- **Consumer-aligned:** `entities` lists the product's own entities — which may differ from canonical entities when the product reshapes or denormalizes. `lineage` traces to canonical entities from one or more domains. Consumer-aligned products source exclusively from canonical products — never from source systems.
 
-**Entity inclusion rules:**
+**Entity rules:**
 
 - Only include entities the consumer actually needs. A product is not a "select all" view.
-- If a consumer needs attributes from a related entity (e.g., Branch name for a
-  Transaction), include both entities — the schema_type skill will handle the join
-  or denormalization.
-- Every entity in the list must exist in the domain's `## Entities` table or in a
-  declared `cross_domain` domain.
+- For consumer-aligned wide-column products, the product typically defines a single denormalized entity (e.g., `Transaction Risk Summary`) even though it sources from many canonical entities.
+- For consumer-aligned normalized products, the product entities may share names with canonical entities but represent projections with selected attribute subsets.
+
+**Lineage rules:**
+
+- Domain-aligned lineage must reference source system folders and tables that exist under `sources/`.
+- Consumer-aligned lineage must reference domain names and entities that exist in those domains' `## Entities` tables.
+- Consumer-aligned products never reference source systems in lineage — they source from canonical products only.
 
 ### Step 6 — Choose Schema Type
 
-For consumer-aligned products, recommend a `schema_type` based on the consumption pattern:
+Every data product must declare a `schema_type`. Recommend based on the consumption pattern:
 
 Consumption Pattern | Recommended `schema_type`
 --- | ---
@@ -117,12 +119,8 @@ Operational integration, master data, multi-system sync | `normalized`
 Dashboard, scan queries, join-minimised consumption | `wide-column`
 Graph traversal, relationship-centric exploration | `knowledge-graph`
 
-If the product is logical-only (documenting what is published without triggering
-generation), omit `schema_type`.
-
-Domain-aligned products typically do not declare `schema_type` because their shape
-matches the canonical model. If a domain-aligned product needs physical generation,
-`normalized` is the default.
+Domain-aligned products default to `normalized` because their shape matches the
+canonical model structure.
 
 ### Step 7 — Set Governance Overrides
 
@@ -136,9 +134,9 @@ Governance Field | When to Override
 `retention` | Product has a different retention requirement (e.g., regulatory report kept longer)
 `masking` | Product needs attribute-level masking for PII exposure
 
-#### Cross-Domain Governance Conflicts
+#### Multi-Domain Governance Conflicts
 
-For consumer-aligned products with `cross_domain` references, governance may conflict
+For consumer-aligned products with multi-domain `lineage`, governance may conflict
 between the owning domain and referenced domains. Apply these resolution rules:
 
 1. **Read each referenced domain's governance defaults** before setting overrides.
@@ -197,7 +195,7 @@ Produce the MD-DDL product declaration following this structure:
 
 ```yaml
 class: [source-aligned | domain-aligned | consumer-aligned]
-schema_type: [normalized | dimensional | wide-column | knowledge-graph]  # optional
+schema_type: [normalized | dimensional | wide-column | knowledge-graph]
 owner: [team or individual email]
 consumers:
   - [Consumer 1]
@@ -208,6 +206,14 @@ version: "[semver]"
 entities:                    # or 'source:' for source-aligned
   - [Entity 1]
   - [Entity 2]
+
+lineage:                     # domain-aligned: source tables; consumer-aligned: canonical entities
+  - source: [source-id]     # for domain-aligned
+    tables:
+      - [transform_file]
+  - domain: [Domain Name]   # for consumer-aligned
+    entities:
+      - [Entity]
 
 governance:                  # only if overriding domain defaults
   classification: [level]
@@ -222,15 +228,53 @@ sla:                         # optional, for operational consumers
   availability: "[target]"
 
 refresh: [cadence]           # optional
-
-cross_domain:                # only for consumer-aligned spanning domains
-  - domain: [Domain Name]
-    entities:
-      - [Entity]
 ```
 ````
 
-### Step 10 — Update the Domain Summary Table
+### Step 10 — Create the Logical Model
+
+Every product must include a `#### Logical Model` section with a Mermaid class diagram.
+
+**Domain-aligned products:** Project the canonical model. Show each entity as a class
+with all its attributes and types, inheritance and association cardinalities. Hyperlink
+entity names to their detail files — the diagram is a view into the canonical model.
+
+**Consumer-aligned products:** Define the product's own structure. The shape depends on
+the schema type:
+- **wide-column:** A single class with all flattened attributes and their types
+- **normalized:** Multiple classes preserving entity boundaries with selected attributes
+- **dimensional:** Fact and dimension classes with their attributes
+
+For consumer-aligned products, follow the logical model with an `#### Attribute Mapping`
+section using the same table-based format as source transform files. This creates a
+consistent lineage format from source through canonical to product.
+
+- **Wide-column products**: a single flat table with columns
+  `Product Attribute | Source | Path | Transform`. Source is the canonical
+  `Entity.Attribute`. Path is the relationship traversal from the product's grain.
+  Transform links to a breakout section for non-direct mappings.
+- **Dimensional products**: one table per fact or dimension entity under a level-5
+  heading, with columns `Product Attribute | Source | Path | Transform`. The Path
+  column captures foreign key lookups in the fact table (e.g., traversing from
+  Usage Record through Service and Subscription to reach Customer). Dimensions
+  that map directly to canonical entities use `—` in the Path column.
+- **Normalized products** (and knowledge-graph): one table per product entity under
+  a level-5 heading, with columns `Product Attribute | Source | Transform`. No Path
+  column is needed because entity boundaries are preserved. If an individual entity
+  includes attributes traversed from another entity, that entity's table may use the
+  4-column format with Path. Cross-domain attributes are prefixed with the domain
+  name (e.g., `Healthcare.Patient.Given Name`).
+
+Direct mappings place the canonical `Entity.Attribute` in the Source column with an
+empty Transform cell. Non-direct mappings link to a breakout section
+(e.g., `[Derive Risk Category](#derive-risk-category)`) in the Transform column,
+with the transformation logic defined using the same YAML types as source transforms
+(`derived`, `conditional`, `lookup`, `aggregation`).
+
+Domain-aligned products do not need an attribute mapping because their entities are
+identity projections of the canonical model — the mapping is implicit.
+
+### Step 11 — Update the Domain Summary Table
 
 Add or update the entry in the domain file's `## Data Products` section:
 
@@ -266,14 +310,14 @@ Domain Status | Product Design Guidance
 `Deprecated` | Do not create new products. Existing products should be reviewed for migration. Flag any `Active` product on a deprecated domain as a lifecycle inconsistency unless it carries a `migration_note`.
 `Retired` | No products should be active. All must be `Retired`.
 
-### Cross-Domain Lifecycle Checks
+### Multi-Domain Lifecycle Checks
 
-For consumer-aligned products with `cross_domain` references:
+For consumer-aligned products with multi-domain `lineage`:
 
-- Check the `status` of each referenced domain. If any referenced domain is
+- Check the `status` of each domain referenced in `lineage`. If any is
   `Deprecated`, warn the user that the product depends on a deprecated domain
   and recommend planning for migration.
-- If a referenced domain is `Retired`, the cross-domain reference is invalid.
+- If a referenced domain is `Retired`, the lineage reference is invalid.
   The product must remove the reference or be retired itself.
 
 ### Version Alignment
@@ -296,10 +340,15 @@ For consumer-aligned products with `cross_domain` references:
 Before declaring a product complete, verify:
 
 - [ ] Class is appropriate for the consumer's needs
-- [ ] Every entity in `entities` exists in the domain or `cross_domain` declaration
-- [ ] `cross_domain` is only used on consumer-aligned products
+- [ ] `schema_type` is declared
+- [ ] `entities` lists what the product publishes (canonical entities for domain-aligned, product's own entities for consumer-aligned)
+- [ ] `lineage` is declared for all non-source-aligned products
+- [ ] Consumer-aligned `lineage` references canonical entities only (no source system references)
+- [ ] Multi-domain lineage is only used on consumer-aligned products
+- [ ] Logical model (Mermaid class diagram) is present with sufficient detail for generation
+- [ ] Consumer-aligned products include `#### Attribute Mapping` tables tracing every attribute to canonical source
 - [ ] Governance overrides are genuine differences from domain defaults (not duplicates)
-- [ ] Cross-domain products resolve governance conflicts (classification, retention, PII, regulatory scope)
+- [ ] Multi-domain products resolve governance conflicts (classification, retention, PII, regulatory scope)
 - [ ] Masking strategies are appropriate for the sensitivity level and consumer access
 - [ ] Source-aligned products use `source` field, not `entities`
 - [ ] Product appears in both domain summary table and detail file
@@ -307,7 +356,7 @@ Before declaring a product complete, verify:
 - [ ] Description clearly states what the product provides and for whom
 - [ ] Status is a valid lifecycle state (`Draft`, `Active`, `Deprecated`, `Retired`)
 - [ ] Product status is not more advanced than the parent domain status
-- [ ] No cross-domain references point to `Deprecated` or `Retired` domains without justification
+- [ ] No lineage references point to `Deprecated` or `Retired` domains without justification
 - [ ] Deprecated products include `deprecated_date` and ideally `successor`
 
 ## Product Review

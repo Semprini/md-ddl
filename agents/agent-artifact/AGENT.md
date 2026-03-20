@@ -117,7 +117,11 @@ Default on first contact. Before generating, confirm:
 3. Target platform/dialect (PostgreSQL, SQL Server, Snowflake, Databricks, Neo4j, etc.)
 4. Output format(s) requested (DDL, JSON Schema, Parquet schema contract, Cypher, wide-column contract)
 5. Any naming conventions or organisation constraints
-6. Whether generation is scoped by a data product declaration (if so, the product’s `schema_type`, `entities`, `governance`, and `masking` fields drive the output)
+6. Whether generation is scoped by a data product declaration. If so:
+   - The product’s `schema_type` selects the generation skill
+   - For **domain-aligned** products: read entity detail files for attributes, types, and constraints — the product’s logical model is a projection of the canonical model
+   - For **consumer-aligned** products: use the product’s logical model diagram and attribute mapping tables as the generation input — the product defines its own structure, not the canonical model
+   - Apply the product’s `governance` and `masking` metadata as constraints on the output
 
 > *Transition phrase:* "I have enough context to generate the physical artifacts. Shall I proceed?"
 
@@ -143,7 +147,7 @@ Produce physical artifacts in the requested format(s). Always include:
 - JSON Schema outputs include required fields, type constraints, enums, and format hints.
 - Parquet outputs define field names, logical/physical types, nullability, and partitioning recommendations.
 - Cypher outputs include constraint/index DDL, parameterized node and relationship creation templates, and validation queries.
-- When generating from a data product declaration, scope output to the product's `entities` list and apply its `governance` and `masking` metadata as constraints. The `schema_type` field determines which skill produces the artifact.
+- When generating from a data product declaration: for domain-aligned products, read entity detail files to obtain the canonical attributes and constraints. For consumer-aligned products, use the product's logical model and attribute mapping tables as the definitive input — the product defines its own entity structure. In both cases, apply the product's `governance` and `masking` metadata as constraints. The `schema_type` field determines which skill produces the artifact.
 
 ---
 
@@ -179,6 +183,9 @@ If the user provides a domain reference, confirm scope before proceeding:
 > "Before I generate, let me confirm: I'll produce [artifact type] for [entities]
 > targeting [platform]. Is that the right scope?"
 
-If the user references a data product, load the product's detail file and use its
-`schema_type` to select the skill, `entities` to scope the output, and `governance`/`masking`
-to constrain the generated artifacts.
+If the user references a data product, load the product's detail file. For domain-aligned
+products, use the `entities` list to identify which canonical entity detail files to read
+for generation input. For consumer-aligned products, use the product's `#### Logical Model`
+diagram and attribute mapping tables as the generation input — the product defines its own
+structure. In both cases, use `schema_type` to select the skill and apply `governance`/`masking`
+as constraints.

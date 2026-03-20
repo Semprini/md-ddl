@@ -22,6 +22,12 @@ entities:
   - Service Case
   - Knowledge Article
 
+# TODO: Add lineage once sources/ directory is populated for this domain.
+# lineage:
+#   - source: <crm-system or service-platform>
+#     tables:
+#       - <transform files>
+
 governance:
   classification: Internal
   pii: true
@@ -35,4 +41,62 @@ sla:
   availability: "99.5%"
 
 refresh: real-time
+```
+
+#### Logical Model
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  class Customer{
+    * Customer Identifier : string
+    Email Address : string
+    Given Name : string
+    Family Name : string
+    Preferred Contact Channel : enum~ContactChannel~
+    Language Preference : string
+    Total Cases Raised : integer
+    Last Contact Date : date
+  }
+
+  class ServiceRequest{
+    * Service Request Identifier : string
+    Status : enum~ServiceRequestStatus~
+    Contact Channel : enum~ContactChannel~
+    Subject : string
+    Received At : datetime
+    Resolved At : datetime
+  }
+
+  class ServiceCase{
+    * Case Identifier : string
+    Status : enum~ServiceCaseStatus~
+    Priority : string
+    Assigned Agent : string
+    Opened At : datetime
+    Closed At : datetime
+    Resolution Summary : string
+  }
+
+  class KnowledgeArticle{
+    * Article Identifier : string
+    Title : string
+    Issue Category : string
+    Resolution Steps : string
+    Published Date : date
+    Last Reviewed Date : date
+    Applicable Product Category : string
+  }
+
+  Customer "1" --> "0..*" ServiceRequest : raises
+  ServiceRequest "0..1" --> "0..1" ServiceCase : escalates to
+  ServiceCase "0..*" --> "0..1" KnowledgeArticle : resolved by
+
+  class Customer["<a href='../entities/customer.md'>Customer</a>"]
+  class ServiceRequest["<a href='../entities/service_request.md'>Service Request</a>"]
+  class ServiceCase["<a href='../entities/service_case.md'>Service Case</a>"]
+  class KnowledgeArticle["<a href='../entities/knowledge_article.md'>Knowledge Article</a>"]
 ```

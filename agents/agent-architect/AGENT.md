@@ -44,7 +44,7 @@ skill applies and read its SKILL.md.
 Skill | Trigger | Path
 --- | --- | ---
 **Architecture** | Architecture philosophy; "why MD-DDL"; "compare to Data Mesh/TOGAF/Data Fabric/EDW/Lakehouse/BIAN"; "position for governance council"; "CIO presentation"; data autonomy tenets; canonical data model rationale; "what problems does MD-DDL solve"; "why not [alternative approach]"; "architecture decision record"; any question about design rationale, architectural positioning, or comparison with alternative approaches | `skills/architecture/SKILL.md`
-**Product Design** | User wants to create, update, or review MD-DDL data product declarations; choosing product class, schema type, governance overrides, masking strategies, or cross-domain references; populating the domain file Data Products summary table | `skills/product-design/SKILL.md`
+**Product Design** | User wants to create, update, or review MD-DDL data product declarations; choosing product class, schema type, designing logical models and lineage, governance overrides, masking strategies, or attribute mappings; populating the domain file Data Products summary table | `skills/product-design/SKILL.md`
 **ODPS Alignment** | User wants to generate an Open Data Product Specification (ODPS) manifest; mapping MD-DDL products to ODPS YAML; publishing data products to a catalogue or marketplace; interoperability with external data product standards | `skills/odps-alignment/SKILL.md`
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
@@ -134,14 +134,22 @@ If the platform posture is not yet recorded in the domain metadata, propose addi
 Create MD-DDL data product declarations. For each product:
 
 1. Choose the product class (`source-aligned`, `domain-aligned`, `consumer-aligned`)
-2. Scope the entity list — which canonical entities belong in this product
-3. Determine the target shape (`schema_type`) if the product will drive generation
-4. Set governance overrides where the product requires controls different from domain defaults
-5. Define masking strategies for PII attributes exposed in this product
-6. Declare SLA and refresh cadence if the product serves operational consumers
-7. Add cross-domain references for consumer-aligned products that span domains
-8. Write the product detail file with level-3 heading, description, and YAML block
-9. Update the domain file's `## Data Products` summary table
+2. Determine the `schema_type` — this is required and determines the logical model shape
+3. Define the `entities` list — the entities the product itself publishes:
+   - Domain-aligned: the canonical entities projected by this product
+   - Consumer-aligned: the product's own entities (e.g., a single wide table, or a normalized subset with selected attributes)
+4. Declare `lineage` — where the product's data comes from:
+   - Domain-aligned: source system tables (referencing `sources/` transforms)
+   - Consumer-aligned: canonical entities from one or more domains (consumer-aligned products source exclusively from canonical products, never from source systems)
+5. Create the `#### Logical Model` — a Mermaid class diagram with enough detail to generate physical artifacts:
+   - Domain-aligned: project the canonical model (link entity names to detail files)
+   - Consumer-aligned: define the product's own structure with all attributes and types
+6. For consumer-aligned products, add an `#### Attribute Mapping` section using the table-based format aligned with source transforms — tracing each product attribute to its canonical source (Entity.Attribute) with relationship traversal paths for denormalized products, and breakout sections for non-direct transformations
+7. Set governance overrides where the product requires controls different from domain defaults
+8. Define masking strategies for PII attributes exposed in this product
+9. Declare SLA and refresh cadence if the product serves operational consumers
+10. Write the product detail file with level-3 heading, description, YAML block, logical model, and (for consumer-aligned) attribute mapping
+11. Update the domain file's `## Data Products` summary table
 
 Follow the two-layer compliance rule: every product must appear in both the domain
 file summary table and a detail file under `products/`.
@@ -199,13 +207,16 @@ When a data product declares a `schema_type`, physical artifact generation is
 Agent Artifact's responsibility. After designing the product, produce a handoff
 context block then say:
 
-> "This product declares `schema_type: [type]`. To generate the physical artifacts,
-> switch to @agent-artifact and reference this product definition. Agent Artifact
-> will scope generation to this product's entity list and apply its governance and
-> masking constraints. Paste the handoff context block into your opening message."
+> "This product declares `schema_type: [type]` and includes a logical model.
+> To generate the physical artifacts, switch to @agent-artifact and reference
+> this product definition. For domain-aligned products, Agent Artifact will read
+> canonical entity detail files. For consumer-aligned products, it will use this
+> product's logical model and attribute mapping as the generation input. Paste
+> the handoff context block into your opening message."
 
 Do not generate DDL, JSON Schema, Parquet contracts, or Cypher. Produce only the
-MD-DDL product declaration that serves as Agent Artifact's input contract.
+MD-DDL product declaration (including logical model and attribute mapping) that
+serves as Agent Artifact's input contract.
 
 ### Handoff to Agent Ontology
 
@@ -249,10 +260,12 @@ On receiving a governance-sourced recommendation:
 - Every data product must follow the declaration format defined in the MD-DDL specification section 9 (Data Products).
 - Product names use level-3 Markdown headings. The heading is the product's identity.
 - Metadata is expressed as YAML in fenced code blocks immediately after the heading.
-- Class determines scope: source-aligned products reference a single source system; domain-aligned reference canonical entities within the owning domain; consumer-aligned may span domains.
-- Cross-domain references are only permitted on consumer-aligned products.
-- Entities listed in a product must exist in the domain's `## Entities` table (or declared `cross_domain` entries).
-- Products do not redefine attributes, types, or constraints — they reference canonical entities.
+- Class determines scope: source-aligned products reference a single source system; domain-aligned project canonical entities within the owning domain; consumer-aligned define their own entities and may source from multiple domains.
+- Multi-domain lineage is only permitted on consumer-aligned products.
+- `entities` lists what the product publishes. For domain-aligned, these are canonical entities. For consumer-aligned, these are the product's own entities.
+- `lineage` declares provenance. For domain-aligned: source system tables. For consumer-aligned: canonical entities from one or more domains. Consumer-aligned products source exclusively from canonical products — never from source systems.
+- Every product must include a logical model (Mermaid class diagram) with sufficient detail for physical generation. Consumer-aligned products must also include an `#### Attribute Mapping` section using table-based format aligned with source transforms.
+- Domain-aligned logical models are projections of the canonical model with entity links. Consumer-aligned logical models define the product's own structure.
 - Governance overrides are declared only when they differ from domain defaults.
 - Masking is product-scoped, not entity-scoped.
 - The domain file `## Data Products` summary table must stay in sync with detail files.
@@ -278,7 +291,7 @@ AI alone. The following require human verification before publication:
 - **Consumer fitness for purpose** — Only actual data consumers can confirm that a product’s entity scope, schema type, and refresh cadence serve their needs.
 - **SLA achievability** — Declared SLAs must be validated against infrastructure capacity by the platform team.
 - **Masking sufficiency** — Masking strategies are recommended based on attribute types. Only a privacy officer or legal counsel can confirm they meet regulatory obligations for the actual data exposed.
-- **Cross-domain authorisation** — Consumer-aligned products referencing entities from other domains require governance approval from each owning domain’s steward.
+- **Multi-domain lineage authorisation** — Consumer-aligned products with lineage from other domains require governance approval from each owning domain’s steward.
 - **Product portfolio completeness** — AI can validate each product’s internal consistency. It cannot verify that the set of products covers the full consumer landscape. Missing products are harder to detect than incorrect ones.---
 
 ## What This Agent Cannot Validate

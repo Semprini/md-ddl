@@ -49,6 +49,9 @@ MD-DDL Concept | ER / UML analogy | dbt / SQL analogy | Data Mesh analogy | FHIR
 **Source** | — | Source in dbt, raw table | External system feed | Integration endpoint | System of record
 **Transformation** | — | dbt transformation, SQL expression | Mapping rule | ConceptMap | ETL specification
 **Data Product** | — | Exposure in dbt | Data product / data contract | — | Published data asset
+**Lineage** | — | Source/ref lineage in dbt | Data provenance chain | — | Data flow audit trail
+**Logical Model** | Logical ER diagram | — | Product schema contract | — | Governed data structure
+**Attribute Mapping** | — | Column-level lineage | Field-level data contract | ConceptMap | Attribute provenance
 **Version / Lifecycle** | Schema version in migration tool | dbt project version, model deprecation | Domain version, contract versioning | Resource version history | Change control record
 **Change Manifest** | Change log with typed impacts | dbt `state:modified` selector | Contract change record | — | Audit change register
 **Reconciliation** | Schema compare tool | Compare generated model to deployed relation | Contract compatibility check | — | Control attestation compare
@@ -74,9 +77,10 @@ Examples:
   to the relationship itself."
 
 - **Data Product:** "A data product declares what data is published, for whom, in
-  what shape, and under what governance rules. It is the contract between the model
-  and the consumers. Agent Artifact uses it to decide what physical schemas to
-  generate."
+  what shape, and under what governance rules. Domain-aligned products are projections
+  of the canonical model with lineage to source system tables. Consumer-aligned
+  products define their own logical model — with attribute-level mapping back to
+  canonical entities — and never source from source systems directly."
 
 ### Step 3 — Check Understanding
 

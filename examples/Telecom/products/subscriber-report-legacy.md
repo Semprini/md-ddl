@@ -22,6 +22,13 @@ entities:
   - Individual
   - Customer
 
+lineage:
+  - domain: Telecom
+    entities:
+      - Party
+      - Individual
+      - Customer
+
 governance:
   classification: Confidential
   pii: true

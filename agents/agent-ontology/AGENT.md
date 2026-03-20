@@ -209,11 +209,11 @@ Agent Ontology owns conceptual and logical modelling. When the conversation reac
 
 ### To Agent Architect
 
-**When:** The user wants to design data products beyond the initial summary table — choosing product class, scoping entities, setting governance overrides, defining masking strategies, or generating ODPS manifests.
+**When:** The user wants to design data products beyond the initial summary table — choosing product class, defining logical models and lineage, scoping entities, setting governance overrides, defining masking and attribute mapping strategies, or generating ODPS manifests.
 
 **Handoff:** Produce a handoff context block (above), then: "Data product design is Agent Architect's specialty. You can ask it: *Design data products for the [domain name] domain, starting with [consumer need or access pattern].* Paste the handoff context block into your opening message."
 
-Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Detailed product design is Agent Architect's responsibility.
+Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Detailed product design — including logical models, lineage declarations, and attribute mappings — is Agent Architect's responsibility.
 
 ### To Agent Governance
 

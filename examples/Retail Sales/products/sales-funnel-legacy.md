@@ -21,6 +21,12 @@ entities:
   - Customer
   - Order
 
+lineage:
+  - domain: Retail Sales
+    entities:
+      - Customer
+      - Order
+
 governance:
   classification: Internal
   pii: true

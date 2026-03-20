@@ -282,7 +282,7 @@ Check | What to verify | Gap if failed
 **Product status consistency** | Product `status` must not be more advanced than the owning domain `status` | Product lifecycle more advanced than domain
 **Product version present when Active** | Products with `status: Active` should declare a `version` field | Active product without version tracking
 **Product version format** | Product `version` follows semantic versioning (`MAJOR.MINOR.PATCH`) when present | Invalid product version format
-**Deprecated upstream handling** | Products referencing deprecated entities or deprecated `cross_domain` dependencies are themselves `Deprecated` or declare `migration_note` | Active product with no migration path for deprecated upstream dependency
+**Deprecated upstream handling** | Products referencing deprecated entities or deprecated `lineage` dependencies are themselves `Deprecated` or declare `migration_note` | Active product with no migration path for deprecated upstream dependency
 **Deprecated product fields** | Products with `status: Deprecated` should declare `deprecated_date` and should declare `successor` when one exists | Deprecated product without retirement provenance
 
 ### Lifecycle severity rules
@@ -415,7 +415,7 @@ Check | What to verify | Gap if failed
 **Masking completeness** | Every attribute listed in included entities' `pii_fields` has a corresponding `masking` entry in the product | PII attribute exposed without masking
 **Masking strategy adequacy** | Masking strategy is appropriate for the attribute type and consumer context | Weak masking for high-sensitivity attribute
 **Source-aligned raw exposure** | Source-aligned products that expose raw PII: is retention constrained and access restricted? | Raw PII feed with permissive governance
-**Cross-domain governance** | For `cross_domain` references: does the product honour the governance posture of the owning domain? | External entity exposed with weaker controls than source domain
+**Multi-domain governance** | For multi-domain `lineage`: does the product honour the governance posture of each referenced domain? | External entity exposed with weaker controls than source domain
 **Governance override justification** | Every field in the product's `governance:` block that differs from domain default has a documented rationale | Override present without justification
 **Consumer appropriateness** | Are the declared `consumers` appropriate for the product's classification and PII posture? | Highly confidential product visible to broad audiences
 
@@ -449,18 +449,21 @@ lightly cleansed data. Apply these checks:
 - If the source contains PII, the product should either declare `masking` or
   document why raw PII access is justified (e.g., audit replay requirements)
 
-### Cross-domain governance consistency
+### Multi-domain governance consistency
 
-For consumer-aligned products with `cross_domain` references, verify that governance
+For consumer-aligned products with multi-domain `lineage`, verify that governance
 conflicts between the owning domain and referenced domains are resolved correctly:
 
 Check | What to verify | Gap if failed
 --- | --- | ---
-**Classification floor** | Product classification is at least as restrictive as the highest classification among all contributing domains | Cross-domain classification downgrade without justification
-**Retention ceiling** | Product retention meets the longest period required by any contributing domain | Cross-domain retention shorter than referenced domain requires
+**Classification floor** | Product classification is at least as restrictive as the highest classification among all contributing domains | Multi-domain classification downgrade without justification
+**Retention ceiling** | Product retention meets the longest period required by any contributing domain | Multi-domain retention shorter than referenced domain requires
 **PII union** | If any referenced domain declares `pii: true`, the product declares `pii: true` with masking or justifies omission | PII from referenced domain exposed without acknowledgement
 **Regulatory scope union** | Product's owning domain `regulatory_scope` covers all frameworks from referenced domains, or product-level overrides address the gap | Product subject to unacknowledged regulatory framework from referenced domain
-**Masking cross-domain PII** | PII attributes from `cross_domain` entities are covered by the product's `masking` entries | External PII attribute exposed without masking strategy
+**Masking multi-domain PII** | PII attributes from `lineage` entities in other domains are covered by the product's `masking` entries | External PII attribute exposed without masking strategy
+**Lineage completeness** | Consumer-aligned products have `lineage` declared tracing to canonical entities; domain-aligned products have `lineage` declared tracing to source system tables | Missing data provenance declaration
+**Logical model present** | Products with `schema_type` include a `#### Logical Model` Mermaid class diagram | Product cannot drive physical generation without a logical model
+**Attribute mapping present** | Consumer-aligned products include an `#### Attribute Mapping` section with table-based mappings tracing every product attribute to its canonical source | Consumer-aligned product attributes not traceable to canonical sources
 
 ### Product governance gap report format
 

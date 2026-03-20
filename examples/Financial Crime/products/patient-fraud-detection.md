@@ -24,8 +24,17 @@ entities:
   - Party
   - Party Role
   - Account
+  - Patient
+  - Encounter
+  - Practitioner
 
-cross_domain:
+lineage:
+  - domain: Financial Crime
+    entities:
+      - Transaction
+      - Party
+      - Party Role
+      - Account
   - domain: Healthcare
     entities:
       - Patient
@@ -80,3 +89,156 @@ sla:
 
 refresh: hourly
 ```
+
+#### Logical Model
+
+Normalized structure preserving entity boundaries across both contributing
+domains. All attributes source from canonical products — Financial Crime
+entities from Canonical Party, Healthcare entities from the Healthcare
+domain-aligned product.
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+  %% Financial Crime domain entities
+  class Transaction{
+    * Transaction Identifier : string
+    Transaction Date Time : datetime
+    Amount : decimal
+    Reference : string
+  }
+
+  class Party{
+    * Party Identifier : string
+    Legal Name : string
+    Also Known As : string[]
+    Risk Rating : enum~FinancialCrimeRiskRating~
+    Sanctions Screen Status : enum~SanctionsScreenStatus~
+  }
+
+  class PartyRole{
+    * Role Identifier : string
+    Role Status : enum~PartyRoleStatus~
+    Due Diligence Status : enum~DDStatus~
+  }
+
+  class Account{
+    * Account Identifier : string
+    Account Number : string
+    Opened Date : date
+    Closed Date : date
+  }
+
+  %% Healthcare domain entities (cross-domain)
+  class Patient{
+    * Patient Identifier : string
+    Given Name : string
+    Family Name : string
+    Date of Birth : date
+    Gender : string
+    Medicare Number : string
+  }
+
+  class Encounter{
+    * Encounter Identifier : string
+    Encounter Date : datetime
+    Encounter Type : string
+    Facility Identifier : string
+    Billed Amount : decimal
+    Claim Status : string
+  }
+
+  class Practitioner{
+    * Practitioner Identifier : string
+    Given Name : string
+    Family Name : string
+    Provider Number : string
+    Specialty : string
+  }
+
+  %% Financial Crime relationships
+  Transaction "0..*" --> "1" Party : payer
+  Transaction "0..*" --> "1" Party : payee
+  Party "1" --> "0..*" PartyRole : assumes
+  PartyRole "0..*" --> "0..*" Account : holds
+
+  %% Healthcare relationships
+  Patient "1" --> "0..*" Encounter : has
+  Practitioner "1" --> "0..*" Encounter : conducts
+
+  %% Cross-domain link — identity resolution
+  Party "0..1" -- "0..1" Patient : identity match
+```
+
+#### Attribute Mapping
+
+##### Transaction
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Transaction Identifier | Transaction.Transaction Identifier | —
+Transaction Date Time | Transaction.Transaction Date Time | —
+Amount | Transaction.Amount | —
+Reference | Transaction.Reference | —
+
+##### Party
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Party Identifier | Party.Party Identifier | —
+Legal Name | Party.Legal Name | —
+Also Known As | Party.Also Known As | —
+Risk Rating | Party.Risk Rating | —
+Sanctions Screen Status | Party.Sanctions Screen Status | —
+
+##### Party Role
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Role Identifier | Party Role.Role Identifier | —
+Role Status | Party Role.Role Status | —
+Due Diligence Status | Party Role.Due Diligence Status | —
+
+##### Account
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Account Identifier | Account.Account Identifier | —
+Account Number | Account.Account Number | —
+Opened Date | Account.Opened Date | —
+Closed Date | Account.Closed Date | —
+
+##### Patient
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Patient Identifier | Healthcare.Patient.Patient Identifier | —
+Given Name | Healthcare.Patient.Given Name | —
+Family Name | Healthcare.Patient.Family Name | —
+Date of Birth | Healthcare.Patient.Date of Birth | —
+Gender | Healthcare.Patient.Gender | —
+Medicare Number | Healthcare.Patient.Medicare Number | —
+
+##### Encounter
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Encounter Identifier | Healthcare.Encounter.Encounter Identifier | —
+Encounter Date | Healthcare.Encounter.Encounter Date | —
+Encounter Type | Healthcare.Encounter.Encounter Type | —
+Facility Identifier | Healthcare.Encounter.Facility Identifier | —
+Billed Amount | Healthcare.Encounter.Billed Amount | —
+Claim Status | Healthcare.Encounter.Claim Status | —
+
+##### Practitioner
+
+Product Attribute | Source | Transform
+--- | --- | ---
+Practitioner Identifier | Healthcare.Practitioner.Practitioner Identifier | —
+Given Name | Healthcare.Practitioner.Given Name | —
+Family Name | Healthcare.Practitioner.Family Name | —
+Provider Number | Healthcare.Practitioner.Provider Number | —
+Specialty | Healthcare.Practitioner.Specialty | —

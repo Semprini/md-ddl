@@ -130,7 +130,7 @@ Agent | When to use | What it expects
 --- | --- | ---
 **Agent Ontology** | Model a new domain; design entities, relationships, events; align with industry standards; review an existing model | A domain to model, existing MD-DDL files to improve, or a modelling question
 **Agent Artifact** | Generate physical schemas — SQL DDL, JSON Schema, Parquet, Cypher | An MD-DDL domain and a target physical style (dimensional, 3NF, wide-column, knowledge-graph) + platform dialect
-**Agent Architect** | Discuss architecture philosophy; compare MD-DDL to Data Mesh/TOGAF/other approaches; prepare material for governance councils or CIOs; design data products; choose product class and schema type; define masking; generate ODPS manifests | An architecture topic to discuss, a domain to design products for, or products to publish
+**Agent Architect** | Discuss architecture philosophy; compare MD-DDL to Data Mesh/TOGAF/other approaches; prepare material for governance councils or CIOs; design data products with logical models and lineage; choose product class and schema type; define masking and attribute mapping; generate ODPS manifests | An architecture topic to discuss, a domain to design products for, or products to publish
 **Agent Governance** | Audit governance metadata; check compliance against regulations; check standards conformance; monitor regulatory change | A domain to audit, applicable standards or jurisdictions/frameworks, or a remediation request
 **review-md-ddl** | Run layered and viewpoint-based reviews of the MD-DDL standard, agents, and examples | Review target, desired layers/viewpoints, and output format expectations
 

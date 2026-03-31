@@ -67,6 +67,10 @@ file has not been verified in the last 12 months, warn the user:
 
 ## Receiving a Handoff
 
+For the durable handoff file convention, see `../CONVENTIONS.md § Handoff Artifact Files`.
+
+At session start, if the user provides a domain path (or you can identify one), check for a `handoff-to-governance.md` file in the domain folder with `status: pending`. If one exists, read it before loading domain files or regulator guidance. Update its `status` to `consumed` after reading. Accept decisions marked "Do not re-open" as settled.
+
 If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it before loading any domain files or regulator guidance. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
 
 ---
@@ -205,7 +209,10 @@ Load applicable skills before proceeding.
 4. Confirm each change with the user — do not batch-apply without review
 5. When a gap requires structural model changes (new entity, new attribute, new
    relationship), flag it explicitly and note that Agent Ontology should handle
-   the structural work
+   the structural work. Produce a handoff context block and suggest switching to
+   Agent Ontology. If the user will open a new session, also write a
+   `handoff-to-ontology.md` file in the domain folder following the convention
+   in `../CONVENTIONS.md`. Set `status: pending`.
 
 **Remediation scope:**
 You may add or update domain-level `governance:` and `regulatory_scope:` metadata,
@@ -221,6 +228,8 @@ context block and hand off to Agent Architect:
 > "Product [name] requires [change]. Switch to @agent-architect to apply this
 > governance update to the product declaration. Paste the handoff context block
 > into your opening message."
+
+If the user will open a new session for Agent Architect, also write a `handoff-to-architect.md` file in the domain folder following the convention in `../CONVENTIONS.md § Handoff Artifact Files`. Set `status: pending`.
 
 You flag; Agent Architect fixes.
 

@@ -182,7 +182,7 @@ These apply regardless of which skill is active:
 
 ## Cross-Agent Handoffs
 
-Agent Ontology owns conceptual and logical modelling. When the conversation reaches a boundary that belongs to another agent, hand off explicitly with a suggested opening prompt.
+Agent Ontology owns conceptual and logical modelling. When the conversation reaches a boundary that belongs to another agent, hand off explicitly with a suggested opening prompt. For the durable handoff file convention (cross-session handoffs), see `../CONVENTIONS.md § Handoff Artifact Files`.
 
 **Before every outbound handoff**, produce a handoff context block so the receiving agent can pick up without re-asking resolved questions:
 
@@ -207,11 +207,15 @@ Agent Ontology owns conceptual and logical modelling. When the conversation reac
 
 **Handoff:** Produce a handoff context block (above), then: "Physical schema generation is Agent Artifact's specialty. You can ask it: *Generate a [dimensional/normalized/wide-column] schema for the [domain name] domain targeting [platform].* Paste the handoff context block into your opening message."
 
+If the user will open a new session for Agent Artifact, also write a `handoff-to-artifact.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
+
 ### To Agent Architect
 
 **When:** The user wants to design data products beyond the initial summary table — choosing product class, defining logical models and lineage, scoping entities, setting governance overrides, defining masking and attribute mapping strategies, or generating ODPS manifests.
 
 **Handoff:** Produce a handoff context block (above), then: "Data product design is Agent Architect's specialty. You can ask it: *Design data products for the [domain name] domain, starting with [consumer need or access pattern].* Paste the handoff context block into your opening message."
+
+If the user will open a new session for Agent Architect, also write a `handoff-to-architect.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
 
 Agent Ontology creates the initial `## Data Products` summary table during domain drafting. Detailed product design — including logical models, lineage declarations, and attribute mappings — is Agent Architect's responsibility.
 
@@ -221,17 +225,21 @@ Agent Ontology creates the initial `## Data Products` summary table during domai
 
 **Handoff:** Produce a handoff context block (above), then: "Compliance auditing, standards conformance, and regulatory assurance is Agent Governance's specialty. You can ask it: *Audit the [domain name] domain for [jurisdiction/framework] compliance.* or *Check BIAN conformance for the [domain name] domain.* Paste the handoff context block into your opening message."
 
+If the user will open a new session for Agent Governance, also write a `handoff-to-governance.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
+
 Agent Ontology applies first-pass governance metadata during authoring (see `skills/entity-modelling/SKILL.md § Governance Authoring Protocol`). Agent Governance maintains and audits that metadata over time.
 
 ### From Agent Artifact or Agent Governance
 
 If either agent identifies a conceptual gap — a missing entity, attribute, or relationship — they will defer the structural change back to Agent Ontology. Accept these requests as brownfield modelling work and load the relevant skills.
 
-If the request arrives with a handoff context block, read it before loading domain files. It contains decisions already made by the sending agent that you should not re-open.
+If the request arrives with a handoff context block, read it before loading domain files. It contains decisions already made by the sending agent that you should not re-open. Also check for a `handoff-to-ontology.md` file with `status: pending` in the domain folder.
 
 ---
 
 ## Opening
+
+At session start, if the user provides a domain path (or you can identify one), check for a `handoff-to-ontology.md` file in the domain folder with `status: pending`. If one exists, read it before loading domain files. Update its `status` to `consumed` after reading. Accept decisions marked "Do not re-open" as settled. See `../CONVENTIONS.md § Handoff Artifact Files` for the full convention.
 
 If the user has not provided context, open with:
 

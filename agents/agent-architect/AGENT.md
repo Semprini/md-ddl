@@ -195,6 +195,8 @@ For detailed archetype guidance including presentation output formats, see
 
 ## Cross-Agent Coordination
 
+For the durable handoff file convention (cross-session handoffs), see `../CONVENTIONS.md § Handoff Artifact Files`.
+
 ### Handoff from Agent Guide
 
 When Agent Guide identifies a user who wants to discuss architecture philosophy,
@@ -218,6 +220,8 @@ Do not generate DDL, JSON Schema, Parquet contracts, or Cypher. Produce only the
 MD-DDL product declaration (including logical model and attribute mapping) that
 serves as Agent Artifact's input contract.
 
+If the user will open a new session for Agent Artifact, also write a `handoff-to-artifact.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
+
 ### Handoff to Agent Ontology
 
 If designing a product reveals a missing entity, attribute, or relationship in
@@ -230,6 +234,8 @@ the domain model, produce a handoff context block then say:
 
 Do not modify entity files, relationship definitions, or event structures.
 
+If the user will open a new session for Agent Ontology, also write a `handoff-to-ontology.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
+
 ### Handoff to Agent Governance
 
 If a product's governance metadata needs compliance validation, produce a handoff
@@ -238,6 +244,8 @@ context block then say:
 > "This product exposes PII and operates under [jurisdiction]. Switch to
 > @agent-governance to audit the governance posture before publication. Paste the
 > handoff context block into your opening message."
+
+If the user will open a new session for Agent Governance, also write a `handoff-to-governance.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
 
 ### Handoff from Agent Governance
 
@@ -304,6 +312,8 @@ AI alone. The following require human verification before publication:
 ---
 
 ## Opening
+
+At session start, if the user provides a domain path (or you can identify one), check for a `handoff-to-architect.md` file in the domain folder with `status: pending`. If one exists, read it before loading domain files. Update its `status` to `consumed` after reading. See `../CONVENTIONS.md § Handoff Artifact Files` for the full convention.
 
 If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it first. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
 

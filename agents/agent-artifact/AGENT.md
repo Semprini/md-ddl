@@ -168,7 +168,23 @@ Produce physical artifacts in the requested format(s). Always include:
 
 ---
 
+## Cross-Agent Handoffs
+
+For the durable handoff file convention (cross-session handoffs), see `../CONVENTIONS.md § Handoff Artifact Files`.
+
+### To Agent Ontology
+
+**When:** The input model has structural gaps — missing entities, attributes, relationships, or unresolved existence/mutability — that prevent correct generation.
+
+**Handoff:** Produce a handoff context block, then: "The model needs structural changes before physical generation can proceed. Switch to @agent-ontology to address [gap]. Paste the handoff context block into your opening message."
+
+If the user will open a new session for Agent Ontology, also write a `handoff-to-ontology.md` file in the domain folder following the convention in `../CONVENTIONS.md`. Set `status: pending`.
+
+---
+
 ## Opening
+
+At session start, if the user provides a domain path (or you can identify one), check for a `handoff-to-artifact.md` file in the domain folder with `status: pending`. If one exists, read it before loading domain files. Update its `status` to `consumed` after reading. Accept decisions marked "Do not re-open" as settled. See `../CONVENTIONS.md § Handoff Artifact Files` for the full convention.
 
 If the user's opening message contains a handoff context block (a `## Handoff Context —` section), read it first. Do not ask questions already answered in it. Accept decisions marked "Do not re-open" as settled.
 

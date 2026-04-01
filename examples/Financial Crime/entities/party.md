@@ -181,7 +181,7 @@ granularity: atomic
 ownership: Party
 self_referential: true
 relationship_attributes:
-  - Association Type
+  - Association Type (enum:Association Type)
   - Association Start Date
   - Association End Date
   - Verified

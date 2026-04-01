@@ -68,27 +68,57 @@ graph TD
   PaymentInitiator --> |is a|PartyRole
 
   Party --> |has|ContactAddress
-  PartyRole -->|uses|ContactAddress
+  PartyRole --> |uses|ContactAddress
   Customer --> |holds|Account
   Customer --> |has|CustomerPreferences
   PartyRole --> |governed by|Agreement
-  Transaction --> |has|Payer
-  Transaction --> |has|Payee
+  
+  Transaction --> |has debtor|Payer
+  Transaction --> |has creditor|Payee
   Transaction --> |initiated by|PaymentInitiator
+  Transaction --> |denominated in|Currency
+  Transaction --> |debits|Account
+  Transaction --> |credits|Account
+  
   Teller --> |processes|Transaction
-  Merchant --> |processes|Transaction
+  Teller --> |assigned to|Branch
+  Merchant --> |receives payment via|Transaction
+  Merchant --> |settles into|Account
 
-  Account --> |holds|Product
+  Account --> |instance of|Product
+  Account --> |denominated in|Currency
   Branch --> |services|Account
 
   Product --> |in terms of|Agreement
+  Agreement --> |governs|PartyRole
+  
   ContactAddress --> |references|Address
 
+  ExchangeRate --> |base|Currency
+  ExchangeRate --> |quote|Currency
+  
   Party["<a href='entities/party.md'>Party</a>"]
   Person["<a href='entities/person.md'>Person</a>"]
+  Company["<a href='entities/company.md'>Company</a>"]
   PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
+  Customer["<a href='entities/customer.md'>Customer</a>"]
+  Merchant["<a href='entities/merchant.md'>Merchant</a>"]
+  Payer["<a href='entities/payer.md'>Payer</a>"]
+  Payee["<a href='entities/payee.md'>Payee</a>"]
+  Teller["<a href='entities/teller.md'>Teller</a>"]
+  PaymentInitiator["<a href='entities/payment_initiator.md'>Payment Initiator</a>"]  
   Address["<a href='entities/address.md'>Address</a>"]
   ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
+  CustomerPreferences["<a href='entities/customer-preferences.md'>Customer Preferences</a>"]
+  Account["<a href='entities/account.md'>Account</a>"]
+  Product["<a href='entities/product.md'>Product</a>"]
+  Agreement["<a href='entities/agreement.md'>Agreement</a>"]
+  LoanAgreement["<a href='entities/loan-agreement.md'>Loan Agreement</a>"]
+  TermDepositAgreement["<a href='entities/term-deposit-agreement.md'>Term Deposit Agreement</a>"]
+  Transaction["<a href='entities/transaction.md'>Transaction</a>"]
+  Branch["<a href='entities/branch.md'>Branch</a>"]
+  Currency["<a href='entities/currency.md'>Currency</a>"]
+  ExchangeRate["<a href='entities/exchange-rate.md'>Exchange Rate</a>"]
 ```
 
 ## Source Systems
@@ -141,6 +171,16 @@ Name | Description | Reference
 [Address Verification Status](enums.md#address-verification-status) | Current verification state of a contact address association. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Verification Method](enums.md#verification-method) | Method used to verify an address. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Currency Code](enums.md#currency-code) | ISO 4217 currency codes for transaction and account values. | [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
+[Transaction Type](enums.md#transaction-type) | Payment mechanism and clearing pathway classification. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Transaction Status](enums.md#transaction-status) | Lifecycle state of a transaction from initiation through settlement. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Transaction Channel](enums.md#transaction-channel) | Channel through which a transaction was initiated or processed. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Account Status](enums.md#account-status) | Operational lifecycle state of an account. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
+[Account Type](enums.md#account-type) | Classification of an account by primary purpose and product characteristics. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
+[Agreement Status](enums.md#agreement-status) | Lifecycle state of a formal agreement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
+[Contact Preference](enums.md#contact-preference) | Customer's preferred outbound communication channel. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
+[Company Legal Structure](enums.md#company-legal-structure) | Legal form under which a company or organisation is constituted. | [BIAN BOM - Legal Entity](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LegalEntity)
+[Association Type](enums.md#association-type) | Nature of the relationship between two parties in a network association. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
+[Account Holder Type](enums.md#account-holder-type) | Nature of a customer's holding relationship with an account. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 
 ## Relationships
 
@@ -165,6 +205,14 @@ Name | Description | Reference
 [Branch Transaction Summary](entities/branch.md#branch-transaction-summary) | Grouped relationship from Branch to Transactions for branch-level fraud analysis. | -
 [Party Role At Point In Time](entities/party_role.md#party-role-at-point-in-time) | Period snapshot of Party Role state for regulatory reporting. | -
 [Party Related To Party](entities/party.md#party-related-to-party) | A Party may be related to one or more other Parties through ownership, control, family, or association ties. Structural basis for beneficial ownership mapping and PEP network analysis. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
+[Teller Assigned To Branch](entities/teller.md#teller-assigned-to-branch) | A Teller is assigned to a Branch for operational responsibilities. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
+[Exchange Rate References Base Currency](entities/exchange-rate.md#exchange-rate-references-base-currency) | Each Exchange Rate references one base Currency. | [BIAN BOM - Exchange Rate](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ExchangeRate)
+[Exchange Rate References Quote Currency](entities/exchange-rate.md#exchange-rate-references-quote-currency) | Each Exchange Rate references one quote Currency. | [BIAN BOM - Exchange Rate](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ExchangeRate)
+[Transaction Denominated In Currency](entities/transaction.md#transaction-denominated-in-currency) | A Transaction is denominated in exactly one Currency. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Transaction Has Debit Account](entities/transaction.md#transaction-has-debit-account) | A Transaction debits one internal Account. Null for externally-held debit accounts. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Transaction Has Credit Account](entities/transaction.md#transaction-has-credit-account) | A Transaction credits one internal Account. Null for externally-held credit accounts. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Account Denominated In Currency](entities/account.md#account-denominated-in-currency) | An Account is denominated in exactly one Currency. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
+[Merchant Has Settlement Account](entities/merchant.md#merchant-has-settlement-account) | A Merchant may have a designated Account for settlement credit. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 
 ## Events
 

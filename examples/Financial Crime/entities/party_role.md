@@ -188,11 +188,14 @@ ownership: Party Role
 
 Captures the state of a Party Role as it stood at a specific point in time. Used for regulatory snapshots — e.g. quarterly compliance reporting requires the role state as of the reporting date, not the current state.
 
+Party Role is declared bitemporal; this period-granularity relationship makes the temporal snapshot pattern explicit for physical generation, ensuring dimensional consumers can materialize point-in-time snapshots for regulatory reporting.
+
 ```yaml
 source: Party Role
-type: associates_with
-target: Customer
+type: snapshots
+target: Party Role
 cardinality: one-to-one
 granularity: period
 ownership: Party Role
+self_referential: true
 ```

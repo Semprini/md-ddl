@@ -20,9 +20,11 @@ classDiagram
 
   Merchant --|> PartyRole
   Merchant "1" --> "0..*" Transaction : processes
+  Merchant "0..*" --> "0..1" Account : settles into
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
   class Transaction["<a href='transaction.md'>Transaction</a>"]
+  class Account["<a href='account.md'>Account</a>"]  
 ```
 
 ```yaml
@@ -37,7 +39,10 @@ attributes:
 
   Merchant Category Code:
     type: string
-    description: Industry code representing the merchant business type.
+    description: >
+      ISO 18245 Merchant Category Code (MCC) representing the merchant's primary
+      business type. Used in transaction monitoring rule segmentation — certain MCCs
+      (e.g., cash-intensive businesses, money services) attract heightened scrutiny.
 
   Settlement Account Identifier:
     type: string
@@ -60,6 +65,17 @@ source: Merchant
 type: associates_with
 target: Transaction
 cardinality: one-to-many
+granularity: atomic
+ownership: Merchant
+```
+
+### Merchant Has Settlement Account
+A Merchant may have a designated Account into which settlement funds are credited by the institution.
+```yaml
+source: Merchant
+type: references
+target: Account
+cardinality: many-to-one
 granularity: atomic
 ownership: Merchant
 ```

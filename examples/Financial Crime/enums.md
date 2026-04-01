@@ -229,3 +229,236 @@ values:
   CAD:
     description: Canadian Dollar
 ```
+
+---
+### Transaction Type
+Category of financial transaction representing the movement mechanism and clearing pathway.
+```yaml
+values:
+  Wire Transfer:
+    description: Domestic or international credit transfer processed via the local RTGS or wire network
+  SWIFT Transfer:
+    description: International payment instruction transmitted via the SWIFT network
+  EFTPOS:
+    description: Electronic funds transfer at point of sale via a card-present terminal
+  ATM Withdrawal:
+    description: Cash withdrawal initiated at an automated teller machine
+  ATM Deposit:
+    description: Cash or cheque deposit lodged at an automated teller machine
+  Direct Debit:
+    description: Pull payment authorised by the account holder and initiated by a creditor
+  Direct Credit:
+    description: Push payment credited directly to a beneficiary account
+  Internal Transfer:
+    description: Movement of funds between two accounts held within the same institution
+  BPay:
+    description: Bill payment processed through the BPAY scheme
+  Cash Deposit:
+    description: Physical cash lodged to an account at a branch or agency
+  Cash Withdrawal:
+    description: Physical cash disbursed from an account at a branch or agency
+  Cheque:
+    description: Payment by paper cheque presented for clearing
+  RTGS:
+    description: High-value same-day settlement payment processed through the Real-Time Gross Settlement system
+```
+---
+### Transaction Status
+Lifecycle state of a transaction from initiation through to final settlement or failure.
+```yaml
+values:
+  Pending:
+    description: Transaction has been submitted and is awaiting authorisation or clearing
+  Authorised:
+    description: Transaction has been authorised but not yet cleared or settled
+  Cleared:
+    description: Transaction has been cleared through the relevant payment scheme
+  Settled:
+    description: Final irrevocable settlement has occurred and funds have moved
+  Failed:
+    description: Transaction could not be processed and no funds were moved
+  Reversed:
+    description: A previously settled transaction has been reversed and funds returned
+  Cancelled:
+    description: Transaction was cancelled before settlement at the request of an authorised party
+  Under Review:
+    description: Transaction has been flagged and is under financial crime or fraud review; settlement is suspended pending outcome
+```
+---
+### Transaction Channel
+The channel or medium through which a transaction was initiated or processed.
+```yaml
+values:
+  Branch:
+    description: Transaction initiated or processed at a physical branch location by a teller or officer
+  Online Banking:
+    description: Transaction initiated by a customer through the institution's internet banking platform
+  Mobile Banking:
+    description: Transaction initiated by a customer through the institution's mobile application
+  ATM:
+    description: Transaction self-served by a customer at an automated teller machine
+  EFTPOS Terminal:
+    description: Transaction initiated at a merchant point-of-sale EFTPOS terminal
+  SWIFT:
+    description: Payment instruction transmitted via the SWIFT network, typically for international transfers
+  Direct Entry:
+    description: Batch payment submitted directly via the Direct Entry (DE) system
+  Third Party:
+    description: Transaction initiated by an authorised third party or payment service provider on behalf of a customer
+  Internal System:
+    description: Transaction generated automatically by an internal system process (e.g., interest capitalisation, fee deduction)
+```
+---
+### Account Status
+Operational lifecycle state of an account.
+```yaml
+values:
+  Pending:
+    description: Account has been created but has not yet been activated for transacting
+  Active:
+    description: Account is open and available for deposits, withdrawals, and other permitted operations
+  Dormant:
+    description: Account has had no customer-initiated transactions for an extended period as defined by the institution's dormancy policy
+  Frozen:
+    description: Account has been administratively frozen; no debits or credits are permitted pending investigation or regulatory instruction
+  Suspended:
+    description: Account is temporarily suspended pending compliance review or fraud investigation
+  Closed:
+    description: Account has been permanently closed; no further transactions are permitted
+```
+---
+### Account Type
+Classification of the financial account by its primary purpose and product characteristics.
+```yaml
+values:
+  Savings:
+    description: Interest-bearing deposit account intended for accumulation of funds
+  Current:
+    description: Transaction account (also called cheque or demand deposit account) used for day-to-day banking
+  Term Deposit:
+    description: Fixed-term deposit account where funds are locked in for a specified period at a contracted interest rate
+  Loan:
+    description: Credit account representing a disbursed loan obligation
+  Line Of Credit:
+    description: Revolving credit facility where the customer may draw down and repay up to an approved limit
+  Mortgage:
+    description: Secured loan account used to finance the purchase of real property
+  Offset:
+    description: Transaction account linked to a mortgage, where the balance offsets interest charged on the mortgage
+  Foreign Currency:
+    description: Account denominated in a currency other than the institution's base currency
+```
+---
+### Agreement Status
+Lifecycle state of a formal agreement between the institution and a party.
+```yaml
+values:
+  Draft:
+    description: Agreement has been created but not yet executed by all required parties
+  Active:
+    description: Agreement is fully executed and currently in force
+  Suspended:
+    description: Agreement is temporarily suspended by one or both parties pending resolution of a dispute or compliance matter
+  Matured:
+    description: Agreement has reached its scheduled maturity date and obligations have been fulfilled
+  Terminated:
+    description: Agreement has been terminated before its natural maturity, by mutual consent or by one party under agreed termination rights
+  Cancelled:
+    description: Agreement was cancelled before it became active and never took effect
+```
+---
+### Contact Preference
+The customer's preferred channel for outbound communication from the institution.
+```yaml
+values:
+  Email:
+    description: Customer prefers communications delivered by email
+  SMS:
+    description: Customer prefers short message service (text message) notifications
+  Post:
+    description: Customer prefers physical mail correspondence
+  Phone:
+    description: Customer prefers to be contacted by telephone call
+  In App:
+    description: Customer prefers push notifications and messages delivered within the institution's mobile application
+  No Contact:
+    description: Customer has opted out of all non-essential outbound communications
+```
+---
+### Company Legal Structure
+The legal form under which a company or organisation is incorporated or constituted. Relevant to AML risk assessment — certain structures (trusts, shell companies, special purpose vehicles) carry elevated money-laundering risk due to opacity of beneficial ownership.
+```yaml
+values:
+  Private Company:
+    description: Privately held limited liability company not listed on a public exchange (e.g., Pty Ltd, Ltd)
+  Public Company:
+    description: Company whose shares are listed and traded on a public stock exchange
+  Partnership:
+    description: Business entity where two or more persons carry on a business in common with a view to profit
+  Sole Trader:
+    description: Unincorporated individual carrying on business in their own name
+  Trust:
+    description: Legal arrangement where a trustee holds assets for the benefit of beneficiaries; elevated AML risk due to beneficial ownership complexity
+  Cooperative:
+    description: Member-owned and democratically controlled organisation
+  Government Entity:
+    description: Entity owned or controlled by a national, state, or local government
+  Non-Profit:
+    description: Organisation operating for a purpose other than profit; subject to specific AML obligations due to potential misuse for terrorist financing
+  Foreign Entity:
+    description: Entity incorporated or constituted under the laws of a foreign jurisdiction
+  Special Purpose Vehicle:
+    description: Entity created for a specific, narrow purpose (e.g., asset securitisation); elevated AML scrutiny due to potential use in layering structures
+```
+---
+### Association Type
+The nature of the relationship between two Parties in the Party Related To Party network. Used for beneficial ownership mapping, PEP network screening, and suspicious activity investigation.
+```yaml
+values:
+  Ultimate Beneficial Owner:
+    description: Individual who ultimately owns or controls 25% or more of the entity, directly or indirectly
+  Beneficial Owner:
+    description: Individual with a beneficial interest in the entity below the UBO threshold but still subject to disclosure obligations
+  Director:
+    description: Individual appointed to the board of directors or equivalent governing body
+  Shareholder:
+    description: Entity or individual holding shares in a company
+  Guarantor:
+    description: Party who has provided a guarantee for another party's obligations
+  Controlling Person:
+    description: Individual who exercises control over an entity through means other than shareholding (e.g., power of attorney, contractual rights)
+  Spouse:
+    description: Legal spouse or domestic partner; relevant for PEP close associate screening
+  Parent:
+    description: Direct parent of an individual; relevant for PEP family member screening
+  Child:
+    description: Direct child of an individual; relevant for PEP family member screening
+  Sibling:
+    description: Sibling of an individual; relevant for PEP family member screening
+  Close Associate:
+    description: Individual known to be in close personal or professional relationship with a PEP
+  Employer:
+    description: Organisation that employs the related party
+  Employee:
+    description: Individual employed by the related organisation
+  Signatory:
+    description: Individual authorised to sign on behalf of an entity
+```
+---
+### Account Holder Type
+The nature of a customer's holding relationship with an account. Used as a relationship attribute on Customer Holds Account.
+```yaml
+values:
+  Primary Holder:
+    description: The principal account owner responsible for the account relationship
+  Joint Holder:
+    description: Co-owner of the account with equal rights to the Primary Holder
+  Signatory:
+    description: Individual authorised to transact on the account but without ownership rights
+  Beneficial Owner:
+    description: Individual who benefits from the account but whose name may not appear as a legal owner
+  Guardian:
+    description: Individual acting as legal guardian for a minor or incapacitated account holder
+  Attorney:
+    description: Individual holding power of attorney to operate the account on behalf of the primary holder
+```

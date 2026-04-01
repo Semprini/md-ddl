@@ -18,10 +18,8 @@ classDiagram
   }
 
   PaymentInitiator --|> PartyRole
-  PaymentInitiator "1" --> "0..*" Transaction : initiates
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Transaction["<a href='transaction.md'>Transaction</a>"]
 ```
 
 ```yaml
@@ -46,15 +44,4 @@ governance:
 
 ## Relationships
 
-### Payment Initiator Initiates Transaction
-
-A Payment Initiator can initiate one or more Transactions.
-
-```yaml
-source: Payment Initiator
-type: triggers
-target: Transaction
-cardinality: one-to-many
-granularity: atomic
-ownership: Payment Initiator
-```
+No relationships are sourced directly from Payment Initiator. The canonical direction is Transaction-owned — see [Transaction Initiated By Instructing Agent](transaction.md#transaction-initiated-by-instructing-agent).

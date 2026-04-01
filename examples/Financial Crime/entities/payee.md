@@ -18,10 +18,8 @@ classDiagram
   }
 
   Payee --|> PartyRole
-  Payee "1" --> "0..*" Transaction : receives
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Transaction["<a href='transaction.md'>Transaction</a>"]
 ```
 
 ```yaml
@@ -46,15 +44,4 @@ governance:
 
 ## Relationships
 
-### Payee Receives Transaction
-
-A Payee can be associated with one or more Transactions as the receiving party.
-
-```yaml
-source: Payee
-type: associates_with
-target: Transaction
-cardinality: one-to-many
-granularity: atomic
-ownership: Payee
-```
+No relationships are sourced directly from Payee. The canonical direction is Transaction-owned — see [Transaction Has Creditor](transaction.md#transaction-has-creditor).

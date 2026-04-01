@@ -65,7 +65,7 @@ cardinality: many-to-many
 granularity: atomic
 ownership: Customer
 relationship_attributes:
-  - Holder Type
+  - Holder Type (enum:Account Holder Type)
   - Holder Start Date
   - Holder End Date
   - Is Primary Holder

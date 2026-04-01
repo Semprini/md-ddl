@@ -14,14 +14,15 @@ config:
 classDiagram
   class CustomerPreferences{
     * Preference Identifier : string
-    Contact Preference : string
+    Contact Preference : enum~ContactPreference~
     Marketing Consent : boolean
     Effective From : date
   }
 
   Customer "1" --> "0..1" CustomerPreferences : has
 
-  class Customer["<a href='customer.md'>Customer</a>"]
+    class ContactPreference["<a href='../enums.md#contact-preference'>Contact Preference</a>"]{<<enumeration>>}
+    class Customer["<a href='customer.md'>Customer</a>"]
 ```
 
 ```yaml
@@ -34,8 +35,10 @@ attributes:
     description: Unique identifier for the customer preference profile.
 
   Contact Preference:
-    type: string
-    description: Preferred communication channel for customer contact.
+    type: enum:Contact Preference
+    description: >
+      The customer's preferred channel for outbound communication from the institution.
+      Must be respected in all non-mandatory communications and drives CRM system routing.
 
   Marketing Consent:
     type: boolean

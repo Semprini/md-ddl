@@ -15,6 +15,7 @@ classDiagram
   class Agreement{
     * Agreement Identifier : string
     Agreement Number : string
+    Agreement Status : enum~AgreementStatus~
     Effective Date : date
     Maturity Date : date
   }
@@ -23,6 +24,7 @@ classDiagram
   LoanAgreement --|> Agreement
   Agreement "1" --> "0..*" PartyRole : governs
 
+  class AgreementStatus["<a href='../enums.md#agreement-status'>Agreement Status</a>"]{<<enumeration>>}
   class TermDepositAgreement["<a href='term-deposit-agreement.md'>Term Deposit Agreement</a>"]
   class LoanAgreement["<a href='loan-agreement.md'>Loan Agreement</a>"]
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
@@ -40,6 +42,14 @@ attributes:
   Agreement Number:
     type: string
     description: Human-facing agreement reference number.
+
+  Agreement Status:
+    type: enum:Agreement Status
+    description: >
+      The current lifecycle state of the agreement. Active agreements govern current
+      obligations; Terminated and Matured agreements must be retained for audit. Used
+      as a dimension attribute in agreement-level analytics and regulatory reporting
+      of active product holdings.
 
   Effective Date:
     type: date

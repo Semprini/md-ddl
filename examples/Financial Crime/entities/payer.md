@@ -18,10 +18,8 @@ classDiagram
   }
 
   Payer --|> PartyRole
-  Payer "1" --> "0..*" Transaction : funds
 
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Transaction["<a href='transaction.md'>Transaction</a>"]
 ```
 
 ```yaml
@@ -46,15 +44,4 @@ governance:
 
 ## Relationships
 
-### Payer Funds Transaction
-
-A Payer can be associated with one or more Transactions as the funding party.
-
-```yaml
-source: Payer
-type: associates_with
-target: Transaction
-cardinality: one-to-many
-granularity: atomic
-ownership: Payer
-```
+No relationships are sourced directly from Payer. The canonical direction is Transaction-owned — see [Transaction Has Debtor](transaction.md#transaction-has-debtor).

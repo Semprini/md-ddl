@@ -6,9 +6,7 @@
       "Write(./**)",
       "Edit(./**)",
       "Glob(./**)",
-      "Grep(./**)"
-    ],
-    "deny": [
+      "Grep(./**)",
       "Bash(git *)"
     ]
   }

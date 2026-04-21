@@ -47,6 +47,7 @@ which skill applies and read its SKILL.md.
 | **Wide Column** | User asks for denormalized reporting tables, wide column schemas, one-table analytics outputs, or join-minimized read models | `skills/wide-column/SKILL.md` |
 | **Knowledge Graph** | User asks for a knowledge graph, graph database schema, Cypher DDL, or Neo4j model; realizing MD-DDL entities, relationships, events, and enums as labeled property graph structures | `skills/knowledge-graph/SKILL.md` |
 | **Reconciliation** | User wants to compare generated artifacts with existing state; "reconcile", "compare", "diff", "gap analysis"; transitioning from Level 3 to Level 4 adoption maturity | `skills/reconciliation/SKILL.md` |
+| **Faker** | User asks for synthetic data, fake data, test data, sample data, seed data, or Faker classes; "generate data for testing"; "populate with data"; references the Python `faker` library; scope is source system data, canonical entity data, or destination physical output data | `skills/faker/SKILL.md` |
 
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a physically incorrect artifact.
@@ -72,6 +73,12 @@ For any knowledge graph, Cypher, or Neo4j request:
 
 - Load `skills/knowledge-graph/SKILL.md`.
 - Use it to translate MD-DDL concepts into labeled property graph structures — node labels, relationship types, constraints, indexes, and seed data.
+
+For any synthetic data, Faker class, or test data generation request:
+
+- Load `skills/faker/SKILL.md`.
+- Use it to determine scope (source / canonical / destination), PII mode, cardinality,
+  and FK resolution strategy before generating any Python code.
 
 Do not generate physical artifacts until the applicable skill and its referenced
 sub-guidance have been loaded.
@@ -118,10 +125,17 @@ Default on first contact. Before generating, confirm:
 4. Output format(s) requested (DDL, JSON Schema, Parquet schema contract, Cypher, wide-column contract)
 5. Any naming conventions or organisation constraints
 6. Whether generation is scoped by a data product declaration. If so:
-   - The product’s `schema_type` selects the generation skill
-   - For **domain-aligned** products: read entity detail files for attributes, types, and constraints — the product’s logical model is a projection of the canonical model
-   - For **consumer-aligned** products: use the product’s logical model diagram and attribute mapping tables as the generation input — the product defines its own structure, not the canonical model
-   - Apply the product’s `governance` and `masking` metadata as constraints on the output
+7. If the request is for Faker / synthetic data generation:
+   - Scope: source system data (raw source column names from transform files), canonical entity
+     data (entity attribute names), or destination physical output (physical column names from DDL)?
+   - PII mode: `safe` (default — clearly fake placeholders for shared environments) or
+     `realistic` (plausible-looking values for isolated developer use)?
+   - Cardinality: how many root rows? Are FK-linked child sets required (e.g., customers + accounts)?
+   - Output: single combined module or one file per entity?
+   - The product's `schema_type` selects the generation skill
+   - For **domain-aligned** products: read entity detail files for attributes, types, and constraints — the product's logical model is a projection of the canonical model
+   - For **consumer-aligned** products: use the product's logical model diagram and attribute mapping tables as the generation input — the product defines its own structure, not the canonical model
+   - Apply the product's `governance` and `masking` metadata as constraints on the output
 
 > *Transition phrase:* "I have enough context to generate the physical artifacts. Shall I proceed?"
 

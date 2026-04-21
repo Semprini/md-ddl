@@ -21,6 +21,7 @@ md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantic
 - **Data products** — source-aligned, domain-aligned, and consumer-aligned products declaring scope, shape, consumers, SLA, governance, and masking — driving automated artifact generation
 - **Governance** — classification, PII, retention, regulatory scope, access roles, and masking strategies living with the model, not in a separate system
 - **Physical artifacts** — dimensional star schemas, normalized 3NF DDL, wide-column schemas, knowledge graph (Cypher), JSON Schema, Parquet contracts
+- **Synthetic data** — Python Faker factory classes generated straight from your entity definitions; source, canonical, or destination scope; safe-mode PII for shared environments, realistic mode for local dev
 
 ---
 
@@ -71,7 +72,7 @@ Example prompts (Claude AI uses `/agent-guide`, CoPilot uses `@agent-guide`):
 3. **Model** — write domain.md, entity files, enums, and events
 4. **Map sources** — declare source systems and column-level transforms
 5. **Publish** — declare data products with scope, shape, SLA, and masking
-6. **Generate** — produce physical artifacts with Agent Artifact
+6. **Generate** — produce physical artifacts and synthetic test data with Agent Artifact
 7. **Govern** — audit standards conformance and regulatory posture with Agent Governance
 
 Agent Guide helps you navigate between these stages and explains any concept along the way.

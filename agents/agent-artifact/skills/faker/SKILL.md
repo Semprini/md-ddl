@@ -388,6 +388,26 @@ if __name__ == "__main__":
 
 ---
 
+## Supporting Runtime
+
+The following files ship with the faker skill and should be offered alongside any generated module.
+
+File | Purpose
+--- | ---
+`agents/agent-artifact/skills/faker/runtime/integrity_check.py` | Validates a `DatasetBuilder` output dict for FK resolution, not-null, enum membership, and PK uniqueness. Zero external dependencies — stdlib only.
+`agents/agent-artifact/skills/faker/runtime/test_template.py` | Pytest template. Copy alongside the generated module, fill in the three `# UPDATE` sections, run `pytest test_factories.py -v`.
+
+**Reference generated example:**
+`examples/Financial Crime/factories.py` — complete canonical-scope factory covering Currency → Party → Account → Transaction with embedded integrity spec constants.
+
+### Offering the runtime
+
+At Step 7, after delivering the generated module, add:
+
+> "Would you like me to also generate a companion test file (`test_<module>.py`) pre-filled with the integrity spec for this domain? Copy `integrity_check.py` from the faker runtime alongside it and run `pytest` to verify referential integrity end-to-end."
+
+---
+
 ## Handoff
 
 **To DDL skills:** generate DDL first, then use physical column names for destination-scope Faker generation.
@@ -399,6 +419,6 @@ if __name__ == "__main__":
 ## Generation Limitations
 
 - Syntactically valid but untested. Run `python -m py_compile file.py` before use.
-- Cross-entity constraints enforced approximately within a single build() call only.
-- One-to-one cardinality honored within DatasetBuilder.build() but not across independent factory calls.
+- Cross-entity constraints enforced within a single `DatasetBuilder.build()` call. Use `integrity_check.py` to verify the full dataset after generation.
+- One-to-one cardinality honored within `DatasetBuilder.build()` but not across independent factory calls.
 - `pii_mode='realistic'` is fictional data. Caller must ensure it never reaches production.

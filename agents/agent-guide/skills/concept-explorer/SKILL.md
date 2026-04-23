@@ -1,6 +1,6 @@
 ---
 name: concept-explorer
-description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness.
+description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling, how to model or validate eventual consistency in MD-DDL.
 ---
 
 # Skill: Concept Explorer
@@ -40,6 +40,7 @@ Use the archetype from the core prompt to select the right analogy:
 
 MD-DDL Concept | ER / UML analogy | dbt / SQL analogy | Data Mesh analogy | FHIR analogy | Governance analogy
 --- | --- | --- | --- | --- | ---
+**Eventual Consistency** | — | Incremental model with overlapping refresh windows | Data product SLA / freshness window | — | Freshness SLA declaration; convergence audit trail
 **Entity** | ER entity, UML class | dbt model, table | Domain aggregate | FHIR Resource (Patient, Encounter) | Governed data asset
 **Attribute** | Column, field | Column in model | Property | Resource element (e.g. `Patient.name`) | Data element with classification
 **Enum** | Lookup table, code table | Seed file, static reference | Reference data | ValueSet, CodeSystem | Controlled vocabulary
@@ -318,6 +319,143 @@ When the user moves from explanation to action, route them explicitly:
 ### Short analogy to use
 
 > "Think of MD-DDL like source code plus release notes for data meaning. The model is the source, `LIFECYCLE.md` is the typed release history, and reconciliation is the step where you compare the newly built artifact to what is already running."
+
+---
+
+## Explaining Eventual Consistency in Canonical Data Products
+
+When a user asks about eventual consistency, propagation lag, freshness SLA,
+partial rows, or null handling for multi-source canonical entities, follow this
+teaching protocol. Load `md-ddl-specification/9-Data-Products.md` and
+`md-ddl-specification/7-Sources.md` before responding substantively.
+
+For deep architectural discussion or product design decisions, hand off to
+Agent Architect. For implementation work (declaring the product, updating DDL
+generation), hand off to Agent Architect then Agent Artifact.
+
+### Step 1 — Anchor to the Familiar
+
+Select the analogy that matches the user's background:
+
+| User type | Analogy |
+| --- | --- |
+| Data engineer | "Like Kafka consumer groups at different offsets — the canonical entity is the eventually-consistent view all consumers converge to. Each source is a producer at its own throughput; the canonical product's SLA is the guaranteed catch-up window." |
+| Data architect | "Like DNS propagation — a record change propagates to different resolvers at different speeds, but within the TTL window all resolvers agree. The canonical data product's `freshness` SLA is the TTL." |
+| Data steward | "Like a master record in a catalogue where different source systems update different fields — the catalogue view is eventually correct once all feeds have processed. The governance question is: what does the record look like mid-update?" |
+| Integration engineer | "Like CDC fan-out where downstream consumers subscribe at different cadences. The canonical entity accumulates updates from each source as they arrive; the bitemporal record shows exactly when each arrived." |
+
+### Step 2 — Two-Sentence Summary
+
+Eventual consistency in a canonical data product means that updates from different
+source systems arrive with different propagation lags, and the canonical entity
+converges to the correct state within a declared SLA window. MD-DDL makes this
+measurable: the `recorded_at` timestamp (transaction time) captures when the
+canonical system received each update, while `valid_from` (valid time) captures
+when it was true in the real world — the gap between them is the observable
+propagation lag.
+
+### Step 3 — How to Declare It in MD-DDL
+
+Teach this four-step pattern:
+
+1. **Source `change_model`** — each source declares how it propagates changes.
+   This governs expected lag per source:
+   ```yaml
+   change_model: real-time-cdc      # < 1 minute lag
+   change_model: batch-intraday     # 15–60 minute lag
+   ```
+
+2. **Entity temporal tracking** — bitemporal entities record both when a fact
+   was true (`valid_from`/`valid_to`) and when the system received it
+   (`recorded_at`/`superseded_at`). This is the audit trail for convergence.
+
+3. **Product `freshness` SLA** — the convergence window the product commits to:
+   ```yaml
+   sla:
+     freshness: "< 1 hour"   # slowest source is batch-intraday at 60 min
+   ```
+
+4. **Consistency posture comment** — records the architectural decision:
+   ```yaml
+   # Consistency posture: eventual (convergence SLA: < 1 hour)
+   # Null strategy: nullable-staging (partial rows in base; converged view for consumers)
+   ```
+
+### Step 4 — The Null Handling Problem
+
+This is the hardest practical consequence of eventual consistency. Teach it
+progressively — lead with the engineering reality, not the theory.
+
+**The problem:** During the convergence lag window, a canonical row may be
+partially populated. One source has delivered its attributes; another hasn't
+yet. The row exists but some fields are `NULL` — not because they are genuinely
+null, but because they haven't arrived yet.
+
+**Three layers where this bites:**
+
+*Storage (Parquet / Arrow):* These columnar formats cannot distinguish `null`
+(explicitly set to null) from *absent* (not yet received). Both encode as `null`.
+Any downstream reader sees identical bytes for "genuinely unknown" and
+"temporarily missing". If downstream ML models or analytics treat `null` as
+"genuinely absent", they may draw incorrect conclusions from in-flight rows.
+
+*Transport protocols:* Each protocol handles absent-vs-null differently. JSON
+omits absent keys but most deserializers collapse the distinction. Avro requires
+a `union [null, <type>]` schema for optional fields. Protobuf's `hasField()` is
+the most expressive — it can distinguish "not set" from "set to zero or empty".
+The **choice of transport protocol is an architectural dependency** of the
+consistency posture: if the user needs to distinguish absent-from-null, they
+must choose Protobuf or a custom Avro convention.
+
+*DDL constraints:* A hard `NOT NULL` column in the physical schema blocks partial
+row insertion entirely. MD-DDL's `not_null` attribute constraint declares business
+intent ("Legal Name must never be permanently null"). The physical `NOT NULL`
+constraint is a separate choice — and under eventual consistency, it may need to
+be relaxed on the staging table and enforced only at the view layer.
+
+**Three design patterns, teach the trade-offs:**
+
+| Pattern | How it works | When to choose |
+| --- | --- | --- |
+| Nullable staging + converged view | Base table has `NULL` columns; a view exposes only rows where all expected fields are populated | Best for most eventual-consistency canonical products |
+| Reject-partial inserts | Application blocks insert until all sources have contributed | Equivalent to strong consistency; use only if all sources can coordinate |
+| Nullable final schema | Base table nullable permanently; consumers handle nulls themselves | Avoid unless consumers are explicitly designed for it |
+
+### Step 5 — How to Validate It
+
+Point the user to the faker runtime for concrete demonstration:
+
+- **`consistency_scenario.py`** (in `agents/agent-artifact/skills/faker/runtime/`)
+  simulates what each source feed has delivered at a given moment and shows which
+  entity instances are still in-flight vs fully converged.
+- **`examples/Financial Crime/consistency_example.py`** is a runnable end-to-end
+  demonstration: three source feeds (5 min, 30 min, 60 min lag) converging on
+  the Party entity, with SLA validation and a convergence report.
+- **`check_temporal_chain()`** in `integrity_check.py` validates that the
+  bitemporal chain for each entity instance is coherent (no duplicate current
+  rows, no inverted valid-time periods, monotonically increasing `recorded_at`).
+
+### Step 6 — When Not to Use Eventual Consistency
+
+Teach the conditions where **strong consistency is required**:
+- Real-time fraud decisioning — a transaction must not be approved against a
+  stale risk rating
+- Payment authorisation — account status must be current at the moment of authorisation
+- Regulatory hard-stops — a party with `sanctions_screen_status: Confirmed Match`
+  must not transact; eventual lag could allow a blocked transaction through
+
+In these cases, either all source systems must support synchronous propagation
+(real-time-cdc with sub-minute lag), or the product must be scoped to exclude
+the slow-source attributes and rely on real-time enrichment at query time.
+
+### Step 7 — Handoff Guidance
+
+| Next step | Route to |
+| --- | --- |
+| Architect wants to *discuss* the consistency posture decision | Agent Architect (architecture skill) |
+| User wants to *declare* the product with consistency posture and null strategy | Agent Architect (product-design skill, Step 8) |
+| User wants to *generate DDL* for a nullable-staging pattern | Agent Artifact (dimensional or normalized skill, with consistency posture handoff note) |
+| User wants to *validate* eventual consistency with synthetic data | Agent Artifact (faker skill) — generate factories then run `consistency_example.py` |
 
 ---
 

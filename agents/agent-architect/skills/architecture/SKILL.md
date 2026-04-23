@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Use this skill when the user asks about architecture philosophy, Data Autonomy, "why does MD-DDL work this way", "what's the philosophy behind", canonical data models, data products as architecture quantum, model-driven generation, "why not [alternative approach]", "what problems does MD-DDL solve", comparison with Data Mesh / Data Fabric / TOGAF / EDW / Lakehouse / API-first, positioning for governance councils or CIOs, architecture decision records, or any question about the design rationale behind MD-DDL. Also use when the user wants to prepare presentation material, talking points, executive summaries, or comparison tables for architectural positioning.
+description: Use this skill when the user asks about architecture philosophy, Data Autonomy, "why does MD-DDL work this way", "what's the philosophy behind", canonical data models, data products as architecture quantum, model-driven generation, "why not [alternative approach]", "what problems does MD-DDL solve", comparison with Data Mesh / Data Fabric / TOGAF / EDW / Lakehouse / API-first, positioning for governance councils or CIOs, architecture decision records, or any question about the design rationale behind MD-DDL. Also use when the user wants to prepare presentation material, talking points, executive summaries, or comparison tables for architectural positioning. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling.
 ---
 
 # Architecture
@@ -101,6 +101,122 @@ No. | Tenet | One-line summary | MD-DDL connection | Counter-position | Context 
   Do not dump all 13 tenets — select the 3–5 most relevant to the user's question
   and go deep. Acknowledging where a tenet has limits makes the case for it stronger,
   not weaker.
+
+---
+
+## Eventual Consistency as an Architectural Decision
+
+When a user is designing canonical or foundational data products and asks about
+consistency, propagation lag, freshness, or how to handle multi-source updates,
+engage this section. It is a **product-level design choice** that sits alongside
+the tenets, not a tenet itself.
+
+### The Choice
+
+**Strong consistency** — All contributing source systems must propagate their update
+before the canonical product publishes the new state. Low observable lag; high
+coordination cost; requires all source `change_model` values to support synchronous
+propagation. Appropriate when downstream decisions cannot tolerate stale data
+(real-time fraud decisioning, payment authorisation, regulatory hard-stops).
+
+**Eventual consistency** — Each source system propagates independently at its own
+cadence. The canonical product publishes as updates arrive and converges to the
+correct state within a declared SLA window. Lower coordination cost; heterogeneous
+source cadences supported. Appropriate when sources have different `change_model`
+values (e.g., one real-time-cdc source and one batch-intraday source feeding the
+same entity).
+
+### How MD-DDL Already Implements This
+
+MD-DDL's **bitemporal model** makes eventual consistency *measurable*, not just
+aspirational:
+
+- `valid_from` / `valid_to` — when a fact was true in the real world (business time)
+- `recorded_at` / `superseded_at` — when the canonical system received and recorded
+  the update (transaction time)
+
+The gap between `valid_from` and `recorded_at` is the measurable propagation lag.
+When all sources have contributed and `recorded_at` has stabilised, the entity has
+converged. The product's `freshness` SLA is the declared convergence window.
+
+Each source's `change_model` field documents its expected propagation speed:
+
+| `change_model` | Typical lag | Consistency fit |
+| --- | --- | --- |
+| `real-time-cdc` | < 1 minute | Compatible with strong or eventual |
+| `event-driven` | 1–15 minutes | Eventual; depends on event bus throughput |
+| `batch-intraday` | 15–60 minutes | Eventual only |
+| `batch-daily` | Hours | Eventual only; freshness SLA must accommodate |
+
+### Null Handling — The Hardest Part
+
+This is where eventual consistency creates **concrete engineering decisions** that
+ripple through storage, transport, and schema design. During the convergence lag
+window, a canonical row may be partially populated: some source attributes have
+arrived; others have not.
+
+**Three-layer null problem:**
+
+**Storage layer** — Parquet and Arrow cannot distinguish `null` (explicitly absent,
+known to be null) from *not yet received* (temporarily absent, will arrive). Both
+appear as `null` to downstream readers. Any columnar physical artifact conflates
+these two semantics. The architect must decide at design time whether the physical
+schema will carry this ambiguity or resolve it.
+
+**Transport layer** — Each protocol handles absent-vs-null differently:
+- JSON: absent key vs `"field": null` — distinguishable at the protocol level but
+  often collapsed by deserializers
+- Avro: requires a `union [null, <type>]` schema to represent optional fields;
+  absent and null are both encoded as the `null` branch
+- Protobuf: `hasField()` distinguishes "not set" from "set to zero/empty"; the
+  most expressive for this problem
+- The choice of transport protocol is therefore an **architectural dependency** of
+  the consistency posture decision
+
+**Schema / DDL layer** — A hard `NOT NULL` constraint in the physical schema blocks
+partial row insertion. This forces one of three design patterns:
+
+| Pattern | Description | Consistency model |
+| --- | --- | --- |
+| Nullable staging + converged view | Schema accepts `NULL`; a view filters to rows where all expected fields are populated | Eventual — rows visible immediately, completeness checked by view |
+| Reject-partial inserts | Application layer blocks insert until all sources have contributed | Strong — no partial rows ever inserted |
+| Nullable final schema | `NOT NULL` removed; convergence window is advisory only | Eventual — consumers must tolerate `NULL` permanently |
+
+**MD-DDL connection:** The `not_null` attribute constraint in the canonical entity
+YAML and the physical `NOT NULL` DDL constraint generated by Agent Artifact are
+**distinct**. The canonical model declares business intent (`Legal Name` must never
+be permanently null); the physical schema reflects the consistency posture (during
+the convergence window, `legal_name` may be `NULL` in the staging layer). When a
+user chooses eventual consistency, advise them to communicate this to Agent Artifact
+via the handoff note so DDL generation applies the correct nullable strategy.
+
+### Tenets Most Relevant to Eventual Consistency
+
+- **Tenet 3** (Loose coupling) — Sources propagate independently; no source blocks another
+- **Tenet 6** (Polyglot persistence) — Storage format choice determines null semantics; this is a consequence of the consistency posture
+- **Tenet 10** (Data products as architecture quantum) — The freshness SLA is the product's published convergence contract
+- **Tenet 12** (Event-driven = real-time semantics) — Eventual consistency is the natural state of event-driven source propagation
+
+### Counter-Positions
+
+- "Strong consistency is simpler to reason about" — True, but it requires all
+  sources to support synchronous propagation and creates a coordination bottleneck.
+  For multi-source canonical entities with heterogeneous source cadences, strong
+  consistency may be unachievable without fundamentally re-engineering source systems.
+- "Just make everything nullable and handle it in the application" — This pushes
+  null semantics complexity downstream to every consumer. Eventually consistent
+  products with a declared convergence SLA and a view-based completeness check are
+  more honest and more testable.
+
+### Discussion Triggers
+
+Engage this section when the user says any of:
+- "How do we handle updates from multiple sources?"
+- "What if one source is slower than another?"
+- "Our freshness SLA is X — is that achievable?"
+- "Can we have NOT NULL columns if data arrives in stages?"
+- "How does Parquet/Avro handle fields that haven't arrived yet?"
+- "What is the difference between strong and eventual consistency for data products?"
 
 ---
 

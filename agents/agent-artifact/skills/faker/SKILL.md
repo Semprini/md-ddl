@@ -394,17 +394,28 @@ The following files ship with the faker skill and should be offered alongside an
 
 File | Purpose
 --- | ---
-`agents/agent-artifact/skills/faker/runtime/integrity_check.py` | Validates a `DatasetBuilder` output dict for FK resolution, not-null, enum membership, and PK uniqueness. Zero external dependencies — stdlib only.
-`agents/agent-artifact/skills/faker/runtime/test_template.py` | Pytest template. Copy alongside the generated module, fill in the three `# UPDATE` sections, run `pytest test_factories.py -v`.
+`agents/agent-artifact/skills/faker/runtime/integrity_check.py` | Validates FK resolution, not-null, enum membership, PK uniqueness, and bitemporal chain coherence (`check_temporal_chain()`). Zero external dependencies — stdlib only.
+`agents/agent-artifact/skills/faker/runtime/consistency_scenario.py` | Eventual-consistency scenario simulator. Define `SourceFeed` objects (name, lag_minutes, change_model), call `generate_scenario()` to produce per-feed source views and convergence deltas, then `check_convergence()` to validate against a declared SLA window. Zero external dependencies — stdlib only.
+`agents/agent-artifact/skills/faker/runtime/test_template.py` | Pytest template. Copy alongside the generated module, fill in the four `# UPDATE` sections (import, integrity spec, temporal/SLA config, expected entities), run `pytest test_factories.py -v`.
 
-**Reference generated example:**
-`examples/Financial Crime/factories.py` — complete canonical-scope factory covering Currency → Party → Account → Transaction with embedded integrity spec constants.
+**Reference generated examples:**
+- `examples/Financial Crime/factories.py` — complete canonical-scope factory covering Currency → Party → Account → Transaction with embedded integrity spec constants.
+- `examples/Financial Crime/consistency_example.py` — end-to-end eventual consistency demonstration: three source feeds (5/30/60 min lag), convergence report, SLA validation, and null handling illustration.
 
 ### Offering the runtime
 
 At Step 7, after delivering the generated module, add:
 
-> "Would you like me to also generate a companion test file (`test_<module>.py`) pre-filled with the integrity spec for this domain? Copy `integrity_check.py` from the faker runtime alongside it and run `pytest` to verify referential integrity end-to-end."
+> "Would you like me to also generate a companion test file (`test_<module>.py`) pre-filled with the integrity and temporal-consistency spec for this domain? Copy `integrity_check.py` and `consistency_scenario.py` from the faker runtime alongside it and run `pytest` to verify referential integrity, temporal chain coherence, and eventual-consistency convergence end-to-end."
+
+### When to offer consistency_scenario.py
+
+Offer it when:
+- The domain has multiple source systems with different `change_model` values.
+- Any entity has `temporal.tracking: bitemporal` or `temporal.tracking: valid_time`.
+- The user asks about propagation lag, freshness SLA, or in-flight data state.
+
+Do **not** offer it for `reference` or `append_only` entities with no `recorded_at` column.
 
 ---
 

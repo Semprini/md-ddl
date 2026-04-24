@@ -43,12 +43,12 @@ classDiagram
   PartyRole "0..*" --> "0..*" ContactAddress : uses
   PartyRole "0..*" --> "0..1" Agreement : governed by
 
-  class PartyRoleStatus["<a href='../enums.md#party-role-status'>Party Role Status</a>"]{<<enumeration>>}
-  class DDStatus["<a href='../enums.md#due-diligence-status'>Due Diligence Status</a>"]{<<enumeration>>}
+  class PartyRoleStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#party-role-status'>Party Role Status</a>"]{<<enumeration>>}
+  class DDStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#due-diligence-status'>Due Diligence Status</a>"]{<<enumeration>>}
 
-  class Party["<a href='party.md'>Party</a>"]
-  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
-  class Agreement["<a href='agreement.md'>Agreement</a>"]
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]
+  class ContactAddress["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/contact_address.md'>Contact Address</a>"]
+  class Agreement["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/agreement.md'>Agreement</a>"]
 ```
 
 ```yaml

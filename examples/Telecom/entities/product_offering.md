@@ -33,7 +33,7 @@ classDiagram
 
   ProductOffering "0..*" --> "0..1" ProductOffering : supersedes
 
-  class ProductOfferingType["<a href='../enums.md#product-offering-type'>Product Offering Type</a>"]{<<enumeration>>}
+  class ProductOfferingType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#product-offering-type'>Product Offering Type</a>"]{<<enumeration>>}
 ```
 
 ```yaml

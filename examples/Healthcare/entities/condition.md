@@ -27,11 +27,11 @@ classDiagram
   Patient "1" --> "0..*" Condition : has
   CarePlan "0..*" --> "0..*" Condition : addresses
 
-  class ConditionClinicalStatus["<a href='../enums.md#condition-clinical-status'>Condition Clinical Status</a>"]{<<enumeration>>}
-  class ICD10ConditionCode["<a href='../enums.md#icd-10-condition-code'>ICD-10 Condition Code</a>"]{<<enumeration>>}
+  class ConditionClinicalStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#condition-clinical-status'>Condition Clinical Status</a>"]{<<enumeration>>}
+  class ICD10ConditionCode["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#icd-10-condition-code'>ICD-10 Condition Code</a>"]{<<enumeration>>}
 
-  class Patient["<a href='patient.md'>Patient</a>"]
-  class CarePlan["<a href='care_plan.md'>Care Plan</a>"]
+  class Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  class CarePlan["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/care_plan.md'>Care Plan</a>"]
 ```
 
 ```yaml

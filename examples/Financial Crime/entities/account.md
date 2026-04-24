@@ -26,13 +26,13 @@ classDiagram
   Account "0..*" --> "1" Currency : denominated in
   Branch "1" --> "0..*" Account : services
 
-  class AccountType["<a href='../enums.md#account-type'>Account Type</a>"]{<<enumeration>>}
-  class AccountStatus["<a href='../enums.md#account-status'>Account Status</a>"]{<<enumeration>>}
+  class AccountType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#account-type'>Account Type</a>"]{<<enumeration>>}
+  class AccountStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#account-status'>Account Status</a>"]{<<enumeration>>}
 
-  class Customer["<a href='customer.md'>Customer</a>"]
-  class Product["<a href='product.md'>Product</a>"]
-  class Currency["<a href='currency.md'>Currency</a>"]
-  class Branch["<a href='branch.md'>Branch</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/customer.md'>Customer</a>"]
+  class Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/product.md'>Product</a>"]
+  class Currency["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/currency.md'>Currency</a>"]
+  class Branch["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/branch.md'>Branch</a>"]
 ```
 
 ```yaml

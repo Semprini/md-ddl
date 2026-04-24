@@ -51,10 +51,10 @@ graph TD
   Order --> |contains|OrderLine
   OrderLine --> |references|Product
 
-  Customer["<a href='entities/customer.md'>Customer</a>"]
-  Order["<a href='entities/order.md'>Order</a>"]
-  OrderLine["<a href='entities/order_line.md'>Order Line</a>"]
-  Product["<a href='entities/product.md'>Product</a>"]
+  Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/customer.md'>Customer</a>"]
+  Order["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order.md'>Order</a>"]
+  OrderLine["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order_line.md'>Order Line</a>"]
+  Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/product.md'>Product</a>"]
 ```
 
 ## Entities

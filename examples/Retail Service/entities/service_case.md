@@ -26,8 +26,8 @@ classDiagram
 
   ServiceCase "0..1" --> "0..1" KnowledgeArticle : resolved by
 
-  class ServiceCaseStatus["<a href='../enums.md#service-case-status'>Service Case Status</a>"]{<<enumeration>>}
-  class KnowledgeArticle["<a href='knowledge_article.md'>Knowledge Article</a>"]
+  class ServiceCaseStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/enums.md#service-case-status'>Service Case Status</a>"]{<<enumeration>>}
+  class KnowledgeArticle["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/knowledge_article.md'>Knowledge Article</a>"]
 ```
 
 ```yaml

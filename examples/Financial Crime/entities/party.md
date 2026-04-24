@@ -37,12 +37,12 @@ classDiagram
   Party "1" --> "0..*" PartyRole
   Party "1" --> "0..*" ContactAddress
 
-  class PartyStatus["<a href='../enums.md#party-status'>Party Status</a>"]{<<enumeration>>}
-  class FinancialCrimeRiskRating["<a href='../enums.md#financial-crime-risk-rating'>Financial Crime Risk Rating</a>"]{<<enumeration>>}
-  class SanctionsScreenStatus["<a href='../enums.md#sanctions-screen-status'>Sanctions Screen Status</a>"]{<<enumeration>>}
+  class PartyStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#party-status'>Party Status</a>"]{<<enumeration>>}
+  class FinancialCrimeRiskRating["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#financial-crime-risk-rating'>Financial Crime Risk Rating</a>"]{<<enumeration>>}
+  class SanctionsScreenStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#sanctions-screen-status'>Sanctions Screen Status</a>"]{<<enumeration>>}
 
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class ContactAddress["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/contact_address.md'>Contact Address</a>"]
 ```
 
 ```yaml

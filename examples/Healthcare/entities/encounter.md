@@ -31,15 +31,15 @@ classDiagram
   Encounter "0..*" --> "1" Location : at
   PractitionerRole "0..*" --> "0..*" Encounter : provides
 
-  class EncounterStatus["<a href='../enums.md#encounter-status'>Encounter Status</a>"]{<<enumeration>>}
-  class EncounterClass["<a href='../enums.md#encounter-class'>Encounter Class</a>"]{<<enumeration>>}
+  class EncounterStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#encounter-status'>Encounter Status</a>"]{<<enumeration>>}
+  class EncounterClass["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#encounter-class'>Encounter Class</a>"]{<<enumeration>>}
 
-  class Patient["<a href='patient.md'>Patient</a>"]
-  class Observation["<a href='observation.md'>Observation</a>"]
-  class Procedure["<a href='procedure.md'>Procedure</a>"]
-  class MedicationRequest["<a href='medication_request.md'>Medication Request</a>"]
-  class Location["<a href='location.md'>Location</a>"]
-  class PractitionerRole["<a href='practitioner_role.md'>Practitioner Role</a>"]
+  class Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  class Observation["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/observation.md'>Observation</a>"]
+  class Procedure["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/procedure.md'>Procedure</a>"]
+  class MedicationRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/medication_request.md'>Medication Request</a>"]
+  class Location["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/location.md'>Location</a>"]
+  class PractitionerRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner_role.md'>Practitioner Role</a>"]
 ```
 
 ```yaml

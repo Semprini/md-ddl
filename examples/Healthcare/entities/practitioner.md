@@ -25,9 +25,9 @@ classDiagram
 
   Practitioner "1" --> "0..*" PractitionerRole : assumes
 
-  class AdministrativeGender["<a href='../enums.md#administrative-gender'>Administrative Gender</a>"]{<<enumeration>>}
+  class AdministrativeGender["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#administrative-gender'>Administrative Gender</a>"]{<<enumeration>>}
 
-  class PractitionerRole["<a href='practitioner_role.md'>Practitioner Role</a>"]
+  class PractitionerRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner_role.md'>Practitioner Role</a>"]
 ```
 
 ```yaml

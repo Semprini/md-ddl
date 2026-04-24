@@ -20,7 +20,7 @@ classDiagram
 
   Branch "1" --> "0..*" Account : services
 
-  class Account["<a href='account.md'>Account</a>"]
+  class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]
 ```
 
 ```yaml

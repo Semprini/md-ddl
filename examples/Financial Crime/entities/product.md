@@ -21,8 +21,8 @@ classDiagram
   Product "0..*" --> "1" Agreement : in terms of
   Account "0..*" --> "1" Product : holds
 
-  class Agreement["<a href='agreement.md'>Agreement</a>"]
-  class Account["<a href='account.md'>Account</a>"]
+  class Agreement["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/agreement.md'>Agreement</a>"]
+  class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]
 ```
 
 ```yaml

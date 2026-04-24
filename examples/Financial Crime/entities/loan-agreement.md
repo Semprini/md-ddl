@@ -20,7 +20,7 @@ classDiagram
 
   LoanAgreement --|> Agreement
 
-  class Agreement["<a href='agreement.md'>Agreement</a>"]
+  class Agreement["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/agreement.md'>Agreement</a>"]
 ```
 
 ```yaml

@@ -32,8 +32,8 @@ classDiagram
 
   Service "1" --> "0..*" UsageRecord : generates
 
-  class UsageType["<a href='../enums.md#usage-type'>Usage Type</a>"]{<<enumeration>>}
-  class Service["<a href='service.md'>Service</a>"]
+  class UsageType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#usage-type'>Usage Type</a>"]{<<enumeration>>}
+  class Service["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service.md'>Service</a>"]
 ```
 
 ```yaml

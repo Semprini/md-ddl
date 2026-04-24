@@ -22,9 +22,9 @@ classDiagram
   Teller "1" --> "0..*" Transaction : processes
   Teller "0..*" --> "1" Branch : assigned to
 
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Transaction["<a href='transaction.md'>Transaction</a>"]
-  class Branch["<a href='branch.md'>Branch</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class Transaction["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/transaction.md'>Transaction</a>"]
+  class Branch["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/branch.md'>Branch</a>"]
 ```
 
 ```yaml

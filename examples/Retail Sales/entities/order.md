@@ -24,9 +24,9 @@ classDiagram
   Customer "1" --> "0..*" Order : places
   Order "1" --> "1..*" OrderLine : contains
 
-  class OrderStatus["<a href='../enums.md#order-status'>Order Status</a>"]{<<enumeration>>}
-  class Customer["<a href='customer.md'>Customer</a>"]
-  class OrderLine["<a href='order_line.md'>Order Line</a>"]
+  class OrderStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/enums.md#order-status'>Order Status</a>"]{<<enumeration>>}
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/customer.md'>Customer</a>"]
+  class OrderLine["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order_line.md'>Order Line</a>"]
 ```
 
 ```yaml

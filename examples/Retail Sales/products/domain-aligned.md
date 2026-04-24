@@ -91,8 +91,8 @@ classDiagram
   Order "1" --> "1..*" OrderLine : contains
   OrderLine "0..*" --> "1" Product : references
 
-  class Customer["<a href='../entities/customer.md'>Customer</a>"]
-  class Product["<a href='../entities/product.md'>Product</a>"]
-  class Order["<a href='../entities/order.md'>Order</a>"]
-  class OrderLine["<a href='../entities/order_line.md'>Order Line</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/customer.md'>Customer</a>"]
+  class Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/product.md'>Product</a>"]
+  class Order["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order.md'>Order</a>"]
+  class OrderLine["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order_line.md'>Order Line</a>"]
 ```

@@ -26,10 +26,10 @@ classDiagram
   Customer "1" --> "0..*" ServiceRequest : raises
   ServiceRequest "0..1" --> "0..1" ServiceCase : escalates to
 
-  class ServiceRequestStatus["<a href='../enums.md#service-request-status'>Service Request Status</a>"]{<<enumeration>>}
-  class ContactChannel["<a href='../enums.md#contact-channel'>Contact Channel</a>"]{<<enumeration>>}
-  class Customer["<a href='customer.md'>Customer</a>"]
-  class ServiceCase["<a href='service_case.md'>Service Case</a>"]
+  class ServiceRequestStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/enums.md#service-request-status'>Service Request Status</a>"]{<<enumeration>>}
+  class ContactChannel["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/enums.md#contact-channel'>Contact Channel</a>"]{<<enumeration>>}
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/customer.md'>Customer</a>"]
+  class ServiceCase["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_case.md'>Service Case</a>"]
 ```
 
 ```yaml

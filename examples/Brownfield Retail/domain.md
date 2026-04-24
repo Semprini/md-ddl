@@ -71,9 +71,9 @@ graph TD
   Sale --> |includes|Product
   Sale --> |occurs at|Store
 
-  Sale["<a href='entities/sale.md'>Sale</a>"]
-  Product["<a href='entities/product.md'>Product</a>"]
-  Store["<a href='entities/store.md'>Store</a>"]
+  Sale["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/sale.md'>Sale</a>"]
+  Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/product.md'>Product</a>"]
+  Store["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/store.md'>Store</a>"]
 ```
 
 ## Source Systems

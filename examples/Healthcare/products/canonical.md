@@ -162,13 +162,13 @@ classDiagram
   Practitioner "1" --> "0..*" PractitionerRole : assumes
   PractitionerRole "0..*" --> "0..*" Encounter : provides
 
-  class Patient["<a href='../entities/patient.md'>Patient</a>"]
-  class Encounter["<a href='../entities/encounter.md'>Encounter</a>"]
-  class Observation["<a href='../entities/observation.md'>Observation</a>"]
-  class Condition["<a href='../entities/condition.md'>Condition</a>"]
-  class Procedure["<a href='../entities/procedure.md'>Procedure</a>"]
-  class MedicationRequest["<a href='../entities/medication_request.md'>Medication Request</a>"]
-  class CarePlan["<a href='../entities/care_plan.md'>Care Plan</a>"]
-  class Practitioner["<a href='../entities/practitioner.md'>Practitioner</a>"]
-  class PractitionerRole["<a href='../entities/practitioner_role.md'>Practitioner Role</a>"]
+  class Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
+  class Observation["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/observation.md'>Observation</a>"]
+  class Condition["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/condition.md'>Condition</a>"]
+  class Procedure["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/procedure.md'>Procedure</a>"]
+  class MedicationRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/medication_request.md'>Medication Request</a>"]
+  class CarePlan["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/care_plan.md'>Care Plan</a>"]
+  class Practitioner["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner.md'>Practitioner</a>"]
+  class PractitionerRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner_role.md'>Practitioner Role</a>"]
 ```

@@ -24,8 +24,8 @@ classDiagram
 
   Company --|> Party
 
-  class CompanyLegalStructure["<a href='../enums.md#company-legal-structure'>Company Legal Structure</a>"]{<<enumeration>>}
-  class Party["<a href='party.md'>Party</a>"]
+  class CompanyLegalStructure["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#company-legal-structure'>Company Legal Structure</a>"]{<<enumeration>>}
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]
 ```
 
 ```yaml

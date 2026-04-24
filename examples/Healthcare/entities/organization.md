@@ -24,7 +24,7 @@ classDiagram
   Organization "0..*" --> "0..1" Organization : part of
   PractitionerRole "0..*" --> "1" Organization : at
 
-  class PractitionerRole["<a href='practitioner_role.md'>Practitioner Role</a>"]
+  class PractitionerRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner_role.md'>Practitioner Role</a>"]
 ```
 
 ```yaml

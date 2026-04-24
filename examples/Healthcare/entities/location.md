@@ -24,7 +24,7 @@ classDiagram
 
   Encounter "0..*" --> "1" Location : at
 
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
 ```
 
 ```yaml

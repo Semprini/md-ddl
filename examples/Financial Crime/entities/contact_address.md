@@ -31,13 +31,13 @@ classDiagram
   PartyRole "0..*" --> "0..*" ContactAddress : uses
   ContactAddress "0..*" --> "1" Address : references
 
-  class AddressPurpose["<a href='../enums.md#address-purpose'>Address Purpose</a>"]{<<enumeration>>}
-  class AddressVerificationStatus["<a href='../enums.md#address-verification-status'>Address Verification Status</a>"]{<<enumeration>>}
-  class VerificationMethod["<a href='../enums.md#verification-method'>Verification Method</a>"]{<<enumeration>>}
+  class AddressPurpose["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#address-purpose'>Address Purpose</a>"]{<<enumeration>>}
+  class AddressVerificationStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#address-verification-status'>Address Verification Status</a>"]{<<enumeration>>}
+  class VerificationMethod["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#verification-method'>Verification Method</a>"]{<<enumeration>>}
 
-  class Party["<a href='party.md'>Party</a>"]
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Address["<a href='address.md'>Address</a>"]
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class Address["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/address.md'>Address</a>"]
 ```
 
 ```yaml

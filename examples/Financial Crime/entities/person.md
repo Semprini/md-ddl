@@ -28,9 +28,9 @@ classDiagram
 
   Person --|> Party
 
-  class PEPStatus["<a href='../enums.md#pep-status'>PEP Status</a>"]{<<enumeration>>}
+  class PEPStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#pep-status'>PEP Status</a>"]{<<enumeration>>}
   
-  class Party["<a href='party.md'>Party</a>"]  
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]  
 ```
 
 ```yaml

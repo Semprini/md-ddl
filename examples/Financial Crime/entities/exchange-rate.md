@@ -21,7 +21,7 @@ classDiagram
   ExchangeRate "0..*" --> "1" Currency : base
   ExchangeRate "0..*" --> "1" Currency : quote
 
-  class Currency["<a href='currency.md'>Currency</a>"]
+  class Currency["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/currency.md'>Currency</a>"]
 ```
 
 ```yaml

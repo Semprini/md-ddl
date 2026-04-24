@@ -24,10 +24,10 @@ classDiagram
 
   Encounter "1" --> "0..*" Procedure : has
 
-  class ProcedureStatus["<a href='../enums.md#procedure-status'>Procedure Status</a>"]{<<enumeration>>}
-  class SNOMEDCTProcedureCode["<a href='../enums.md#snomed-ct-procedure-code'>SNOMED CT Procedure Code</a>"]{<<enumeration>>}
+  class ProcedureStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#procedure-status'>Procedure Status</a>"]{<<enumeration>>}
+  class SNOMEDCTProcedureCode["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#snomed-ct-procedure-code'>SNOMED CT Procedure Code</a>"]{<<enumeration>>}
 
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
 ```
 
 ```yaml

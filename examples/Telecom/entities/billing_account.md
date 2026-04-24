@@ -29,8 +29,8 @@ classDiagram
 
   BillingAccount "0..*" --> "1" Customer : assigned to
 
-  class BillingAccountStatus["<a href='../enums.md#billing-account-status'>Billing Account Status</a>"]{<<enumeration>>}
-  class Customer["<a href='customer.md'>Customer</a>"]
+  class BillingAccountStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#billing-account-status'>Billing Account Status</a>"]{<<enumeration>>}
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/customer.md'>Customer</a>"]
 ```
 
 ```yaml

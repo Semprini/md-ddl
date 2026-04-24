@@ -31,14 +31,14 @@ classDiagram
   Transaction "0..*" --> "0..1" Account : debits
   Transaction "0..*" --> "0..1" Account : credits
 
-  class TransactionType["<a href='../enums.md#transaction-type'>Transaction Type</a>"]{<<enumeration>>}
-  class TransactionChannel["<a href='../enums.md#transaction-channel'>Transaction Channel</a>"]{<<enumeration>>}
-  class TransactionStatus["<a href='../enums.md#transaction-status'>Transaction Status</a>"]{<<enumeration>>}
-  class Payer["<a href='payer.md'>Payer</a>"]
-  class Payee["<a href='payee.md'>Payee</a>"]
-  class PaymentInitiator["<a href='payment_initiator.md'>Payment Initiator</a>"]
-  class Currency["<a href='currency.md'>Currency</a>"]
-  class Account["<a href='account.md'>Account</a>"]  
+  class TransactionType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-type'>Transaction Type</a>"]{<<enumeration>>}
+  class TransactionChannel["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-channel'>Transaction Channel</a>"]{<<enumeration>>}
+  class TransactionStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-status'>Transaction Status</a>"]{<<enumeration>>}
+  class Payer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payer.md'>Payer</a>"]
+  class Payee["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payee.md'>Payee</a>"]
+  class PaymentInitiator["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payment_initiator.md'>Payment Initiator</a>"]
+  class Currency["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/currency.md'>Currency</a>"]
+  class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]  
 ```
 
 ```yaml

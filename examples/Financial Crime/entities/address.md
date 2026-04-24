@@ -30,9 +30,9 @@ classDiagram
 
   ContactAddress "0..*" --> "1" Address : references
 
-  class AddressType["<a href='../enums.md#address-type'>Address Type</a>"]{<<enumeration>>}
+  class AddressType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#address-type'>Address Type</a>"]{<<enumeration>>}
 
-  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
+  class ContactAddress["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/contact_address.md'>Contact Address</a>"]
 ```
 
 ```yaml

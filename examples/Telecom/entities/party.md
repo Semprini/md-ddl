@@ -20,7 +20,7 @@ classDiagram
     Party Type : enum~PartyType~
   }
 
-  class PartyType["<a href='../enums.md#party-type'>Party Type</a>"]{<<enumeration>>}
+  class PartyType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#party-type'>Party Type</a>"]{<<enumeration>>}
 
   class Individual
   class Organization
@@ -30,7 +30,7 @@ classDiagram
 
   Party "1" --> "0..*" Customer : has
 
-  class Customer["<a href='customer.md'>Customer</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/customer.md'>Customer</a>"]
 ```
 
 ```yaml

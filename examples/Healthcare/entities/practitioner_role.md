@@ -26,9 +26,9 @@ classDiagram
   PractitionerRole "0..*" --> "1" Organization : at
   PractitionerRole "0..*" --> "0..*" Encounter : provides
 
-  class Practitioner["<a href='practitioner.md'>Practitioner</a>"]
-  class Organization["<a href='organization.md'>Organization</a>"]
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
+  class Practitioner["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner.md'>Practitioner</a>"]
+  class Organization["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/organization.md'>Organization</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
 ```
 
 ```yaml

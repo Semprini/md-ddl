@@ -26,8 +26,8 @@ classDiagram
   Sale "0..*" --> "1" Product : includes
   Sale "0..*" --> "1" Store : occurs at
 
-  class Product["<a href='product.md'>Product</a>"]
-  class Store["<a href='store.md'>Store</a>"]
+  class Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/product.md'>Product</a>"]
+  class Store["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/store.md'>Store</a>"]
 ```
 
 ```yaml

@@ -28,10 +28,10 @@ classDiagram
   Customer "1" --> "0..*" BillingAccount : owns
   Customer "1" --> "0..*" Subscription : has
 
-  class CustomerStatus["<a href='../enums.md#customer-status'>Customer Status</a>"]{<<enumeration>>}
-  class Party["<a href='party.md'>Party</a>"]
-  class BillingAccount["<a href='billing_account.md'>Billing Account</a>"]
-  class Subscription["<a href='subscription.md'>Subscription</a>"]
+  class CustomerStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#customer-status'>Customer Status</a>"]{<<enumeration>>}
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/party.md'>Party</a>"]
+  class BillingAccount["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/billing_account.md'>Billing Account</a>"]
+  class Subscription["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/subscription.md'>Subscription</a>"]
 ```
 
 ```yaml

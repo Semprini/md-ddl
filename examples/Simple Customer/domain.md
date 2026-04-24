@@ -43,9 +43,9 @@ graph TD
   Customer --> |is a|PartyRole
   Customer --> |has|CustomerPreference
 
-  PartyRole["<a href='details.md#party-role'>Party Role</a>"]
-  Customer["<a href='details.md#customer'>Customer</a>"]
-  CustomerPreference["<a href='details.md#customer-preference'>Customer Preference</a>"]
+  PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#party-role'>Party Role</a>"]
+  Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#customer'>Customer</a>"]
+  CustomerPreference["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#customer-preference'>Customer Preference</a>"]
 ```
 
 ## Entities

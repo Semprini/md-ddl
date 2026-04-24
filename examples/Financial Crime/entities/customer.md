@@ -22,9 +22,9 @@ classDiagram
   Customer "0..*" --> "0..*" Account : holds
   Customer "1" --> "0..1" CustomerPreferences : has
 
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Account["<a href='account.md'>Account</a>"]
-  class CustomerPreferences["<a href='customer-preferences.md'>Customer Preferences</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]
+  class CustomerPreferences["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/customer-preferences.md'>Customer Preferences</a>"]
 ```
 
 ```yaml

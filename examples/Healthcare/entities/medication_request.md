@@ -27,10 +27,10 @@ classDiagram
   Encounter "1" --> "0..*" MedicationRequest : has
   CarePlan "0..*" --> "0..*" MedicationRequest : includes
 
-  class MedicationRequestStatus["<a href='../enums.md#medication-request-status'>Medication Request Status</a>"]{<<enumeration>>}
+  class MedicationRequestStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#medication-request-status'>Medication Request Status</a>"]{<<enumeration>>}
 
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
-  class CarePlan["<a href='care_plan.md'>Care Plan</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
+  class CarePlan["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/care_plan.md'>Care Plan</a>"]
 ```
 
 ```yaml

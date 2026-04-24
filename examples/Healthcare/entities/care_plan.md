@@ -31,11 +31,11 @@ classDiagram
   CarePlan "0..*" --> "0..*" Condition : addresses
   CarePlan "0..*" --> "0..*" MedicationRequest : includes
 
-  class CarePlanStatus["<a href='../enums.md#care-plan-status'>Care Plan Status</a>"]{<<enumeration>>}
+  class CarePlanStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#care-plan-status'>Care Plan Status</a>"]{<<enumeration>>}
 
-  class Patient["<a href='patient.md'>Patient</a>"]
-  class Condition["<a href='condition.md'>Condition</a>"]
-  class MedicationRequest["<a href='medication_request.md'>Medication Request</a>"]
+  class Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  class Condition["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/condition.md'>Condition</a>"]
+  class MedicationRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/medication_request.md'>Medication Request</a>"]
 ```
 
 ```yaml

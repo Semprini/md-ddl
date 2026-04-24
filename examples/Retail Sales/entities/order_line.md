@@ -25,8 +25,8 @@ classDiagram
   Order "1" --> "1..*" OrderLine : contains
   OrderLine "0..*" --> "1" Product : references
 
-  class Order["<a href='order.md'>Order</a>"]
-  class Product["<a href='product.md'>Product</a>"]
+  class Order["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order.md'>Order</a>"]
+  class Product["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/product.md'>Product</a>"]
 ```
 
 ```yaml

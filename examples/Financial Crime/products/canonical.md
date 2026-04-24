@@ -125,11 +125,11 @@ classDiagram
   PartyRole "0..*" --> "0..*" ContactAddress : uses
   ContactAddress "0..*" --> "1" Address : references
 
-  class Party["<a href='../entities/party.md'>Party</a>"]
-  class Person["<a href='../entities/person.md'>Person</a>"]
-  class Company["<a href='../entities/company.md'>Company</a>"]
-  class PartyRole["<a href='../entities/party_role.md'>Party Role</a>"]
-  class Customer["<a href='../entities/customer.md'>Customer</a>"]
-  class ContactAddress["<a href='../entities/contact_address.md'>Contact Address</a>"]
-  class Address["<a href='../entities/address.md'>Address</a>"]
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]
+  class Person["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/person.md'>Person</a>"]
+  class Company["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/company.md'>Company</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/customer.md'>Customer</a>"]
+  class ContactAddress["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/contact_address.md'>Contact Address</a>"]
+  class Address["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/address.md'>Address</a>"]
 ```

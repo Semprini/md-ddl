@@ -25,8 +25,8 @@ classDiagram
 
   Customer "1" --> "0..*" Order : places
 
-  class CustomerTier["<a href='../enums.md#customer-tier'>Customer Tier</a>"]{<<enumeration>>}
-  class Order["<a href='order.md'>Order</a>"]
+  class CustomerTier["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/enums.md#customer-tier'>Customer Tier</a>"]{<<enumeration>>}
+  class Order["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Sales/entities/order.md'>Order</a>"]
 ```
 
 ```yaml

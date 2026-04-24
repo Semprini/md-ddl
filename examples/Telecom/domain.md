@@ -61,16 +61,16 @@ graph TD
   Service --> |generates|UsageRecord
   ProductOffering --> |supersedes|ProductOffering
 
-  Party["<a href='entities/party.md'>Party</a>"]
-  Individual["<a href='entities/individual.md'>Individual</a>"]
-  Organization["<a href='entities/organization.md'>Organization</a>"]
-  Customer["<a href='entities/customer.md'>Customer</a>"]
-  BillingAccount["<a href='entities/billing_account.md'>Billing Account</a>"]
-  ProductOffering["<a href='entities/product_offering.md'>Product Offering</a>"]
-  Subscription["<a href='entities/subscription.md'>Subscription</a>"]
-  Service["<a href='entities/service.md'>Service</a>"]
-  ServiceOrder["<a href='entities/service_order.md'>Service Order</a>"]
-  UsageRecord["<a href='entities/usage_record.md'>Usage Record</a>"]
+  Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/party.md'>Party</a>"]
+  Individual["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/individual.md'>Individual</a>"]
+  Organization["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/organization.md'>Organization</a>"]
+  Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/customer.md'>Customer</a>"]
+  BillingAccount["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/billing_account.md'>Billing Account</a>"]
+  ProductOffering["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/product_offering.md'>Product Offering</a>"]
+  Subscription["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/subscription.md'>Subscription</a>"]
+  Service["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service.md'>Service</a>"]
+  ServiceOrder["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service_order.md'>Service Order</a>"]
+  UsageRecord["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/usage_record.md'>Usage Record</a>"]
 ```
 
 ## Source Systems

@@ -38,10 +38,10 @@ classDiagram
     Unknown
   }
 
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
-  class Condition["<a href='condition.md'>Condition</a>"]
-  class CarePlan["<a href='care_plan.md'>Care Plan</a>"]
-  class Appointment["<a href='appointment.md'>Appointment</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
+  class Condition["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/condition.md'>Condition</a>"]
+  class CarePlan["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/care_plan.md'>Care Plan</a>"]
+  class Appointment["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/appointment.md'>Appointment</a>"]
 ```
 
 ```yaml

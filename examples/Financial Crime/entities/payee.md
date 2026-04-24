@@ -19,7 +19,7 @@ classDiagram
 
   Payee --|> PartyRole
 
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
 ```
 
 ```yaml

@@ -120,10 +120,10 @@ classDiagram
   Customer "1" --> "0..*" Subscription : has
   Subscription "0..*" --> "1" ProductOffering : activates
 
-  class Party["<a href='../entities/party.md'>Party</a>"]
-  class Individual["<a href='../entities/individual.md'>Individual</a>"]
-  class Organization["<a href='../entities/organization.md'>Organization</a>"]
-  class Customer["<a href='../entities/customer.md'>Customer</a>"]
-  class Subscription["<a href='../entities/subscription.md'>Subscription</a>"]
-  class ProductOffering["<a href='../entities/product_offering.md'>Product Offering</a>"]
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/party.md'>Party</a>"]
+  class Individual["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/individual.md'>Individual</a>"]
+  class Organization["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/organization.md'>Organization</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/customer.md'>Customer</a>"]
+  class Subscription["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/subscription.md'>Subscription</a>"]
+  class ProductOffering["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/product_offering.md'>Product Offering</a>"]
 ```

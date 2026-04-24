@@ -26,9 +26,9 @@ classDiagram
   ServiceOrder "1" --> "0..1" Service : provisions
   Service "1" --> "0..*" UsageRecord : generates
 
-  class ServiceStatus["<a href='../enums.md#service-status'>Service Status</a>"]{<<enumeration>>}
-  class ServiceOrder["<a href='service_order.md'>Service Order</a>"]
-  class UsageRecord["<a href='usage_record.md'>Usage Record</a>"]
+  class ServiceStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#service-status'>Service Status</a>"]{<<enumeration>>}
+  class ServiceOrder["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service_order.md'>Service Order</a>"]
+  class UsageRecord["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/usage_record.md'>Usage Record</a>"]
 ```
 
 ```yaml

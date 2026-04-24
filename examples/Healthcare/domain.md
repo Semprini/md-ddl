@@ -66,18 +66,18 @@ graph TD
   CarePlan --> |includes|MedicationRequest
   Appointment --> |results in|Encounter
 
-  Patient["<a href='entities/patient.md'>Patient</a>"]
-  Encounter["<a href='entities/encounter.md'>Encounter</a>"]
-  Observation["<a href='entities/observation.md'>Observation</a>"]
-  Condition["<a href='entities/condition.md'>Condition</a>"]
-  Procedure["<a href='entities/procedure.md'>Procedure</a>"]
-  Practitioner["<a href='entities/practitioner.md'>Practitioner</a>"]
-  PractitionerRole["<a href='entities/practitioner_role.md'>Practitioner Role</a>"]
-  Organization["<a href='entities/organization.md'>Organization</a>"]
-  Location["<a href='entities/location.md'>Location</a>"]
-  MedicationRequest["<a href='entities/medication_request.md'>Medication Request</a>"]
-  CarePlan["<a href='entities/care_plan.md'>Care Plan</a>"]
-  Appointment["<a href='entities/appointment.md'>Appointment</a>"]
+  Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
+  Observation["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/observation.md'>Observation</a>"]
+  Condition["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/condition.md'>Condition</a>"]
+  Procedure["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/procedure.md'>Procedure</a>"]
+  Practitioner["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner.md'>Practitioner</a>"]
+  PractitionerRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/practitioner_role.md'>Practitioner Role</a>"]
+  Organization["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/organization.md'>Organization</a>"]
+  Location["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/location.md'>Location</a>"]
+  MedicationRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/medication_request.md'>Medication Request</a>"]
+  CarePlan["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/care_plan.md'>Care Plan</a>"]
+  Appointment["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/appointment.md'>Appointment</a>"]
 ```
 
 ## Source Systems

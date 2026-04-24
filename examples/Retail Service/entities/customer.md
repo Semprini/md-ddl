@@ -27,8 +27,8 @@ classDiagram
 
   Customer "1" --> "0..*" ServiceRequest : raises
 
-  class ContactChannel["<a href='../enums.md#contact-channel'>Contact Channel</a>"]{<<enumeration>>}
-  class ServiceRequest["<a href='service_request.md'>Service Request</a>"]
+  class ContactChannel["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/enums.md#contact-channel'>Contact Channel</a>"]{<<enumeration>>}
+  class ServiceRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_request.md'>Service Request</a>"]
 ```
 
 ```yaml

@@ -26,7 +26,7 @@ classDiagram
 
   Customer --|> PartyRole
 
-  class Customer["<a href='details.md#customer'>Customer</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#customer'>Customer</a>"]
 ```
 
 ```yaml
@@ -75,8 +75,8 @@ classDiagram
     Platinum
   }
 
-  class PartyRole["<a href='details.md#party-role'>Party Role</a>"]
-  class CustomerPreference["<a href='details.md#customer-preference'>Customer Preference</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#party-role'>Party Role</a>"]
+  class CustomerPreference["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#customer-preference'>Customer Preference</a>"]
 ```
 
 ```yaml
@@ -139,7 +139,7 @@ classDiagram
 
   Customer "1" --> "0..*" CustomerPreference : owns
 
-  class Customer["<a href='details.md#customer'>Customer</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Simple%20Customer/details.md#customer'>Customer</a>"]
 ```
 
 ```yaml

@@ -27,7 +27,7 @@ classDiagram
 
   Individual --|> Party
 
-  class Party["<a href='party.md'>Party</a>"]
+  class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/party.md'>Party</a>"]
 ```
 
 ```yaml

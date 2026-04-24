@@ -28,10 +28,10 @@ classDiagram
 
   Encounter "1" --> "0..*" Observation : has
 
-  class ObservationStatus["<a href='../enums.md#observation-status'>Observation Status</a>"]{<<enumeration>>}
-  class LOINCObservationCode["<a href='../enums.md#loinc-observation-code'>LOINC Observation Code</a>"]{<<enumeration>>}
+  class ObservationStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#observation-status'>Observation Status</a>"]{<<enumeration>>}
+  class LOINCObservationCode["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#loinc-observation-code'>LOINC Observation Code</a>"]{<<enumeration>>}
 
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
 ```
 
 ```yaml

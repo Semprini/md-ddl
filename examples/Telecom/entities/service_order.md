@@ -26,10 +26,10 @@ classDiagram
   Subscription "1" --> "0..*" ServiceOrder : triggers
   ServiceOrder "1" --> "0..1" Service : provisions
 
-  class ServiceOrderType["<a href='../enums.md#service-order-type'>Service Order Type</a>"]{<<enumeration>>}
-  class ServiceOrderStatus["<a href='../enums.md#service-order-status'>Service Order Status</a>"]{<<enumeration>>}
-  class Subscription["<a href='subscription.md'>Subscription</a>"]
-  class Service["<a href='service.md'>Service</a>"]
+  class ServiceOrderType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#service-order-type'>Service Order Type</a>"]{<<enumeration>>}
+  class ServiceOrderStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#service-order-status'>Service Order Status</a>"]{<<enumeration>>}
+  class Subscription["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/subscription.md'>Subscription</a>"]
+  class Service["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service.md'>Service</a>"]
 ```
 
 ```yaml

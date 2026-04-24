@@ -22,9 +22,9 @@ classDiagram
   Merchant "1" --> "0..*" Transaction : processes
   Merchant "0..*" --> "0..1" Account : settles into
 
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class Transaction["<a href='transaction.md'>Transaction</a>"]
-  class Account["<a href='account.md'>Account</a>"]  
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
+  class Transaction["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/transaction.md'>Transaction</a>"]
+  class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]  
 ```
 
 ```yaml

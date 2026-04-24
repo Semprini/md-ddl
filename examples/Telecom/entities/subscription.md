@@ -29,10 +29,10 @@ classDiagram
   Subscription "0..*" --> "1" ProductOffering : activates
   Subscription "1" --> "0..*" ServiceOrder : triggers
 
-  class SubscriptionStatus["<a href='../enums.md#subscription-status'>Subscription Status</a>"]{<<enumeration>>}
-  class Customer["<a href='customer.md'>Customer</a>"]
-  class ProductOffering["<a href='product_offering.md'>Product Offering</a>"]
-  class ServiceOrder["<a href='service_order.md'>Service Order</a>"]
+  class SubscriptionStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#subscription-status'>Subscription Status</a>"]{<<enumeration>>}
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/customer.md'>Customer</a>"]
+  class ProductOffering["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/product_offering.md'>Product Offering</a>"]
+  class ServiceOrder["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/service_order.md'>Service Order</a>"]
 ```
 
 ```yaml

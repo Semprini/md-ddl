@@ -21,8 +21,8 @@ classDiagram
 
   Customer "1" --> "0..1" CustomerPreferences : has
 
-    class ContactPreference["<a href='../enums.md#contact-preference'>Contact Preference</a>"]{<<enumeration>>}
-    class Customer["<a href='customer.md'>Customer</a>"]
+    class ContactPreference["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#contact-preference'>Contact Preference</a>"]{<<enumeration>>}
+    class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/customer.md'>Customer</a>"]
 ```
 
 ```yaml

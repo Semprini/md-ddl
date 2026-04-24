@@ -95,8 +95,8 @@ classDiagram
   ServiceRequest "0..1" --> "0..1" ServiceCase : escalates to
   ServiceCase "0..*" --> "0..1" KnowledgeArticle : resolved by
 
-  class Customer["<a href='../entities/customer.md'>Customer</a>"]
-  class ServiceRequest["<a href='../entities/service_request.md'>Service Request</a>"]
-  class ServiceCase["<a href='../entities/service_case.md'>Service Case</a>"]
-  class KnowledgeArticle["<a href='../entities/knowledge_article.md'>Knowledge Article</a>"]
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/customer.md'>Customer</a>"]
+  class ServiceRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_request.md'>Service Request</a>"]
+  class ServiceCase["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_case.md'>Service Case</a>"]
+  class KnowledgeArticle["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/knowledge_article.md'>Knowledge Article</a>"]
 ```

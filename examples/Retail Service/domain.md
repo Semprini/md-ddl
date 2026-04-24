@@ -51,10 +51,10 @@ graph TD
   ServiceRequest --> |escalates to|ServiceCase
   ServiceCase --> |resolved by|KnowledgeArticle
 
-  Customer["<a href='entities/customer.md'>Customer</a>"]
-  ServiceRequest["<a href='entities/service_request.md'>Service Request</a>"]
-  ServiceCase["<a href='entities/service_case.md'>Service Case</a>"]
-  KnowledgeArticle["<a href='entities/knowledge_article.md'>Knowledge Article</a>"]
+  Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/customer.md'>Customer</a>"]
+  ServiceRequest["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_request.md'>Service Request</a>"]
+  ServiceCase["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/service_case.md'>Service Case</a>"]
+  KnowledgeArticle["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Retail%20Service/entities/knowledge_article.md'>Knowledge Article</a>"]
 ```
 
 ## Entities

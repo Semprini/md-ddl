@@ -26,7 +26,7 @@ classDiagram
 
   Sale "0..*" --> "1" Product : includes
 
-  class Sale["<a href='sale.md'>Sale</a>"]
+  class Sale["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Brownfield%20Retail/entities/sale.md'>Sale</a>"]
 ```
 
 ```yaml

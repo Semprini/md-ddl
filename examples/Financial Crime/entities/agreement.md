@@ -24,10 +24,10 @@ classDiagram
   LoanAgreement --|> Agreement
   Agreement "1" --> "0..*" PartyRole : governs
 
-  class AgreementStatus["<a href='../enums.md#agreement-status'>Agreement Status</a>"]{<<enumeration>>}
-  class TermDepositAgreement["<a href='term-deposit-agreement.md'>Term Deposit Agreement</a>"]
-  class LoanAgreement["<a href='loan-agreement.md'>Loan Agreement</a>"]
-  class PartyRole["<a href='party_role.md'>Party Role</a>"]
+  class AgreementStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#agreement-status'>Agreement Status</a>"]{<<enumeration>>}
+  class TermDepositAgreement["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/term-deposit-agreement.md'>Term Deposit Agreement</a>"]
+  class LoanAgreement["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/loan-agreement.md'>Loan Agreement</a>"]
+  class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
 ```
 
 ```yaml

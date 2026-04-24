@@ -29,10 +29,10 @@ classDiagram
   Patient "1" --> "0..*" Appointment : has
   Appointment "0..*" --> "0..1" Encounter : results in
 
-  class AppointmentStatus["<a href='../enums.md#appointment-status'>Appointment Status</a>"]{<<enumeration>>}
+  class AppointmentStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#appointment-status'>Appointment Status</a>"]{<<enumeration>>}
 
-  class Patient["<a href='patient.md'>Patient</a>"]
-  class Encounter["<a href='encounter.md'>Encounter</a>"]
+  class Patient["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/patient.md'>Patient</a>"]
+  class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
 ```
 
 ```yaml

@@ -126,6 +126,12 @@ your-project/
     salesforce-crm/
       source.md
       transforms/
+  generated/                 ← Agent Artifact output (commit alongside the model)
+    customer/
+      ddl/                   ← SQL DDL, JSON Schema, Parquet contracts, Cypher
+      synthetic/
+        factories.py         ← Faker factory classes
+        test_factories.py    ← integrity and consistency tests
 ```
 
 ---

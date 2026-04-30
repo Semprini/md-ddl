@@ -1,6 +1,6 @@
 ---
 name: concept-explorer
-description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling, how to model or validate eventual consistency in MD-DDL.
+description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling, how to model or validate eventual consistency in MD-DDL. Also use when the user asks about synthetic data generation, Faker factories, test data, enterprise profiles, demographic weights, product catalogues, how to generate realistic or tailored test data, or how to make synthetic data reflect a specific industry, geography, customer mix, or product portfolio.
 ---
 
 # Skill: Concept Explorer
@@ -56,6 +56,8 @@ MD-DDL Concept | ER / UML analogy | dbt / SQL analogy | Data Mesh analogy | FHIR
 **Version / Lifecycle** | Schema version in migration tool | dbt project version, model deprecation | Domain version, contract versioning | Resource version history | Change control record
 **Change Manifest** | Change log with typed impacts | dbt `state:modified` selector | Contract change record | — | Audit change register
 **Reconciliation** | Schema compare tool | Compare generated model to deployed relation | Contract compatibility check | — | Control attestation compare
+**Synthetic Data Factory** | Test fixture, factory class | dbt seed, `generate_series()` | Consumer test dataset generator | — | Governance-safe test dataset
+**Enterprise Profile** | Test data seed configuration | Faker locale + custom providers | Domain product consumer config | — | Demographic and product-catalogue constraint set
 
 > "In ER modelling, you would call this an entity with attributes. In MD-DDL, it is
 > the same idea — but defined in Markdown with YAML blocks, version-controlled, and
@@ -456,6 +458,184 @@ the slow-source attributes and rely on real-time enrichment at query time.
 | User wants to *declare* the product with consistency posture and null strategy | Agent Architect (product-design skill, Step 8) |
 | User wants to *generate DDL* for a nullable-staging pattern | Agent Artifact (dimensional or normalized skill, with consistency posture handoff note) |
 | User wants to *validate* eventual consistency with synthetic data | Agent Artifact (faker skill) — generate factories then run `consistency_example.py` |
+
+---
+
+## Explaining Synthetic Data Generation and Enterprise Profiles
+
+When a user asks about synthetic data, Faker factories, test data generation,
+or how to make generated data reflect their enterprise's characteristics, follow
+this protocol. Load `agents/agent-artifact/skills/faker/SKILL.md` to access the
+full generation specification before responding substantively.
+
+For production generation work (producing factory files, running the factories,
+validating integrity), hand off to Agent Artifact. Your role here is to help the
+user understand the concepts well enough to answer the discovery questions Agent
+Artifact will ask — particularly around enterprise profiles.
+
+### Step 1 — Anchor to the Familiar
+
+Select the analogy that fits the user's background:
+
+| User type | Analogy |
+| --- | --- |
+| Data engineer | "Like pytest fixtures with a `faker` provider — a factory class that builds a realistic row on demand. The enterprise profile is like a custom Faker provider that constrains the random draw to your actual distribution." |
+| Data modeller | "Like a population model for your domain: instead of `random.choice()` on any value, you weight the draws to reflect the enterprise's real customer mix, product split, and geographic spread." |
+| Data steward | "Like test data governance — the enterprise profile documents *what kind of data* the enterprise handles, so synthetic records look like real ones without containing real ones. You get plausibility without PII risk." |
+| QA / test engineer | "Like parameterised test data factories where the parameters come from the business. Instead of inventing values, you declare the distribution once and every generated row conforms to it." |
+| Business analyst | "Like describing your customer base in a config file: 70% UK, 20% EU, 10% rest; average age 42; mostly individual accounts with a small SME book. The factory then generates records that fit that description." |
+
+### Step 2 — Two-Sentence Summary
+
+MD-DDL's synthetic data system generates Python Faker factory classes from entity
+definitions — producing referentially consistent, PII-safe test datasets with correct
+temporal patterns, FK relationships, and constraint encoding. An enterprise profile is
+an optional configuration layer on top of those factories that weights field generation
+toward the enterprise's actual geographic distribution, customer age mix, customer-type
+split, product catalogue, and monetary value ranges.
+
+### Step 3 — The Five Discovery Questions
+
+Before handing off to Agent Artifact for generation, help the user answer these
+five questions. They correspond directly to the five fields of `EnterpriseProfile`.
+Walk through them conversationally — do not present them as a form.
+
+**1. What industry and primary market(s) does the enterprise operate in?**
+
+This determines the broadest framing — a UK bank, a US fintech, and an APAC insurer
+each have fundamentally different customer bases, products, and value ranges. If the
+user describes their industry, you can often suggest the closest pre-built profile
+as a starting point.
+
+*If the user is unsure:* "What sector do you work in, and which country is the primary
+market? That's enough to get started."
+
+**2. Which geographies does the enterprise serve, and roughly what proportion each?**
+
+Geography drives two things: the Faker locale (which produces locale-appropriate
+names, addresses, and phone numbers per record) and the `*country*` / `*region*`
+field values. Ask for relative proportions, not exact percentages — they will be
+normalised automatically.
+
+*Teaching note:* When `geo_weights` is active, each generated record picks a locale
+from the distribution and instantiates a locale-specific Faker — so a 70/20/10
+UK/EU/Other split produces records with British, French/German, and globally diverse
+names and addresses in those proportions.
+
+*If the user is unsure:* "Roughly, what share of your customers are domestic vs.
+international? Even a rough split like '80% domestic, 20% international' is enough."
+
+**3. What does the customer age distribution look like?**
+
+Age bands drive `*date_of_birth*` and `*dob*` fields. Ask for rough bands (18–34,
+35–54, 55+) and relative weights (heavy, moderate, light) rather than precise
+statistics. The profile translates these into sampled ages that land within each band.
+
+*If the user is unsure:* "Is your customer base younger (say, digital-first), older
+(traditional bank or insurer), or broadly spread? Any skew helps."
+
+**4. What is the customer type mix — individual vs. corporate vs. other segments?**
+
+Customer type drives `*party_type*`, `*entity_type*`, and product eligibility.
+Some products are individual-only (personal loan, motor insurance); others are
+corporate-only (group life, business current account). The profile enforces these
+eligibility rules automatically during generation.
+
+*If the user is unsure:* "Roughly what proportion of your customers are individual
+people vs. businesses? And are there smaller segments like sole traders or SMEs
+worth separating out?"
+
+**5. What products does the enterprise offer, and are any restricted by customer type?**
+
+This is the product catalogue — the most domain-specific part of the profile. Ask the
+user to list their main product types and indicate which are retail-only vs.
+commercial-only. Value ranges (what are typical balances or premium amounts?) drive
+`*amount*`, `*balance*`, `*premium*`, and `*limit*` fields. Currency comes with the
+product.
+
+*If the user is unsure:* "List your main product lines — savings account, mortgage,
+insurance policy, and so on. Don't worry about exact value ranges; approximate bands
+(e.g. 'mortgages typically £50k–£500k') are enough to constrain the distribution."
+
+### Step 4 — Pre-built Profile Selection
+
+If the user's enterprise fits one of the three pre-built profiles, recommend it
+directly and explain what adjustments they might need. Pre-built profiles are
+starting points — the user should copy and modify them, not treat them as fixed.
+
+| User describes | Suggest | Likely adjustments |
+| --- | --- | --- |
+| UK-based bank, building society, or credit union | `uk_retail_bank_profile()` | Adjust SME vs. individual split; add product types specific to their offer |
+| US-based neobank, BNPL, payments, or digital wallet | `us_fintech_profile()` | Adjust age skew and product weights; add crypto or investment products if relevant |
+| APAC insurer, life / health / general lines | `apac_insurance_profile()` | Adjust market mix (AU vs. JP vs. SG weighting); add lines specific to their portfolio |
+| None of the above | Custom `EnterpriseProfile(...)` | Walk through each field; Agent Artifact will build the inline definition |
+
+> "The pre-built profile for a UK retail bank is a reasonable starting point. It has
+> a 75% GB / 10% IE / 15% EU geographic split, an age distribution skewed toward
+> 25–64, and GBP products across current account, savings, mortgage, and credit card.
+> Do any of those need adjusting for your actual book?"
+
+### Step 5 — Connecting Profile to Entity Attributes
+
+Help the user see how the profile connects to their specific entity definitions.
+The profile does not replace entity-defined enum values — it *weights* the generation
+of fields that are sensitive to distributional realism.
+
+| Entity attribute pattern | How the profile influences it |
+| --- | --- |
+| `country`, `region`, `locale` | Sampled from `geo_weights`; Faker locale set per record |
+| `date_of_birth`, `age` | Age drawn from `age_bands`; date derived from today minus sampled age |
+| `party_type`, `customer_type`, `entity_type` | Sampled from `customer_type_weights` |
+| `product_code`, `product_name`, `product_type` | Sampled from `products` catalogue, filtered by customer type eligibility |
+| `amount`, `balance`, `premium`, `limit` | Drawn from `product.value_range` for the sampled product |
+| `currency` | From `product.currency` for the sampled product |
+| `sector`, `industry` | Sampled from `sector_weights` (B2B and commercial domains only) |
+
+*Teaching note:* The profile only influences fields that match these patterns. Fields
+not in the table are unaffected and follow the base Faker mapping rules. The profile
+is additive, not restrictive — no existing generation behaviour is removed.
+
+### Step 6 — When No Profile Is Needed
+
+Make clear that enterprise profiles are optional. They add value when:
+
+- The user needs data that looks believable to domain stakeholders, not just
+  technically valid
+- Value ranges, currencies, or product eligibility matter for testing
+- The generated data will be used in demos, UAT, or stakeholder walkthroughs
+  rather than just unit tests
+
+They do not add value when:
+
+- The test only needs structural validity (FK resolution, not-null, enum membership)
+- The entity domain has no geographic, demographic, or product-catalogue dimension
+- The cardinality and temporal patterns are what matters, not distributional realism
+
+> "If your goal is to check that FK relationships hold and temporal chains are coherent,
+> the base Faker factories are sufficient. The enterprise profile matters when the data
+> needs to be believable to a product manager or business analyst reviewing it."
+
+### Step 7 — Handoff to Agent Artifact
+
+When the user is ready to generate, hand off explicitly with the discovery answers
+packaged as context:
+
+> "You have enough to hand off to Agent Artifact. Tell it:
+> - Scope: canonical (or source / destination — whichever applies)
+> - PII mode: safe or realistic
+> - Cardinality: how many root-entity rows
+> - Enterprise profile: [summarise the five answers, or name the pre-built profile]
+>
+> Agent Artifact will generate a Python module with factory classes and a
+> DatasetBuilder that accepts your profile. You can then run `integrity_check.py`
+> to validate referential integrity and temporal chain coherence."
+
+| Next step | Route to |
+| --- | --- |
+| User wants to *generate* factory classes | Agent Artifact (faker skill) — provide scope, PII mode, cardinality, and profile answers |
+| User wants to *validate* generated data against integrity rules | Agent Artifact (faker skill) — `integrity_check.py` and `test_template.py` |
+| User wants to *demonstrate* eventual consistency with the generated data | Agent Artifact (faker skill) — `consistency_scenario.py` and `consistency_example.py` |
+| User wants to *understand* how the model should be structured first | Agent Ontology — model the domain, declare entities and enums, then return for generation |
 
 ---
 

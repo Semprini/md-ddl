@@ -4,8 +4,6 @@
 
 > **Version 0.9.2**
 
-**Model once. Reuse everywhere.**
-
 MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — then generating physical artifacts from a single source of truth that humans and AI agents share.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**

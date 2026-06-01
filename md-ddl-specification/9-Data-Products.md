@@ -37,7 +37,7 @@ A source-aligned product publishes raw or lightly cleansed data from a single so
 - **Shape:** Mirrors source structure; no joins across sources
 - **Governance:** Inherits domain defaults; typically lower classification than domain-aligned products
 - **Consumers:** Data engineers, audit teams, integration debugging
-- **Cross-domain dependencies:** None — source-aligned products are self-contained within a domain
+- **Cross-domain dependencies:** None — source-aligned products are self-contained
 
 Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure defined in `sources/<system>/source.md`.
 

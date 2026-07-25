@@ -61,8 +61,8 @@ MD‑DDL is composed of several logical components:
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition** in the domain file
-2. A **detailed definition** in a separate file
+1. A **summary definition**
+2. A **detailed definition**
 
 During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
 

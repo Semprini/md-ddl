@@ -1,6 +1,6 @@
 # MD‑DDL Specification (Draft 0.9.2)
 
-*A Markdown‑native Data Definition Language for human-AI collaboration.*
+*Lightweight layout for domain ontology & semantic data model designed human-AI collaboration.*
 
 ---
 
@@ -57,7 +57,7 @@ MD‑DDL is composed of several logical components:
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary/conceptual definition**
+1. A **summary/conceptual definition with semantic relationships**
 2. A **detailed/logical definition**
 
 During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:

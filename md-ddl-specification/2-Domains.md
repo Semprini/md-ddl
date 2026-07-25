@@ -2,7 +2,20 @@
 
 ## **Domains**
 
-In MD-DDL, the domain level acts as the router for the Knowledge Graph. While the detail level provides the DNA (Attributes/Constraints), the domain level provides the Anatomy (how entities, events, and relationships sit together).
+In MD-DDL, the domain level is the domain's **ontology** — the shared vocabulary of concepts a business uses and the named, meaningful relationships between them. It is also the router for the Knowledge Graph: the detail level supplies the DNA (attributes and constraints), while the domain level supplies the anatomy — which concepts exist, how they specialise one another, and how they relate.
+
+### **Semantics Without Formalism**
+
+MD-DDL is deliberately a *light* ontology. It shares the intent of formal ontology languages — explicit concepts, explicit named relationships, alignment to shared vocabularies — without their machinery. There are no formal axioms, no reasoner, no required upper ontology, and no obligation to express the model as triples.
+
+Meaning is carried instead by:
+
+- **Natural-language names** — a concept is named as the business names it, so the label itself carries meaning
+- **Prose descriptions** — every summary entry describes what the concept means; ambiguity is resolved in words, not logic
+- **Named relationships** — every connection between concepts is a labelled predicate using a business verb, never an anonymous link
+- **Optional alignment** — the `Reference` column ties a local concept to an external vocabulary (BIAN, FIBO, ISO, FHIR, TM Forum) where one applies
+
+This is enough for agents to reason over the model and for domain experts to maintain it without specialist training. An organisation that needs formal semantics can project the model into RDF/OWL; MD-DDL does not require it.
 
 ### **Domain Declaration**
 
@@ -97,12 +110,12 @@ Business Application | Platform | Capability Domain
 
 Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
-The domain level should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the primary navigational artefact of the domain level: the summary is the map, and the diagram is its visual index.
+The domain level should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the visual rendering of the ontology: the summary tables declare the concepts, and the diagram shows the semantic web they form.
 
-Two rules keep the diagram consistent with the model:
+Every edge is a **semantic assertion**, readable as a sentence in subject–predicate–object order: `Party --> |assumes| PartyRole` asserts that a Party assumes a Party Role. Two rules follow from this:
 
-- Relationship edges are labelled, and the labels match the relationship names defined in the Relationships section (e.g., `-->|assumes|`). Inheritance is expressed as `Child -->|is a|Parent`.
-- The overview diagram shows concepts, not detail. Attributes, cardinality notation, and enumeration values belong in the detail level, not the overview.
+- Edges are always labelled, and the label matches the relationship name declared in the Relationships section (e.g., `-->|assumes|`). An unlabelled edge asserts nothing and is not a relationship. Specialisation is asserted as `Child -->|is a|Parent`.
+- The overview asserts meaning, not structure. Attributes, cardinality notation, and enumeration values belong in the detail level, not the overview.
 
 Nodes may hyperlink to detail definitions for navigation, and additional level‑3 diagrams focusing on specific sub-areas may follow the overview. Layout configuration, linking syntax, and worked examples are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
@@ -125,16 +138,16 @@ graph TD
 ```
 ````
 
-#### Conceptual vs Logical Diagrams
+#### Semantic vs Logical Diagrams
 
 MD-DDL uses two distinct diagram types for different purposes:
 
 Diagram|Location|Purpose|Relationship Labels
 -------|--------|-------|-------------------
-`graph TD/LR`|Domain level|Conceptual model — business meaning and named relationships|Match the Relationships section
-`classDiagram`|Entity detail level|Logical model — structural realization of the entity|Optional — structural intent only
+`graph TD/LR`|Domain level|Semantic model — the ontology: concepts and the named relationships asserted between them|Required — match the Relationships section
+`classDiagram`|Entity detail level|Logical model — one structural realization of those concepts|Optional — structural intent only
 
-The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
+The semantic layer is authoritative for *meaning*; the logical layer is one realization of it. The classDiagram is therefore not required to mirror the domain graph one-for-one — a single semantic relationship may realize as several logical associations, and modellers have freedom in how they do it.
 
 ---
 
@@ -142,7 +155,7 @@ The classDiagram is not required to mirror the domain graph one-for-one. Modelle
 
 Below the metadata section, the domain level organizes concepts into six primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, `## Events`, and `## Data Products`.
 
-At the domain level, these sections **must use Markdown tables** for high-level summaries. This ensures the domain level acts as a compact "Router" for the knowledge graph.
+At the domain level, these sections **must use Markdown tables** for high-level summaries. This keeps the ontology scannable — a compact, complete index of the domain's vocabulary that both humans and agents can read before descending into detail.
 
 #### Splitting Across Files
 
@@ -169,20 +182,20 @@ Summarizes operational source applications relevant to the domain, using the col
 
 #### **Entities Table**
 
-The Entities table summarizes the core concepts of the domain.
+The Entities table declares the concepts of the domain ontology — the things the business talks about.
 
  Column | Purpose
  --- | ---
-**Name** | The natural language name of the entity, linked to its detail-level anchor.
-**Specializes** | If applicable, a link to the parent entity being specialized.
-**Description** | A brief conceptual definition (1–2 sentences).
-**Reference** | Optional URL to external industry standards (e.g., BIAN, FIBO, ISO).
+**Name** | The natural language name of the concept, linked to its detail-level anchor.
+**Specializes** | If applicable, a link to the parent concept. Specialization asserts *is-a*: every instance of this concept is also an instance of the parent, and inherits its attributes, constraints, and governance.
+**Description** | A brief definition of what the concept means (1–2 sentences).
+**Reference** | Optional alignment to an external vocabulary or standard (e.g., BIAN, FIBO, ISO, FHIR). This is how a local concept is tied to a shared industry meaning.
 
 ---
 
 #### **Enums Table**
 
-Summarizes the discrete value sets used within the domain. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
+Declares the controlled vocabularies of the domain — the closed value sets that concepts draw on. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
 
 Column | Purpose
 --- | ---
@@ -194,26 +207,26 @@ Column | Purpose
 
 #### **Relationships Table**
 
-Summarizes the semantic connections between entities.
+Declares the predicates of the domain ontology — the named, meaningful connections asserted between concepts. Each row is an assertion the business would recognise as true.
 
 Column | Purpose
 --- | ---
-**Name** | The action-oriented name (e.g., Customer Has Preferences), linked to details.
-**Description** | The business meaning of the connection.
-**Reference** | Optional link to relationship patterns or external schemas.
+**Name** | The action-oriented name, reading as subject–predicate–object (e.g., Customer Has Preferences), linked to details.
+**Description** | What the connection means in the business, and when it holds.
+**Reference** | Optional alignment to an external relationship pattern or vocabulary.
 
 ---
 
 #### **Events Table**
 
-Summarizes the meaningful business changes that occur within the domain.
+Declares the meaningful state changes in the domain. An event names *what happened* in business terms, and binds it to the concepts that participate: who acted, and what was affected.
 
 Column | Purpose
 --- | ---
 **Name** | The natural language name of the event, linked to details.
-**Actor** | The primary entity or role that initiates the event.
-**Entity** | The primary entity affected by the event.
-**Description** | The business trigger for this event.
+**Actor** | The concept or role that initiates the event.
+**Entity** | The concept whose state the event changes.
+**Description** | The business trigger and meaning of this event.
 
 ---
 
@@ -234,7 +247,7 @@ Column | Purpose
 
 - **Tabular Authority:** The domain-level summary **must** use the table formats defined above. H3 headings under these sections are reserved for **detail definitions**.
 - **Linking Strategy:** The `Name` column must contain a Markdown link pointing to the H3 anchor of the detail definition — `[Entity Name](#entity-name)` when detail sits in the same file, or `[Entity Name](entities/customer.md#entity-name)` when it is split out.
-- **AI Scoping:** AI agents should ingest these tables first to understand the "Anatomy" of the domain before requesting the "DNA" (YAML blocks) from the detail level.
+- **AI Scoping:** AI agents should ingest these tables first to understand the domain's ontology — its concepts and their relationships — before requesting attribute-level detail (YAML blocks) from the detail level.
 - **No Boilerplate:** If a column like `Specializes` or `Reference` is empty for all entries in a section, it may be omitted from the table, but the `Name` and `Description` columns are mandatory.
 - The description must include a short natural‑language description. A longer description belongs at the detail level.
 

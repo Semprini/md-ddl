@@ -4,7 +4,7 @@
 
 > **Version 0.9.2**
 
-MD-DDL is a simple, standard way to organise data definitions. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
+MD-DDL is a simple, standard way to organise domain ontology & semantic data models. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 

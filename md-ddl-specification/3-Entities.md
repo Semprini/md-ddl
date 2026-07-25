@@ -31,7 +31,7 @@ Free‑text Markdown under the heading describes the entity in more detail than 
 
 An entity definition should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
 
-The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships declared at the domain level one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
+The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the semantic relationships asserted at the domain level one-for-one. A single semantic relationship may realize as multiple logical associations, and some logical associations may have no direct semantic counterpart.
 
 Example:
 

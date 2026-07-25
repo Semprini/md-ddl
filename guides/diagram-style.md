@@ -1,6 +1,6 @@
 # MD-DDL Diagram Style Guide
 
-*A non-normative companion guide to the MD-DDL specification. The specification itself asks only that a domain file include a Domain Overview Diagram whose edge labels match the Relationships section, and recommends a `classDiagram` in entity detail files. Everything in this guide — layout engines, linking syntax, element ordering — is convention for producing consistent, readable diagrams. Deviations are observations, not errors.*
+*A non-normative companion guide to the MD-DDL specification. The specification itself asks only that the domain level include a Domain Overview Diagram whose edge labels match the Relationships section, and recommends a `classDiagram` on entity definitions. Everything in this guide — layout engines, linking syntax, element ordering — is convention for producing consistent, readable diagrams. Deviations are observations, not errors.*
 
 ---
 
@@ -11,9 +11,9 @@ The Domain Overview Diagram is the first artefact an AI agent or a new team memb
 - **Scope**: what concepts are owned by this domain
 - **Structure**: how inheritance hierarchies are organised
 - **Connectivity**: which entities are central vs peripheral
-- **Navigation**: hyperlinks on key entities provide one-click access to detail files from the diagram itself
+- **Navigation**: hyperlinks on key entities provide one-click access to their detail definitions from the diagram itself
 
-A well-maintained domain diagram makes the two-layer structure of MD-DDL work in practice — the domain file is the map, and the diagram is the visual index of that map.
+A well-maintained domain diagram makes the two-layer structure of MD-DDL work in practice — the domain level is the map, and the diagram is the visual index of that map.
 
 ### What to Include
 
@@ -26,9 +26,9 @@ The overview diagram works best when it shows:
 
 And leaves out:
 
-- Attributes (these belong in entity detail files)
-- Cardinality notation (this belongs in relationship detail files)
-- Enumeration values (these belong in enum detail files)
+- Attributes (these belong in entity definitions)
+- Cardinality notation (this belongs in relationship definitions)
+- Enumeration values (these belong in enum definitions)
 
 ### Syntax Conventions
 
@@ -101,7 +101,7 @@ graph TD
 
 ### Additional Diagrams
 
-Beyond the overview, a domain file may contain additional level-3 diagrams focusing on a specific sub-area. For example:
+Beyond the overview, the domain level may contain additional level-3 diagrams focusing on a specific sub-area. For example:
 
 ````markdown
 ### Transaction Flow Diagram
@@ -120,7 +120,7 @@ Additional diagrams are optional.
 
 ## Entity Class Diagrams
 
-An entity detail file's `classDiagram` sits immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities. The YAML block remains authoritative — the diagram is a rendering of it.
+An entity's `classDiagram` sits immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities. The YAML block remains authoritative — the diagram is a rendering of it.
 
 ### Configuration
 
@@ -178,7 +178,7 @@ Conventions for reference classes:
 - The `href` path is relative to the current file's location and uses snake_case filenames (e.g., `party.md`, `party_role.md`, `contact_address.md`)
 - Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
 - All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
-- If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
+- If a specialisation child has no detail definition yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
 
 ### Enum Classes
 
@@ -204,8 +204,8 @@ Any enum used by the subject class attributes appears in the class diagram, usin
 Conventions for enum classes:
 
 - Every enum type referenced in the subject class (for example `enum~PartyStatus~`) appears exactly once in the diagram
-- If the enum is defined in the same detail file under `## Enums`, render it as an expanded enum class with its values and include `<<enumeration>>`
-- If the enum is defined elsewhere, render it as a linked reference class to its enum detail file and include only the `<<enumeration>>` tag in the class detail
+- If the enum is defined alongside the entity under `## Enums`, render it as an expanded enum class with its values and include `<<enumeration>>`
+- If the enum is defined elsewhere, render it as a linked reference class to its enum definition and include only the `<<enumeration>>` tag in the class detail
 - Use PascalCase class names for enum class identifiers (for example `PartyStatus`, `CountryCode`)
 - Display names in links use natural language (for example `Party Status`, `Country Code`)
 

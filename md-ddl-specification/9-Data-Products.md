@@ -26,7 +26,7 @@ A source-aligned product publishes raw or lightly cleansed data from a single so
 - **Consumers:** Data engineers, audit teams, integration debugging
 - **Cross-domain dependencies:** None — source-aligned products are self-contained
 
-Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure defined in `sources/<system>/source.md`.
+Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure declared in that source's summary.
 
 #### Domain-Aligned
 
@@ -85,7 +85,7 @@ Product classes outside the declared `product_scope` are still valid as infrastr
 
 ### **Data Product Declaration**
 
-A data product is declared using a **level-3 Markdown heading** inside a detail file stored in the `products/` subfolder of the domain:
+A data product is declared at the detail level, using a **level-3 Markdown heading** under a `## Data Products` section (conventionally kept in a `products/` subfolder):
 
 ```markdown
 ### Customer 360 Profile
@@ -205,7 +205,7 @@ lineage:
       - table_sanctions_screening
 ```
 
-Each `source` value must match a source system folder under `sources/`. Each `tables` entry must match a transform file declared in that source system's feeds table.
+Each `source` value must match a declared source system. Each `tables` entry must match a source table declared in that source system's feeds table.
 
 **Consumer-aligned products** trace lineage to canonical entities from one or more domains:
 
@@ -257,9 +257,9 @@ A domain-aligned logical model is a **projection of the canonical domain model**
 - Each entity as a class with all its attributes and types, matching the canonical entity definitions
 - Inheritance relationships (e.g., Person → Party)
 - Association cardinalities between entities
-- Entity names hyperlinked to their detail files — the logical model is a view into the canonical model, not a copy of it
+- Entity names hyperlinked to their detail definitions — the logical model is a view into the canonical model, not a copy of it
 
-Because domain-aligned products publish the canonical structure directly, their logical model can be mechanically derived from the entity detail files. The entity detail files remain authoritative for constraints, governance, and temporal tracking.
+Because domain-aligned products publish the canonical structure directly, their logical model can be mechanically derived from the entity definitions, which remain authoritative for constraints, governance, and temporal tracking.
 
 #### Consumer-Aligned Logical Models
 
@@ -274,7 +274,7 @@ Consumer-aligned logical models must be accompanied by an `#### Attribute Mappin
 
 #### Attribute Mapping
 
-Consumer-aligned products declare an `#### Attribute Mapping` section following the logical model diagram. The mapping uses the same table-based format as source transform files (see [Section 8 — Transformations](./8-Transformations.md)), providing a consistent lineage format from source through canonical to product.
+Consumer-aligned products declare an `#### Attribute Mapping` section following the logical model diagram. The mapping uses the same table-based format as source transform detail (see [Section 8 — Transformations](./8-Transformations.md)), providing a consistent lineage format from source through canonical to product.
 
 Each mapping table traces product attributes to their canonical source:
 
@@ -378,7 +378,7 @@ The strategy list is extensible — organisations may declare additional strateg
 
 The `schema_type` field on a data product is the entry point for physical artifact generation: it declares the shape of the physical output (`normalized`, `dimensional`, `wide-column`, `knowledge-graph`) and generating tooling selects its approach accordingly.
 
-The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity detail files provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
+The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity definitions provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
 
 ---
 
@@ -401,10 +401,10 @@ SLA fields are informational — they document expectations but do not generate 
 
 Data products follow the same two-layer pattern as entities, relationships, and events:
 
-1. **Summary** — A `## Data Products` table in the domain file, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
-2. **Detail** — Individual product definitions in `products/` detail files, following the standard detail file rules: a level-1 heading naming the domain (linked back to the domain file), a `## Data Products` section, and one level-3 heading per product with its YAML metadata block
+1. **Summary** — A `## Data Products` table at the domain level, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
+2. **Detail** — Individual product definitions under a `## Data Products` section, one level-3 heading per product with its YAML metadata block. When split into separate files, each repeats the hierarchy with a level-1 heading naming the domain, linked back to the domain summary.
 
-This allows the domain file to act as a complete index of what the domain publishes, while detail files contain the full product specification.
+This allows the domain level to act as a complete index of what the domain publishes, while the detail level carries the full product specification.
 
 ---
 
@@ -428,7 +428,7 @@ This allows the domain file to act as a complete index of what the domain publis
 
 9. **Source field for source-aligned.** Source-aligned products use `source` instead of `entities`. The value must match a source system folder under `sources/`.
 
-10. **Two-layer compliance.** Every data product must appear in both the domain file summary table and a detail file. The domain file is the index; the detail file is the contract.
+10. **Two-layer compliance.** Every data product must appear in both the domain-level summary table and a detail definition. The summary is the index; the detail is the contract.
 
 11. **Name uniqueness.** Data product names must be unique within a domain. The level-3 heading is the product's identity in the Knowledge Graph.
 
@@ -453,7 +453,7 @@ State | Meaning
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
 `Active` | Product is live and governed.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
-`Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
+`Retired` | Product is no longer available. Retained in the model for lineage and audit traceability but not published or generated.
 
 Optional lifecycle metadata fields document transitions:
 

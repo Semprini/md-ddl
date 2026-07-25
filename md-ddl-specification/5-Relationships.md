@@ -2,7 +2,7 @@
 
 ## **Relationships**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+Relationships are defined at the detail level, under a level‑2 `## Relationships` section. When relationship detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 Relationships are **first‑class citizens**.
 

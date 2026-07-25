@@ -8,21 +8,34 @@
 
 A Source in MD-DDL represents a system that generates operational change — a CRM, a core banking system, a payment platform, an ERP. Sources are not owners of data. They are systems of change whose outputs feed canonical data products.
 
-The canonical domain model defines meaning. Sources define operational reality. The Source File is the contract that translates between them.
+The canonical domain model defines meaning. Sources define operational reality. The source declaration is the contract that translates between them.
 
 This separation is deliberate and load-bearing:
 
 - Domain modellers define canonical entities, attributes, and governance without knowing or caring which source systems produce the underlying data.
 - Source system SMEs define field-level mappings and encode source idiosyncrasies without needing to understand the canonical model's governance posture.
-- Integration engineers own transform files that connect the two worlds.
+- Integration engineers own the transform definitions that connect the two worlds.
 
-**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to rules declared in source-folder transform files.
+**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to rules declared in the source layer.
 
 ---
 
 ### **Source Structure**
 
-Sources are self-contained within each domain. Each source system has a folder under `sources/` containing a `source.md` router file and a `transforms/` subfolder for optional transform detail files.
+The source layer belongs to the domain and uses the same two-layer pattern as the rest of MD-DDL:
+
+Level | Heading structure | Contains
+--- | --- | ---
+**Source summary** | Level‑1 heading naming the source system; level‑2 `## Metadata` and `## <Domain> Feeds` sections | What the source system is, how it generates change, and which canonical entities it feeds
+**Transform detail** | Level‑2 heading naming the source table; level‑3 headings for non-direct mapping rules | Field-level mappings using the transformation types defined in Section 8
+
+Transform detail is optional — a source may be declared before any mappings are authored.
+
+#### Splitting Across Files
+
+As elsewhere in MD-DDL, the heading hierarchy is what the standard defines; the file layout is the author's choice. A source may be a single document, or its transform detail may be split across many files — the natural split being one per source table, subdivided further by functional area for large systems. When transform detail is split out, each file repeats the hierarchy with a level‑1 heading linking back to the source summary.
+
+The conventional layout, for illustration:
 
 ```text
 Financial Crime/
@@ -32,53 +45,23 @@ Financial Crime/
     salesforce-crm/
       source.md             ← source metadata + domain feed table
       transforms/
-        table_account.md
-        table_contact_point.md
-    sap-fraud-management/
-      source.md
-      transforms/
-        table_alert_case.md
-    temenos-payment/
-      source.md
-      transforms/
-        table_account_ref.md
-```
-
-The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
-
-Transform files are named for the source table, by convention:
-
-`table_<source-table>.md`
-
-Examples: `table_account.md`, `table_contact_point.md`, `table_payment_event.md`.
-
-If multiple canonical entities map from the same source table, they should be grouped in the same transform file under separate level-2 entity headings.
-
-#### File Organisation
-
-A source may split transform definitions across as many files as needed. The natural split is one transform file per source table. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored under the source folder's `transforms/` subfolder and every transform file must begin with a level-1 heading linking back to `../source.md`.
-
-```text
-Financial Crime/
-  sources/
-    salesforce-crm/
-      source.md
-      transforms/
-        table_account.md       ← Account table mappings for Party/Company/Customer
+        table_account.md    ← Account table mappings for Party/Company/Customer
         table_contact_point.md
     sap-fraud-management/
       source.md
       transforms/
         table_alert_case.md
 ```
+
+By convention, transform documents are named for the source table — `table_<source-table>.md`, for example `table_account.md` or `table_payment_event.md`. If multiple canonical entities map from the same source table, group them under separate level-2 entity headings in the same place.
 
 ---
 
-### **Source File**
+### **Source Summary**
 
 #### Declaration
 
-A source file is declared using a level-1 Markdown heading:
+A source is declared using a level-1 Markdown heading:
 
 ```markdown
 # Salesforce CRM
@@ -156,7 +139,7 @@ The tier does not prevent a source from contributing to canonical entities. It s
 
 #### Domain Feed Sections
 
-Below the metadata block, a source file declares the feed table for its owning domain using this heading pattern:
+Below the metadata block, the source summary declares the feed table for its owning domain using this heading pattern:
 
 ```markdown
 ## [<Domain Name>](../../domain.md) Feeds
@@ -167,7 +150,7 @@ Example domain feed section:
 ```markdown
 ## [Financial Crime](../../domain.md) Feeds
 
-Canonical Entity | Transform File | Attributes Contributed | Change Model
+Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
 [Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
 [Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
@@ -178,7 +161,7 @@ Canonical Entity | Transform File | Attributes Contributed | Change Model
 Column | Purpose
 --- | ---
 **Canonical Entity** | Link to the entity in the target domain this source contributes to.
-**Transform File** | Link to a `transforms/table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
+**Transform** | Link to the transform detail for this source table, or `TBD` if not yet defined.
 **Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
 **Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
 
@@ -186,7 +169,7 @@ Column | Purpose
 
 #### Source Overview Diagram
 
-A source file should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
+A source summary should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
 
 ````markdown
 ### Source Overview Diagram
@@ -209,11 +192,11 @@ graph LR
 
 ---
 
-### **Transform Files**
+### **Transform Detail**
 
-#### Transform Files Declaration
+#### Declaration
 
-Every transform file begins with a level-1 heading that names the source system and links back to `../source.md`:
+When transform detail is split into its own file, that file begins with a level-1 heading naming the source system and linking back to the source summary:
 
 ```markdown
 # [Salesforce CRM](../source.md)
@@ -221,7 +204,7 @@ Every transform file begins with a level-1 heading that names the source system 
 
 #### Structure
 
-Transform files are source-table documents. Each file begins with a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
+Transform detail is organised by source table: a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
 
 Required source schema table columns:
 
@@ -235,13 +218,13 @@ Column | Purpose
 **Scale** | Numeric scale when applicable.
 **Nulls** | Whether source column allows nulls.
 **Comment** | Source-system context or business notes.
-**Destination** | Canonical destination mapping (`Entity.Attribute`) or a same-file link to a rule section for non-direct mappings.
+**Destination** | Canonical destination mapping (`Entity.Attribute`) or a link to a rule section for non-direct mappings.
 
 When mapping is direct, the `Destination` cell is sufficient and no additional YAML rule is required. Use a level-3 rule section only for non-direct mappings such as `conditional`, `derived`, `lookup`, `reconciliation`, or `aggregation`.
 
-Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column must point to anchors in the same file (for example `[Map Party Status](#map-party-status)`).
+Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column point to the rule's anchor (for example `[Map Party Status](#map-party-status)`).
 
-Transform files may include multiple canonical entities when mappings originate from the same source table.
+Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
 Example level-2 heading:
 
@@ -249,18 +232,18 @@ Example level-2 heading:
 ## Account
 ```
 
-For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the transform file.
+For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the source table's transform detail.
 
 #### Source field references
 
-Within a transform file, all field references are scoped to the owning source system. The `system:` key is **not** required — it is implicit. Only the field path within the source is needed:
+Within transform detail, all field references are scoped to the owning source system. The `system:` key is **not** required — it is implicit. Only the field path within the source is needed:
 
 ```yaml
 source:
   field: Contact.Email
 ```
 
-This keeps transform files clean and makes them portable if a source system is renamed. The source file's `id` field is the authoritative system identifier.
+This keeps transform detail clean and portable if a source system is renamed. The source summary's `id` field is the authoritative system identifier.
 
 #### Target notation
 
@@ -274,10 +257,10 @@ The entity name must match an entity declared in the canonical domain model. The
 
 #### Transformation types
 
-Transform files use the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
+Transform detail uses the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
 syntax is unchanged. The only differences from Section 8's syntax are:
 
-- `system:` is omitted from all `source:` blocks (implicit from file location)
+- `system:` is omitted from all `source:` blocks (implicit from the owning source)
 - `target:` uses `Entity · Attribute` notation instead of bare attribute name
 - The H3 heading is the transformation identity (Key-as-Name, as elsewhere)
 
@@ -285,7 +268,7 @@ syntax is unchanged. The only differences from Section 8's syntax are:
 
 #### **Source Idiosyncrasies**
 
-Transform files are the right place to encode source-specific data quality characteristics that the canonical model should never need to know about.
+Transform detail is the right place to encode source-specific data quality characteristics that the canonical model should never need to know about.
 
 ##### Null representations
 
@@ -325,13 +308,13 @@ source:
   cast: date                  # generates format-aware cast
 ```
 
-These annotations belong in the transform file, not in the canonical entity definition. The canonical model defines what the attribute means; the transform file handles the operational reality of getting clean data there.
+These annotations belong in the transform detail, not in the canonical entity definition. The canonical model defines what the attribute means; the transform handles the operational reality of getting clean data there.
 
 ---
 
 ### **Complete Example**
 
-#### Source file
+#### Source summary
 
 ````markdown
 # Salesforce CRM
@@ -378,14 +361,14 @@ graph LR
 
 ## [Financial Crime](../../domain.md) Feeds
 
-Canonical Entity | Transform File | Attributes Contributed | Change Model
+Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
 [Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
 [Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
 [Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](transforms/table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
 ````
 
-#### Transform file — `sources/salesforce-crm/transforms/table_contact.md`
+#### Transform detail — `sources/salesforce-crm/transforms/table_contact.md`
 
 ````markdown
 # [Salesforce CRM](../source.md)
@@ -462,25 +445,25 @@ source:
 
 ### **Brownfield Adoption Note**
 
-When adopting MD-DDL into an existing environment, source declarations may initially reference baseline ETL documentation in `baselines/etl/` to capture the current transformation logic before formalising it as MD-DDL transform files. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow and baseline-to-source migration path.
+When adopting MD-DDL into an existing environment, source declarations may initially reference baseline ETL documentation in `baselines/etl/` to capture the current transformation logic before formalising it as MD-DDL transform definitions. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow and baseline-to-source migration path.
 
 ---
 
 ### **Source Rules**
 
-1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
+1. **Source identity is stable.** The `id` in the source metadata is a breaking-change identifier. Renaming requires a coordinated update across the source layer and its references at the domain level.
 
-2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
+2. **Canonical entities stay pure.** Entity definitions contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
-3. **Transform files are source-folder scoped.** A transform file belongs to exactly one source folder and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a transform file, listing the contributing sources explicitly.
+3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly.
 
-4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
+4. **Source idiosyncrasies stay in transform detail.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
 5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, this is a validation error. If a transformation exists in the source folder but the entity is not listed in the feed table, this is a warning.
 
 6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.
 
-7. **Sources do not carry governance metadata.** Source files do not declare a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
+7. **Sources do not carry governance metadata.** Source declarations do not include a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
 
 ---
 

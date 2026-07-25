@@ -20,27 +20,19 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 
 ## **Core Principles**
 
-1. **Source of Truth**  
-   Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
-
-   This principle extends to source mappings: canonical entities contain no source references — they define meaning, not origin. Source definitions and transform files are self-contained under `sources/<system>/` within each domain (see [Section 7 — Sources](./7-Sources.md)).
-
-2. **Markdown‑Native**  
+1. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
 
-3. **AI‑Friendly**  
+2. **AI‑Friendly**
    No redundant fields. No manually maintained lists. Minimal boilerplate.
 
-4. **Agent‑Driven**  
+3. **Agent‑Driven**  
    AI agents infer domain membership, index entities, validate relationships, and generate physical artifacts from the model.
 
-5. **Graph‑Powered**  
-   The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
-
-6. **Natural‑Language Naming**
+4. **Natural‑Language Naming**
    Entities, attributes, and relationships use human‑readable names rather than code‑style casing.
 
-7. **Adoption is Incremental**
+5. **Adoption is Incremental**
    MD-DDL supports incremental adoption. Organisations can begin by documenting their existing data landscape — dimensional models, canonical models, ETL pipelines, governance metadata — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state; the adoption maturity model tracks the journey; the canonical model is the destination. See [Section 10 — Adoption](./10-Adoption.md) for the full maturity model and adoption workflow.
 
 ### Normative Language
@@ -65,8 +57,8 @@ MD‑DDL is composed of several logical components:
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition**
-2. A **detailed definition**
+1. A **summary/conceptual definition**
+2. A **detailed/logical definition**
 
 During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
 
@@ -74,7 +66,7 @@ During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may a
 
 Baselines document what exists today. They are not part of the canonical model and are never used for generation. They are superseded as the domain advances through adoption maturity levels.
 
-This structure supports both human readability and AI context management.
+A folder layout is flexible, the standard uses markdown headers which can be split across many files.
 
 Example domain layout:
 
@@ -90,14 +82,12 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-Financial Crime/sources/salesforce-crm/source.md
-Financial Crime/sources/salesforce-crm/transforms/table_account.md
-Financial Crime/sources/salesforce-crm/transforms/table_contact_point.md
-Financial Crime/sources/sap-fraud-management/source.md
-Financial Crime/sources/temenos-payment/source.md
+sources/salesforce-crm/source.md
+sources/salesforce-crm/transforms/table_account.md
+sources/salesforce-crm/transforms/table_contact_point.md
+sources/sap-fraud-management/source.md
+sources/temenos-payment/source.md
 ```
-
-Domain files and source files are co-located at the domain level. Domain files define meaning. Source folders define operational origin and mapping logic for that specific domain context.
 
 ---
 
@@ -105,26 +95,26 @@ Domain files and source files are co-located at the domain level. Domain files d
 
 #### **AI Context Management**
 
-- The domain file provides a compact summary of all conceptual objects.  
+- The domain level provides a compact summary of all conceptual objects.  
 - AI agents load only the summaries initially.  
 - When deeper context is needed, they follow the `detail:` link to load the full definition.
 
 #### **Human Readability**
 
-- The domain file becomes a clean, navigable table of contents.  
-- Detail files remain focused, concise, and free from clutter.
+- The domain level becomes a clean, navigable table of contents.  
+- Detail level remain focused, concise, and free from clutter.
 
 #### **Structural Predictability**
 
-- AI agents know exactly where to find summaries and details.  
+- AI agents know exactly how to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
 #### Detail File Flexibility
 
-Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships.
-The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events, ## Data Products) containing the relevant definitions.
+Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships, or use a file per aggregate root.
+The only structural requirement is that every file maintains the heading hierarchy (with a links back to the domain level).
 
-Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
+Source transform files follow the same two-layer pattern but are scoped to a source system. Details begin with a level-1 heading linking back to the source summary, followed by a level-2 heading for the source table and optional level-3 rule sections for complex mappings.
 
 ---
 

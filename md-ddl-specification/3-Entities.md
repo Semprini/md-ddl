@@ -2,7 +2,7 @@
 
 ## **Entities**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. The domain name should provide a link back to the domain file like:
+Entities are defined at the detail level, under a level‑2 `## Entities` section. When entity detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 ```markdown
 # [My Domain](../domain.md)
@@ -10,8 +10,8 @@ Each file must declare which domain it is part of by starting with a Level 1 hea
 
 ### **Entity Declaration**
 
-A detail file may contain any combination of ## Entities, ## Enums, and ## Relationships sections. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
-The Entities section appear under a level‑2 heading:
+A level‑2 `## Entities` section may sit alongside `## Enums` and `## Relationships` sections in the same file. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
+The Entities section appears under a level‑2 heading:
 
 ```markdown
 ## Entities
@@ -29,9 +29,9 @@ Free‑text Markdown under the heading describes the entity in more detail than 
 
 ### **Entity Diagram**
 
-An entity detail file should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
+An entity definition should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
 
-The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships in the domain file one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
+The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships declared at the domain level one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
 Example:
 
@@ -103,7 +103,7 @@ governance:
 
 ### Governance Metadata Schema
 
-Governance metadata is declared at the domain level (in the domain file metadata block) and optionally overridden at the entity level (in a `governance:` block within an entity detail file). Entities inherit all governance fields from the domain. Include a `governance:` block in an entity detail file only when specifying an override or stricter requirement than the domain default.
+Governance metadata is declared at the domain level (in the `## Metadata` block) and optionally overridden per entity (in a `governance:` block within the entity's definition). Entities inherit all governance fields from the domain. Include a `governance:` block on an entity only when specifying an override or stricter requirement than the domain default.
 
 #### Domain-Level Governance Fields
 
@@ -152,7 +152,7 @@ regulatory_scope:
 default_retention: "10 years post relationship end"
 ```
 
-#### Example: Entity-Level Override (in entity detail file)
+#### Example: Entity-Level Override (in the entity definition)
 
 ```yaml
 governance:
@@ -343,7 +343,7 @@ constraints:
 
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
-- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes in entity detail files; include a `governance:` block only for overrides.
+- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes on entities; include a `governance:` block only for overrides.
 
 **Identifiers:**
 
@@ -353,9 +353,9 @@ Every Entity should have at least one attribute marked as an identifier (`identi
 
 Entity YAML must not declare foreign-key attributes (e.g., a Customer Id inside a Preference entity). The Relationships section defines the link; physical keys are generated from the relationship definition. This prevents "Foreign Key Drift" — an FK attribute in entity YAML would be interpreted as a business attribute and corrupt generation.
 
-**No Source References in Entity Files:**
+**No Source References in Entity Definitions:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced structurally — source mappings are declared under domain-local source folders (for example `sources/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is structural — source mappings are declared in the source layer, not alongside entity definitions. See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
@@ -363,7 +363,7 @@ Entity YAML contains no `source:` keys, no source field names, and no references
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
 - Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, physical artifact generation automatically handles the normalisation (e.g., conversion to snake_case) for target systems.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `sources/<system>/transforms/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in the source layer's transform definitions, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ---
 

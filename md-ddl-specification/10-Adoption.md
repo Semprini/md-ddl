@@ -78,9 +78,9 @@ baseline:
 - `captured_date` is the date the baseline was documented (ISO 8601)
 - `captured_by` identifies who documented the baseline (person or agent)
 - `status` tracks the baseline's lifecycle: `active` (in use), `superseded` (replaced by canonical entity), or `archived` (retained for history)
-- `superseded_by` links to the canonical entity file that replaced this baseline
+- `superseded_by` links to the canonical entity definition that replaced this baseline
 
-Baseline files carry no `mapping:` blocks — baseline-to-canonical mappings are derived from source transform files ([Section 8 — Transformations](./8-Transformations.md)), which define the operational data flow. The transform file *is* the mapping.
+Baseline files carry no `mapping:` blocks — baseline-to-canonical mappings are derived from source transform detail ([Section 8 — Transformations](./8-Transformations.md)), which defines the operational data flow. The transform *is* the mapping.
 
 See the [Adoption Playbook](../guides/adoption-playbook.md) for the baseline folder structure, free-form body guidance, and how agents generate baselines and derive mapping views.
 

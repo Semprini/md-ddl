@@ -51,7 +51,7 @@ When modifying an existing domain:
 2. Bump the `version` field in metadata according to the rules above.
 3. Record the logical change in `LIFECYCLE.md` if the domain maintains one. Include a machine-readable change manifest and any affected products.
 4. If breaking: review all data products that reference the affected entities and update them accordingly.
-5. If additive: update the relevant summary tables and create/update detail files.
+5. If additive: update the relevant summary tables and create/update the detail definitions.
 6. If corrective: fix the error in place.
 
 ---
@@ -152,7 +152,7 @@ Product lifecycle states and metadata fields are defined in [Section 9 — Data 
 
 - `Draft` → `Active`: Product has passed quality review, names at least one consumer, and declares version `1.0.0` or higher.
 - `Active` → `Deprecated`: Add a `deprecated_date` to the product metadata. A `successor` field should name the replacement product if one exists.
-- `Deprecated` → `Retired`: Add a `sunset_date`. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
+- `Deprecated` → `Retired`: Add a `sunset_date`. After this date the product is no longer generated or published. The declaration remains in the model for audit purposes.
 - `Retired` → any: Not recommended. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
 
 ### Product Versioning

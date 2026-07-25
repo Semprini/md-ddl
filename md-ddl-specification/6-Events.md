@@ -2,7 +2,7 @@
 
 ## **Events**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+Events are defined at the detail level, under a level‑2 `## Events` section. When event detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 Events represent meaningful business-level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 
@@ -99,8 +99,8 @@ governance:
 4. **Events describe business meaning, not technical mechanics**  
    Events should not reference CDC, SQL operations, or ETL logic.
 
-5. **Events may appear in any file**  
-   As long as the file begins with the domain's level‑1 heading, they will be discovered and assembled.
+5. **Events may be declared anywhere in the domain**  
+   Any `## Events` section within the domain's heading hierarchy is discovered and assembled, whether it sits beside the domain summary or in a separate file.
 
 6. **Events may be linked to entities and relationships**  
    Through `actor`, `entity`, and optional `relationships`.

@@ -6,11 +6,9 @@
 
 ## **Transformations**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
-
 Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and actionable by AI agents.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `sources/<system>/transforms/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the source layer. They are declared in transform detail (see [Section 7 — Sources](./7-Sources.md)), not alongside entity definitions. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -26,7 +24,7 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source-table transform files under `sources/<system>/transforms/`. The transform file structure — source schema table, `Destination` column mechanics, and file naming — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
+Transformations are declared in transform detail, organised by source table. That structure — source schema table, `Destination` column mechanics, and heading hierarchy — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
 
 Each non-direct transformation uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
@@ -53,7 +51,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `sources/<system>/transforms/`. Only the field path within the source system is declared:
+Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -275,11 +273,11 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and generated output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the source table's transform detail and is the authoritative name used in lineage tracing and generated output.
 
 2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. Both the entity name and the attribute name are validated during generation.
 
-3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
+3. **Source system is implicit:** Within transform detail, the source system is not declared on individual transformations — it is inherited from the owning source. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
 4. **One mapping path per canonical attribute per source table:** Use exactly one `Destination` entry per target attribute from a given source table. If mapping is non-direct, the `Destination` entry must link to a single rule section that defines the logic.
 
@@ -287,13 +285,13 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
+7. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 
 ---
 
-### **Example — Transform file excerpt**
+### **Example — Transform detail excerpt**
 
-See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
+See [Section 7 — Sources](./7-Sources.md) for the complete example. The following shows the transformation type syntax in context:
 
 ````markdown
 # [Salesforce CRM](../source.md)

@@ -20,27 +20,19 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 
 ## **Core Principles**
 
-1. **Source of Truth**  
-   Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
-
-   This principle extends to source mappings: canonical entities contain no source references — they define meaning, not origin. Source definitions and transform files are self-contained under `sources/<system>/` within each domain (see [Section 7 — Sources](./7-Sources.md)).
-
-2. **Markdown‑Native**  
+1. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
 
-3. **AI‑Friendly**  
+2. **AI‑Friendly**
    No redundant fields. No manually maintained lists. Minimal boilerplate.
 
-4. **Agent‑Driven**  
+3. **Agent‑Driven**  
    AI agents infer domain membership, index entities, validate relationships, and generate physical artifacts from the model.
 
-5. **Graph‑Powered**  
-   The knowledge graph acts as the semantic runtime for reasoning, lineage, and governance.
-
-6. **Natural‑Language Naming**
+4. **Natural‑Language Naming**
    Entities, attributes, and relationships use human‑readable names rather than code‑style casing.
 
-7. **Adoption is Incremental**
+5. **Adoption is Incremental**
    MD-DDL supports incremental adoption. Organisations can begin by documenting their existing data landscape — dimensional models, canonical models, ETL pipelines, governance metadata — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state; the adoption maturity model tracks the journey; the canonical model is the destination. See [Section 10 — Adoption](./10-Adoption.md) for the full maturity model and adoption workflow.
 
 ### Normative Language
@@ -65,8 +57,8 @@ MD‑DDL is composed of several logical components:
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition**
-2. A **detailed definition**
+1. A **summary/conceptual definition**
+2. A **detailed/logical definition**
 
 During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
 
@@ -74,7 +66,7 @@ During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may a
 
 Baselines document what exists today. They are not part of the canonical model and are never used for generation. They are superseded as the domain advances through adoption maturity levels.
 
-This structure supports both human readability and AI context management.
+A folder layout is flexible, the standard uses markdown headers which can be split across many files.
 
 Example domain layout:
 
@@ -90,14 +82,12 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-Financial Crime/sources/salesforce-crm/source.md
-Financial Crime/sources/salesforce-crm/transforms/table_account.md
-Financial Crime/sources/salesforce-crm/transforms/table_contact_point.md
-Financial Crime/sources/sap-fraud-management/source.md
-Financial Crime/sources/temenos-payment/source.md
+sources/salesforce-crm/source.md
+sources/salesforce-crm/transforms/table_account.md
+sources/salesforce-crm/transforms/table_contact_point.md
+sources/sap-fraud-management/source.md
+sources/temenos-payment/source.md
 ```
-
-Domain files and source files are co-located at the domain level. Domain files define meaning. Source folders define operational origin and mapping logic for that specific domain context.
 
 ---
 
@@ -105,26 +95,26 @@ Domain files and source files are co-located at the domain level. Domain files d
 
 #### **AI Context Management**
 
-- The domain file provides a compact summary of all conceptual objects.  
+- The domain level provides a compact summary of all conceptual objects.  
 - AI agents load only the summaries initially.  
 - When deeper context is needed, they follow the `detail:` link to load the full definition.
 
 #### **Human Readability**
 
-- The domain file becomes a clean, navigable table of contents.  
-- Detail files remain focused, concise, and free from clutter.
+- The domain level becomes a clean, navigable table of contents.  
+- Detail level remain focused, concise, and free from clutter.
 
 #### **Structural Predictability**
 
-- AI agents know exactly where to find summaries and details.  
+- AI agents know exactly how to find summaries and details.  
 - Both layers are merged into a unified conceptual, logical, and physical model.
 
 #### Detail File Flexibility
 
-Detail files are not restricted to a single entity. Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships.
-The only structural requirement is that every detail file begins with a level‑1 heading naming the domain (with a link back to the domain file), followed by one or more level‑2 section headings (## Entities, ## Enums, ## Relationships, ## Events, ## Data Products) containing the relevant definitions.
+Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships, or use a file per aggregate root.
+The only structural requirement is that every file maintains the heading hierarchy (with a links back to the domain level).
 
-Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
+Source transform files follow the same two-layer pattern but are scoped to a source system. Details begin with a level-1 heading linking back to the source summary, followed by a level-2 heading for the source table and optional level-3 rule sections for complex mappings.
 
 ---
 
@@ -138,7 +128,7 @@ The full validation level taxonomy, pre-flight check definitions, the tool inter
 
 ## **Domains**
 
-In MD-DDL, the Domain file acts as the router for the Knowledge Graph. While detail files provide the DNA (Attributes/Constraints), the Domain file provides the Anatomy (How entities, events, and relationships sit together).
+In MD-DDL, the domain level acts as the router for the Knowledge Graph. While the detail level provides the DNA (Attributes/Constraints), the domain level provides the Anatomy (how entities, events, and relationships sit together).
 
 ### **Domain Declaration**
 
@@ -160,7 +150,7 @@ Metadata appears under a level‑2 heading:
 ## Metadata
 ```
 
-Domain Metadata sets the default posture for all contained objects: governance and compliance metadata declared here is inherited by every entity, relationship, event, and data product in the domain. Detail files declare a `governance:` block only when overriding the domain default. The governance field schema and inheritance rules are defined once, in [Section 3 — Governance Metadata Schema](./3-Entities.md#governance-metadata-schema).
+Domain Metadata sets the default posture for all contained objects: governance and compliance metadata declared here is inherited by every entity, relationship, event, and data product in the domain. Detail definitions declare a `governance:` block only when overriding the domain default. The governance field schema and inheritance rules are defined once, in [Section 3 — Governance Metadata Schema](./3-Entities.md#governance-metadata-schema).
 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
@@ -214,7 +204,7 @@ Use a Markdown table with the following columns:
 
 Column | Purpose
 --- | ---
-**Business Application** | Source application or product name, expressed as a Markdown link to the source markdown file.
+**Business Application** | Source application or product name, expressed as a Markdown link to the source declaration.
 **Platform** | Technology platform or deployment model.
 **Capability Domain** | Business capability or functional area served by the source.
 
@@ -233,14 +223,14 @@ Business Application | Platform | Capability Domain
 
 Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
-A domain file should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the primary navigational artefact of the domain file: the domain file is the map, and the diagram is its visual index.
+The domain level should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the primary navigational artefact of the domain level: the summary is the map, and the diagram is its visual index.
 
 Two rules keep the diagram consistent with the model:
 
 - Relationship edges are labelled, and the labels match the relationship names defined in the Relationships section (e.g., `-->|assumes|`). Inheritance is expressed as `Child -->|is a|Parent`.
-- The overview diagram shows concepts, not detail. Attributes, cardinality notation, and enumeration values belong in detail files, not the overview.
+- The overview diagram shows concepts, not detail. Attributes, cardinality notation, and enumeration values belong in the detail level, not the overview.
 
-Nodes may hyperlink to detail files for navigation, and additional level‑3 diagrams focusing on specific sub-areas may follow the overview. Layout configuration, linking syntax, and worked examples are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
+Nodes may hyperlink to detail definitions for navigation, and additional level‑3 diagrams focusing on specific sub-areas may follow the overview. Layout configuration, linking syntax, and worked examples are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
 Example (abbreviated):
 
@@ -267,8 +257,8 @@ MD-DDL uses two distinct diagram types for different purposes:
 
 Diagram|Location|Purpose|Relationship Labels
 -------|--------|-------|-------------------
-`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Match the Relationships section
-`classDiagram`|Entity detail file|Logical model — structural realization of the entity|Optional — structural intent only
+`graph TD/LR`|Domain level|Conceptual model — business meaning and named relationships|Match the Relationships section
+`classDiagram`|Entity detail level|Logical model — structural realization of the entity|Optional — structural intent only
 
 The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
 
@@ -276,11 +266,15 @@ The classDiagram is not required to mirror the domain graph one-for-one. Modelle
 
 ### **Domain Structure**
 
-Below the metadata section, the Domain file organizes concepts into six primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, `## Events`, and `## Data Products`.
+Below the metadata section, the domain level organizes concepts into six primary sections using level‑2 headings: `## Source Systems`, `## Entities`, `## Enums`, `## Relationships`, `## Events`, and `## Data Products`.
 
-In the Domain file, these sections **must use Markdown tables** for high-level summaries. This ensures the domain file acts as a compact "Router" for the knowledge graph.
+At the domain level, these sections **must use Markdown tables** for high-level summaries. This ensures the domain level acts as a compact "Router" for the knowledge graph.
 
-#### Sample File Structure
+#### Splitting Across Files
+
+The heading hierarchy above is what the standard defines. How it is distributed across files is the author's choice: a single file may carry the domain summary and every detail definition, or the detail level may be split across many files in nested folders. When detail is split out, each file repeats the hierarchy — a level‑1 heading naming the domain (linked back to the domain summary), the relevant level‑2 section heading, then the level‑3 definitions — so that agents can reassemble the full model from any arrangement.
+
+A common split, for illustration only:
 
 ```shell
 domain.md
@@ -305,7 +299,7 @@ The Entities table summarizes the core concepts of the domain.
 
  Column | Purpose
  --- | ---
-**Name** | The natural language name of the entity, linked to its anchor in a detail file.
+**Name** | The natural language name of the entity, linked to its detail-level anchor.
 **Specializes** | If applicable, a link to the parent entity being specialized.
 **Description** | A brief conceptual definition (1–2 sentences).
 **Reference** | Optional URL to external industry standards (e.g., BIAN, FIBO, ISO).
@@ -318,7 +312,7 @@ Summarizes the discrete value sets used within the domain. By convention, an enu
 
 Column | Purpose
 --- | ---
-**Name** | The name of the enumeration, linked to the detail file.
+**Name** | The name of the enumeration, linked to its detail-level anchor.
 **Description** | What this set of values represents.
 **Reference** | Optional external reference for standardized codes.
 
@@ -364,13 +358,13 @@ Column | Purpose
 
 ### **Rules for Summary Definitions**
 
-- **Tabular Authority:** The Domain file summary **must** use the table formats defined above. H3 headings are reserved for **Detail Files**.
-- **Linking Strategy:** The `Name` column must contain a Markdown link pointing to the specific H3 anchor in the detail file (e.g., `[Entity Name](./path/to/file.md#entity-name)`).
-- **AI Scoping:** AI agents should ingest these tables first to understand the "Anatomy" of the domain before requesting the "DNA" (YAML blocks) from the detail files.
+- **Tabular Authority:** The domain-level summary **must** use the table formats defined above. H3 headings under these sections are reserved for **detail definitions**.
+- **Linking Strategy:** The `Name` column must contain a Markdown link pointing to the H3 anchor of the detail definition — `[Entity Name](#entity-name)` when detail sits in the same file, or `[Entity Name](entities/customer.md#entity-name)` when it is split out.
+- **AI Scoping:** AI agents should ingest these tables first to understand the "Anatomy" of the domain before requesting the "DNA" (YAML blocks) from the detail level.
 - **No Boilerplate:** If a column like `Specializes` or `Reference` is empty for all entries in a section, it may be omitted from the table, but the `Name` and `Description` columns are mandatory.
-- The description must include a short natural‑language description. A longer description will be included in the detail file.
+- The description must include a short natural‑language description. A longer description belongs at the detail level.
 
-This allows the domain file to act as a semantic index of the domain.
+This allows the domain level to act as a semantic index of the domain.
 
 ---
 
@@ -394,7 +388,7 @@ Value | Description
 
 The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`): major for breaking changes, minor for additive changes, patch for corrective changes. A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied.
 
-A domain may also maintain a `LIFECYCLE.md` file adjacent to `domain.md`, combining a machine-readable change manifest with a human-readable changelog.
+A domain may also maintain a lifecycle history document (conventionally `LIFECYCLE.md`) combining a machine-readable change manifest with a human-readable changelog.
 
 Lifecycle transition rules, version-bump guidance, the breaking-change taxonomy, the evolution workflow, and the `LIFECYCLE.md` format are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
@@ -402,7 +396,7 @@ Lifecycle transition rules, version-bump guidance, the breaking-change taxonomy,
 
 #### **Domain Structure Example**
 
-Below is an example of how a domain file is structured.
+Below is an example of how the domain level is structured.
 
 ````markdown
 # Domain Name
@@ -464,7 +458,7 @@ Name | Class | Consumers | Status
 
 ## **Entities**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name. The domain name should provide a link back to the domain file like:
+Entities are defined at the detail level, under a level‑2 `## Entities` section. When entity detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 ```markdown
 # [My Domain](../domain.md)
@@ -472,8 +466,8 @@ Each file must declare which domain it is part of by starting with a Level 1 hea
 
 ### **Entity Declaration**
 
-A detail file may contain any combination of ## Entities, ## Enums, and ## Relationships sections. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
-The Entities section appear under a level‑2 heading:
+A level‑2 `## Entities` section may sit alongside `## Enums` and `## Relationships` sections in the same file. Authors are free to co-locate an entity with its directly originating relationships and any enumerations it references — this is the recommended pattern when a single entity is the clear owner of those concepts.
+The Entities section appears under a level‑2 heading:
 
 ```markdown
 ## Entities
@@ -491,9 +485,9 @@ Free‑text Markdown under the heading describes the entity in more detail than 
 
 ### **Entity Diagram**
 
-An entity detail file should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
+An entity definition should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
 
-The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships in the domain file one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
+The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships declared at the domain level one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
 Example:
 
@@ -565,7 +559,7 @@ governance:
 
 ### Governance Metadata Schema
 
-Governance metadata is declared at the domain level (in the domain file metadata block) and optionally overridden at the entity level (in a `governance:` block within an entity detail file). Entities inherit all governance fields from the domain. Include a `governance:` block in an entity detail file only when specifying an override or stricter requirement than the domain default.
+Governance metadata is declared at the domain level (in the `## Metadata` block) and optionally overridden per entity (in a `governance:` block within the entity's definition). Entities inherit all governance fields from the domain. Include a `governance:` block on an entity only when specifying an override or stricter requirement than the domain default.
 
 #### Domain-Level Governance Fields
 
@@ -614,7 +608,7 @@ regulatory_scope:
 default_retention: "10 years post relationship end"
 ```
 
-#### Example: Entity-Level Override (in entity detail file)
+#### Example: Entity-Level Override (in the entity definition)
 
 ```yaml
 governance:
@@ -805,7 +799,7 @@ constraints:
 
 - Attribute Inheritance: Customer gets all attributes of Party Role
 - Constraint Inheritance: If Party Role has a constraint, Customer must follow it.
-- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes in entity detail files; include a `governance:` block only for overrides.
+- Governance Inheritance: Entities inherit governance/compliance metadata from the domain. Do not repeat identical governance attributes on entities; include a `governance:` block only for overrides.
 
 **Identifiers:**
 
@@ -815,9 +809,9 @@ Every Entity should have at least one attribute marked as an identifier (`identi
 
 Entity YAML must not declare foreign-key attributes (e.g., a Customer Id inside a Preference entity). The Relationships section defines the link; physical keys are generated from the relationship definition. This prevents "Foreign Key Drift" — an FK attribute in entity YAML would be interpreted as a business attribute and corrupt generation.
 
-**No Source References in Entity Files:**
+**No Source References in Entity Definitions:**
 
-Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is enforced structurally — source mappings are declared under domain-local source folders (for example `sources/salesforce-crm/source.md` and related transform files). See [Section 7 — Sources](./7-Sources.md).
+Entity YAML contains no `source:` keys, no source field names, and no references to source systems. The canonical model defines meaning and governance; source systems define operational reality. This separation is structural — source mappings are declared in the source layer, not alongside entity definitions. See [Section 7 — Sources](./7-Sources.md).
 
 #### **Naming Rules**
 
@@ -825,11 +819,11 @@ Entity YAML contains no `source:` keys, no source field names, and no references
 - Case & Spaces: Names are case-sensitive and support spaces.
 - No Redundancy: Do not include a name: field inside the YAML block. The Markdown heading serves as the Entity name, and the YAML keys serve as Attribute/Constraint names.
 - Machine Normalisation: While the Knowledge Graph preserves these natural labels for navigability, physical artifact generation automatically handles the normalisation (e.g., conversion to snake_case) for target systems.
-- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in source-folder transform files under `sources/<system>/transforms/`, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
+- Source Field Names are the one place in MD-DDL where non-natural-language identifiers appear. They are declared in the source layer's transform definitions, not in entity definitions. They are owned by the source system and are not subject to MD-DDL's naming rules.
 
 ## **Enumerations**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+Enumerations are defined at the detail level, under a level‑2 `## Enums` section. When enum detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 ### **Enum Declaration**
 
@@ -903,7 +897,7 @@ when the representative subset is insufficient for the target use case.
 
 ## **Relationships**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+Relationships are defined at the detail level, under a level‑2 `## Relationships` section. When relationship detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 Relationships are **first‑class citizens**.
 
@@ -1033,7 +1027,7 @@ How self-referential relationships realize physically (bridge tables, FK column 
 
 ## **Events**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
+Events are defined at the detail level, under a level‑2 `## Events` section. When event detail is split into its own file, that file repeats the hierarchy: a level‑1 heading naming the domain, linked back to the domain summary, before the level‑2 section.
 
 Events represent meaningful business-level changes in state. They describe *what happened* in the domain, independent of how the underlying data systems record or transport those changes. Events allow MD‑DDL to map technical change (CDC, ETL deltas, logs) to **semantic business events**, ensuring that business processes react to meaning rather than database mechanics.
 
@@ -1130,8 +1124,8 @@ governance:
 4. **Events describe business meaning, not technical mechanics**  
    Events should not reference CDC, SQL operations, or ETL logic.
 
-5. **Events may appear in any file**  
-   As long as the file begins with the domain's level‑1 heading, they will be discovered and assembled.
+5. **Events may be declared anywhere in the domain**  
+   Any `## Events` section within the domain's heading hierarchy is discovered and assembled, whether it sits beside the domain summary or in a separate file.
 
 6. **Events may be linked to entities and relationships**  
    Through `actor`, `entity`, and optional `relationships`.
@@ -1179,21 +1173,34 @@ attributes:
 
 A Source in MD-DDL represents a system that generates operational change — a CRM, a core banking system, a payment platform, an ERP. Sources are not owners of data. They are systems of change whose outputs feed canonical data products.
 
-The canonical domain model defines meaning. Sources define operational reality. The Source File is the contract that translates between them.
+The canonical domain model defines meaning. Sources define operational reality. The source declaration is the contract that translates between them.
 
 This separation is deliberate and load-bearing:
 
 - Domain modellers define canonical entities, attributes, and governance without knowing or caring which source systems produce the underlying data.
 - Source system SMEs define field-level mappings and encode source idiosyncrasies without needing to understand the canonical model's governance posture.
-- Integration engineers own transform files that connect the two worlds.
+- Integration engineers own the transform definitions that connect the two worlds.
 
-**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to rules declared in source-folder transform files.
+**Canonical data products replace the concept of Systems of Record.** There is no attribute in a domain entity that is "owned" by Salesforce or SAP. Those systems generate change events. The canonical model absorbs those changes according to rules declared in the source layer.
 
 ---
 
 ### **Source Structure**
 
-Sources are self-contained within each domain. Each source system has a folder under `sources/` containing a `source.md` router file and a `transforms/` subfolder for optional transform detail files.
+The source layer belongs to the domain and uses the same two-layer pattern as the rest of MD-DDL:
+
+Level | Heading structure | Contains
+--- | --- | ---
+**Source summary** | Level‑1 heading naming the source system; level‑2 `## Metadata` and `## <Domain> Feeds` sections | What the source system is, how it generates change, and which canonical entities it feeds
+**Transform detail** | Level‑2 heading naming the source table; level‑3 headings for non-direct mapping rules | Field-level mappings using the transformation types defined in Section 8
+
+Transform detail is optional — a source may be declared before any mappings are authored.
+
+#### Splitting Across Files
+
+As elsewhere in MD-DDL, the heading hierarchy is what the standard defines; the file layout is the author's choice. A source may be a single document, or its transform detail may be split across many files — the natural split being one per source table, subdivided further by functional area for large systems. When transform detail is split out, each file repeats the hierarchy with a level‑1 heading linking back to the source summary.
+
+The conventional layout, for illustration:
 
 ```text
 Financial Crime/
@@ -1203,53 +1210,23 @@ Financial Crime/
     salesforce-crm/
       source.md             ← source metadata + domain feed table
       transforms/
-        table_account.md
-        table_contact_point.md
-    sap-fraud-management/
-      source.md
-      transforms/
-        table_alert_case.md
-    temenos-payment/
-      source.md
-      transforms/
-        table_account_ref.md
-```
-
-The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
-
-Transform files are named for the source table, by convention:
-
-`table_<source-table>.md`
-
-Examples: `table_account.md`, `table_contact_point.md`, `table_payment_event.md`.
-
-If multiple canonical entities map from the same source table, they should be grouped in the same transform file under separate level-2 entity headings.
-
-#### File Organisation
-
-A source may split transform definitions across as many files as needed. The natural split is one transform file per source table. For large, complex source systems, transform files may be further subdivided by functional area. If used, transform files are stored under the source folder's `transforms/` subfolder and every transform file must begin with a level-1 heading linking back to `../source.md`.
-
-```text
-Financial Crime/
-  sources/
-    salesforce-crm/
-      source.md
-      transforms/
-        table_account.md       ← Account table mappings for Party/Company/Customer
+        table_account.md    ← Account table mappings for Party/Company/Customer
         table_contact_point.md
     sap-fraud-management/
       source.md
       transforms/
         table_alert_case.md
 ```
+
+By convention, transform documents are named for the source table — `table_<source-table>.md`, for example `table_account.md` or `table_payment_event.md`. If multiple canonical entities map from the same source table, group them under separate level-2 entity headings in the same place.
 
 ---
 
-### **Source File**
+### **Source Summary**
 
 #### Declaration
 
-A source file is declared using a level-1 Markdown heading:
+A source is declared using a level-1 Markdown heading:
 
 ```markdown
 # Salesforce CRM
@@ -1327,7 +1304,7 @@ The tier does not prevent a source from contributing to canonical entities. It s
 
 #### Domain Feed Sections
 
-Below the metadata block, a source file declares the feed table for its owning domain using this heading pattern:
+Below the metadata block, the source summary declares the feed table for its owning domain using this heading pattern:
 
 ```markdown
 ## [<Domain Name>](../../domain.md) Feeds
@@ -1338,7 +1315,7 @@ Example domain feed section:
 ```markdown
 ## [Financial Crime](../../domain.md) Feeds
 
-Canonical Entity | Transform File | Attributes Contributed | Change Model
+Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
 [Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
 [Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
@@ -1349,7 +1326,7 @@ Canonical Entity | Transform File | Attributes Contributed | Change Model
 Column | Purpose
 --- | ---
 **Canonical Entity** | Link to the entity in the target domain this source contributes to.
-**Transform File** | Link to a `transforms/table_<source-table>.md` transform file in the same source folder, or `TBD` if not yet defined.
+**Transform** | Link to the transform detail for this source table, or `TBD` if not yet defined.
 **Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
 **Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
 
@@ -1357,7 +1334,7 @@ Column | Purpose
 
 #### Source Overview Diagram
 
-A source file should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
+A source summary should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
 
 ````markdown
 ### Source Overview Diagram
@@ -1380,11 +1357,11 @@ graph LR
 
 ---
 
-### **Transform Files**
+### **Transform Detail**
 
-#### Transform Files Declaration
+#### Declaration
 
-Every transform file begins with a level-1 heading that names the source system and links back to `../source.md`:
+When transform detail is split into its own file, that file begins with a level-1 heading naming the source system and linking back to the source summary:
 
 ```markdown
 # [Salesforce CRM](../source.md)
@@ -1392,7 +1369,7 @@ Every transform file begins with a level-1 heading that names the source system 
 
 #### Structure
 
-Transform files are source-table documents. Each file begins with a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
+Transform detail is organised by source table: a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
 
 Required source schema table columns:
 
@@ -1406,13 +1383,13 @@ Column | Purpose
 **Scale** | Numeric scale when applicable.
 **Nulls** | Whether source column allows nulls.
 **Comment** | Source-system context or business notes.
-**Destination** | Canonical destination mapping (`Entity.Attribute`) or a same-file link to a rule section for non-direct mappings.
+**Destination** | Canonical destination mapping (`Entity.Attribute`) or a link to a rule section for non-direct mappings.
 
 When mapping is direct, the `Destination` cell is sufficient and no additional YAML rule is required. Use a level-3 rule section only for non-direct mappings such as `conditional`, `derived`, `lookup`, `reconciliation`, or `aggregation`.
 
-Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column must point to anchors in the same file (for example `[Map Party Status](#map-party-status)`).
+Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column point to the rule's anchor (for example `[Map Party Status](#map-party-status)`).
 
-Transform files may include multiple canonical entities when mappings originate from the same source table.
+Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
 Example level-2 heading:
 
@@ -1420,18 +1397,18 @@ Example level-2 heading:
 ## Account
 ```
 
-For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the transform file.
+For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the source table's transform detail.
 
 #### Source field references
 
-Within a transform file, all field references are scoped to the owning source system. The `system:` key is **not** required — it is implicit. Only the field path within the source is needed:
+Within transform detail, all field references are scoped to the owning source system. The `system:` key is **not** required — it is implicit. Only the field path within the source is needed:
 
 ```yaml
 source:
   field: Contact.Email
 ```
 
-This keeps transform files clean and makes them portable if a source system is renamed. The source file's `id` field is the authoritative system identifier.
+This keeps transform detail clean and portable if a source system is renamed. The source summary's `id` field is the authoritative system identifier.
 
 #### Target notation
 
@@ -1445,10 +1422,10 @@ The entity name must match an entity declared in the canonical domain model. The
 
 #### Transformation types
 
-Transform files use the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
+Transform detail uses the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
 syntax is unchanged. The only differences from Section 8's syntax are:
 
-- `system:` is omitted from all `source:` blocks (implicit from file location)
+- `system:` is omitted from all `source:` blocks (implicit from the owning source)
 - `target:` uses `Entity · Attribute` notation instead of bare attribute name
 - The H3 heading is the transformation identity (Key-as-Name, as elsewhere)
 
@@ -1456,7 +1433,7 @@ syntax is unchanged. The only differences from Section 8's syntax are:
 
 #### **Source Idiosyncrasies**
 
-Transform files are the right place to encode source-specific data quality characteristics that the canonical model should never need to know about.
+Transform detail is the right place to encode source-specific data quality characteristics that the canonical model should never need to know about.
 
 ##### Null representations
 
@@ -1496,13 +1473,13 @@ source:
   cast: date                  # generates format-aware cast
 ```
 
-These annotations belong in the transform file, not in the canonical entity definition. The canonical model defines what the attribute means; the transform file handles the operational reality of getting clean data there.
+These annotations belong in the transform detail, not in the canonical entity definition. The canonical model defines what the attribute means; the transform handles the operational reality of getting clean data there.
 
 ---
 
 ### **Complete Example**
 
-#### Source file
+#### Source summary
 
 ````markdown
 # Salesforce CRM
@@ -1549,14 +1526,14 @@ graph LR
 
 ## [Financial Crime](../../domain.md) Feeds
 
-Canonical Entity | Transform File | Attributes Contributed | Change Model
+Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
 [Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
 [Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
 [Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](transforms/table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
 ````
 
-#### Transform file — `sources/salesforce-crm/transforms/table_contact.md`
+#### Transform detail — `sources/salesforce-crm/transforms/table_contact.md`
 
 ````markdown
 # [Salesforce CRM](../source.md)
@@ -1633,25 +1610,25 @@ source:
 
 ### **Brownfield Adoption Note**
 
-When adopting MD-DDL into an existing environment, source declarations may initially reference baseline ETL documentation in `baselines/etl/` to capture the current transformation logic before formalising it as MD-DDL transform files. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow and baseline-to-source migration path.
+When adopting MD-DDL into an existing environment, source declarations may initially reference baseline ETL documentation in `baselines/etl/` to capture the current transformation logic before formalising it as MD-DDL transform definitions. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow and baseline-to-source migration path.
 
 ---
 
 ### **Source Rules**
 
-1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
+1. **Source identity is stable.** The `id` in the source metadata is a breaking-change identifier. Renaming requires a coordinated update across the source layer and its references at the domain level.
 
-2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
+2. **Canonical entities stay pure.** Entity definitions contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
-3. **Transform files are source-folder scoped.** A transform file belongs to exactly one source folder and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a transform file, listing the contributing sources explicitly.
+3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly.
 
-4. **Source idiosyncrasies stay in transform files.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
+4. **Source idiosyncrasies stay in transform detail.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
 5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, this is a validation error. If a transformation exists in the source folder but the entity is not listed in the feed table, this is a warning.
 
 6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.
 
-7. **Sources do not carry governance metadata.** Source files do not declare a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
+7. **Sources do not carry governance metadata.** Source declarations do not include a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -1659,11 +1636,9 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 ## **Transformations**
 
-Each file must declare which domain it is part of by starting with a Level 1 heading with the domain name.
-
 Transformations define how source system data is shaped and mapped into domain entities. They make the lineage from raw source field to governed domain attribute explicit, human-readable, and actionable by AI agents.
 
-Transformations are **first-class citizens** of the Source layer. They are declared in source folders under `sources/<system>/transforms/` (see [Section 7 — Sources](./7-Sources.md)), not in domain entity files. The canonical domain model contains no source references — it defines meaning, not origin.
+Transformations are **first-class citizens** of the source layer. They are declared in transform detail (see [Section 7 — Sources](./7-Sources.md)), not alongside entity definitions. The canonical domain model contains no source references — it defines meaning, not origin.
 
 **This section defines the transformation type vocabulary** — the available types, their YAML syntax, and the expression language. Where transformations are declared and how they are organised is defined in Section 7.
 
@@ -1679,7 +1654,7 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source-table transform files under `sources/<system>/transforms/`. The transform file structure — source schema table, `Destination` column mechanics, and file naming — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
+Transformations are declared in transform detail, organised by source table. That structure — source schema table, `Destination` column mechanics, and heading hierarchy — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
 
 Each non-direct transformation uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
@@ -1706,7 +1681,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
-Within a transform file, `source.system` is **omitted** — it is implicit from the file's location under `sources/<system>/transforms/`. Only the field path within the source system is declared:
+Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
 ```yaml
 source:
@@ -1928,11 +1903,11 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the file and is the authoritative name used in lineage tracing and generated output.
+1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the source table's transform detail and is the authoritative name used in lineage tracing and generated output.
 
 2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. Both the entity name and the attribute name are validated during generation.
 
-3. **Source system is implicit:** Within a transform file, the source system is not declared on individual transformations — it is inherited from the file's location. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
+3. **Source system is implicit:** Within transform detail, the source system is not declared on individual transformations — it is inherited from the owning source. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
 4. **One mapping path per canonical attribute per source table:** Use exactly one `Destination` entry per target attribute from a given source table. If mapping is non-direct, the `Destination` entry must link to a single rule section that defines the logic.
 
@@ -1940,13 +1915,13 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
+7. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 
 ---
 
-### **Example — Transform file excerpt**
+### **Example — Transform detail excerpt**
 
-See [Section 7 — Sources](./7-Sources.md) for the complete transform file example. The following shows the transformation type syntax in context:
+See [Section 7 — Sources](./7-Sources.md) for the complete example. The following shows the transformation type syntax in context:
 
 ````markdown
 # [Salesforce CRM](../source.md)
@@ -2006,7 +1981,7 @@ A source-aligned product publishes raw or lightly cleansed data from a single so
 - **Consumers:** Data engineers, audit teams, integration debugging
 - **Cross-domain dependencies:** None — source-aligned products are self-contained
 
-Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure defined in `sources/<system>/source.md`.
+Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure declared in that source's summary.
 
 #### Domain-Aligned
 
@@ -2065,7 +2040,7 @@ Product classes outside the declared `product_scope` are still valid as infrastr
 
 ### **Data Product Declaration**
 
-A data product is declared using a **level-3 Markdown heading** inside a detail file stored in the `products/` subfolder of the domain:
+A data product is declared at the detail level, using a **level-3 Markdown heading** under a `## Data Products` section (conventionally kept in a `products/` subfolder):
 
 ```markdown
 ### Customer 360 Profile
@@ -2185,7 +2160,7 @@ lineage:
       - table_sanctions_screening
 ```
 
-Each `source` value must match a source system folder under `sources/`. Each `tables` entry must match a transform file declared in that source system's feeds table.
+Each `source` value must match a declared source system. Each `tables` entry must match a source table declared in that source system's feeds table.
 
 **Consumer-aligned products** trace lineage to canonical entities from one or more domains:
 
@@ -2237,9 +2212,9 @@ A domain-aligned logical model is a **projection of the canonical domain model**
 - Each entity as a class with all its attributes and types, matching the canonical entity definitions
 - Inheritance relationships (e.g., Person → Party)
 - Association cardinalities between entities
-- Entity names hyperlinked to their detail files — the logical model is a view into the canonical model, not a copy of it
+- Entity names hyperlinked to their detail definitions — the logical model is a view into the canonical model, not a copy of it
 
-Because domain-aligned products publish the canonical structure directly, their logical model can be mechanically derived from the entity detail files. The entity detail files remain authoritative for constraints, governance, and temporal tracking.
+Because domain-aligned products publish the canonical structure directly, their logical model can be mechanically derived from the entity definitions, which remain authoritative for constraints, governance, and temporal tracking.
 
 #### Consumer-Aligned Logical Models
 
@@ -2254,7 +2229,7 @@ Consumer-aligned logical models must be accompanied by an `#### Attribute Mappin
 
 #### Attribute Mapping
 
-Consumer-aligned products declare an `#### Attribute Mapping` section following the logical model diagram. The mapping uses the same table-based format as source transform files (see [Section 8 — Transformations](./8-Transformations.md)), providing a consistent lineage format from source through canonical to product.
+Consumer-aligned products declare an `#### Attribute Mapping` section following the logical model diagram. The mapping uses the same table-based format as source transform detail (see [Section 8 — Transformations](./8-Transformations.md)), providing a consistent lineage format from source through canonical to product.
 
 Each mapping table traces product attributes to their canonical source:
 
@@ -2358,7 +2333,7 @@ The strategy list is extensible — organisations may declare additional strateg
 
 The `schema_type` field on a data product is the entry point for physical artifact generation: it declares the shape of the physical output (`normalized`, `dimensional`, `wide-column`, `knowledge-graph`) and generating tooling selects its approach accordingly.
 
-The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity detail files provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
+The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity definitions provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
 
 ---
 
@@ -2381,10 +2356,10 @@ SLA fields are informational — they document expectations but do not generate 
 
 Data products follow the same two-layer pattern as entities, relationships, and events:
 
-1. **Summary** — A `## Data Products` table in the domain file, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
-2. **Detail** — Individual product definitions in `products/` detail files, following the standard detail file rules: a level-1 heading naming the domain (linked back to the domain file), a `## Data Products` section, and one level-3 heading per product with its YAML metadata block
+1. **Summary** — A `## Data Products` table at the domain level, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
+2. **Detail** — Individual product definitions under a `## Data Products` section, one level-3 heading per product with its YAML metadata block. When split into separate files, each repeats the hierarchy with a level-1 heading naming the domain, linked back to the domain summary.
 
-This allows the domain file to act as a complete index of what the domain publishes, while detail files contain the full product specification.
+This allows the domain level to act as a complete index of what the domain publishes, while the detail level carries the full product specification.
 
 ---
 
@@ -2408,7 +2383,7 @@ This allows the domain file to act as a complete index of what the domain publis
 
 9. **Source field for source-aligned.** Source-aligned products use `source` instead of `entities`. The value must match a source system folder under `sources/`.
 
-10. **Two-layer compliance.** Every data product must appear in both the domain file summary table and a detail file. The domain file is the index; the detail file is the contract.
+10. **Two-layer compliance.** Every data product must appear in both the domain-level summary table and a detail definition. The summary is the index; the detail is the contract.
 
 11. **Name uniqueness.** Data product names must be unique within a domain. The level-3 heading is the product's identity in the Knowledge Graph.
 
@@ -2433,7 +2408,7 @@ State | Meaning
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
 `Active` | Product is live and governed.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
-`Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
+`Retired` | Product is no longer available. Retained in the model for lineage and audit traceability but not published or generated.
 
 Optional lifecycle metadata fields document transitions:
 
@@ -2559,8 +2534,8 @@ baseline:
 - `captured_date` is the date the baseline was documented (ISO 8601)
 - `captured_by` identifies who documented the baseline (person or agent)
 - `status` tracks the baseline's lifecycle: `active` (in use), `superseded` (replaced by canonical entity), or `archived` (retained for history)
-- `superseded_by` links to the canonical entity file that replaced this baseline
+- `superseded_by` links to the canonical entity definition that replaced this baseline
 
-Baseline files carry no `mapping:` blocks — baseline-to-canonical mappings are derived from source transform files ([Section 8 — Transformations](./8-Transformations.md)), which define the operational data flow. The transform file *is* the mapping.
+Baseline files carry no `mapping:` blocks — baseline-to-canonical mappings are derived from source transform detail ([Section 8 — Transformations](./8-Transformations.md)), which defines the operational data flow. The transform *is* the mapping.
 
 See the [Adoption Playbook](../guides/adoption-playbook.md) for the baseline folder structure, free-form body guidance, and how agents generate baselines and derive mapping views.

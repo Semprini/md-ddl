@@ -24,11 +24,7 @@ Metadata appears under a level‑2 heading:
 ## Metadata
 ```
 
-Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
-
-Governance and compliance metadata declared at the domain level is inherited by all contained entities, relationships, and events. Detail files should not repeat governance attributes when values are unchanged from the domain defaults.
-
-Include a `governance:` block in detail files only when specifying an exception or stricter requirement than the domain default.
+Domain Metadata sets the default posture for all contained objects: governance and compliance metadata declared here is inherited by every entity, relationship, event, and data product in the domain. Detail files declare a `governance:` block only when overriding the domain default. The governance field schema and inheritance rules are defined once, in [Section 3 — Governance Metadata Schema](./3-Entities.md#governance-metadata-schema).
 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
@@ -101,125 +97,33 @@ Business Application | Platform | Capability Domain
 
 Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
-A domain file should contain at least one **Domain Overview Diagram** that shows the full entity graph for the domain. This diagram is the primary navigational and communicative artefact of the domain file — it must give any reader an immediate understanding of how all concepts relate to each other.
+A domain file should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the primary navigational artefact of the domain file: the domain file is the map, and the diagram is its visual index.
 
-The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR` (left-right) Mermaid syntax with the ELK layout engine for consistent, readable positioning of complex graphs.
+Two rules keep the diagram consistent with the model:
 
-##### **What to include in the Domain Overview Diagram**
+- Relationship edges are labelled, and the labels match the relationship names defined in the Relationships section (e.g., `-->|assumes|`). Inheritance is expressed as `Child -->|is a|Parent`.
+- The overview diagram shows concepts, not detail. Attributes, cardinality notation, and enumeration values belong in detail files, not the overview.
 
-The diagram must show:
+Nodes may hyperlink to detail files for navigation, and additional level‑3 diagrams focusing on specific sub-areas may follow the overview. Layout configuration, linking syntax, and worked examples are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
-1. **All entities** defined in the domain
-2. **Inheritance relationships** using `-->|is a|` notation
-3. **All relationships** between entities using labelled edges whose verb matches the relationship name defined in the Relationships section
-4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]` syntax. Not every node needs a link — prioritise the abstract and most-referenced entities.
-
-The diagram must not show:
-
-- Attributes (these belong in entity detail files)
-- Cardinality notation (this belongs in relationship detail files)
-- Enumeration values (these belong in enum detail files)
-
-##### **Diagram Syntax Rules**
-
-- Use `graph TD` for domains with deep inheritance hierarchies
-- Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for complex graphs to prevent edge crossings
-- Relationship edge labels must use the verb form from the Relationships
-  section: `-->|assumes|`, `-->|references|`, `-->|governed by|`
-- Inheritance is always expressed as `Child -->|is a|Parent`
-- Bidirectional relationships use `<-->|label|`
-- Entity hyperlinks use plain anchor tags: `<a href='path'>Display Name</a>`
-  with no additional CSS class attributes
-- Node identifiers in the graph use PascalCase for readability
-  (e.g., `PartyRole`, `ContactAddress`) but the display label uses
-  natural language where a hyperlink is defined
-
-##### **Example: Financial Crime Domain Overview Diagram**
+Example (abbreviated):
 
 ````markdown
 ### Domain Overview Diagram
 
 ```mermaid
----
-config:
-  layout: elk
-  elk:
-    mergeEdges: false
-    nodePlacementStrategy: LINEAR_SEGMENTS
-  look: classic
-  theme: dark
----
 graph TD
 
   Individual --> |is a|Party
   Company --> |is a|Party
-  TermDepositAgreement --> |is a|Agreement
-  LoanAgreement --> |is a|Agreement
 
-  Party <--> |related to|Party
   Party --> |assumes|PartyRole
-
-  Customer --> |is a|PartyRole
-  Merchant --> |is a|PartyRole
-  Payee --> |is a|PartyRole
-  Payer --> |is a|PartyRole
-  Teller --> |is a|PartyRole
-  PaymentInitiator --> |is a|PartyRole
-
   Party --> |has|ContactAddress
-  PartyRole --> |uses|ContactAddress
-  ContactAddress --> |references|Address
-
-  Customer --> |holds|Account
-  Customer --> |has|CustomerPreferences
-  PartyRole --> |governed by|Agreement
-  PaymentTransaction --> |has|Payer
-  PaymentTransaction --> |has|Payee
-  PaymentTransaction --> |initiated by|PaymentInitiator
-  PaymentTransactionAccount --> |involved in|PaymentTransaction
-  PaymentTransactionAccount --> |debits|Account
-  PaymentTransactionAccount --> |credits|Account
-  Teller --> |processes|PaymentTransaction
-  Merchant --> |processes|PaymentTransaction
-
-  Account --> |holds|Product
-  Branch --> |services|Account
-  Product --> |in terms of|Agreement
 
   Party["<a href='entities/party.md'>Party</a>"]
   PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
-  ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
-  Address["<a href='entities/address.md'>Address</a>"]
 ```
 ````
-
-##### **Why the Domain Overview Diagram matters**
-
-The domain diagram is the first artefact an AI agent or a new team member loads when working with a domain. It establishes:
-
-- **Scope**: what concepts are owned by this domain
-- **Structure**: how inheritance hierarchies are organised
-- **Connectivity**: which entities are central vs peripheral
-- **Navigation**: hyperlinks on key entities provide one-click access to detail files from the diagram itself
-
-A well-maintained domain diagram makes the two-layer structure of MD‑DDL work in practice — the domain file is the map, and the diagram is the visual index of that map.
-
-##### **Additional Diagrams**
-
-Beyond the overview, a domain file may contain additional level‑3 diagrams focusing on a specific sub-area. For example:
-
-````markdown
-### Transaction Flow Diagram
-Shows how payment transactions move through party roles.
-
-```mermaid
-graph LR
-  Payer --> |initiates|PaymentTransaction
-  PaymentTransaction --> |credits|Payee
-```
-````
-
-Additional diagrams are optional. The Domain Overview Diagram is required.
 
 #### Conceptual vs Logical Diagrams
 
@@ -227,7 +131,7 @@ MD-DDL uses two distinct diagram types for different purposes:
 
 Diagram|Location|Purpose|Relationship Labels
 -------|--------|-------|-------------------
-`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Required — must match Relationships section
+`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Match the Relationships section
 `classDiagram`|Entity detail file|Logical model — structural realization of the entity|Optional — structural intent only
 
 The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
@@ -255,13 +159,7 @@ sources/sap-fraud-management/source.md
 
 #### **Source Systems Table**
 
-Summarizes operational source applications relevant to the domain.
-
-Column | Purpose
---- | ---
-**Application** | Markdown link to the source markdown file.
-**Platform** | Technology platform or deployment model.
-**Capability Domain** | Business capability or functional area served by the source.
+Summarizes operational source applications relevant to the domain, using the column format defined in [Source Systems](#source-systems) above.
 
 ---
 
@@ -280,7 +178,7 @@ The Entities table summarizes the core concepts of the domain.
 
 #### **Enums Table**
 
-Summarizes the discrete value sets used within the domain. Enums should be named as a plural - E.g. Customer Types.
+Summarizes the discrete value sets used within the domain. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
 
 Column | Purpose
 --- | ---
@@ -346,147 +244,23 @@ Every domain definition has a lifecycle — it moves from initial authoring thro
 
 #### Domain Status
 
-The `status` field declares the current lifecycle state of the domain definition. They govern the lifecycle of the domain definition.
-
-Valid values:
+The `status` field declares the current lifecycle state of the domain definition:
 
 Value | Description
 --- | ---
 `Draft` | Under active development. Not yet validated. Do not consume.
-`Review` | Under structured review (Layer 1/2/3 process). Stable enough for early feedback; breaking changes possible.
+`Review` | Under structured review. Stable enough for early feedback; breaking changes possible.
 `Active` | Validated and available for consumption. Stability guaranteed within major version.
-`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition. No new consumers should onboard.
+`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition, which may be declared in a `superseded_by` metadata field.
 `Retired` | No longer maintained. Historical record only.
-
-**Transition rules:**
-
-- A domain may only move forward through lifecycle states: `Draft` → `Review` → `Active` → `Deprecated` → `Retired`.
-- Reverting from `Active` to `Draft` or `Review` is permitted only when a major version bump accompanies the change (the previous active version is effectively superseded).
-- `Deprecated` domains should declare a `superseded_by` field in metadata pointing to the replacement domain (if one exists).
-- `Retired` domains are immutable records. They remain in the repository for lineage and audit purposes.
 
 #### Domain Version
 
-The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the domain definition. See [Domain Evolution](#domain-evolution) for version bump rules.
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`): major for breaking changes, minor for additive changes, patch for corrective changes. A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied.
 
-**Lifecycle and version interaction:**
+A domain may also maintain a `LIFECYCLE.md` file adjacent to `domain.md`, combining a machine-readable change manifest with a human-readable changelog.
 
-- A domain in `Draft` status may use version `0.x.y` to signal pre-release instability. The `0.x` convention indicates that breaking changes may occur without a major bump.
-- A domain in `Active` status must have version `1.0.0` or higher. Stability guarantees apply from the first major release.
-- When a domain transitions from `Review` to `Active` for the first time, its version should be set to `1.0.0`.
-
----
-
-### **Domain Evolution**
-
-Domains are living artifacts. They evolve as business understanding deepens, new source systems are integrated, regulatory requirements change, and consumer needs shift. The `version` field in domain metadata tracks this evolution using semantic versioning.
-
-#### Version Bump Rules
-
-Change Type | Version Impact | Examples
---- | --- | ---
-**Breaking** — changes meaning or removes consumer-visible structure | Major bump | Removing an entity or attribute; changing an attribute type incompatibly; reducing relationship cardinality; changing an identifier; removing or renaming an enum used by consumers
-**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, attribute, relationship, event, enum value, or constraint; declaring a new source system or data product
-**Corrective** — fixes errors without changing intended meaning | Patch bump | Clarifying descriptions; correcting broken links; updating governance metadata without changing logical structure; clarifying a constraint description without changing its logic
-
-#### Breaking vs Non-Breaking Changes
-
-A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied. Specifically:
-
-- Removing or renaming an entity or enum is always breaking.
-- Changing relationship cardinality (e.g., `1:N` to `M:N`) is breaking — physical schemas may need restructuring.
-- Changing relationship granularity (`atomic` to `period`) is breaking — it alters the semantics of the join.
-- Removing an attribute is breaking if any data product includes that entity.
-- Changing an attribute's type or constraints is breaking if it narrows the valid domain.
-
-A change is **non-breaking** if existing consumers continue to produce correct output without modification.
-
-#### Evolution Workflow
-
-When modifying an existing domain:
-
-1. Identify the change and classify it as breaking, additive, or corrective.
-2. Bump the `version` field in metadata according to the rules above.
-3. Record the logical change in `LIFECYCLE.md` if the domain maintains one. Include a machine-readable change manifest and any affected products.
-4. If breaking: review all data products that reference the affected entities and update them accordingly.
-5. If additive: update the relevant summary tables and create/update detail files.
-6. If corrective: fix the error in place.
-
-#### Lifecycle File Convention
-
-A domain may include a `LIFECYCLE.md` file adjacent to `domain.md`. This file is optional, but recommended from the first version bump onward and strongly recommended for domains at `Active` status or higher.
-
-`LIFECYCLE.md` replaces the narrower `CHANGELOG.md` convention used in earlier drafts. It combines a machine-readable change manifest with a human-readable changelog so the same file supports both agent workflows and human review.
-
-Suggested structure:
-
-````markdown
-# Lifecycle - Financial Crime
-
-## Current State
-
-```yaml
-domain_version: "1.1.0"
-domain_status: Active
-
-products:
-  - name: Customer 360 Profile
-    status: Active
-    version: "1.0.0"
-  - name: Suspicious Activity Report
-    status: Draft
-    version: "0.2.0"
-```
-
-## Version History
-
-### Domain 1.1.0 - 2026-03-14
-
-#### Change Manifest
-
-```yaml
-changes:
-  - type: additive
-    scope: entity
-    entity: Exchange Rate
-    description: "Added Exchange Rate entity for multi-currency analysis"
-  - type: additive
-    scope: attribute
-    entity: Transaction
-    attribute: Exchange Rate
-    description: "Added Exchange Rate attribute to Transaction"
-
-affected_products:
-  - name: Suspicious Activity Report
-    impact: additive
-    reason: "Transaction schema extended with exchange-rate context"
-```
-
-#### Changelog
-
-### Added
-- Exchange Rate entity for multi-currency transaction analysis
-- Currency entity as reference data
-
-### Changed
-- Transaction entity: added `Exchange Rate` attribute
-
-### Domain 1.0.0 - 2025-11-01
-
-#### Changelog
-
-### Added
-- Initial domain release with Party, Account, Transaction, and Agreement entity families
-````
-
-**Rules:**
-
-- `LIFECYCLE.md` is domain-scoped and may also record product status/version snapshots in the `## Current State` section.
-- Each domain version entry must correspond to a semantic version used in the domain metadata.
-- The `#### Change Manifest` block is the machine-readable section. It may be consumed by reconciliation and impact-analysis workflows.
-- The `#### Changelog` section is the human-readable section and should use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` headings where applicable.
-- Agents should offer to create or update `LIFECYCLE.md` whenever the domain version is bumped or a product is promoted, deprecated, or retired.
-- `LIFECYCLE.md` is the authoritative lifecycle history file. If an older `CHANGELOG.md` exists, it should be migrated or treated as legacy documentation.
+Lifecycle transition rules, version-bump guidance, the breaking-change taxonomy, the evolution workflow, and the `LIFECYCLE.md` format are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 ---
 

@@ -11,13 +11,14 @@ and helps users understand which starting-point pattern applies to them.
 
 ## MD-DDL Reference
 
-Load the Adoption specification from `md-ddl-specification/10-Adoption.md`
-before responding. Key sections to apply:
+Load the Adoption Playbook from `guides/adoption-playbook.md` and the
+Adoption specification from `md-ddl-specification/10-Adoption.md` before
+responding. Key sections to apply:
 
-- **Adoption Maturity Model** — the five levels and advancement criteria
-- **Adoption Journey Patterns** — the four starting-point patterns (A/B/C/D)
-- **Baselines** — folder structure and file format
-- **Domain Adoption Metadata** — the `adoption` block in domain metadata
+- **Adoption Maturity Model** (playbook) — the five levels and advancement criteria
+- **Adoption Journey Patterns** (playbook) — the four starting-point patterns (A/B/C/D)
+- **Working with Baselines** (playbook) — folder structure and file format
+- **Domain Adoption Metadata** (spec) — the `adoption` block in domain metadata
 
 ---
 

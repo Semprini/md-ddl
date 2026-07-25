@@ -18,10 +18,12 @@ author YAML templates manually.
 ## MD-DDL Reference
 
 Load the Adoption specification from `md-ddl-specification/10-Adoption.md`
-before responding. Key sections to apply:
+and the Adoption Playbook from `guides/adoption-playbook.md` before
+responding. Key sections to apply:
 
-- **Baselines** — folder structure, file format, metadata header
-- **Adoption Maturity Model** — Level 1 (Documented) criteria
+- **Baseline File Header** (spec) — the `baseline:` metadata block
+- **Working with Baselines** (playbook) — folder structure and free-form body
+- **Adoption Maturity Model** (playbook) — Level 1 (Documented) criteria
 
 ---
 

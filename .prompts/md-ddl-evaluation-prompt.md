@@ -39,7 +39,11 @@ Read these files in order. You need the full context to simulate authentic inter
 7. `md-ddl-specification/7-Sources.md` — source system declarations
 8. `md-ddl-specification/8-Transformations.md` — transformation vocabulary
 9. `md-ddl-specification/9-Data-Products.md` — data product classes and declarations
-10. `md-ddl-specification/10-Adoption.md` — brownfield adoption and maturity model
+10. `md-ddl-specification/10-Adoption.md` — adoption metadata shapes (`adoption:` block, `baseline:` header)
+11. `guides/adoption-playbook.md` — brownfield adoption methodology and maturity model (non-normative)
+12. `guides/diagram-style.md` — Mermaid diagram conventions (non-normative)
+13. `guides/lifecycle-versioning.md` — change management and versioning process (non-normative)
+14. `guides/validation-tooling.md` — validation levels, pre-flight checks, tool interface (non-normative)
 
 ### Agents (read AGENT.md and each skill's SKILL.md)
 

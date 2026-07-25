@@ -12,7 +12,7 @@ Enums appear under:
 ## Enums
 ```
 
-Enums can be defined as a simple list of values or a dictionary if the values require additional metadata. Enums should be named as a plural - E.g. Customer Types.
+Enums can be defined as a simple list of values or a dictionary if the values require additional metadata. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
 
 Simple Format:
 

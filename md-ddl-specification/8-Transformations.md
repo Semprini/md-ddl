@@ -26,31 +26,15 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source-table transform files. Each file uses a level-2 heading for the source table and a source schema table that maps columns to destinations:
+Transformations are declared in source-table transform files under `sources/<system>/transforms/`. The transform file structure — source schema table, `Destination` column mechanics, and file naming — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
 
-```markdown
-## Account
-
-Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Comment | Destination
---- | --- | --- | --- | --- | --- | --- | --- | ---
-1 | ExternalPartyId | Text | 40 | | | no | Account-scoped party id | Party.Party Identifier
-2 | RecordStatus | Text | 20 | | | yes | Record lifecycle status | [Map Party Status](#map-party-status)
-```
-
-Each non-direct transformation in that file uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
+Each non-direct transformation uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
 ```markdown
 ### Concatenate Name Parts
 ```
 
-A short prose description of the business intent follows the heading, before the YAML block. See [Section 7 — Sources](./7-Sources.md) for the full transform file structure.
-
-Transform files must be named for the source table using the `table_<source-table>.md` pattern. If multiple canonical entities are mapped from the same source table, they can coexist in one file.
-
-The `Destination` column controls rule verbosity:
-
-- Direct mapping: use `Entity.Attribute` directly in the `Destination` cell.
-- Non-direct mapping: link to a same-file rule section (for example `[Map Party Status](#map-party-status)`) and define the YAML rule under that heading.
+A short prose description of the business intent follows the heading, before the YAML block.
 
 ---
 
@@ -64,6 +48,8 @@ target: Entity · Attribute
 ```
 
 `type` and `target` are always required. Everything else depends on the type.
+
+A transformation may also declare `quality_check: false` to indicate that a null target attribute after the transformation runs is legitimate (by default, generated quality tests assert non-null).
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
@@ -140,7 +126,7 @@ String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)` | `
 Date functions | `today()`, `date_diff(a, b, unit)`, `date_add(d, n, unit)` | `"date_diff(End Date, Start Date, 'days')"`
 Null handling | `coalesce(a, b)` | `"coalesce(Preferred Name, First Name)"`
 
-The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
+The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names. The function set above is the portable core, not a closed list — additional functions may be used where the generating agent and target platform support them.
 
 ---
 
@@ -174,6 +160,8 @@ Strategy | Behaviour
 `priority_always` | Always take the highest-priority value, even if null
 `most_recent` | Take the value with the most recent timestamp; requires `timestamp_field` on each source
 `consensus` | Take a value only when all sources agree; otherwise null
+
+These strategies cover the common cases and are not a closed list — an organisation may declare another strategy, described in the transformation's prose, and the generating agent should confirm its interpretation rather than guess.
 
 For `most_recent`, declare the timestamp field on each source:
 
@@ -271,7 +259,7 @@ grain:
 ```
 ````
 
-`function` supports: `sum`, `count`, `count_distinct`, `min`, `max`, `average`, `first`, `last`.
+`function` supports: `sum`, `count`, `count_distinct`, `min`, `max`, `average`, `first`, `last`. Additional functions may be used where the target platform supports them.
 
 `grain` declares which entity this aggregation rolls up to and the join key. The `entity` value must match an entity name in the domain model. The `join_on` value must match an attribute name on that entity.
 
@@ -300,17 +288,6 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
 7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
-
----
-
-### **Generation Behaviour**
-
-AI agents use transformation definitions to generate:
-
-- **ETL / ELT logic** — SQL `SELECT` statements, dbt models, or Spark transformations depending on the target platform
-- **Lineage graph edges** — source field → transformation → domain attribute nodes in the Knowledge Graph
-- **Data quality test stubs** — one test per transformation, asserting the target attribute is non-null after the transformation runs (override with `quality_check: false` on the transformation if the null case is valid)
-- **Source-to-domain mapping documentation** — a human-readable crosswalk table per entity, generated from all inline and named source mappings
 
 ---
 

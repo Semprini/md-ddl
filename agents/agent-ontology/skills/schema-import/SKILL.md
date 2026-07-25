@@ -15,7 +15,8 @@ files.
 
 Load before responding:
 
-- `md-ddl-specification/10-Adoption.md` — Adoption maturity model
+- `guides/adoption-playbook.md` — Adoption maturity model
+- `md-ddl-specification/10-Adoption.md` — `adoption:` metadata block and maturity vocabulary
 - `md-ddl-specification/2-Domains.md` — Domain file structure
 - `md-ddl-specification/3-Entities.md` — Entity detail file structure
 

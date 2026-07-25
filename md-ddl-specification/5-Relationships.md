@@ -62,6 +62,8 @@ governance:
 - `governs`: A set of rules or a domain controlling an entity. Example: GDPR Policy governs Customer PII.
 - `masks` / `protects`: Security-specific relationships. Example: Vault Service masks Credit Card Number.
 
+This vocabulary is extensible. Organisations may use additional type verbs where none of the above fits; agents treat an unrecognised type as a loose association for generation purposes and note it as a potential spec vocabulary contribution.
+
 ### Granularity
 
 Describes the resolution at which a relationship operates relative to the entities it connects.
@@ -109,24 +111,11 @@ relationship_attributes:
 
 #### Source and Target Semantics
 
-When `self_referential: true`, directionality is preserved in the physical model by generating two FK columns pointing to the same entity table:
-
-- `source_[entity_identifier]` — FK referencing the source instance
-- `target_[entity_identifier]` — FK referencing the target instance
-
-For a Party with identifier `Party Identifier`, the bridge table would contain `source_party_identifier` and `target_party_identifier`. For bidirectional relationships where direction is not meaningful (e.g., "sibling of"), the generating agent should document that either column may be treated as the source.
+Directionality is meaningful even when both ends name the same entity: `source` is the origin instance and `target` the destination instance. For bidirectional relationships where direction is not meaningful (e.g., "sibling of"), note this in the relationship description.
 
 The `ownership` field names the entity that owns the relationship definition — typically the entity the relationship most naturally describes from. For self-referential relationships this is always the same entity as `source` and `target`.
 
-#### Generation Guidance
-
-Self-referential relationships always generate a bridge/association table — even at one-to-many cardinality — to avoid a self-referencing FK on the entity's own primary key column:
-
-Cardinality | Physical pattern
---- | ---
-`many-to-many` | Bridge table with `source_[pk]`, `target_[pk]`, and `relationship_attributes` columns
-`one-to-many` (hierarchy) | Bridge table preferred; adjacency list (parent FK on entity) is acceptable for shallow hierarchies where generation skill supports it explicitly
-Any | Unbounded recursion depth is the default; document when depth is bounded and recommend recursive CTE query patterns in platform-specific notes
+How self-referential relationships realize physically (bridge tables, FK column naming, recursion handling) is a generation-tooling concern, outside this spec.
 
 ### Relationship Rules
 

@@ -65,7 +65,7 @@ For brownfield adoption (documenting existing systems and migrating to MD-DDL):
 - If the user wants to **document** existing assets as baselines → load `skills/baseline-capture/SKILL.md`
 - If the user wants to **fast-track** from DDL to a draft domain → load `skills/schema-import/SKILL.md`
 - If the user wants to **translate** baselines to canonical entities → load `skills/domain-scoping/SKILL.md` (Brownfield Step 5)
-- Reference `md-ddl-specification/10-Adoption.md` for the adoption maturity model and journey patterns.
+- Reference `guides/adoption-playbook.md` for the adoption maturity model and journey patterns, and `md-ddl-specification/10-Adoption.md` for the `adoption:` and `baseline:` metadata shapes.
 
 For source system integration and field-level mapping:
 

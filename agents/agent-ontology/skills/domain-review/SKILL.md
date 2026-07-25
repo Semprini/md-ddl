@@ -57,7 +57,7 @@ Confirm all modeled artifacts are present and navigable:
 Validate structure and formatting against MD-DDL spec:
 
 - Heading hierarchy and section placement
-- Mermaid syntax and ELK usage in all required diagrams
+- Mermaid syntax in diagrams; style conventions per `guides/diagram-style.md` (deviations are observations, not errors)
 - Entity YAML completeness (identifier, attributes, no FK attributes)
 - Enum declaration correctness (simple list vs dictionary usage)
 - Relationship YAML completeness (`source`, `type`, `target`, `cardinality`, `granularity`, `ownership`)
@@ -238,7 +238,7 @@ All of the following must be true:
 - All relationships have `cardinality`, `granularity`, and `ownership`
 - Domain metadata includes `classification`, `pii`, `regulatory_scope`, and `default_retention`
 - Governance blocks on entities with PII or elevated classification are present
-- Mermaid diagrams are syntactically valid with ELK layout
+- Mermaid diagrams are syntactically valid
 - No unresolved `# TODO:` markers in production-status domains
 
 ### Conditionally Ready

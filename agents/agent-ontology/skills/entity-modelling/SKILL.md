@@ -13,6 +13,8 @@ Covers concept realisation decisions, inheritance hierarchies, entity YAML struc
   (reference stub: `references/entities-spec.md`)
 - Full enumeration specification: `md-ddl-specification/4-Enumerations.md`
   (reference stub: `references/enumerations-spec.md`)
+- Entity classDiagram conventions: `guides/diagram-style.md`
+  (non-normative — subject/reference classes, enum rendering, ordering)
 - Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
   (use for ownership/cardinality decisions, dimensional implementation reasoning, and final `existence` value selection)
 - Entity-vs-enum classification deep guidance: `guidance.md`

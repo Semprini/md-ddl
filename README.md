@@ -4,7 +4,7 @@
 
 > **Version 0.9.2**
 
-MD-DDL is a simple standard way to organise data definitions. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
+MD-DDL is a simple, standard way to organise data definitions. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 
@@ -157,6 +157,12 @@ md-ddl-specification/        Normative standard
   1-Foundation.md            Start here to understand the model
   2-Domains.md … 10-Adoption.md
   MD-DDL-Complete.md         Single-file version for AI context windows
+
+guides/                      Non-normative companion guides
+  adoption-playbook.md       Brownfield adoption methodology
+  diagram-style.md           Mermaid diagram conventions
+  lifecycle-versioning.md    Change management and versioning process
+  validation-tooling.md      Validation levels, pre-flight checks, tool interface
 
 agents/                      Canonical agent prompts and skills
   agent-guide/               Learning companion and navigator

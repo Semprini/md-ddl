@@ -16,7 +16,7 @@ Key sections to apply:
 
 - **Domain Declaration and Description** — H1 heading, free-text before H2
 - **Domain Metadata** — YAML block under `## Metadata`, fields and categories
-- **Domain Overview Diagram** — required Mermaid graph, ELK engine, rules for what to include and exclude
+- **Domain Overview Diagram** — the conceptual entity graph; edge labels match the Relationships section. Layout and linking conventions: `guides/diagram-style.md`
 - **Domain Structure** — the four summary tables (Entities, Enums, Relationships, Events) and the rules that govern them
 
 For canonical-vs-bounded-context boundary decisions, also load `domain-boundaries.md`.
@@ -247,7 +247,7 @@ Source Mapping, etc.) for just the change in question. Update:
 
 Use this step when the user has baseline files (in `baselines/`) and wants to
 create canonical entities from them. This extends the brownfield path for
-adoption scenarios. See `md-ddl-specification/10-Adoption.md` for the full
+adoption scenarios. See `guides/adoption-playbook.md` for the full
 adoption maturity model.
 
 **Triggers:**

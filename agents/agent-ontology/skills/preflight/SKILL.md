@@ -15,8 +15,8 @@ Model against a domain folder and presents the findings to the user.
 
 The checks cover YAML syntax, Mermaid syntax, internal link integrity,
 entity reference consistency, and domain version. See
-`1-Foundation.md § Pre-Flight Check Scope` for the rationale and exact
-scope of each check.
+`guides/validation-tooling.md § Pre-Flight Check Scope` for the rationale
+and exact scope of each check.
 
 ---
 

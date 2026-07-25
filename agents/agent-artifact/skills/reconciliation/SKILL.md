@@ -16,9 +16,9 @@ noise.
 
 Load before responding:
 
-- `md-ddl-specification/10-Adoption.md` — Adoption maturity model, coexistence
-  and cutover rules, drift detection
-- `md-ddl-specification/2-Domains.md` — Domain evolution and `LIFECYCLE.md`
+- `guides/adoption-playbook.md` — Adoption maturity model, coexistence
+  and cutover guidance, drift detection
+- `guides/lifecycle-versioning.md` — Domain evolution and `LIFECYCLE.md`
   change manifest convention
 - `md-ddl-specification/9-Data-Products.md` — Product versioning and
   product-scoped lifecycle context

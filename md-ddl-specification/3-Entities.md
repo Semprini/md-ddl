@@ -29,165 +29,14 @@ Free‑text Markdown under the heading describes the entity in more detail than 
 
 ### **Entity Diagram**
 
-Every entity detail file must include a `classDiagram` immediately after the entity description and before the YAML definition blocks. The diagram is the visual contract for the entity — it shows the entity's own attributes, its position in the inheritance hierarchy, and all of its immediate relationships to other entities.
+An entity detail file should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
 
-#### **Diagram Configuration**
+The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships in the domain file one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
-All entity diagrams use the ELK layout engine for consistent rendering:
-
-````markdown
-```mermaid
----
-config:
-  layout: elk
----
-classDiagram
-  ...
-```
-````
-
-#### **The Subject Class**
-
-The entity being defined is the **subject class**. It is always written as a full class block with its attributes listed inside:
-
-```text
-  class Party{
-    <<abstract>>
-    * Party Identifier : string
-    Legal Name : string
-    Party Status : enum~PartyStatus~
-  }
-```
-
-**Rules for the subject class:**
-
-- The class name uses PascalCase matching the entity heading (e.g., `Party`, `ContactAddress`, `PartyRole`)
-- If the entity is abstract — never instantiated directly, only specialised - add `<<abstract>>` as the first line inside the class block
-- The primary identifier attribute is prefixed with `*` to mark it as the key
-- All attributes defined in the entity's YAML block must appear in the diagram
-- Attribute types use the Mermaid classifier syntax:
-  - Primitives: `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`
-  - Enumerations: `enum~EnumName~` (e.g., `enum~PartyStatus~`, `enum~CountryCode~`)
-  - Arrays: append `[]` to the type (e.g., `enum~CountryCode~[]`, `string[]`)
-- Inherited attributes from parent entities are **not** repeated in the subject class — only attributes defined in this entity's own YAML block are shown
-- Attribute format is `AttributeName : Type` with a space either side of the colon
-
-#### **Related Classes**
-
-All other classes that appear in the diagram — parents, children, related entities, and referenced enums — are **reference classes** unless they are enums detailed in the same file. Reference classes are never defined with attribute blocks. Instead they use the linked class syntax:
-
-```text
-  class Party["<a href='party.md'>Party</a>"]
-```
-
-**Rules for reference classes:**
-
-- Use plain anchor tags: `<a href='path'>Display Name</a>`
-- No CSS class attributes on the anchor tag
-- The `href` path is relative to the current file's location and uses snake_case filenames (e.g., `party.md`, `party_role.md`, `contact_address.md`)
-- Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
-- All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
-- If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
-
-#### **Enum Classes in Entity Diagrams**
-
-Any enum used by the subject class attributes must appear in the class diagram.
-
-Use one of two patterns:
-
-1. **Referenced enum (detail in another file)** — show as a linked reference class:
-
-```text
-  class PartyStatus["<a href='../enums/party_status.md'>Party Status</a>"]
-```
-
-1. **Co-located enum (detail in the same file)** — show as an expanded enum class with values:
-
-```text
-  class PartyStatus{
-    <<enumeration>>
-    Active
-    Inactive
-    Under Review
-  }
-```
-
-**Rules for enum classes:**
-
-- Every enum type referenced in the subject class (for example `enum~PartyStatus~`) must appear exactly once in the diagram
-- If the enum is defined in the same detail file under `## Enums`, render it as an expanded enum class with its values and include `<<enumeration>>`
-- If the enum is defined elsewhere, render it as a linked reference class to its enum detail file and include only the `<<enumeration>>` tag in the class detail.
-- Use PascalCase class names for enum class identifiers (for example `PartyStatus`, `CountryCode`)
-- Display names in links use natural language (for example `Party Status`, `Country Code`)
-
-#### **Inheritance**
-
-Inheritance uses the Mermaid `--|>` arrow with the child on the left:
-
-```text
-  Individual --|> Party
-  Company --|> Party
-```
-
-This reads as "Individual is a specialisation of Party." The direction matches the domain overview diagram convention of `Child -->|is a|Parent`.
-
-When an entity **is** a specialisation, show the parent as a reference class:
-
-```text
-  Individual --|> Party
-  class Party["<a href='party.md'>Party</a>"]
-```
-
-When an entity **has** specialisations, show each child as a reference class (or bare class if not yet defined):
-
-```text
-  Individual --|> Party
-  Company --|> Party
-  class Individual["<a href='individual.md'>Individual</a>"]
-  class Company["<a href='company.md'>Company</a>"]
-```
-
-#### **Entity Relationships**
-
-All immediate relationships to and from the entity are shown with labelled arrows and cardinality. The classDiagram is a logical realization of the entity — relationship labels here describe the structural link (e.g., has, references) and do not need to match the conceptual relationship names defined in the domain Relationships section. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
-
-```text
-  Party "1" --> "0..*" PartyRole
-  PartyRole "0..*" --> "0..*" ContactAddress
-  ContactAddress "0..*" --> "1" Address
-```
-
-Relationship labels on classDiagram arrows are optional. When included, they describe the structural navigation intent, not the conceptual relationship name.
-
-**Rules for relationships:**
-
-- Cardinality is always shown on both ends using quoted strings: `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
-- In class diagrams the relationship label is optional. We are realizing the concepts from the domain in a logical model so there may not be a direct relationship.
-- The arrow direction reflects the ownership or navigational direction: the entity that *holds the reference* is the source (`-->`)
-- Bidirectional relationships use `<-->`
-- Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
-
-#### **Ordering Within the Diagram**
-
-To keep diagrams readable and consistent, follow this ordering:
-
-1. The subject class block (with attributes)
-2. Specialisation child classes (bare or linked, one per line)
-3. Inheritance arrows (`--|>`)
-4. Relationship lines (`-->` with cardinality and label)
-5. Enum classes (expanded if co-located; linked reference if external)
-6. All remaining reference class definitions (`class Foo["<a href='...'>...</a>"]`)
-
-#### **Example**
-
-**Abstract entity with specialisations and outbound relationships (Party):**
+Example:
 
 ````markdown
 ```mermaid
----
-config:
-  layout: elk
----
 classDiagram
   class Party{
     <<abstract>>
@@ -199,39 +48,15 @@ classDiagram
   Individual --|> Party
   Company --|> Party
   Party "1" --> "0..*" PartyRole
-  Party "1" --> "0..*" ContactAddress
-
-  class FinancialCrimeRiskRating["<a href='../enums/financial_crime_risk_rating.md'>Financial Crime Risk Rating</a>"]
 
   class Individual["<a href='individual.md'>Individual</a>"]
   class Company["<a href='company.md'>Company</a>"]
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
+  class FinancialCrimeRiskRating["<a href='../enums/financial_crime_risk_rating.md'>Financial Crime Risk Rating</a>"]
 ```
 ````
 
-**Entity with co-located enum values (example):**
-
-````markdown
-```mermaid
----
-config:
-  layout: elk
----
-classDiagram
-  class CustomerPreferences{
-    * Preference Identifier : string
-    Contact Method Preference : enum~ContactMethodPreference~
-  }
-
-  class ContactMethodPreference{
-    <<enumeration>>
-    Email
-    SMS
-    Phone
-  }
-```
-````
+Conventions for subject classes, reference classes, enum rendering, inheritance arrows, cardinality, and element ordering are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
 ### **Entity Definition**
 
@@ -248,7 +73,7 @@ temporal:
 attributes:
   Customer Number:
     type: string
-    identifier: true
+    identifier: primary
   Email Address:
     type: string
     pii: true
@@ -298,7 +123,7 @@ These fields may appear in an entity's `governance:` YAML block. Only include fi
 Field | Type | Required | Description
 --- | --- | --- | ---
 `pii` | boolean | No | Override the domain's PII flag for this entity.
-`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. This field name is standardised — do not use alternatives such as `pii_attributes` or `personal_data_fields`.
+`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. `pii_fields` is the conventional name for this field — using it consistently lets agents and tooling rely on it across domains.
 `classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
 `retention` | string | No | Override the domain's retention period for this entity.
 `retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.
@@ -373,13 +198,10 @@ Property | Type | Required | Description
 
 #### Lifecycle Rules
 
-- An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
-- When `status` is omitted, the entity inherits the domain's status.
+- When `status` is omitted, the entity inherits the domain's status. An entity's `status` should not be more advanced than its parent domain's status.
 - The `since`, `deprecated_at`, and `breaking_in` fields refer to domain semantic versions as defined in [2-Domains.md](./2-Domains.md#domain-version).
-- The `since` field is informational — it records provenance and aids lifecycle history generation.
-- The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
-- The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
-- When an entity is introduced, deprecated, or flagged with `breaking_in`, the domain's `LIFECYCLE.md` should be updated if that file is maintained.
+
+Practices for deprecation, migration notice, and lifecycle history are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 #### Example
 
@@ -424,12 +246,12 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 
 This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
-Type|Description|Generation Guidance
-----|-----------|-------------------
-`valid_time`|Business time - when is this true in the real world?|Adds effective/expiration date columns, supports point-in-time queries
-`transaction_time`|System time - when was this recorded?|Adds created/superseded timestamps, immutable records
-`bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
-`point_in_time`|Event timestamp only|For events - single timestamp, immutable
+Type|Description
+----|-----------
+`valid_time`|Business time - when is this true in the real world? Supports point-in-time queries.
+`transaction_time`|System time - when was this recorded? Records are immutable once superseded.
+`bitemporal`|Both valid and transaction time - full temporal reconstruction.
+`point_in_time`|Event timestamp only. For events - single timestamp, immutable.
 
 ### Existence
 
@@ -438,8 +260,6 @@ This optional section defines if this entity can exist independently.
 - independent — meaningful on its own; doesn't require another entity to give it purpose (Customer, Product, Location)
 - dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
 - associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
-
-The generating agent uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
 
 ### Mutability
 
@@ -451,7 +271,7 @@ This optional section defines how the data changes over time.
 - frequently_changing — changes often, current value is what matters (account balance, inventory level)
 - reference — essentially static, managed by a small number of administrators (country codes, currency codes)
 
-The generating agent sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+Both `existence` and `mutability` are intent signals: they tell generating agents and human readers how the entity behaves, without prescribing a physical structure. How generators map them to physical patterns is a generation-tooling concern, outside this spec.
 
 ---
 
@@ -527,11 +347,11 @@ constraints:
 
 **Identifiers:**
 
-Every Entity should have at least one attribute marked identifier: true. If missing, the Knowledge Graph treats the entity as a "Logic Object" rather than a "Data Object."
+Every Entity should have at least one attribute marked as an identifier (`identifier: primary` for the primary key). If missing, the Knowledge Graph treats the entity as a "Logic Object" rather than a "Data Object."
 
 **No Relationship Attributes:**
 
-Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead, the Relationships section handles the link. This prevents "Foreign Key Drift."
+Entity YAML must not declare foreign-key attributes (e.g., a Customer Id inside a Preference entity). The Relationships section defines the link; physical keys are generated from the relationship definition. This prevents "Foreign Key Drift" — an FK attribute in entity YAML would be interpreted as a business attribute and corrupt generation.
 
 **No Source References in Entity Files:**
 

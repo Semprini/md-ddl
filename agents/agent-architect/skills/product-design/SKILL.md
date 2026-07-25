@@ -17,7 +17,9 @@ If any of these are missing, defer to Agent Ontology before proceeding.
 
 ## Load the Specification
 
-Read `md-ddl-specification/9-Data-Products.md` for normative rules.
+Read `md-ddl-specification/9-Data-Products.md` for normative rules, and
+`platform-posture.md` (in this skill folder) for the platform posture
+architecture guidance that shapes class selection and artifact targets.
 
 Platform note: `{{INCLUDE}}` blocks are only processed by include-aware
 platforms (for example, VS Code Copilot custom agents). In other platforms,

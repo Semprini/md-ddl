@@ -12,19 +12,6 @@ The canonical entities, relationships, and events remain the single source of tr
 
 ---
 
-### **Why Data Products Are First-Class**
-
-Without data products, the gap between a well-modelled domain and a usable output is filled by undocumented views, ad-hoc queries, and shadow pipelines. Data products close that gap by making the publication contract explicit:
-
-- **What** is published (which entities, attributes, relationships)
-- **How** it is shaped (normalized, denormalized, aggregated)
-- **Who** consumes it (team, system, or regulatory body)
-- **Why** it exists (business purpose and SLA)
-
-By declaring data products in the same Markdown-native format as the rest of the model, MD-DDL ensures that publication intent is version-controlled, reviewable, and traceable from source through canonical model to consumer.
-
----
-
 ### **Data Product Classes**
 
 MD-DDL defines three classes of data product, each serving a distinct purpose in the data lifecycle. These classes are not tiers or layers — they are independent publication intents that may coexist within a single domain.
@@ -63,47 +50,15 @@ A consumer-aligned product reshapes domain data for a specific audience or use c
 - **Consumers:** Named team, application, report, or regulatory body
 - **Multi-domain:** Consumer-aligned products may source from canonical entities across multiple domains when the consumer's use case spans domain boundaries. The `lineage` field declares which domains and entities are consumed.
 
-Consumer-aligned products define their own logical model with a Mermaid class diagram and an attribute mapping section that traces every product attribute back to its canonical source using the same table-based format as source transforms. The `schema_type` declared on the product determines which Agent Artifact skill produces the physical output.
+Consumer-aligned products define their own logical model with a Mermaid class diagram and an attribute mapping section that traces every product attribute back to its canonical source using the same table-based format as source transforms. The `schema_type` declared on the product determines the shape of the physical output.
 
 ---
 
 ### **Platform Posture**
 
-Organisations differ fundamentally in how they relate data products to platforms. This architectural decision shapes which product classes apply, what artifacts get generated, and what infrastructure is assumed. The platform posture must be established before designing data products.
+Organisations differ in how they relate data products to platforms: some run everything on a single platform, some use different technologies per product class (polyglot), and some treat certain classes as infrastructure rather than governed products (selective scope). This architectural decision shapes which product classes apply and what artifacts get generated, so it should be established before designing data products — the trade-offs are architecture guidance, not part of this spec.
 
-MD-DDL defines three platform postures:
-
-#### Single-Platform
-
-All data products are self-contained on one platform (e.g., Snowflake, Databricks, BigQuery). Source ingestion, transformation, canonical storage, and consumer access all happen within the same platform.
-
-- **Effect on classes:** All three classes (source-aligned, domain-aligned, consumer-aligned) are typically recognised as data products
-- **Effect on artifacts:** Agent Artifact generates for one target platform; `schema_type` maps directly to platform-native constructs
-- **Effect on infrastructure:** Minimal integration complexity; the platform provides compute, storage, and access control
-- **Typical pattern:** Source-aligned = raw/staging schemas; domain-aligned = curated schemas; consumer-aligned = materialized views or denormalized tables
-
-#### Polyglot
-
-Different product classes leverage different platforms and technologies depending on the data's lifecycle stage and access pattern. The organisation accepts that data products span infrastructure boundaries.
-
-- **Effect on classes:** Each class may target a different platform stack:
-  - **Source-aligned** — CDC, streaming (Kafka, Flink), operational data stores, event buses
-  - **Domain-aligned / foundational** — polyglot persistence (relational + document + graph), analytical and operational interfaces, potentially spanning OLTP and OLAP stores
-  - **Consumer-aligned** — purpose-built for the consumer's query engine (data warehouse, API layer, search index, dashboard cache)
-- **Effect on artifacts:** Agent Artifact may need to generate for multiple target platforms per domain; `schema_type` maps to platform-appropriate constructs for each product
-- **Effect on infrastructure:** Higher integration complexity; requires cross-platform lineage tracking, consistent governance enforcement, and potentially different access control mechanisms per platform
-
-#### Selective Scope
-
-The organisation does not consider all classes as "data products." Some layers are treated as infrastructure or engineering concerns rather than governed, published products.
-
-- **Common pattern:** Source-aligned feeds are infrastructure (CDC pipelines, staging areas) managed by data engineering — not declared as data products. Only domain-aligned and consumer-aligned outputs are governed as products.
-- **Alternative pattern:** Only consumer-aligned outputs are products. Domain-aligned canonical models are internal reference architectures, not published products.
-- **Effect on MD-DDL:** Product classes that fall outside the org's product scope are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms still exist in `sources/` regardless of whether source-aligned products are declared.
-
-#### Declaring Platform Posture
-
-Platform posture is declared in domain metadata under the `platform` block:
+The decision is recorded in domain metadata under the `platform` block:
 
 ```yaml
 platform:
@@ -124,7 +79,7 @@ Field | Required | Purpose
 `product_scope` | No | Which product classes the organisation recognises as data products. Defaults to all three. If omitted, all classes are in scope.
 `notes` | No | Free-text context on platform decisions, constraints, or migration plans
 
-Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy. When all domains share the same posture, use consistent values across domain files.
+Product classes outside the declared `product_scope` are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms exist in `sources/` regardless. Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy.
 
 ---
 
@@ -186,7 +141,7 @@ governance:
 Field | Purpose
 --- | ---
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
-`schema_type` | Physical output style: `normalized`, `dimensional`, `wide-column`, `knowledge-graph`. Drives Agent Artifact's skill selection for generation and determines the logical model shape.
+`schema_type` | Physical output style: `normalized`, `dimensional`, `wide-column`, `knowledge-graph`. Drives generation and determines the logical model shape.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
 `status` | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
@@ -415,20 +370,15 @@ Strategy | Behaviour
 
 Masking is declared at the product level, not the entity level. The same entity may appear in multiple products with different masking rules depending on the consumer's access level.
 
+The strategy list is extensible — organisations may declare additional strategies (e.g., platform-specific tokenization schemes); the generating agent should confirm its interpretation of an unrecognised strategy rather than guess.
+
 ---
 
 ### **Product-Driven Generation**
 
-The `schema_type` field on a data product is the entry point for physical artifact generation. When an AI agent encounters a data product with a `schema_type`, it selects the corresponding Agent Artifact skill:
+The `schema_type` field on a data product is the entry point for physical artifact generation: it declares the shape of the physical output (`normalized`, `dimensional`, `wide-column`, `knowledge-graph`) and generating tooling selects its approach accordingly.
 
-`schema_type` value | Agent Artifact skill | Output
---- | --- | ---
-`normalized` | Normalized | DDL, JSON Schema, Parquet contract
-`dimensional` | Dimensional | Star schema DDL
-`wide-column` | Wide Column | Denormalized table DDL
-`knowledge-graph` | Knowledge Graph | Cypher DDL
-
-The product's logical model and `entities` list scope the generation. For domain-aligned products, the agent reads the canonical entity detail files to obtain attributes, types, and constraints. For consumer-aligned products, the agent uses the logical model diagram and attribute mapping tables as the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are applied as constraints on the generated artifacts.
+The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity detail files provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
 
 ---
 
@@ -451,53 +401,10 @@ SLA fields are informational — they document expectations but do not generate 
 
 Data products follow the same two-layer pattern as entities, relationships, and events:
 
-1. **Summary** — A `## Data Products` table in the domain file listing all products with class, consumers, and status
-2. **Detail** — Individual product definitions in `products/` detail files using level-3 headings and YAML blocks
+1. **Summary** — A `## Data Products` table in the domain file, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
+2. **Detail** — Individual product definitions in `products/` detail files, following the standard detail file rules: a level-1 heading naming the domain (linked back to the domain file), a `## Data Products` section, and one level-3 heading per product with its YAML metadata block
 
 This allows the domain file to act as a complete index of what the domain publishes, while detail files contain the full product specification.
-
-#### Domain File Summary Table
-
-The domain file includes a `## Data Products` section with a summary table:
-
-Column | Purpose
---- | ---
-**Name** | The product name, linked to its detail definition.
-**Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
-**Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state.
-
-Example:
-
-```markdown
-## Data Products
-
-Name | Class | Consumers | Status
---- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
-[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Active
-[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Active
-```
-
-#### Detail File Structure
-
-Product detail files follow the same structural rules as entity detail files:
-
-- Begin with a level-1 heading naming the domain, linked back to the domain file
-- Use level-2 heading `## Data Products`
-- Define individual products under level-3 headings with YAML metadata blocks
-
-```markdown
-# [Financial Crime](../domain.md)
-
-## Data Products
-
-### Customer 360 Profile
-...product definition...
-
-### Transaction Risk Summary
-...product definition...
-```
 
 ---
 
@@ -517,7 +424,7 @@ Product detail files follow the same structural rules as entity detail files:
 
 7. **Masking is product-scoped.** Masking rules are declared per product, not per entity. The same attribute may be masked differently in different products.
 
-8. **Schema type drives generation.** The `schema_type` is required and determines which Agent Artifact skill produces the physical output. The product's logical model, `entities` list, and `governance`/`masking` metadata are the generation input contract.
+8. **Schema type drives generation.** The `schema_type` is required and determines the shape of the physical output. The product's logical model, `entities` list, and `governance`/`masking` metadata are the generation input contract.
 
 9. **Source field for source-aligned.** Source-aligned products use `source` instead of `entities`. The value must match a source system folder under `sources/`.
 
@@ -541,30 +448,21 @@ In brownfield adoption contexts (see [Section 10 — Adoption](./10-Adoption.md)
 
 Data products progress through defined lifecycle states. The `status` field declares the current state; optional date fields document transition timing.
 
-#### Lifecycle States
-
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Active` | Product is live and governed. Changes follow the product versioning and consistency rules defined below.
+`Active` | Product is live and governed.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
-#### Transition Rules
+Optional lifecycle metadata fields document transitions:
 
-- `Draft` → `Active`: Product has passed quality review, names at least one consumer, and declares version `1.0.0` or higher.
-- `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
-- `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
-- `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
-
-#### Lifecycle Metadata Fields
-
-Field | Required | Purpose
---- | --- | ---
-`deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
-`successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
-`migration_note` | Advisory when the product remains active during upstream deprecation | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
-`sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
+Field | Purpose
+--- | ---
+`deprecated_date` | ISO 8601 date when the product was marked for retirement (used with `Deprecated`).
+`successor` | Name of the replacement product (if any), linked to its detail heading.
+`migration_note` | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
+`sunset_date` | ISO 8601 date after which the product is no longer published (used with `Retired`).
 
 Example:
 
@@ -574,35 +472,7 @@ deprecated_date: "2025-03-15"
 successor: "Customer 360 Profile v2"
 ```
 
-#### Product Versioning
-
-The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract. Product versions are independent from domain versions: a product may remain `Draft` while its domain is `Active`, and a product may lag behind the latest domain version while consumers migrate.
-
-Trigger | Version Impact
---- | ---
-Domain breaking change affecting an entity in the product's `lineage` | Major bump
-Domain additive change affecting an entity in the product's `lineage` and reflected in the product's logical model | Minor bump
-Product removes an entity from its `entities` list | Major bump
-Product adds an entity to its `entities` list | Minor bump
-Product changes masking rules, SLA, consumers, or other governance contract details without reducing schema scope | Minor or patch bump depending on consumer impact
-Corrective documentation or descriptive fixes with no contract impact | Patch bump
-
-Use a major bump when a correctly-authored consumer must change to keep working. Use a minor bump when the published contract is extended but existing consumers can continue unchanged. Use a patch bump for non-breaking clarifications or corrective metadata changes.
-
-#### Product-Domain Lifecycle Consistency
-
-Products evolve independently, but they cannot be more mature than the model they publish.
-
-- A product's `status` must not be more advanced than the owning domain's status. A product cannot be `Active` if its domain is `Draft` or `Review`.
-- Products may lag the domain. A product may remain `Draft` while its domain is `Active`.
-- Promoting a domain to `Active` does not automatically promote any products declared within it.
-- An `Active` product should declare version `1.0.0` or higher.
-- If a product references deprecated entities or draws from a deprecated lineage dependency, it must either move to `Deprecated` or declare a `migration_note` explaining the consumer migration path.
-- When a domain version bump changes referenced entities, affected products should evaluate their own version independently using the rules above and record the result in the domain's `LIFECYCLE.md` when that file is maintained.
-
-#### Lifecycle History Recording
-
-Product promotions, version bumps, deprecations, and retirements should be recorded in the owning domain's `LIFECYCLE.md` file when present. The domain owns the lifecycle history file because product lifecycle is part of the domain's publication history.
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract, independently of the domain version. Transition rules, version-bump triggers, product-domain lifecycle consistency, and lifecycle history recording are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 ---
 

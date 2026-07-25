@@ -23,7 +23,7 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 1. **Source of Truth**  
    Every concept is defined once in the domain, in one canonical location. A design choice is whether to follow Domain Driven Design (DDD) and allow domain concepts to be mutually exclusive or not.
 
-   This principle extends to source mappings. Source definitions and transform files are self-contained within each domain under `sources/<system>/`. Canonical entities contain no source references — they define meaning, not origin. Canonical data products replace the concept of Systems of Record: source systems are systems of change whose outputs are governed by the canonical model.
+   This principle extends to source mappings: canonical entities contain no source references — they define meaning, not origin. Source definitions and transform files are self-contained under `sources/<system>/` within each domain (see [Section 7 — Sources](./7-Sources.md)).
 
 2. **Markdown‑Native**  
    Headings define structure; prose defines meaning.
@@ -43,6 +43,10 @@ MD‑DDL uses Markdown structure as its primary syntax, with YAML or JSON blocks
 7. **Adoption is Incremental**
    MD-DDL supports incremental adoption. Organisations can begin by documenting their existing data landscape — dimensional models, canonical models, ETL pipelines, governance metadata — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state; the adoption maturity model tracks the journey; the canonical model is the destination. See [Section 10 — Adoption](./10-Adoption.md) for the full maturity model and adoption workflow.
 
+### Normative Language
+
+MD-DDL reserves **must** for rules whose violation breaks AI interpretation of the model — syntax, reference integrity, and the two-layer discovery structure. Everything else — naming, file layout, table columns, value vocabularies — is a **default convention**: the shape agents generate by default and recognise on sight. Conventions are extensible, and deviations from them are observations to work with (and potential spec contributions), not errors. See the [Validation Model](#validation-model) below.
+
 ---
 
 ## **Document Structure**
@@ -61,8 +65,8 @@ MD‑DDL is composed of several logical components:
 
 MD‑DDL uses a **two‑layer structure** for Entities, Enums, Relationships, Events, and Data Products:
 
-1. A **summary definition** in the domain file
-2. A **detailed definition** in a separate file
+1. A **summary definition**
+2. A **detailed definition**
 
 During adoption (see [Section 10](./10-Adoption.md)), a transitional layer may also exist:
 
@@ -105,12 +109,6 @@ Domain files and source files are co-located at the domain level. Domain files d
 - AI agents load only the summaries initially.  
 - When deeper context is needed, they follow the `detail:` link to load the full definition.
 
-This mirrors Anthropic’s "skills" concept but improves on it by:
-
-- Centralising summaries
-- Avoiding duplication
-- Ensuring humans can browse the domain easily
-
 #### **Human Readability**
 
 - The domain file becomes a clean, navigable table of contents.  
@@ -128,87 +126,15 @@ The only structural requirement is that every detail file begins with a level‑
 
 Source transform files follow the same two-layer pattern but are scoped to a source system within a domain context. They begin with a level-1 heading linking back to `./source.md` in the same source folder, followed by a level-2 heading for the source table and optional level-3 rule sections for non-direct mappings.
 
-### Include Directive
-
-Agent prompt files and skill reference stubs use an `{{INCLUDE: <path>}}` directive to inject content from other files at prompt-load time. This is processed by the AI platform (e.g. VS Code Copilot custom agents, Claude Code) before the prompt reaches the model — it is not part of the MD-DDL modelling language itself.
-
-The directive appears on its own line and takes a file-relative path:
-
-```text
-{{INCLUDE: ../../../md-ddl-specification/3-Entities.md}}
-```
-
-Paths must be relative to the file containing the directive. Do not use workspace-root paths, as MD-DDL repositories are commonly consumed as submodules where absolute paths break.
-
-This mechanism enables the spec reference stub pattern: skill reference files contain a brief description and an `{{INCLUDE}}` pointing to the canonical spec section, so that spec updates propagate automatically without duplicating content across agent files.
-
 ---
 
 ## **Validation Model**
 
-MD-DDL uses a two-tier validation model: **mechanical pre-flight checks** and **agent-driven quality review**. These tiers are deliberately separate because different categories of problem require different kinds of intelligence to detect.
+MD-DDL uses a two-tier validation model. **Tier 1 — mechanical pre-flight checks** covers only what breaks AI interpretation outright: YAML and Mermaid syntax, internal link integrity, entity reference consistency, and the presence of a domain `version:` field. **Tier 2 — agent-driven quality review** covers everything else: structure, convention, quality, and domain fitness are judgment calls that need context, so they belong to agents and humans, not rule-based linters.
 
-### Why Not a Traditional Linter
+Agents treat organisational deviations from convention — a field named `phi` instead of `pii`, `data_class` instead of `classification` — as observations to work with and potential spec vocabulary contributions, not errors.
 
-MD-DDL is an AI-native standard. The primary consumer of an MD-DDL model is an AI agent that already understands intent, domain context, and organisational conventions — capabilities that no rule-based linter can match. Applying rigid pass/fail enforcement above the syntax level would:
-
-- Reject legitimate organisational vocabulary differences (e.g., `phi` instead of `pii`) that agents understand and can work with
-- Suppress feedback that drives spec evolution — when organisations adapt MD-DDL to their context, that signal is valuable
-- Produce false positives for intentional exceptions (governance inheritance, minimal reference domains) that require domain context to evaluate correctly
-
-Traditional linters assume the checker is smarter than the thing being checked. For MD-DDL, the inverse is true.
-
-### Validation Levels
-
-Five categories of check exist across the MD-DDL model. Only Level 1 benefits from mechanical tooling:
-
-Level | Category | Example | Mechanically checked?
---- | --- | --- | ---
-1 | Syntax | YAML parses, Mermaid renders, markdown links resolve | Yes — broken syntax silently corrupts agent interpretation with no wiggle room
-2 | Structure | Required sections present, required YAML keys present | Partially — legitimate exceptions exist; structural checks need domain context to avoid false positives
-3 | Convention | Naming patterns, column order, heading hierarchy | No — organisational vocabulary differences are signal, not errors
-4 | Quality | Governance completeness, relationship coverage, event payloads | No — this is judgment; agents handle it through domain-review and compliance-audit
-5 | Domain fitness | Is this the right model for the business? | Never — requires human domain expertise by definition
-
-**The split:** Level 1 gets mechanical pre-flight checks. Levels 2–5 stay with agents and humans, where context and judgment live.
-
-### Pre-Flight Check Scope
-
-The following checks are the complete set of mechanical validation that MD-DDL endorses. No additional checks should be added without a spec version bump.
-
-Check | What it validates | Why it is mechanical
---- | --- | ---
-YAML syntax | All YAML code blocks parse without syntax errors | A YAML parse error silently corrupts agent interpretation of every attribute in the block
-Mermaid syntax | All Mermaid code blocks use valid diagram syntax | A Mermaid syntax error breaks every rendering of the domain or entity diagram
-Internal link integrity | All markdown links (`[text](path)`) resolve to existing files or headings | Dead links break navigation for both humans and agents
-Entity reference consistency | Entity names in relationships, events, products, and source mappings match an entity defined in the domain | A typo in an entity name creates a silent reference to nothing
-Domain version field | The `version:` key exists in domain metadata | Versionless domains cannot participate in maturity tracking or change management
-
-**What is explicitly not checked mechanically:**
-
-- Presence or absence of optional YAML keys (mutability, temporal, governance fields)
-- Naming conventions or vocabulary choices
-- Governance metadata completeness or correctness
-- Relationship granularity or cardinality appropriateness
-- Event payload structure completeness
-- Standards alignment accuracy
-- Any modelling judgment
-
-### Pre-Flight Check Tool Interface
-
-Any tool implementing pre-flight checks must conform to this interface:
-
-- **Input:** a domain folder path
-- **Output:** a list of findings, each with file path, line number, check name, and message
-- **Exit behaviour:** report all findings; do not stop on first error
-- **Severity:** all findings are a single severity ("pre-flight failure") — there is no warning/error distinction because all checks are binary
-- **Configuration:** none — the checks are fixed and minimal; there are no rules to enable or disable
-
-### Agent-Driven Quality Review
-
-Everything above Level 1 is the responsibility of agents. Agent Ontology's domain-review skill, Agent Governance's compliance-audit skill, and the structured review prompts in `.github/` handle structural, convention, quality, and domain-fitness concerns. They understand context and intent. They flag deviations as observations, not errors.
-
-When an agent encounters an organisational vocabulary deviation — a field named `phi` instead of `pii`, `data_class` instead of `classification` — the correct response is to note it as a **potential spec vocabulary gap** and work with it, not reject the file.
+The full validation level taxonomy, pre-flight check definitions, the tool interface, and the `{{INCLUDE}}` directive used by agent prompt files are collected in the non-normative [Validation Tooling Guide](../guides/validation-tooling.md).
 
 ## **Domains**
 
@@ -234,11 +160,7 @@ Metadata appears under a level‑2 heading:
 ## Metadata
 ```
 
-Domain Metadata sets the default posture for all contained objects unless overridden. Metadata is:
-
-Governance and compliance metadata declared at the domain level is inherited by all contained entities, relationships, and events. Detail files should not repeat governance attributes when values are unchanged from the domain defaults.
-
-Include a `governance:` block in detail files only when specifying an exception or stricter requirement than the domain default.
+Domain Metadata sets the default posture for all contained objects: governance and compliance metadata declared here is inherited by every entity, relationship, event, and data product in the domain. Detail files declare a `governance:` block only when overriding the domain default. The governance field schema and inheritance rules are defined once, in [Section 3 — Governance Metadata Schema](./3-Entities.md#governance-metadata-schema).
 
 Category|Metadata Keys|Purpose
 --------|-------------|-------
@@ -311,125 +233,33 @@ Business Application | Platform | Capability Domain
 
 Diagrams appear under level‑3 headings inside the Metadata section, after the YAML metadata block. This separates data *about* the domain from visuals *of* the domain.
 
-A domain file should contain at least one **Domain Overview Diagram** that shows the full entity graph for the domain. This diagram is the primary navigational and communicative artefact of the domain file — it must give any reader an immediate understanding of how all concepts relate to each other.
+A domain file should contain a **Domain Overview Diagram** — a Mermaid `graph TD` (top-down) or `graph LR` (left-right) showing the domain's entities and how they relate. It is the primary navigational artefact of the domain file: the domain file is the map, and the diagram is its visual index.
 
-The Domain Overview Diagram uses `graph TD` (top-down) or `graph LR` (left-right) Mermaid syntax with the ELK layout engine for consistent, readable positioning of complex graphs.
+Two rules keep the diagram consistent with the model:
 
-##### **What to include in the Domain Overview Diagram**
+- Relationship edges are labelled, and the labels match the relationship names defined in the Relationships section (e.g., `-->|assumes|`). Inheritance is expressed as `Child -->|is a|Parent`.
+- The overview diagram shows concepts, not detail. Attributes, cardinality notation, and enumeration values belong in detail files, not the overview.
 
-The diagram must show:
+Nodes may hyperlink to detail files for navigation, and additional level‑3 diagrams focusing on specific sub-areas may follow the overview. Layout configuration, linking syntax, and worked examples are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
-1. **All entities** defined in the domain
-2. **Inheritance relationships** using `-->|is a|` notation
-3. **All relationships** between entities using labelled edges whose verb matches the relationship name defined in the Relationships section
-4. **Hyperlinks** on key navigable entities using `EntityName["<a href='path'>Display Name</a>"]` syntax. Not every node needs a link — prioritise the abstract and most-referenced entities.
-
-The diagram must not show:
-
-- Attributes (these belong in entity detail files)
-- Cardinality notation (this belongs in relationship detail files)
-- Enumeration values (these belong in enum detail files)
-
-##### **Diagram Syntax Rules**
-
-- Use `graph TD` for domains with deep inheritance hierarchies
-- Use the ELK layout engine (`layout: elk`) with `mergeEdges: false` for complex graphs to prevent edge crossings
-- Relationship edge labels must use the verb form from the Relationships
-  section: `-->|assumes|`, `-->|references|`, `-->|governed by|`
-- Inheritance is always expressed as `Child -->|is a|Parent`
-- Bidirectional relationships use `<-->|label|`
-- Entity hyperlinks use plain anchor tags: `<a href='path'>Display Name</a>`
-  with no additional CSS class attributes
-- Node identifiers in the graph use PascalCase for readability
-  (e.g., `PartyRole`, `ContactAddress`) but the display label uses
-  natural language where a hyperlink is defined
-
-##### **Example: Financial Crime Domain Overview Diagram**
+Example (abbreviated):
 
 ````markdown
 ### Domain Overview Diagram
 
 ```mermaid
----
-config:
-  layout: elk
-  elk:
-    mergeEdges: false
-    nodePlacementStrategy: LINEAR_SEGMENTS
-  look: classic
-  theme: dark
----
 graph TD
 
   Individual --> |is a|Party
   Company --> |is a|Party
-  TermDepositAgreement --> |is a|Agreement
-  LoanAgreement --> |is a|Agreement
 
-  Party <--> |related to|Party
   Party --> |assumes|PartyRole
-
-  Customer --> |is a|PartyRole
-  Merchant --> |is a|PartyRole
-  Payee --> |is a|PartyRole
-  Payer --> |is a|PartyRole
-  Teller --> |is a|PartyRole
-  PaymentInitiator --> |is a|PartyRole
-
   Party --> |has|ContactAddress
-  PartyRole --> |uses|ContactAddress
-  ContactAddress --> |references|Address
-
-  Customer --> |holds|Account
-  Customer --> |has|CustomerPreferences
-  PartyRole --> |governed by|Agreement
-  PaymentTransaction --> |has|Payer
-  PaymentTransaction --> |has|Payee
-  PaymentTransaction --> |initiated by|PaymentInitiator
-  PaymentTransactionAccount --> |involved in|PaymentTransaction
-  PaymentTransactionAccount --> |debits|Account
-  PaymentTransactionAccount --> |credits|Account
-  Teller --> |processes|PaymentTransaction
-  Merchant --> |processes|PaymentTransaction
-
-  Account --> |holds|Product
-  Branch --> |services|Account
-  Product --> |in terms of|Agreement
 
   Party["<a href='entities/party.md'>Party</a>"]
   PartyRole["<a href='entities/party_role.md'>Party Role</a>"]
-  ContactAddress["<a href='entities/contact_address.md'>Contact Address</a>"]
-  Address["<a href='entities/address.md'>Address</a>"]
 ```
 ````
-
-##### **Why the Domain Overview Diagram matters**
-
-The domain diagram is the first artefact an AI agent or a new team member loads when working with a domain. It establishes:
-
-- **Scope**: what concepts are owned by this domain
-- **Structure**: how inheritance hierarchies are organised
-- **Connectivity**: which entities are central vs peripheral
-- **Navigation**: hyperlinks on key entities provide one-click access to detail files from the diagram itself
-
-A well-maintained domain diagram makes the two-layer structure of MD‑DDL work in practice — the domain file is the map, and the diagram is the visual index of that map.
-
-##### **Additional Diagrams**
-
-Beyond the overview, a domain file may contain additional level‑3 diagrams focusing on a specific sub-area. For example:
-
-````markdown
-### Transaction Flow Diagram
-Shows how payment transactions move through party roles.
-
-```mermaid
-graph LR
-  Payer --> |initiates|PaymentTransaction
-  PaymentTransaction --> |credits|Payee
-```
-````
-
-Additional diagrams are optional. The Domain Overview Diagram is required.
 
 #### Conceptual vs Logical Diagrams
 
@@ -437,7 +267,7 @@ MD-DDL uses two distinct diagram types for different purposes:
 
 Diagram|Location|Purpose|Relationship Labels
 -------|--------|-------|-------------------
-`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Required — must match Relationships section
+`graph TD/LR`|Domain file|Conceptual model — business meaning and named relationships|Match the Relationships section
 `classDiagram`|Entity detail file|Logical model — structural realization of the entity|Optional — structural intent only
 
 The classDiagram is not required to mirror the domain graph one-for-one. Modellers have freedom to realize conceptual relationships as they see fit at the logical level.
@@ -465,13 +295,7 @@ sources/sap-fraud-management/source.md
 
 #### **Source Systems Table**
 
-Summarizes operational source applications relevant to the domain.
-
-Column | Purpose
---- | ---
-**Application** | Markdown link to the source markdown file.
-**Platform** | Technology platform or deployment model.
-**Capability Domain** | Business capability or functional area served by the source.
+Summarizes operational source applications relevant to the domain, using the column format defined in [Source Systems](#source-systems) above.
 
 ---
 
@@ -490,7 +314,7 @@ The Entities table summarizes the core concepts of the domain.
 
 #### **Enums Table**
 
-Summarizes the discrete value sets used within the domain. Enums should be named as a plural - E.g. Customer Types.
+Summarizes the discrete value sets used within the domain. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
 
 Column | Purpose
 --- | ---
@@ -556,147 +380,23 @@ Every domain definition has a lifecycle — it moves from initial authoring thro
 
 #### Domain Status
 
-The `status` field declares the current lifecycle state of the domain definition. They govern the lifecycle of the domain definition.
-
-Valid values:
+The `status` field declares the current lifecycle state of the domain definition:
 
 Value | Description
 --- | ---
 `Draft` | Under active development. Not yet validated. Do not consume.
-`Review` | Under structured review (Layer 1/2/3 process). Stable enough for early feedback; breaking changes possible.
+`Review` | Under structured review. Stable enough for early feedback; breaking changes possible.
 `Active` | Validated and available for consumption. Stability guaranteed within major version.
-`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition. No new consumers should onboard.
+`Deprecated` | Retained for reference and migration support. Consumers should migrate to the superseding definition, which may be declared in a `superseded_by` metadata field.
 `Retired` | No longer maintained. Historical record only.
-
-**Transition rules:**
-
-- A domain may only move forward through lifecycle states: `Draft` → `Review` → `Active` → `Deprecated` → `Retired`.
-- Reverting from `Active` to `Draft` or `Review` is permitted only when a major version bump accompanies the change (the previous active version is effectively superseded).
-- `Deprecated` domains should declare a `superseded_by` field in metadata pointing to the replacement domain (if one exists).
-- `Retired` domains are immutable records. They remain in the repository for lineage and audit purposes.
 
 #### Domain Version
 
-The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the domain definition. See [Domain Evolution](#domain-evolution) for version bump rules.
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`): major for breaking changes, minor for additive changes, patch for corrective changes. A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied.
 
-**Lifecycle and version interaction:**
+A domain may also maintain a `LIFECYCLE.md` file adjacent to `domain.md`, combining a machine-readable change manifest with a human-readable changelog.
 
-- A domain in `Draft` status may use version `0.x.y` to signal pre-release instability. The `0.x` convention indicates that breaking changes may occur without a major bump.
-- A domain in `Active` status must have version `1.0.0` or higher. Stability guarantees apply from the first major release.
-- When a domain transitions from `Review` to `Active` for the first time, its version should be set to `1.0.0`.
-
----
-
-### **Domain Evolution**
-
-Domains are living artifacts. They evolve as business understanding deepens, new source systems are integrated, regulatory requirements change, and consumer needs shift. The `version` field in domain metadata tracks this evolution using semantic versioning.
-
-#### Version Bump Rules
-
-Change Type | Version Impact | Examples
---- | --- | ---
-**Breaking** — changes meaning or removes consumer-visible structure | Major bump | Removing an entity or attribute; changing an attribute type incompatibly; reducing relationship cardinality; changing an identifier; removing or renaming an enum used by consumers
-**Additive** — extends the model without altering existing meaning | Minor bump | Adding a new entity, attribute, relationship, event, enum value, or constraint; declaring a new source system or data product
-**Corrective** — fixes errors without changing intended meaning | Patch bump | Clarifying descriptions; correcting broken links; updating governance metadata without changing logical structure; clarifying a constraint description without changing its logic
-
-#### Breaking vs Non-Breaking Changes
-
-A change is **breaking** if a correctly-authored downstream consumer (data product, physical artifact, or integration) would produce different or incorrect output after the change is applied. Specifically:
-
-- Removing or renaming an entity or enum is always breaking.
-- Changing relationship cardinality (e.g., `1:N` to `M:N`) is breaking — physical schemas may need restructuring.
-- Changing relationship granularity (`atomic` to `period`) is breaking — it alters the semantics of the join.
-- Removing an attribute is breaking if any data product includes that entity.
-- Changing an attribute's type or constraints is breaking if it narrows the valid domain.
-
-A change is **non-breaking** if existing consumers continue to produce correct output without modification.
-
-#### Evolution Workflow
-
-When modifying an existing domain:
-
-1. Identify the change and classify it as breaking, additive, or corrective.
-2. Bump the `version` field in metadata according to the rules above.
-3. Record the logical change in `LIFECYCLE.md` if the domain maintains one. Include a machine-readable change manifest and any affected products.
-4. If breaking: review all data products that reference the affected entities and update them accordingly.
-5. If additive: update the relevant summary tables and create/update detail files.
-6. If corrective: fix the error in place.
-
-#### Lifecycle File Convention
-
-A domain may include a `LIFECYCLE.md` file adjacent to `domain.md`. This file is optional, but recommended from the first version bump onward and strongly recommended for domains at `Active` status or higher.
-
-`LIFECYCLE.md` replaces the narrower `CHANGELOG.md` convention used in earlier drafts. It combines a machine-readable change manifest with a human-readable changelog so the same file supports both agent workflows and human review.
-
-Suggested structure:
-
-````markdown
-# Lifecycle - Financial Crime
-
-## Current State
-
-```yaml
-domain_version: "1.1.0"
-domain_status: Active
-
-products:
-  - name: Customer 360 Profile
-    status: Active
-    version: "1.0.0"
-  - name: Suspicious Activity Report
-    status: Draft
-    version: "0.2.0"
-```
-
-## Version History
-
-### Domain 1.1.0 - 2026-03-14
-
-#### Change Manifest
-
-```yaml
-changes:
-  - type: additive
-    scope: entity
-    entity: Exchange Rate
-    description: "Added Exchange Rate entity for multi-currency analysis"
-  - type: additive
-    scope: attribute
-    entity: Transaction
-    attribute: Exchange Rate
-    description: "Added Exchange Rate attribute to Transaction"
-
-affected_products:
-  - name: Suspicious Activity Report
-    impact: additive
-    reason: "Transaction schema extended with exchange-rate context"
-```
-
-#### Changelog
-
-### Added
-- Exchange Rate entity for multi-currency transaction analysis
-- Currency entity as reference data
-
-### Changed
-- Transaction entity: added `Exchange Rate` attribute
-
-### Domain 1.0.0 - 2025-11-01
-
-#### Changelog
-
-### Added
-- Initial domain release with Party, Account, Transaction, and Agreement entity families
-````
-
-**Rules:**
-
-- `LIFECYCLE.md` is domain-scoped and may also record product status/version snapshots in the `## Current State` section.
-- Each domain version entry must correspond to a semantic version used in the domain metadata.
-- The `#### Change Manifest` block is the machine-readable section. It may be consumed by reconciliation and impact-analysis workflows.
-- The `#### Changelog` section is the human-readable section and should use `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` headings where applicable.
-- Agents should offer to create or update `LIFECYCLE.md` whenever the domain version is bumped or a product is promoted, deprecated, or retired.
-- `LIFECYCLE.md` is the authoritative lifecycle history file. If an older `CHANGELOG.md` exists, it should be migrated or treated as legacy documentation.
+Lifecycle transition rules, version-bump guidance, the breaking-change taxonomy, the evolution workflow, and the `LIFECYCLE.md` format are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 ---
 
@@ -791,165 +491,14 @@ Free‑text Markdown under the heading describes the entity in more detail than 
 
 ### **Entity Diagram**
 
-Every entity detail file must include a `classDiagram` immediately after the entity description and before the YAML definition blocks. The diagram is the visual contract for the entity — it shows the entity's own attributes, its position in the inheritance hierarchy, and all of its immediate relationships to other entities.
+An entity detail file should include a Mermaid `classDiagram` immediately after the entity description and before the YAML definition blocks. It shows the entity's own attributes, its position in the inheritance hierarchy, and its immediate relationships to other entities.
 
-#### **Diagram Configuration**
+The YAML definition block remains the authoritative source for attributes and types — the diagram is a rendering of it, and the two should stay consistent. The classDiagram is a logical realization of the entity: its associations and labels do not need to mirror the conceptual relationships in the domain file one-for-one. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
 
-All entity diagrams use the ELK layout engine for consistent rendering:
-
-````markdown
-```mermaid
----
-config:
-  layout: elk
----
-classDiagram
-  ...
-```
-````
-
-#### **The Subject Class**
-
-The entity being defined is the **subject class**. It is always written as a full class block with its attributes listed inside:
-
-```text
-  class Party{
-    <<abstract>>
-    * Party Identifier : string
-    Legal Name : string
-    Party Status : enum~PartyStatus~
-  }
-```
-
-**Rules for the subject class:**
-
-- The class name uses PascalCase matching the entity heading (e.g., `Party`, `ContactAddress`, `PartyRole`)
-- If the entity is abstract — never instantiated directly, only specialised - add `<<abstract>>` as the first line inside the class block
-- The primary identifier attribute is prefixed with `*` to mark it as the key
-- All attributes defined in the entity's YAML block must appear in the diagram
-- Attribute types use the Mermaid classifier syntax:
-  - Primitives: `string`, `integer`, `decimal`, `boolean`, `date`, `datetime`
-  - Enumerations: `enum~EnumName~` (e.g., `enum~PartyStatus~`, `enum~CountryCode~`)
-  - Arrays: append `[]` to the type (e.g., `enum~CountryCode~[]`, `string[]`)
-- Inherited attributes from parent entities are **not** repeated in the subject class — only attributes defined in this entity's own YAML block are shown
-- Attribute format is `AttributeName : Type` with a space either side of the colon
-
-#### **Related Classes**
-
-All other classes that appear in the diagram — parents, children, related entities, and referenced enums — are **reference classes** unless they are enums detailed in the same file. Reference classes are never defined with attribute blocks. Instead they use the linked class syntax:
-
-```text
-  class Party["<a href='party.md'>Party</a>"]
-```
-
-**Rules for reference classes:**
-
-- Use plain anchor tags: `<a href='path'>Display Name</a>`
-- No CSS class attributes on the anchor tag
-- The `href` path is relative to the current file's location and uses snake_case filenames (e.g., `party.md`, `party_role.md`, `contact_address.md`)
-- Display Name uses natural language with spaces matching the entity heading (e.g., `Party Role`, `Contact Address`)
-- All reference class definitions are grouped at the bottom of the diagram, after all relationship lines
-- If a specialisation child has no detail file yet, it may appear as a bare unlinked class: `class Customer` — without a block or link
-
-#### **Enum Classes in Entity Diagrams**
-
-Any enum used by the subject class attributes must appear in the class diagram.
-
-Use one of two patterns:
-
-1. **Referenced enum (detail in another file)** — show as a linked reference class:
-
-```text
-  class PartyStatus["<a href='../enums/party_status.md'>Party Status</a>"]
-```
-
-1. **Co-located enum (detail in the same file)** — show as an expanded enum class with values:
-
-```text
-  class PartyStatus{
-    <<enumeration>>
-    Active
-    Inactive
-    Under Review
-  }
-```
-
-**Rules for enum classes:**
-
-- Every enum type referenced in the subject class (for example `enum~PartyStatus~`) must appear exactly once in the diagram
-- If the enum is defined in the same detail file under `## Enums`, render it as an expanded enum class with its values and include `<<enumeration>>`
-- If the enum is defined elsewhere, render it as a linked reference class to its enum detail file and include only the `<<enumeration>>` tag in the class detail.
-- Use PascalCase class names for enum class identifiers (for example `PartyStatus`, `CountryCode`)
-- Display names in links use natural language (for example `Party Status`, `Country Code`)
-
-#### **Inheritance**
-
-Inheritance uses the Mermaid `--|>` arrow with the child on the left:
-
-```text
-  Individual --|> Party
-  Company --|> Party
-```
-
-This reads as "Individual is a specialisation of Party." The direction matches the domain overview diagram convention of `Child -->|is a|Parent`.
-
-When an entity **is** a specialisation, show the parent as a reference class:
-
-```text
-  Individual --|> Party
-  class Party["<a href='party.md'>Party</a>"]
-```
-
-When an entity **has** specialisations, show each child as a reference class (or bare class if not yet defined):
-
-```text
-  Individual --|> Party
-  Company --|> Party
-  class Individual["<a href='individual.md'>Individual</a>"]
-  class Company["<a href='company.md'>Company</a>"]
-```
-
-#### **Entity Relationships**
-
-All immediate relationships to and from the entity are shown with labelled arrows and cardinality. The classDiagram is a logical realization of the entity — relationship labels here describe the structural link (e.g., has, references) and do not need to match the conceptual relationship names defined in the domain Relationships section. A single conceptual relationship may realize as multiple logical associations, and some logical associations may have no direct conceptual counterpart.
-
-```text
-  Party "1" --> "0..*" PartyRole
-  PartyRole "0..*" --> "0..*" ContactAddress
-  ContactAddress "0..*" --> "1" Address
-```
-
-Relationship labels on classDiagram arrows are optional. When included, they describe the structural navigation intent, not the conceptual relationship name.
-
-**Rules for relationships:**
-
-- Cardinality is always shown on both ends using quoted strings: `"1"`, `"0..1"`, `"0..*"`, `"1..*"`
-- In class diagrams the relationship label is optional. We are realizing the concepts from the domain in a logical model so there may not be a direct relationship.
-- The arrow direction reflects the ownership or navigational direction: the entity that *holds the reference* is the source (`-->`)
-- Bidirectional relationships use `<-->`
-- Every entity in a relationship line must have a corresponding reference class definition at the bottom of the diagram
-
-#### **Ordering Within the Diagram**
-
-To keep diagrams readable and consistent, follow this ordering:
-
-1. The subject class block (with attributes)
-2. Specialisation child classes (bare or linked, one per line)
-3. Inheritance arrows (`--|>`)
-4. Relationship lines (`-->` with cardinality and label)
-5. Enum classes (expanded if co-located; linked reference if external)
-6. All remaining reference class definitions (`class Foo["<a href='...'>...</a>"]`)
-
-#### **Example**
-
-**Abstract entity with specialisations and outbound relationships (Party):**
+Example:
 
 ````markdown
 ```mermaid
----
-config:
-  layout: elk
----
 classDiagram
   class Party{
     <<abstract>>
@@ -961,39 +510,15 @@ classDiagram
   Individual --|> Party
   Company --|> Party
   Party "1" --> "0..*" PartyRole
-  Party "1" --> "0..*" ContactAddress
-
-  class FinancialCrimeRiskRating["<a href='../enums/financial_crime_risk_rating.md'>Financial Crime Risk Rating</a>"]
 
   class Individual["<a href='individual.md'>Individual</a>"]
   class Company["<a href='company.md'>Company</a>"]
   class PartyRole["<a href='party_role.md'>Party Role</a>"]
-  class ContactAddress["<a href='contact_address.md'>Contact Address</a>"]
+  class FinancialCrimeRiskRating["<a href='../enums/financial_crime_risk_rating.md'>Financial Crime Risk Rating</a>"]
 ```
 ````
 
-**Entity with co-located enum values (example):**
-
-````markdown
-```mermaid
----
-config:
-  layout: elk
----
-classDiagram
-  class CustomerPreferences{
-    * Preference Identifier : string
-    Contact Method Preference : enum~ContactMethodPreference~
-  }
-
-  class ContactMethodPreference{
-    <<enumeration>>
-    Email
-    SMS
-    Phone
-  }
-```
-````
+Conventions for subject classes, reference classes, enum rendering, inheritance arrows, cardinality, and element ordering are collected in the non-normative [Diagram Style Guide](../guides/diagram-style.md).
 
 ### **Entity Definition**
 
@@ -1010,7 +535,7 @@ temporal:
 attributes:
   Customer Number:
     type: string
-    identifier: true
+    identifier: primary
   Email Address:
     type: string
     pii: true
@@ -1060,7 +585,7 @@ These fields may appear in an entity's `governance:` YAML block. Only include fi
 Field | Type | Required | Description
 --- | --- | --- | ---
 `pii` | boolean | No | Override the domain's PII flag for this entity.
-`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. This field name is standardised — do not use alternatives such as `pii_attributes` or `personal_data_fields`.
+`pii_fields` | string[] | No | Explicit enumeration of attribute names within this entity that contain PII. Optional — use when an applicable regulatory framework requires an enumerated PII field inventory (e.g., GDPR Article 30 data mapping, HIPAA Safe Harbor de-identification). When present, must list all attributes marked `pii: true` in the entity. When absent, PII is identified by the `pii: true` marker on individual attributes. `pii_fields` is the conventional name for this field — using it consistently lets agents and tooling rely on it across domains.
 `classification` | string | No | Override the domain's classification for this entity. Must use the same value set: `Public`, `Internal`, `Confidential`, `Highly Confidential`.
 `retention` | string | No | Override the domain's retention period for this entity.
 `retention_basis` | string | No | Justification for why this entity's retention differs from or elaborates on the domain default. Include regulatory citation where applicable.
@@ -1135,13 +660,10 @@ Property | Type | Required | Description
 
 #### Lifecycle Rules
 
-- An entity's `status` must not be more advanced than its parent domain's status. An entity cannot be `Active` in a `Draft` domain.
-- When `status` is omitted, the entity inherits the domain's status.
+- When `status` is omitted, the entity inherits the domain's status. An entity's `status` should not be more advanced than its parent domain's status.
 - The `since`, `deprecated_at`, and `breaking_in` fields refer to domain semantic versions as defined in [2-Domains.md](./2-Domains.md#domain-version).
-- The `since` field is informational — it records provenance and aids lifecycle history generation.
-- The `deprecated_at` field signals to consumers that this entity should no longer be relied upon. Deprecated entities should include a description noting the replacement or migration path.
-- The `breaking_in` field provides advance notice of an upcoming breaking change. Agents and consumers can use this to plan migrations before the change takes effect.
-- When an entity is introduced, deprecated, or flagged with `breaking_in`, the domain's `LIFECYCLE.md` should be updated if that file is maintained.
+
+Practices for deprecation, migration notice, and lifecycle history are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 #### Example
 
@@ -1186,12 +708,12 @@ By using the business term (e.g., Positive Liquidity) as the YAML key rather tha
 
 This optional section defines how temporal tracking is applied to the entity. This is optional and will default to current state tracking if not specified or inherit from parent entities if they have temporal tracking defined.
 
-Type|Description|Generation Guidance
-----|-----------|-------------------
-`valid_time`|Business time - when is this true in the real world?|Adds effective/expiration date columns, supports point-in-time queries
-`transaction_time`|System time - when was this recorded?|Adds created/superseded timestamps, immutable records
-`bitemporal`|Both valid and transaction time|Adds both sets of columns, full temporal reconstruction
-`point_in_time`|Event timestamp only|For events - single timestamp, immutable
+Type|Description
+----|-----------
+`valid_time`|Business time - when is this true in the real world? Supports point-in-time queries.
+`transaction_time`|System time - when was this recorded? Records are immutable once superseded.
+`bitemporal`|Both valid and transaction time - full temporal reconstruction.
+`point_in_time`|Event timestamp only. For events - single timestamp, immutable.
 
 ### Existence
 
@@ -1200,8 +722,6 @@ This optional section defines if this entity can exist independently.
 - independent — meaningful on its own; doesn't require another entity to give it purpose (Customer, Product, Location)
 - dependent — only meaningful in the context of other entities; its reason for existing is to record a relationship between them (Payment Transaction, Order Line, Enrolment)
 - associative — resolves a many-to-many; carries attributes about the relationship itself (Party Agreement, Student Course Enrolment)
-
-The generating agent uses this to decide whether to create a candidate dimension or candidate fact. Associative signals a bridge in dimensional models.
 
 ### Mutability
 
@@ -1213,7 +733,7 @@ This optional section defines how the data changes over time.
 - frequently_changing — changes often, current value is what matters (account balance, inventory level)
 - reference — essentially static, managed by a small number of administrators (country codes, currency codes)
 
-The generating agent sees immutable or append_only and knows this belongs at the centre of a star. It sees slowly_changing and knows to apply SCD logic. It sees reference and knows to generate a small lookup table.
+Both `existence` and `mutability` are intent signals: they tell generating agents and human readers how the entity behaves, without prescribing a physical structure. How generators map them to physical patterns is a generation-tooling concern, outside this spec.
 
 ---
 
@@ -1289,11 +809,11 @@ constraints:
 
 **Identifiers:**
 
-Every Entity should have at least one attribute marked identifier: true. If missing, the Knowledge Graph treats the entity as a "Logic Object" rather than a "Data Object."
+Every Entity should have at least one attribute marked as an identifier (`identifier: primary` for the primary key). If missing, the Knowledge Graph treats the entity as a "Logic Object" rather than a "Data Object."
 
 **No Relationship Attributes:**
 
-Explicitly forbid Customer Id appearing inside a Preference entity YAML. Instead, the Relationships section handles the link. This prevents "Foreign Key Drift."
+Entity YAML must not declare foreign-key attributes (e.g., a Customer Id inside a Preference entity). The Relationships section defines the link; physical keys are generated from the relationship definition. This prevents "Foreign Key Drift" — an FK attribute in entity YAML would be interpreted as a business attribute and corrupt generation.
 
 **No Source References in Entity Files:**
 
@@ -1319,7 +839,7 @@ Enums appear under:
 ## Enums
 ```
 
-Enums can be defined as a simple list of values or a dictionary if the values require additional metadata. Enums should be named as a plural - E.g. Customer Types.
+Enums can be defined as a simple list of values or a dictionary if the values require additional metadata. By convention, an enum's name describes the value set (e.g., Loyalty Tier, Customer Types) — be consistent within a domain.
 
 Simple Format:
 
@@ -1443,6 +963,8 @@ governance:
 - `governs`: A set of rules or a domain controlling an entity. Example: GDPR Policy governs Customer PII.
 - `masks` / `protects`: Security-specific relationships. Example: Vault Service masks Credit Card Number.
 
+This vocabulary is extensible. Organisations may use additional type verbs where none of the above fits; agents treat an unrecognised type as a loose association for generation purposes and note it as a potential spec vocabulary contribution.
+
 ### Granularity
 
 Describes the resolution at which a relationship operates relative to the entities it connects.
@@ -1490,24 +1012,11 @@ relationship_attributes:
 
 #### Source and Target Semantics
 
-When `self_referential: true`, directionality is preserved in the physical model by generating two FK columns pointing to the same entity table:
-
-- `source_[entity_identifier]` — FK referencing the source instance
-- `target_[entity_identifier]` — FK referencing the target instance
-
-For a Party with identifier `Party Identifier`, the bridge table would contain `source_party_identifier` and `target_party_identifier`. For bidirectional relationships where direction is not meaningful (e.g., "sibling of"), the generating agent should document that either column may be treated as the source.
+Directionality is meaningful even when both ends name the same entity: `source` is the origin instance and `target` the destination instance. For bidirectional relationships where direction is not meaningful (e.g., "sibling of"), note this in the relationship description.
 
 The `ownership` field names the entity that owns the relationship definition — typically the entity the relationship most naturally describes from. For self-referential relationships this is always the same entity as `source` and `target`.
 
-#### Generation Guidance
-
-Self-referential relationships always generate a bridge/association table — even at one-to-many cardinality — to avoid a self-referencing FK on the entity's own primary key column:
-
-Cardinality | Physical pattern
---- | ---
-`many-to-many` | Bridge table with `source_[pk]`, `target_[pk]`, and `relationship_attributes` columns
-`one-to-many` (hierarchy) | Bridge table preferred; adjacency list (parent FK on entity) is acceptable for shallow hierarchies where generation skill supports it explicitly
-Any | Unbounded recursion depth is the default; document when depth is bounded and recommend recursive CTE query patterns in platform-specific notes
+How self-referential relationships realize physically (bridge tables, FK column naming, recursion handling) is a generation-tooling concern, outside this spec.
 
 ### Relationship Rules
 
@@ -1708,7 +1217,7 @@ Financial Crime/
 
 The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
 
-Transform file names are based on the source table and must follow this pattern:
+Transform files are named for the source table, by convention:
 
 `table_<source-table>.md`
 
@@ -1787,17 +1296,16 @@ tags:
 
 ##### Change Models
 
-The `change_model` field declares how change flows out of the source system.
-This guides the pipeline pattern to generate.
+The `change_model` field declares how change flows out of the source system. It is an intent signal — generating tooling uses it to select an appropriate pipeline pattern.
 
-Value | Description | Generated pipeline pattern
---- | --- | ---
-`real-time-cdc` | Change Data Capture — row-level changes streamed in real time | Streaming pipeline
-`event-driven` | Source publishes business events (not raw CDC) | Event consumer
-`batch-daily` | Full or incremental extract on a daily schedule | Scheduled ETL
-`batch-intraday` | Multiple batch extracts within a day | Scheduled ETL with frequency
-`api-poll` | Changes retrieved by polling a source API | API ingestion job
-`manual` | Data loaded by human intervention; no automated feed | Manual load template
+Value | Description
+--- | ---
+`real-time-cdc` | Change Data Capture — row-level changes streamed in real time
+`event-driven` | Source publishes business events (not raw CDC)
+`batch-daily` | Full or incremental extract on a daily schedule
+`batch-intraday` | Multiple batch extracts within a day
+`api-poll` | Changes retrieved by polling a source API
+`manual` | Data loaded by human intervention; no automated feed
 
 ##### Change Events
 
@@ -2133,7 +1641,7 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
 
-2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is non-negotiable.
+2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
 3. **Transform files are source-folder scoped.** A transform file belongs to exactly one source folder and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a transform file, listing the contributing sources explicitly.
 
@@ -2171,31 +1679,15 @@ Transformations are **first-class citizens** of the Source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in source-table transform files. Each file uses a level-2 heading for the source table and a source schema table that maps columns to destinations:
+Transformations are declared in source-table transform files under `sources/<system>/transforms/`. The transform file structure — source schema table, `Destination` column mechanics, and file naming — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
 
-```markdown
-## Account
-
-Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Comment | Destination
---- | --- | --- | --- | --- | --- | --- | --- | ---
-1 | ExternalPartyId | Text | 40 | | | no | Account-scoped party id | Party.Party Identifier
-2 | RecordStatus | Text | 20 | | | yes | Record lifecycle status | [Map Party Status](#map-party-status)
-```
-
-Each non-direct transformation in that file uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
+Each non-direct transformation uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
 
 ```markdown
 ### Concatenate Name Parts
 ```
 
-A short prose description of the business intent follows the heading, before the YAML block. See [Section 7 — Sources](./7-Sources.md) for the full transform file structure.
-
-Transform files must be named for the source table using the `table_<source-table>.md` pattern. If multiple canonical entities are mapped from the same source table, they can coexist in one file.
-
-The `Destination` column controls rule verbosity:
-
-- Direct mapping: use `Entity.Attribute` directly in the `Destination` cell.
-- Non-direct mapping: link to a same-file rule section (for example `[Map Party Status](#map-party-status)`) and define the YAML rule under that heading.
+A short prose description of the business intent follows the heading, before the YAML block.
 
 ---
 
@@ -2209,6 +1701,8 @@ target: Entity · Attribute
 ```
 
 `type` and `target` are always required. Everything else depends on the type.
+
+A transformation may also declare `quality_check: false` to indicate that a null target attribute after the transformation runs is legitimate (by default, generated quality tests assert non-null).
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
 
@@ -2285,7 +1779,7 @@ String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)` | `
 Date functions | `today()`, `date_diff(a, b, unit)`, `date_add(d, n, unit)` | `"date_diff(End Date, Start Date, 'days')"`
 Null handling | `coalesce(a, b)` | `"coalesce(Preferred Name, First Name)"`
 
-The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names.
+The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names. The function set above is the portable core, not a closed list — additional functions may be used where the generating agent and target platform support them.
 
 ---
 
@@ -2319,6 +1813,8 @@ Strategy | Behaviour
 `priority_always` | Always take the highest-priority value, even if null
 `most_recent` | Take the value with the most recent timestamp; requires `timestamp_field` on each source
 `consensus` | Take a value only when all sources agree; otherwise null
+
+These strategies cover the common cases and are not a closed list — an organisation may declare another strategy, described in the transformation's prose, and the generating agent should confirm its interpretation rather than guess.
 
 For `most_recent`, declare the timestamp field on each source:
 
@@ -2416,7 +1912,7 @@ grain:
 ```
 ````
 
-`function` supports: `sum`, `count`, `count_distinct`, `min`, `max`, `average`, `first`, `last`.
+`function` supports: `sum`, `count`, `count_distinct`, `min`, `max`, `average`, `first`, `last`. Additional functions may be used where the target platform supports them.
 
 `grain` declares which entity this aggregation rolls up to and the join key. The `entity` value must match an entity name in the domain model. The `join_on` value must match an attribute name on that entity.
 
@@ -2445,17 +1941,6 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
 7. **Transformations are optional:** A `source.md` file may exist without additional transform files if the source is declared but mappings have not yet been authored. Transform files are added when integration lineage is needed.
-
----
-
-### **Generation Behaviour**
-
-AI agents use transformation definitions to generate:
-
-- **ETL / ELT logic** — SQL `SELECT` statements, dbt models, or Spark transformations depending on the target platform
-- **Lineage graph edges** — source field → transformation → domain attribute nodes in the Knowledge Graph
-- **Data quality test stubs** — one test per transformation, asserting the target attribute is non-null after the transformation runs (override with `quality_check: false` on the transformation if the null case is valid)
-- **Source-to-domain mapping documentation** — a human-readable crosswalk table per entity, generated from all inline and named source mappings
 
 ---
 
@@ -2507,19 +1992,6 @@ The canonical entities, relationships, and events remain the single source of tr
 
 ---
 
-### **Why Data Products Are First-Class**
-
-Without data products, the gap between a well-modelled domain and a usable output is filled by undocumented views, ad-hoc queries, and shadow pipelines. Data products close that gap by making the publication contract explicit:
-
-- **What** is published (which entities, attributes, relationships)
-- **How** it is shaped (normalized, denormalized, aggregated)
-- **Who** consumes it (team, system, or regulatory body)
-- **Why** it exists (business purpose and SLA)
-
-By declaring data products in the same Markdown-native format as the rest of the model, MD-DDL ensures that publication intent is version-controlled, reviewable, and traceable from source through canonical model to consumer.
-
----
-
 ### **Data Product Classes**
 
 MD-DDL defines three classes of data product, each serving a distinct purpose in the data lifecycle. These classes are not tiers or layers — they are independent publication intents that may coexist within a single domain.
@@ -2532,7 +2004,7 @@ A source-aligned product publishes raw or lightly cleansed data from a single so
 - **Shape:** Mirrors source structure; no joins across sources
 - **Governance:** Inherits domain defaults; typically lower classification than domain-aligned products
 - **Consumers:** Data engineers, audit teams, integration debugging
-- **Cross-domain dependencies:** None — source-aligned products are self-contained within a domain
+- **Cross-domain dependencies:** None — source-aligned products are self-contained
 
 Source-aligned products reference a source system declared in the domain's `## Source Systems` section. Their schema corresponds to the source table structure defined in `sources/<system>/source.md`.
 
@@ -2558,47 +2030,15 @@ A consumer-aligned product reshapes domain data for a specific audience or use c
 - **Consumers:** Named team, application, report, or regulatory body
 - **Multi-domain:** Consumer-aligned products may source from canonical entities across multiple domains when the consumer's use case spans domain boundaries. The `lineage` field declares which domains and entities are consumed.
 
-Consumer-aligned products define their own logical model with a Mermaid class diagram and an attribute mapping section that traces every product attribute back to its canonical source using the same table-based format as source transforms. The `schema_type` declared on the product determines which Agent Artifact skill produces the physical output.
+Consumer-aligned products define their own logical model with a Mermaid class diagram and an attribute mapping section that traces every product attribute back to its canonical source using the same table-based format as source transforms. The `schema_type` declared on the product determines the shape of the physical output.
 
 ---
 
 ### **Platform Posture**
 
-Organisations differ fundamentally in how they relate data products to platforms. This architectural decision shapes which product classes apply, what artifacts get generated, and what infrastructure is assumed. The platform posture must be established before designing data products.
+Organisations differ in how they relate data products to platforms: some run everything on a single platform, some use different technologies per product class (polyglot), and some treat certain classes as infrastructure rather than governed products (selective scope). This architectural decision shapes which product classes apply and what artifacts get generated, so it should be established before designing data products — the trade-offs are architecture guidance, not part of this spec.
 
-MD-DDL defines three platform postures:
-
-#### Single-Platform
-
-All data products are self-contained on one platform (e.g., Snowflake, Databricks, BigQuery). Source ingestion, transformation, canonical storage, and consumer access all happen within the same platform.
-
-- **Effect on classes:** All three classes (source-aligned, domain-aligned, consumer-aligned) are typically recognised as data products
-- **Effect on artifacts:** Agent Artifact generates for one target platform; `schema_type` maps directly to platform-native constructs
-- **Effect on infrastructure:** Minimal integration complexity; the platform provides compute, storage, and access control
-- **Typical pattern:** Source-aligned = raw/staging schemas; domain-aligned = curated schemas; consumer-aligned = materialized views or denormalized tables
-
-#### Polyglot
-
-Different product classes leverage different platforms and technologies depending on the data's lifecycle stage and access pattern. The organisation accepts that data products span infrastructure boundaries.
-
-- **Effect on classes:** Each class may target a different platform stack:
-  - **Source-aligned** — CDC, streaming (Kafka, Flink), operational data stores, event buses
-  - **Domain-aligned / foundational** — polyglot persistence (relational + document + graph), analytical and operational interfaces, potentially spanning OLTP and OLAP stores
-  - **Consumer-aligned** — purpose-built for the consumer's query engine (data warehouse, API layer, search index, dashboard cache)
-- **Effect on artifacts:** Agent Artifact may need to generate for multiple target platforms per domain; `schema_type` maps to platform-appropriate constructs for each product
-- **Effect on infrastructure:** Higher integration complexity; requires cross-platform lineage tracking, consistent governance enforcement, and potentially different access control mechanisms per platform
-
-#### Selective Scope
-
-The organisation does not consider all classes as "data products." Some layers are treated as infrastructure or engineering concerns rather than governed, published products.
-
-- **Common pattern:** Source-aligned feeds are infrastructure (CDC pipelines, staging areas) managed by data engineering — not declared as data products. Only domain-aligned and consumer-aligned outputs are governed as products.
-- **Alternative pattern:** Only consumer-aligned outputs are products. Domain-aligned canonical models are internal reference architectures, not published products.
-- **Effect on MD-DDL:** Product classes that fall outside the org's product scope are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms still exist in `sources/` regardless of whether source-aligned products are declared.
-
-#### Declaring Platform Posture
-
-Platform posture is declared in domain metadata under the `platform` block:
+The decision is recorded in domain metadata under the `platform` block:
 
 ```yaml
 platform:
@@ -2619,7 +2059,7 @@ Field | Required | Purpose
 `product_scope` | No | Which product classes the organisation recognises as data products. Defaults to all three. If omitted, all classes are in scope.
 `notes` | No | Free-text context on platform decisions, constraints, or migration plans
 
-Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy. When all domains share the same posture, use consistent values across domain files.
+Product classes outside the declared `product_scope` are still valid as infrastructure concepts but are not declared in `products/`. Source declarations and transforms exist in `sources/` regardless. Platform posture is typically an organisation-wide decision, but is declared per domain because different parts of the organisation may be at different stages of platform strategy.
 
 ---
 
@@ -2681,7 +2121,7 @@ governance:
 Field | Purpose
 --- | ---
 `class` | One of `source-aligned`, `domain-aligned`, `consumer-aligned`.
-`schema_type` | Physical output style: `normalized`, `dimensional`, `wide-column`, `knowledge-graph`. Drives Agent Artifact's skill selection for generation and determines the logical model shape.
+`schema_type` | Physical output style: `normalized`, `dimensional`, `wide-column`, `knowledge-graph`. Drives generation and determines the logical model shape.
 `owner` | The team or individual accountable for this product's correctness and availability.
 `consumers` | List of named consumers — teams, systems, reports, or regulatory bodies.
 `status` | Lifecycle state: `Draft`, `Active`, `Deprecated`, `Retired`.
@@ -2910,20 +2350,15 @@ Strategy | Behaviour
 
 Masking is declared at the product level, not the entity level. The same entity may appear in multiple products with different masking rules depending on the consumer's access level.
 
+The strategy list is extensible — organisations may declare additional strategies (e.g., platform-specific tokenization schemes); the generating agent should confirm its interpretation of an unrecognised strategy rather than guess.
+
 ---
 
 ### **Product-Driven Generation**
 
-The `schema_type` field on a data product is the entry point for physical artifact generation. When an AI agent encounters a data product with a `schema_type`, it selects the corresponding Agent Artifact skill:
+The `schema_type` field on a data product is the entry point for physical artifact generation: it declares the shape of the physical output (`normalized`, `dimensional`, `wide-column`, `knowledge-graph`) and generating tooling selects its approach accordingly.
 
-`schema_type` value | Agent Artifact skill | Output
---- | --- | ---
-`normalized` | Normalized | DDL, JSON Schema, Parquet contract
-`dimensional` | Dimensional | Star schema DDL
-`wide-column` | Wide Column | Denormalized table DDL
-`knowledge-graph` | Knowledge Graph | Cypher DDL
-
-The product's logical model and `entities` list scope the generation. For domain-aligned products, the agent reads the canonical entity detail files to obtain attributes, types, and constraints. For consumer-aligned products, the agent uses the logical model diagram and attribute mapping tables as the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are applied as constraints on the generated artifacts.
+The product's logical model and `entities` list scope the generation. For domain-aligned products, the canonical entity detail files provide attributes, types, and constraints. For consumer-aligned products, the logical model diagram and attribute mapping tables are the generation input — the product defines its own structure. In both cases, the product's `governance` and `masking` metadata are constraints on the generated artifacts.
 
 ---
 
@@ -2946,53 +2381,10 @@ SLA fields are informational — they document expectations but do not generate 
 
 Data products follow the same two-layer pattern as entities, relationships, and events:
 
-1. **Summary** — A `## Data Products` table in the domain file listing all products with class, consumers, and status
-2. **Detail** — Individual product definitions in `products/` detail files using level-3 headings and YAML blocks
+1. **Summary** — A `## Data Products` table in the domain file, using the column format defined in [Section 2 — Data Products Table](./2-Domains.md#data-products-table)
+2. **Detail** — Individual product definitions in `products/` detail files, following the standard detail file rules: a level-1 heading naming the domain (linked back to the domain file), a `## Data Products` section, and one level-3 heading per product with its YAML metadata block
 
 This allows the domain file to act as a complete index of what the domain publishes, while detail files contain the full product specification.
-
-#### Domain File Summary Table
-
-The domain file includes a `## Data Products` section with a summary table:
-
-Column | Purpose
---- | ---
-**Name** | The product name, linked to its detail definition.
-**Class** | `source-aligned`, `domain-aligned`, or `consumer-aligned`.
-**Consumers** | Primary consumers of this product.
-**Status** | Lifecycle state.
-
-Example:
-
-```markdown
-## Data Products
-
-Name | Class | Consumers | Status
---- | --- | --- | ---
-[Customer 360 Profile](products/analytics.md#customer-360-profile) | consumer-aligned | Retail Analytics Team | Active
-[Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Active
-[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Active
-```
-
-#### Detail File Structure
-
-Product detail files follow the same structural rules as entity detail files:
-
-- Begin with a level-1 heading naming the domain, linked back to the domain file
-- Use level-2 heading `## Data Products`
-- Define individual products under level-3 headings with YAML metadata blocks
-
-```markdown
-# [Financial Crime](../domain.md)
-
-## Data Products
-
-### Customer 360 Profile
-...product definition...
-
-### Transaction Risk Summary
-...product definition...
-```
 
 ---
 
@@ -3012,7 +2404,7 @@ Product detail files follow the same structural rules as entity detail files:
 
 7. **Masking is product-scoped.** Masking rules are declared per product, not per entity. The same attribute may be masked differently in different products.
 
-8. **Schema type drives generation.** The `schema_type` is required and determines which Agent Artifact skill produces the physical output. The product's logical model, `entities` list, and `governance`/`masking` metadata are the generation input contract.
+8. **Schema type drives generation.** The `schema_type` is required and determines the shape of the physical output. The product's logical model, `entities` list, and `governance`/`masking` metadata are the generation input contract.
 
 9. **Source field for source-aligned.** Source-aligned products use `source` instead of `entities`. The value must match a source system folder under `sources/`.
 
@@ -3036,30 +2428,21 @@ In brownfield adoption contexts (see [Section 10 — Adoption](./10-Adoption.md)
 
 Data products progress through defined lifecycle states. The `status` field declares the current state; optional date fields document transition timing.
 
-#### Lifecycle States
-
 State | Meaning
 --- | ---
 `Draft` | Product is being designed. Not yet available to consumers. May change without notice.
-`Active` | Product is live and governed. Changes follow the product versioning and consistency rules defined below.
+`Active` | Product is live and governed.
 `Deprecated` | Product is marked for retirement. Consumers should migrate to an alternative. Still available but no longer enhanced.
 `Retired` | Product is no longer available. Retained in the domain file for lineage and audit traceability but not published or generated.
 
-#### Transition Rules
+Optional lifecycle metadata fields document transitions:
 
-- `Draft` → `Active`: Product has passed quality review, names at least one consumer, and declares version `1.0.0` or higher.
-- `Active` → `Deprecated`: A `deprecated_date` field must be added to the product metadata. A `successor` field should name the replacement product if one exists.
-- `Deprecated` → `Retired`: A `sunset_date` field must be added. After this date the product is no longer generated or published. The declaration remains in the detail file for audit purposes.
-- `Retired` → any: Not permitted. Retired products are immutable records. If the concept needs to be revived, create a new product with a new name.
-
-#### Lifecycle Metadata Fields
-
-Field | Required | Purpose
---- | --- | ---
-`deprecated_date` | When status is `Deprecated` | ISO 8601 date when the product was marked for retirement.
-`successor` | Advisory when `Deprecated` | Name of the replacement product (if any), linked to its detail heading.
-`migration_note` | Advisory when the product remains active during upstream deprecation | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
-`sunset_date` | When status is `Retired` | ISO 8601 date after which the product is no longer published.
+Field | Purpose
+--- | ---
+`deprecated_date` | ISO 8601 date when the product was marked for retirement (used with `Deprecated`).
+`successor` | Name of the replacement product (if any), linked to its detail heading.
+`migration_note` | Free-text migration guidance explaining how consumers should respond to deprecated upstream entities or domains.
+`sunset_date` | ISO 8601 date after which the product is no longer published (used with `Retired`).
 
 Example:
 
@@ -3069,35 +2452,7 @@ deprecated_date: "2025-03-15"
 successor: "Customer 360 Profile v2"
 ```
 
-#### Product Versioning
-
-The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract. Product versions are independent from domain versions: a product may remain `Draft` while its domain is `Active`, and a product may lag behind the latest domain version while consumers migrate.
-
-Trigger | Version Impact
---- | ---
-Domain breaking change affecting an entity in the product's `lineage` | Major bump
-Domain additive change affecting an entity in the product's `lineage` and reflected in the product's logical model | Minor bump
-Product removes an entity from its `entities` list | Major bump
-Product adds an entity to its `entities` list | Minor bump
-Product changes masking rules, SLA, consumers, or other governance contract details without reducing schema scope | Minor or patch bump depending on consumer impact
-Corrective documentation or descriptive fixes with no contract impact | Patch bump
-
-Use a major bump when a correctly-authored consumer must change to keep working. Use a minor bump when the published contract is extended but existing consumers can continue unchanged. Use a patch bump for non-breaking clarifications or corrective metadata changes.
-
-#### Product-Domain Lifecycle Consistency
-
-Products evolve independently, but they cannot be more mature than the model they publish.
-
-- A product's `status` must not be more advanced than the owning domain's status. A product cannot be `Active` if its domain is `Draft` or `Review`.
-- Products may lag the domain. A product may remain `Draft` while its domain is `Active`.
-- Promoting a domain to `Active` does not automatically promote any products declared within it.
-- An `Active` product should declare version `1.0.0` or higher.
-- If a product references deprecated entities or draws from a deprecated lineage dependency, it must either move to `Deprecated` or declare a `migration_note` explaining the consumer migration path.
-- When a domain version bump changes referenced entities, affected products should evaluate their own version independently using the rules above and record the result in the domain's `LIFECYCLE.md` when that file is maintained.
-
-#### Lifecycle History Recording
-
-Product promotions, version bumps, deprecations, and retirements should be recorded in the owning domain's `LIFECYCLE.md` file when present. The domain owns the lifecycle history file because product lifecycle is part of the domain's publication history.
+The `version` field uses semantic versioning (`MAJOR.MINOR.PATCH`) to track the evolution of the product contract, independently of the domain version. Transition rules, version-bump triggers, product-domain lifecycle consistency, and lifecycle history recording are collected in the non-normative [Lifecycle & Versioning Guide](../guides/lifecycle-versioning.md).
 
 ---
 
@@ -3132,276 +2487,25 @@ Field | Conflict Exists When
 
 ## **Adoption**
 
-MD-DDL supports incremental adoption. Organisations can begin by importing existing schemas — DDL, dbt models, catalog exports — and progressively evolve toward declarative, AI-generated artifacts. The `baselines/` folder captures existing state for reference; the adoption maturity model tracks the journey; the canonical model is the destination.
+MD-DDL supports incremental adoption. Organisations can begin by importing existing schemas — DDL, dbt models, catalog exports — and progressively evolve toward declarative, AI-generated artifacts. The primary brownfield path is **schema-import**: provide your existing DDL and receive a draft canonical domain. Baseline capture is an optional secondary path for organisations that need to document existing state before modelling.
 
-The primary brownfield path is **schema-import**: paste your DDL, answer two or three questions, and receive a draft canonical domain. Baseline capture is an optional secondary path for organisations that need to document existing state before modelling.
-
-Coexistence between baseline documentation and canonical entities is transitional. The goal is always full conversion to declarative MD-DDL, but the timeline may span months or years depending on organisational readiness, domain complexity, and the number of existing systems to absorb.
+This section defines only the structural shapes agents rely on: the adoption maturity vocabulary, the `adoption:` domain metadata block, and the `baseline:` file header. The adoption methodology — maturity model detail, advancement criteria, journey patterns, coexistence and cutover, drift detection, and portfolio-level adoption — lives in the non-normative [Adoption Playbook](../guides/adoption-playbook.md).
 
 ---
 
-### **Adoption Maturity Model**
-
-Maturity is tracked at the domain level. Individual entities do not carry their own maturity — the domain advances as a whole. Domain maturity equals the lowest level all entities have reached. The `progress` field in domain metadata shows forward momentum within a level as a structured count.
-
-#### Maturity Levels
-
-Level | Name | Description | Characteristics
---- | --- | --- | ---
-1 | Documented | Existing state captured as MD-DDL baseline files | `baselines/` folder populated; no canonical entities yet; existing schemas, ETLs, catalog entries recorded as-is
-2 | Mapped | Canonical entities defined; mappings derivable from source transforms | `entities/` folder populated; `sources/` with transform files define the lineage from source fields to canonical attributes; baseline-to-canonical mappings are auto-generated from transforms, not manually authored
-3 | Governed | Governance metadata complete on all canonical entities | Classification, PII, retention, regulatory scope, compliance relevance all populated; domain review passed
-4 | Declarative | MD-DDL is the source of truth; physical artifacts generated and drift-monitored | Agent Artifact generates DDL/schemas from MD-DDL; existing physical artifacts replaced or reconciled; baselines superseded; basic drift detection flags divergence between declarations and deployed state. **Requires external tooling** — drift detection mechanisms (CI/CD hooks, database introspection, scheduled agent runs) must be implemented outside MD-DDL
-5 | Automated | CI/CD generates, deploys, and enforces from MD-DDL | Pipeline generates, deploys, and monitors physical artifacts; automated drift detection with remediation triggers; baseline folder can be removed. **Requires external tooling** — CI/CD pipeline integration, automated deployment, and remediation infrastructure must be implemented outside MD-DDL
-
-#### Advancement Criteria
-
-Each level has explicit exit criteria that must be satisfied before advancing. These are structural checks (verifiable by agents) plus SME attestations.
-
-**Level 1 → Level 2:**
-
-- All known existing assets documented as baseline files in `baselines/`
-- Each baseline file has the required `baseline:` metadata header
-- Domain metadata contains an `adoption` block with `maturity: documented`
-- Candidate canonical entities identified (documented in baseline file notes or a separate assessment)
-
-**Level 2 → Level 3:**
-
-- Canonical entity files exist in `entities/` for all business concepts identified from baselines
-- Source transform files in `sources/*/transforms/` define mappings from source fields to canonical attributes (see [Section 8 — Transformations](./8-Transformations.md))
-- Domain metadata updated to `maturity: mapped`
-
-**Level 3 → Level 4:**
-
-- All canonical entities have complete governance metadata (classification, PII, retention, regulatory scope)
-- Domain review passed (Agent Ontology domain-review skill)
-- Domain metadata updated to `maturity: governed`
-
-**Level 4 → Level 5:**
-
-- Agent Artifact generates physical artifacts from canonical entities
-- Generated artifacts reconciled against existing state — differences are intentional
-- Baseline files marked `status: superseded` with `superseded_by:` pointing to canonical entities
-- Basic drift detection in place: divergence between MD-DDL declarations and deployed physical state is flagged
-- External tooling operational for drift detection
-- Domain metadata updated to `maturity: declarative`
-
-**Level 5 exit (Automated):**
-
-- CI/CD pipeline generates, deploys, and monitors physical artifacts from MD-DDL
-- Automated drift detection with remediation triggers operational
-- Baseline files may be `status: archived` or removed entirely
-- External tooling operational for deployment and remediation
-- Domain metadata updated to `maturity: automated`
-
-#### Regression Rules
-
-A domain cannot regress to a lower maturity level. If structural changes invalidate a level (e.g., new entities added without governance), the domain stays at its current level but is flagged as "incomplete at current level" until gaps are resolved.
-
-#### Staleness Rule
-
-If a domain's `target_date` has passed and `maturity` has not reached `target_maturity`, agents flag the domain as "adoption stalled." The adoption-planning skill prompts a review: reassess timeline, identify blockers, or adjust target. This prevents Level 1 sprawl where teams document legacy but never progress.
-
----
-
-### **Baselines**
-
-The `baselines/` folder captures existing state documentation within a domain. Baseline files are reference documentation only — they are never used as inputs for physical artifact generation. Agent Artifact generates exclusively from canonical entities in `entities/`.
-
-**Baselines are agent-generated, not human-authored.** Users provide raw input — DDL, dbt models, catalog exports, pipeline descriptions, natural-language notes — and the agent produces the baseline file. The human effort is providing the raw material; the structuring is the agent's job.
-
-#### Folder Structure
-
-```text
-<domain>/
-  domain.md
-  baselines/                    # Existing state documentation
-    dimensional/                # Existing dimensional models
-      fact_transaction.md       # Star schema fact table documented
-      dim_customer.md           # Dimension table documented
-    canonical/                  # Existing enterprise/canonical models
-      enterprise_customer.md    # Existing canonical entity documented
-    etl/                        # Existing ETL/ELT pipeline inventory
-      customer_load.md          # Pipeline documented
-    catalog/                    # Governance catalog imports
-      customer_governance.md    # Collibra/Purview metadata captured
-  entities/
-  sources/
-  ...
-```
-
-#### Baseline File Format
-
-Each baseline file has two parts: a short YAML metadata header and a free-form body. There are no type-specific YAML templates — the body holds whatever content best describes the existing asset.
-
-##### Metadata Header
-
-Every baseline file must include this metadata block:
-
-```yaml
-baseline:
-  type: dimensional | canonical | etl | catalog
-  source_system: "Snowflake DW" | "Informatica" | "Collibra" | etc.
-  captured_date: 2024-01-15
-  captured_by: "Jane Smith"
-  status: active | superseded | archived
-  superseded_by: "entities/customer.md"  # populated at Level 4+
-```
-
-- `type` identifies the baseline category and determines the subfolder
-- `source_system` names the platform or tool where the existing asset lives
-- `captured_date` is the date the baseline was documented (ISO 8601)
-- `captured_by` identifies who documented the baseline (person or agent)
-- `status` tracks the baseline's lifecycle: `active` (in use), `superseded` (replaced by canonical entity), or `archived` (retained for history)
-- `superseded_by` links to the canonical entity file that replaced this baseline (populated at Level 4+)
-
-##### Free-Form Body
-
-Below the metadata header, the body may contain any combination of:
-
-- Verbatim DDL in fenced code blocks (CREATE TABLE, ALTER TABLE, etc.)
-- dbt model SQL or schema.yml excerpts
-- Column listings (as Markdown tables, YAML, or plain text)
-- Catalog export data (classification, ownership, quality scores, lineage)
-- ETL/pipeline descriptions (schedule, dependencies, transformation logic)
-- Known data quality issues
-- Business context, historical notes, ERD fragments
-
-The format is deliberately flexible. Agents parse the body to extract structured information when needed — humans should not be required to structure it manually. Paste what you have; the agent handles the rest.
-
-##### What Baselines Do NOT Contain
-
-- **No type-specific YAML templates.** Earlier versions of this spec defined `dimensional:`, `canonical:`, `etl:`, and `catalog:` YAML blocks. These are no longer required. If an agent generates structured YAML from raw input, it appears in the free-form body as documentation — not as a required schema.
-- **No mapping blocks.** Baseline-to-canonical mappings are derived from source transforms (see below). Baselines do not carry `mapping:` blocks.
-
----
-
-### **Mapping: Auto-Generated from Source Transforms**
-
-When a domain advances from Level 1 (Documented) to Level 2 (Mapped), the intellectual translation from existing assets to canonical entities is captured in **source transform files** ([Section 8 — Transformations](./8-Transformations.md)), not in baseline mapping blocks.
-
-This means mappings are derived from operational data flow definitions — the same transforms that will eventually generate ETL/ELT code. There is no separate "mapping" artifact to maintain.
-
-#### How Mappings Are Derived
-
-Source transform files in `sources/*/transforms/` define how source system fields map to canonical entity attributes. Each transform's `target` field points to a canonical attribute; each transform's `source` field points to a source system field. Together, these define the complete lineage from source to canonical model.
-
-For brownfield adoption, agents parse existing ETL logic to **propose** transform files:
-
-Input format | What the agent parses | Output
---- | --- | ---
-SQL (SELECT, INSERT, MERGE) | Column aliases, JOIN conditions, WHERE filters, CASE expressions | `direct`, `derived`, `lookup`, `conditional` transforms
-dbt models (SQL + schema.yml) | ref() calls, column descriptions, tests, source() macros | Transforms + source declarations
-Stored procedures | Parameter mappings, cursor logic, conditional branches | Transforms with `derived` and `conditional` types
-Informatica / SSIS mappings | Source-to-target field maps, expression transforms, lookup transforms | Transforms matching the ETL tool's logic
-Natural-language descriptions | Entity and field references, business rules | Draft transforms marked with `# INFERRED` comments
-
-The agent produces draft transform files from existing ETL code. The human reviews and refines. This replaces the manual `mapping:` block — the transform file *is* the mapping, and it is also the specification for generating new ETL code.
-
-#### Reconciling Baseline Fields to Canonical Attributes
-
-To understand how a baseline's columns relate to canonical attributes, agents read the transform files and produce a **mapping view** on demand. This is a generated report, not a stored artifact:
-
-```text
-Baseline: baselines/dimensional/fact_transaction.md
-Canonical Entity: Transaction
-
-Baseline Column     | Transform Type | Canonical Attribute     | Transform File
----                 | ---            | ---                     | ---
-transaction_id      | direct         | Transaction Identifier  | sources/cbs/transforms/table_transactions.md
-customer_key        | lookup         | Customer                | sources/cbs/transforms/table_transactions.md
-amount              | direct         | Amount                  | sources/cbs/transforms/table_transactions.md
-risk_score          | conditional    | Risk Rating             | sources/cbs/transforms/table_transactions.md
-etl_batch_id        | —              | (unmapped: technical)   | —
-dw_load_timestamp   | —              | (unmapped: technical)   | —
-```
-
-This view is generated by cross-referencing baseline column names against transform source fields. It is not stored in baseline files — it is computed when needed.
-
----
-
-### **Adoption Journey Patterns**
-
-Four starting-point patterns cover the most common brownfield scenarios. **Pattern A is the recommended default** — most brownfield adoptions start with existing schemas.
-
-#### Pattern A: Starting from Existing Schemas (Primary Path)
-
-1. Provide existing DDL, dbt models, or schema descriptions to the **schema-import** skill
-2. Agent infers canonical entities, relationships, and enums — asks 2-3 clarifying questions
-3. Review and refine the draft canonical model
-4. Provide existing ETL code (SQL, dbt, stored procedures) — agent generates draft transform files
-5. Review transforms; agent produces a mapping view showing baseline-to-canonical coverage
-6. Establish governance metadata
-7. Use Agent Artifact to generate new physical artifacts from canonical model
-8. Reconcile generated vs existing — iterate until equivalent
-9. Cut over to MD-DDL-generated artifacts
-
-#### Pattern B: Starting from Existing Canonical/Enterprise Models
-
-1. Document existing canonical model as `baselines/canonical/` files
-2. Translate canonical entities to MD-DDL entity files (may be 1:1 or require restructuring)
-3. Validate against MD-DDL rules (attribute types, constraints, relationships)
-4. Map source systems via transform files
-5. Establish governance metadata
-6. Generate physical artifacts and reconcile with existing
-
-#### Pattern C: Starting from ETL/ELT Pipelines
-
-1. Document existing pipelines as `baselines/etl/` files
-2. Agent parses pipeline logic to extract entity patterns and propose transform files
-3. Create canonical entities from the target patterns
-4. Review and refine generated transforms
-5. Map source systems from pipeline sources
-6. Generate physical artifacts from canonical model
-
-#### Pattern D: Starting from Governance Catalog
-
-1. Export governance metadata as `baselines/catalog/` files
-2. Use classification, PII, ownership as seed data for domain and entity governance blocks
-3. Create canonical entities using catalog entity/table definitions
-4. Map source systems using catalog lineage; create transform files
-5. Generate physical artifacts from canonical model
-
----
-
-### **Coexistence and Cutover**
-
-- **Coexistence is transitional** — the goal is always to reach Declarative or Automated maturity
-- While at maturity levels 1–3, both baseline files and canonical entities may coexist
-- At level 4 (Declarative), baseline files should be marked `status: superseded` with `superseded_by:` pointing to the canonical entity
-- At level 5 (Automated), baseline files may be `status: archived` or removed entirely
-- **No generation from baselines** — baselines are documentation only; Agent Artifact only generates from canonical entities in `entities/`
-- **Reconciliation** — at the level 3→4 transition, generated artifacts must be compared against existing state; differences must be intentional
-
----
-
-### **Drift Detection**
-
-Drift detection becomes relevant at Level 4 (Declarative) when MD-DDL becomes the source of truth.
-
-#### Level 4 — Basic Drift Detection
-
-At Declarative maturity, the domain must have a mechanism to detect divergence between MD-DDL declarations and deployed physical state. The spec defines *what* drift means; the *mechanism* (CI/CD hooks, database introspection scripts, scheduled agent runs) is left to implementers since MD-DDL has no runtime.
-
-Drift exists when:
-
-- A deployed schema contains columns, tables, or constraints not declared in the MD-DDL model
-- The MD-DDL model declares attributes, entities, or constraints not present in the deployed schema
-- Data types, nullability, or constraint definitions differ between declaration and deployment
-
-When drift is detected, it should be flagged with:
-
-- The entity or attribute where drift occurred
-- The nature of the divergence (added, removed, modified)
-- A timestamp of when drift was detected
-
-#### Level 5 — Automated Drift Enforcement
-
-At Automated maturity, drift detection is integrated into CI/CD with remediation triggers:
-
-- Drift detection runs automatically on deployment and on a schedule
-- Detected drift blocks deployment or triggers automated remediation
-- Drift history is retained for audit
+### **Adoption Maturity Vocabulary**
+
+Maturity is tracked at the domain level; the domain advances as a whole. The `maturity` field uses these values:
+
+Value | Meaning
+--- | ---
+`documented` | Existing state captured as baseline files; no canonical entities yet
+`mapped` | Canonical entities defined; mappings derivable from source transforms
+`governed` | Governance metadata complete on all canonical entities
+`declarative` | MD-DDL is the source of truth; physical artifacts generated and drift-monitored
+`automated` | CI/CD generates, deploys, and enforces from MD-DDL
+
+See the [Adoption Playbook](../guides/adoption-playbook.md) for level characteristics, advancement criteria, and the regression and staleness rules.
 
 ---
 
@@ -3434,30 +2538,29 @@ The `adoption` block is required once any baseline file exists in the domain. It
 
 ---
 
-### **Portfolio-Level Adoption**
+### **Baseline File Header**
 
-Large enterprises may adopt MD-DDL domain-by-domain over months or years. Each domain tracks its own maturity independently. A portfolio-level adoption view can be assembled by reading all `domain.md` files and aggregating their `adoption` blocks. No portfolio-level metadata structure is defined in this version of the spec — this is deferred to a future version if demand warrants it.
+The `baselines/` folder captures existing state documentation within a domain. Baseline files are reference documentation only — they are never used as inputs for physical artifact generation. Physical artifacts are generated exclusively from canonical entities in `entities/`.
 
----
+Every baseline file begins with this metadata block, followed by a free-form body (verbatim DDL, column listings, pipeline descriptions — whatever best describes the existing asset):
 
-### **Adoption Rules**
+```yaml
+baseline:
+  type: dimensional | canonical | etl | catalog
+  source_system: "Snowflake DW" | "Informatica" | "Collibra" | etc.
+  captured_date: 2024-01-15
+  captured_by: "Jane Smith"
+  status: active | superseded | archived
+  superseded_by: "entities/customer.md"  # populated when superseded
+```
 
-1. **Maturity is domain-level.** Entities do not individually track maturity. The domain advances as a whole. Domain maturity equals the lowest level all entities have reached.
+- `type` identifies the baseline category and determines the subfolder under `baselines/`
+- `source_system` names the platform or tool where the existing asset lives
+- `captured_date` is the date the baseline was documented (ISO 8601)
+- `captured_by` identifies who documented the baseline (person or agent)
+- `status` tracks the baseline's lifecycle: `active` (in use), `superseded` (replaced by canonical entity), or `archived` (retained for history)
+- `superseded_by` links to the canonical entity file that replaced this baseline
 
-2. **Baselines are documentation, not generation inputs.** Agent Artifact never generates from baselines. They are reference material for humans and for the reconciliation skill.
+Baseline files carry no `mapping:` blocks — baseline-to-canonical mappings are derived from source transform files ([Section 8 — Transformations](./8-Transformations.md)), which define the operational data flow. The transform file *is* the mapping.
 
-3. **Baselines are agent-generated.** Users provide raw input (DDL, dbt models, catalog exports, descriptions). Agents produce the structured baseline file. Humans should not be expected to author YAML templates manually.
-
-4. **Coexistence is transitional.** Baselines exist to be superseded. The goal is always Declarative or Automated. Baseline files progress through `active` → `superseded` → `archived`.
-
-5. **No regression.** A domain cannot move to a lower maturity level. New entities or structural changes that create gaps are flagged as "incomplete at current level."
-
-6. **Mappings are derived from transforms.** Baseline-to-canonical mappings are not manually authored. They are derived from source transform files ([Section 8](./8-Transformations.md)) which define the operational data flow. The transform file *is* the mapping.
-
-7. **Schema-import is the primary brownfield path.** For organisations with existing schemas (DDL, dbt, catalog exports), schema-import produces a draft canonical model directly. Baseline-capture is an optional secondary path for audit, history, or when no schema is available.
-
-8. **Staleness prevents adoption decay.** Domains with a `target_date` that has passed without reaching `target_maturity` are flagged as "adoption stalled."
-
-9. **Drift detection starts at Level 4.** When MD-DDL becomes the source of truth, basic drift detection is required to maintain that status. Level 5 upgrades to automated enforcement.
-
-10. **Levels 4–5 require external tooling.** MD-DDL has no runtime. Drift detection, CI/CD integration, and automated deployment require tooling outside the spec. The spec defines what these levels mean; implementers build the infrastructure.
+See the [Adoption Playbook](../guides/adoption-playbook.md) for the baseline folder structure, free-form body guidance, and how agents generate baselines and derive mapping views.

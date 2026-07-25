@@ -34,8 +34,14 @@ md-ddl-specification/         Normative spec — source of truth for all rules
   7-Sources.md                Source system declarations and source-layer structure
   8-Transformations.md        Transformation vocabulary and mapping types
   9-Data-Products.md          Data product classes, declaration, and generation rules
-  10-Adoption.md              Brownfield adoption, maturity model, baseline-to-canonical path
+  10-Adoption.md              Adoption metadata shapes (adoption: block, baseline: header)
   MD-DDL-Complete.md          Concatenated single-file version (generated)
+
+guides/
+  adoption-playbook.md        Non-normative adoption methodology: maturity model, journey patterns, drift detection
+  diagram-style.md            Non-normative diagram conventions: ELK layout, class/link syntax, ordering
+  lifecycle-versioning.md     Non-normative change management: transitions, version bumps, LIFECYCLE.md format
+  validation-tooling.md       Non-normative tooling detail: validation levels, pre-flight checks, INCLUDE directive
 
 agents/
   agent-guide/                Learning and navigation agent
@@ -124,15 +130,15 @@ Each spec section owns a distinct layer of the language:
 File | Owns
 --- | ---
 `1-Foundation.md` | Principles, document structure, two-layer model
-`2-Domains.md` | Domain file format, metadata schema, diagram rules, summary tables
-`3-Entities.md` | Entity YAML, attribute types, constraints, diagrams, inheritance
+`2-Domains.md` | Domain file format, metadata schema, summary tables, lifecycle vocabulary
+`3-Entities.md` | Entity YAML, attribute types, constraints, inheritance, lifecycle fields
 `4-Enumerations.md` | Enum formats, naming, dictionary vs. simple list
 `5-Relationships.md` | Relationship types, granularity, cardinality, constraint syntax
 `6-Events.md` | Event structure, payload design, temporal priority, actor/entity
 `7-Sources.md` | Source file format, change models, domain feed tables, source-layer rules
 `8-Transformations.md` | Transformation types, YAML syntax, expression language, generation behaviour
 `9-Data-Products.md` | Data product classes, declaration syntax, governance, masking, product-driven generation
-`10-Adoption.md` | Brownfield adoption maturity model, baseline capture format, baseline-to-canonical transition
+`10-Adoption.md` | Adoption maturity vocabulary, `adoption:` metadata block, `baseline:` file header (methodology lives in `guides/adoption-playbook.md`)
 
 When adding or changing a rule, edit the owning section only. Do not duplicate rules across sections.
 
@@ -310,15 +316,15 @@ When upgrading an example, update all patterns in the file in a single pass — 
 
 ## Validation philosophy
 
-MD-DDL distinguishes between **mechanical pre-flight checks** (syntax, links, entity references) and **agent-driven quality review** (structure, convention, governance, domain fitness). This split is deliberate and normative — see `md-ddl-specification/1-Foundation.md` "Validation Model" for the authoritative definition.
+MD-DDL distinguishes between **mechanical pre-flight checks** (syntax, links, entity references) and **agent-driven quality review** (structure, convention, governance, domain fitness). This split is deliberate and normative — the principle is stated in `md-ddl-specification/1-Foundation.md` "Validation Model"; the full level taxonomy and check definitions are in `guides/validation-tooling.md`.
 
 Rules for contributors:
 
 - **Do not add lint-style enforcement to agent prompts.** If an agent rejects a file for a convention violation, that is a prompt bug. Agents flag deviations; they do not reject files for anything above syntax level.
 - **Validation language in agent prompts must match the tier.** Use `flag` / `note` / `suggest` / `observe` for convention and quality issues (Levels 3–5). Use `error` / `reject` / `fail` only for syntax-level failures (Level 1). When reviewing an agent prompt, search for error-language and confirm it is limited to syntax contexts.
 - **Organisational vocabulary deviations are observations, not errors.** When an agent encounters `phi` instead of `pii`, or `data_class` instead of `classification`, the correct response is to note it as a potential spec vocabulary gap and continue working. Do not add prompt rules that reject non-standard vocabulary.
-- **Pre-flight checks are fixed and minimal.** There are exactly 5 checks (YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, domain version field). Adding a new check requires a spec version bump — it is a deliberate, reviewed decision, not a casual addition.
-- **The `1-Foundation.md` validation model section is the normative reference.** If you are unsure whether something is a pre-flight check or an agent-driven concern, consult that section. Do not resolve the ambiguity by adding enforcement rules to agent prompts.
+- **Pre-flight checks are fixed and minimal.** There are exactly 5 checks (YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, domain version field). Adding a new check is a deliberate, reviewed decision, not a casual addition.
+- **The validation model is the normative reference.** If you are unsure whether something is a pre-flight check or an agent-driven concern, consult `1-Foundation.md` "Validation Model" and `guides/validation-tooling.md`. Do not resolve the ambiguity by adding enforcement rules to agent prompts.
 
 ---
 

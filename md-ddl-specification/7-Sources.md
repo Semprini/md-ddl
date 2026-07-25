@@ -46,7 +46,7 @@ Financial Crime/
 
 The source file is the router — it declares what the source system is, how it generates change, and how it contributes to the current domain. Transform files remain the optional detail layer for field-level mappings using the transformation types defined in Section 8.
 
-Transform file names are based on the source table and must follow this pattern:
+Transform files are named for the source table, by convention:
 
 `table_<source-table>.md`
 
@@ -125,17 +125,16 @@ tags:
 
 ##### Change Models
 
-The `change_model` field declares how change flows out of the source system.
-This guides the pipeline pattern to generate.
+The `change_model` field declares how change flows out of the source system. It is an intent signal — generating tooling uses it to select an appropriate pipeline pattern.
 
-Value | Description | Generated pipeline pattern
---- | --- | ---
-`real-time-cdc` | Change Data Capture — row-level changes streamed in real time | Streaming pipeline
-`event-driven` | Source publishes business events (not raw CDC) | Event consumer
-`batch-daily` | Full or incremental extract on a daily schedule | Scheduled ETL
-`batch-intraday` | Multiple batch extracts within a day | Scheduled ETL with frequency
-`api-poll` | Changes retrieved by polling a source API | API ingestion job
-`manual` | Data loaded by human intervention; no automated feed | Manual load template
+Value | Description
+--- | ---
+`real-time-cdc` | Change Data Capture — row-level changes streamed in real time
+`event-driven` | Source publishes business events (not raw CDC)
+`batch-daily` | Full or incremental extract on a daily schedule
+`batch-intraday` | Multiple batch extracts within a day
+`api-poll` | Changes retrieved by polling a source API
+`manual` | Data loaded by human intervention; no automated feed
 
 ##### Change Events
 
@@ -471,7 +470,7 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 1. **Source identity is stable.** The `id` in `source.md` metadata is a breaking-change identifier. Renaming requires a coordinated update across the source folder and references in the domain file.
 
-2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is non-negotiable.
+2. **Canonical entities stay pure.** Entity detail files in the domain model contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
 3. **Transform files are source-folder scoped.** A transform file belongs to exactly one source folder and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type within a transform file, listing the contributing sources explicitly.
 

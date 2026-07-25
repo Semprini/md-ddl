@@ -49,6 +49,8 @@ which skill applies and read its SKILL.md.
 | **Reconciliation** | User wants to compare generated artifacts with existing state; "reconcile", "compare", "diff", "gap analysis"; transitioning from Level 3 to Level 4 adoption maturity | `skills/reconciliation/SKILL.md` |
 | **Faker** | User asks for synthetic data, fake data, test data, sample data, seed data, or Faker classes; "generate data for testing"; "populate with data"; references the Python `faker` library; scope is source system data, canonical entity data, or destination physical output data | `skills/faker/SKILL.md` |
 
+For every generation engagement, also load `references/generation-semantics.md` — it maps the spec's intent vocabularies (`existence`, `mutability`, `temporal`, `change_model`, `schema_type`, self-referential relationships) to the physical structures you generate.
+
 When in doubt, load the skill. The cost of loading an unnecessary skill is low.
 The cost of missing one is a physically incorrect artifact.
 

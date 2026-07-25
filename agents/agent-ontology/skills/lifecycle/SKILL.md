@@ -15,9 +15,10 @@ history for both domains and products.
 
 Read the lifecycle and versioning rules from:
 
-- `md-ddl-specification/2-Domains.md` — Domain Lifecycle and Domain Evolution sections
-- `md-ddl-specification/3-Entities.md` — Entity Lifecycle Fields section
-- `md-ddl-specification/9-Data-Products.md` — Product Lifecycle, Product Versioning, and Product-Domain Lifecycle Consistency
+- `guides/lifecycle-versioning.md` — transition rules, version-bump rules, breaking-change taxonomy, `LIFECYCLE.md` format, product versioning and consistency
+- `md-ddl-specification/2-Domains.md` — domain `status`/`version` vocabulary
+- `md-ddl-specification/3-Entities.md` — Entity Lifecycle Fields
+- `md-ddl-specification/9-Data-Products.md` — product lifecycle states and metadata fields
 
 ---
 

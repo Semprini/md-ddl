@@ -4,7 +4,7 @@
 
 > **Version 0.9.2**
 
-MD-DDL is a Markdown-native standard for defining what data means, where it comes from, and how it is governed — then generating physical artifacts from a single source of truth that humans and AI agents share.
+MD-DDL is a simple standard way to organise data definitions. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
 
 md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantically rich · Ready for automation**
 

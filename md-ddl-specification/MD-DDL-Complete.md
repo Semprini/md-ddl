@@ -1,6 +1,6 @@
 # MD‑DDL Specification (Draft 0.9.2)
 
-*Lightweight layout for domain ontology & semantic data modelling via human-AI collaboration.*
+*Lightweight layout standard for domain ontology & semantic data modelling via human-AI collaboration.*
 
 ---
 

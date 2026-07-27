@@ -36,7 +36,7 @@ When activating an agent, also follow its skill-loading protocol — read the ap
 
 ## Validation
 
-MD-DDL uses **agent-driven quality review**, not traditional linting. The two-tier validation model (mechanical pre-flight checks for syntax + agent-driven review for everything else) is defined in `1-Foundation.md`. Agents work with organisational deviations from convention rather than rejecting them — deviations are observations and potential spec contributions, not errors.
+MD-DDL uses **agent-driven quality review**, plus lightweight linting. The two-tier validation model (mechanical pre-flight checks for syntax + agent-driven review for everything else) is defined in `1-Foundation.md`. Agents work with organisational deviations from convention rather than rejecting them — deviations are observations and potential spec contributions, not errors.
 
 ## Review Output
 

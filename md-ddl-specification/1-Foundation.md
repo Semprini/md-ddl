@@ -120,7 +120,9 @@ Source transform files follow the same two-layer pattern but are scoped to a sou
 
 ## **Validation Model**
 
-MD-DDL uses a two-tier validation model. **Tier 1 — mechanical pre-flight checks** covers only what breaks AI interpretation outright: YAML and Mermaid syntax, internal link integrity, entity reference consistency, and the presence of a domain `version:` field. **Tier 2 — agent-driven quality review** covers everything else: structure, convention, quality, and domain fitness are judgment calls that need context, so they belong to agents and humans, not rule-based linters.
+MD-DDL uses a two-tier validation model. **Tier 1 — mechanical pre-flight checks** covers what breaks AI interpretation outright, plus what the model contradicts about itself: YAML and Mermaid syntax, internal link integrity, entity reference consistency, the presence of a domain `version:` field, and agreement between a model's three representations — the diagram, the summary tables, and the YAML. A model whose diagram declares a concept its tables never list, or whose attributes differ between the diagram and the YAML, is wrong by its own account; no domain knowledge is needed to see it. **Tier 2 — agent-driven quality review** covers everything else: convention, quality, and domain fitness are judgment calls that need context, so they belong to agents and humans, not rule-based linters.
+
+Where a deviation has a legitimate organisational explanation — an ontology deliberately drawn in part, relationship labels that read differently from relationship names — pre-flight reports an observation rather than a failure.
 
 Agents treat organisational deviations from convention — a field named `phi` instead of `pii`, `data_class` instead of `classification` — as observations to work with and potential spec vocabulary contributions, not errors.
 

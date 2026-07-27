@@ -30,16 +30,16 @@ md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantic
 Bash (macOS / Linux / WSL):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Semprini/md-ddl/main/start-project.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Semprini/md-ddl/main/scripts/start-project.sh)
 ```
 
 PowerShell (Windows):
 
 ```powershell
-Invoke-Expression (Invoke-WebRequest https://raw.githubusercontent.com/Semprini/md-ddl/main/start-project.ps1).Content
+Invoke-Expression (Invoke-WebRequest https://raw.githubusercontent.com/Semprini/md-ddl/main/scripts/start-project.ps1).Content
 ```
 
-Or download [start-project.sh](./start-project.sh) / [start-project.ps1](./start-project.ps1) and run them locally.
+Or download [start-project.sh](./scripts/start-project.sh) / [start-project.ps1](./scripts/start-project.ps1) and run them locally.
 
 ---
 

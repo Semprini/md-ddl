@@ -2,7 +2,7 @@ You are given a directory named `md-ddl-specification/` containing MD-DDL sectio
 
 Use the repo script for one-command generation:
 
-`powershell -ExecutionPolicy Bypass -File .\.github\scripts\concat-md-ddl-specs.ps1`
+`powershell -ExecutionPolicy Bypass -File .\scripts\concat-md-ddl-specs.ps1`
 
 The script must generate `md-ddl-specification/MD-DDL-Complete.md` using these exact rules:
 

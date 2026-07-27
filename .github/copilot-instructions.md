@@ -150,7 +150,7 @@ This is a generated file — a concatenation of sections 1–10 in order. It exi
 
 Regenerate with the repo script:
 
-`powershell -ExecutionPolicy Bypass -File .\.github\scripts\concat-md-ddl-specs.ps1`
+`powershell -ExecutionPolicy Bypass -File .\scripts\concat-md-ddl-specs.ps1`
 
 Canonical generation rules are maintained in `.prompts/concat-md-ddl-specs.prompt.md`. Keep concatenation behavior defined there and avoid duplicating detailed algorithm rules in multiple files.
 

@@ -138,27 +138,52 @@ Flag under-specified regulatory posture and unsupported claims.
 
 If the domain declares source systems in `## Source Systems`, review the source layer:
 
-#### Source File Conformance
+#### Source Summary Conformance
 
-- Each source system in the domain summary has a corresponding `sources/<system>/source.md` file
-- Source files include platform, capability, and change model metadata
-- Domain feed tables map every source table to a canonical entity
-- Source schema tables are present with column-level detail
-- `Destination` column uses correct formats (`Entity.Attribute` for direct, `[Name](#anchor)` for transforms)
+- Each source system in the domain summary has a corresponding `### <System>` summary under `## Sources` (conventionally in `sources/sources.md`, split out only once large)
+- Source files are domain-rooted: level-1 heading names the domain and links back to it
+- Metadata declares `id`, `owner`, `steward`, `change_model`, `data_quality_tier`, `status`, `version`
+- `change_model` uses a declared value (`real-time-cdc`, `event-driven`, `batch-daily`, `batch-intraday`, `api-poll`, `manual`)
+- A Source Overview Diagram is present, with edges labelled by change model
+- The Feeds table declares Canonical Entity, Transform, Attributes Contributed, and Change Model
+- Feeds list concrete subtypes actually instantiated, not abstract parents
+- Domain-level `## Source Systems` links resolve to the source's summary anchor
 
-#### Transform File Conformance
+#### Transform Detail Conformance
 
-- Transform files follow `table_<source-table>.md` naming pattern
-- Each transform has a level-3 heading, prose description, and YAML block
-- YAML blocks declare `type`, `source_field`, `target_entity`, `target_attribute`
-- Transformation types use the vocabulary from the Transformations spec (Section 8)
-- Destination column in source schema tables links correctly to transform anchors
+- Transform files are named for the source table, matching the source system's casing
+- Hierarchy is repeated from the domain down; the source heading links back to its summary
+- Source schema table uses the `Description` column and covers every source column
+- `Destination` uses `Entity.Attribute` for direct maps and a rule-section link for non-direct; a column feeding several targets uses a comma-separated list
+- Each non-direct mapping has a `Transform: ` heading, prose description, and YAML block
+- YAML declares `type:` and `target: Entity · Attribute`; `system:` is omitted (implicit from the owning source)
+- Transformation types come from the Section 8 vocabulary: `direct`, `derived`, `lookup`, `conditional`, `reconciliation`, `deduplication`, `aggregation`
+
+#### Determinism Review
+
+This is the part a structural check misses. Ask whether a generating agent would produce the same output twice:
+
+- **Fan-out declared** — wherever one source row produces more than one canonical instance, an `Entity Fan-Out` section with a `produces:` block exists
+- **Abstract targets bound** — any transform targeting an attribute on an abstract entity has a fan-out entry binding it to a concrete subtype
+- **Identity derived** — wherever an instance identifier is not a direct map from a source column, a `deduplication` transform declares how it is derived
+- **Survivorship declared** — wherever rows can merge, a `survivorship` rule exists; without one, output is order-dependent
+- **Key branches exhaustive** — a `deduplication` key has a branch covering the case where the external identifier is absent
+- **Evaluation order declared** — wherever `conditional` cases can overlap, `evaluation` is stated
+- **Inputs complete** — every field a case predicate references is declared in `inputs:` or `source:`
+- **Case keys valid** — for `enum:` targets, every case key is a real enum value
+- **Predicate types match** — predicates compare columns against values of the source column's actual type
+- **Blanks are decisions** — blank `Destination` cells mean deliberately unmapped, and the file states this convention
+- **Unresolved is recorded** — undecided mappings, unknown code values, and contradictory source metadata appear in `Open Decisions`, not as blanks or guesses
+- **Worked examples present** — anything beyond direct maps has examples covering each fan-out branch and each key branch, and every entity they produce is declared in the fan-out
 
 #### Source-Domain Consistency
 
-- Every canonical entity that is claimed to receive data from a source has at least one mapping (domain feed table entry or transform destination)
+- **Every `target` resolves** — the entity and attribute exist in the domain model, spelled as the model spells them, including inherited attributes. This is the most common defect in hand-authored transform detail; check it attribute by attribute rather than by eye
+- Every canonical entity claimed to receive data from a source has at least one mapping (feed table entry or transform destination)
+- Every entity in a `produces:` block appears in the source's Feeds table
 - Source fields that map to PII attributes are flagged if entity governance does not already declare `pii: true`
 - No source references appear in entity detail files (source-agnostic canonical layer is maintained)
+- No source idiosyncrasies (null representations, legacy codes, format quirks) have leaked into entity definitions
 
 If no source systems are declared, skip this step but note the absence as advisory — most production domains should declare at least one source.
 

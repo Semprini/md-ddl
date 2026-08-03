@@ -76,6 +76,37 @@ Transformation definitions ([Section 8](../../../md-ddl-specification/8-Transfor
 - **Data quality test stubs** — one test per transformation, asserting the target attribute is non-null after the transformation runs (override with `quality_check: false` on the transformation if the null case is valid)
 - **Source-to-domain mapping documentation** — a human-readable crosswalk table per entity, generated from all inline and named source mappings
 
+### Entity fan-out
+
+An `Entity Fan-Out` section ([Section 7](../../../md-ddl-specification/7-Sources.md)) declares that one source row produces several canonical instances. It determines pipeline shape, not just lineage:
+
+- Each `produces:` entry becomes a separate write target from one source read
+- `condition` becomes the routing predicate selecting which entries emit for a given row
+- `cardinality` sets the expected row count per target — usable as a generated reconciliation check
+- `references` becomes the foreign key wiring between instances produced from the same row
+- Where a transform's `target` names an attribute on an abstract entity, the matched fan-out entry determines which concrete subtype's table receives it
+
+A source table with no fan-out declaration produces exactly one instance of one entity per row.
+
+### Deduplication
+
+A `deduplication` transformation determines instance identity and therefore write semantics:
+
+- `key` branches generate the identifier expression, evaluated in declaration order
+- `normalise` operations apply to each field before key composition
+- The merge is generated as an upsert on the derived key, not an insert
+- `survivorship` selects which row's values win on conflict; `most_recent` uses the declared `timestamp_field`
+
+Without a `survivorship` rule the merge is order-dependent — surface this as a generation warning rather than picking a default.
+
+### Evaluation order
+
+`conditional` transformations declaring `evaluation: first_match` must generate as an ordered `CASE WHEN` chain preserving declaration order. `evaluation: exclusive` additionally generates a data quality check asserting no row matches more than one case.
+
+### Worked examples
+
+A `Worked Examples` section generates directly into pipeline test fixtures — each `given` row becomes an input fixture and each `produces` block the expected output assertion. These are the highest-value tests available, because they encode intent the transformation YAML only implies.
+
 ## Data Product: `schema_type`
 
 The `schema_type` on a data product selects the generation skill:

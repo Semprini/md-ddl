@@ -82,11 +82,10 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-sources/salesforce-crm/source.md
-sources/salesforce-crm/transforms/table_account.md
-sources/salesforce-crm/transforms/table_contact_point.md
-sources/sap-fraud-management/source.md
-sources/temenos-payment/source.md
+sources/sources.md                          ← all source summaries for the domain
+sources/salesforce-crm/table_ACCOUNT.md
+sources/salesforce-crm/table_CONTACT_POINT.md
+sources/sap-fraud-management/table_ALERT_CASE.md
 ```
 
 ---
@@ -114,7 +113,7 @@ sources/temenos-payment/source.md
 Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships, or use a file per aggregate root.
 The only structural requirement is that every file maintains the heading hierarchy (with a links back to the domain level).
 
-Source transform files follow the same two-layer pattern but are scoped to a source system. Details begin with a level-1 heading linking back to the source summary, followed by a level-2 heading for the source table and optional level-3 rule sections for complex mappings.
+Source files follow the same two-layer pattern and the same domain-rooted hierarchy. `## Sources` is a domain section like `## Entities`: summaries sit at level 3 under it, and transform detail for a source table sits at level 4 with optional level-5 rule sections for complex mappings. Detail files repeat the hierarchy from the domain down, linking the source heading back to its summary.
 
 ---
 
@@ -219,7 +218,7 @@ Use a Markdown table with the following columns:
 
 Column | Purpose
 --- | ---
-**Business Application** | Source application or product name, expressed as a Markdown link to the source declaration.
+**Business Application** | Source application or product name, expressed as a Markdown link to the source's summary heading in the source layer.
 **Platform** | Technology platform or deployment model.
 **Capability Domain** | Business capability or functional area served by the source.
 
@@ -230,9 +229,11 @@ Example:
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
+[Temenos Payment](sources/sources.md#temenos-payment) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sources.md#sap-fraud-management) | SAP | Fraud
 ````
+
+This table is the domain-level summary; the source layer holds the detail. See [Section 7 — Sources](./7-Sources.md) for the source summary and transform detail structure.
 
 #### **Diagrams**
 
@@ -298,8 +299,8 @@ entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
 products/analytics.md    ← Consumer-aligned data products
 products/canonical.md    ← Domain-aligned data products
-sources/temenos-payment/source.md
-sources/sap-fraud-management/source.md
+sources/sources.md       ← All source summaries for the domain
+sources/temenos-payment/table_PAYMENT_EVENT.md
 ```
 
 #### **Source Systems Table**
@@ -1202,18 +1203,22 @@ This separation is deliberate and load-bearing:
 
 ### **Source Structure**
 
-The source layer belongs to the domain and uses the same two-layer pattern as the rest of MD-DDL:
+The source layer belongs to the domain and uses the same two-layer pattern, and the same domain-rooted heading hierarchy, as the rest of MD-DDL. `## Sources` is a domain section like `## Entities` or `## Enums`, and its detail files are rooted at the domain:
 
-Level | Heading structure | Contains
+Level | Heading | Contains
 --- | --- | ---
-**Source summary** | Level‑1 heading naming the source system; level‑2 `## Metadata` and `## <Domain> Feeds` sections | What the source system is, how it generates change, and which canonical entities it feeds
-**Transform detail** | Level‑2 heading naming the source table; level‑3 headings for non-direct mapping rules | Field-level mappings using the transformation types defined in Section 8
+1 | `# [<Domain>](../domain.md)` | Link back to the domain summary
+2 | `## Sources` | The domain section
+3 | `### <Source System>` | The source system — its description, metadata, diagram, and feeds
+4 | `#### Metadata` / `#### Source Overview Diagram` / `#### Feeds` | Source summary sections
+4 | `#### <Source Table>` | Transform detail for one source table
+5 | `##### Transform: <Name>` and the fixed sections below | Mapping rules and supporting detail
 
 Transform detail is optional — a source may be declared before any mappings are authored.
 
 #### Splitting Across Files
 
-As elsewhere in MD-DDL, the heading hierarchy is what the standard defines; the file layout is the author's choice. A source may be a single document, or its transform detail may be split across many files — the natural split being one per source table, subdivided further by functional area for large systems. When transform detail is split out, each file repeats the hierarchy with a level‑1 heading linking back to the source summary.
+As elsewhere in MD-DDL, the heading hierarchy is what the standard defines; the file layout is the author's choice. Parsers and linters locate content by heading hierarchy, not by path, so no particular directory structure is required.
 
 The conventional layout, for illustration:
 
@@ -1222,18 +1227,17 @@ Financial Crime/
   domain.md
   entities/
   sources/
+    sources.md                      ← all source summaries for the domain
     salesforce-crm/
-      source.md             ← source metadata + domain feed table
-      transforms/
-        table_account.md    ← Account table mappings for Party/Company/Customer
-        table_contact_point.md
-    sap-fraud-management/
-      source.md
-      transforms/
-        table_alert_case.md
+      table_ADDRESS.md              ← transform detail, one file per source table
+      table_CONTACT.md
 ```
 
-By convention, transform documents are named for the source table — `table_<source-table>.md`, for example `table_account.md` or `table_payment_event.md`. If multiple canonical entities map from the same source table, group them under separate level-2 entity headings in the same place.
+Source summaries are small. Collect them in a single `sources/sources.md` and split a source out into its own file only once it grows large enough to warrant it. Transform detail is usually split one file per source table from the outset, since a single table's mappings can run to hundreds of lines.
+
+By convention, transform documents are named for the source table — `table_<source-table>.md`. Match the source system's own casing, so a table named `ADDRESS` gives `table_ADDRESS.md`.
+
+Every split-out file repeats the hierarchy from the domain down, so agents can reassemble the model from any arrangement.
 
 ---
 
@@ -1241,24 +1245,22 @@ By convention, transform documents are named for the source table — `table_<so
 
 #### Declaration
 
-A source is declared using a level-1 Markdown heading:
+A source is declared using a level-3 heading under `## Sources`:
 
 ```markdown
-# Salesforce CRM
+### Salesforce CRM
 ```
 
 The heading is the source's display name. The stable machine identifier lives in the metadata block.
 
 #### Description
 
-Free-text Markdown under the H1 and before the first H2 describes the source system's business role — what it does, who operates it, and why it is a source for the canonical model. This is written for domain modellers and data stewards, not for engineers.
+Free-text Markdown under the source heading and before the first level-4 heading describes the source system's business role — what it does, who operates it, and why it is a source for the canonical model. This is written for domain modellers and data stewards, not for engineers.
 
 #### Metadata
 
-Metadata appears under a level-2 heading:
-
 ```markdown
-## Metadata
+#### Metadata
 ```
 
 ```yaml
@@ -1317,42 +1319,12 @@ The tier does not prevent a source from contributing to canonical entities. It s
 
 ---
 
-#### Domain Feed Sections
-
-Below the metadata block, the source summary declares the feed table for its owning domain using this heading pattern:
-
-```markdown
-## [<Domain Name>](../../domain.md) Feeds
-```
-
-Example domain feed section:
-
-```markdown
-## [Financial Crime](../../domain.md) Feeds
-
-Canonical Entity | Transform | Attributes Contributed | Change Model
---- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Onboarding Date, Segment | real-time-cdc
-```
-
-**Domain feed table columns:**
-
-Column | Purpose
---- | ---
-**Canonical Entity** | Link to the entity in the target domain this source contributes to.
-**Transform** | Link to the transform detail for this source table, or `TBD` if not yet defined.
-**Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
-**Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
-
----
-
 #### Source Overview Diagram
 
 A source summary should include a Mermaid diagram showing which canonical entities the source feeds and what kind of change model applies to each.
 
 ````markdown
-### Source Overview Diagram
+#### Source Overview Diagram
 
 ```mermaid
 ---
@@ -1361,14 +1333,42 @@ config:
 ---
 graph LR
   Salesforce --> |real-time-cdc| Customer
-  Salesforce --> |real-time-cdc| ContactAddress
+  Salesforce --> |real-time-cdc| Address
   Salesforce --> |event-driven| CustomerPreferences
 
-  Customer["<a href='../../domains/customer/entities/customer.md'>Customer</a>"]
-  ContactAddress["<a href='../../domains/customer/entities/contact_address.md'>Contact Address</a>"]
-  CustomerPreferences["<a href='../../domains/customer/entities/customer_preferences.md'>Customer Preferences</a>"]
+  Customer["<a href='../entities/customer.md'>Customer</a>"]
+  Address["<a href='../entities/address.md'>Address</a>"]
+  CustomerPreferences["<a href='../entities/customer_preferences.md'>Customer Preferences</a>"]
 ```
 ````
+
+---
+
+#### Feeds
+
+Below the metadata and diagram, the source summary declares what it contributes to the domain:
+
+```markdown
+#### Feeds
+
+Canonical Entity | Transform | Attributes Contributed | Change Model
+--- | --- | --- | ---
+[Party](../entities/party.md#party) | [table_ACCOUNT](salesforce-crm/table_ACCOUNT.md#account) | Party Identifier, Party Status | real-time-cdc
+[Customer](../entities/customer.md#customer) | [table_ACCOUNT](salesforce-crm/table_ACCOUNT.md#account) | Customer Number, Onboarding Date, Segment | real-time-cdc
+```
+
+Because the file is rooted at the domain, the domain name is not repeated in the heading.
+
+**Feed table columns:**
+
+Column | Purpose
+--- | ---
+**Canonical Entity** | Link to the entity in the target domain this source contributes to.
+**Transform** | Link to the transform detail for this source table, or `TBD` if not yet defined.
+**Attributes Contributed** | Comma-separated list of the canonical attributes this source populates. Not every attribute needs to come from this source.
+**Change Model** | How changes to this entity flow from this source. May differ per entity if the source uses different mechanisms for different record types.
+
+Where a source row produces an abstract entity's concrete subtypes, list the subtypes actually instantiated — not the abstract parent — and note the inherited attributes against each.
 
 ---
 
@@ -1376,17 +1376,87 @@ graph LR
 
 #### Declaration
 
-When transform detail is split into its own file, that file begins with a level-1 heading naming the source system and linking back to the source summary:
+Transform detail is organised by source table under a level-4 heading naming the table. When split into its own file, the file repeats the hierarchy from the domain down, linking the source heading back to the source summary:
 
 ```markdown
-# [Salesforce CRM](../source.md)
+# [Financial Crime](../../domain.md)
+
+## Sources
+
+### [Salesforce CRM](../sources.md#salesforce-crm)
+
+#### Address
 ```
 
 #### Structure
 
-Transform detail is organised by source table: a level-2 heading naming the source table (for example `## Account`, `## ContactPoint`) followed by a source schema table.
+Under the source table heading, transform detail uses a fixed set of level-5 sections. All are optional except the source schema table:
 
-Required source schema table columns:
+Section | Purpose
+--- | ---
+`##### Entity Fan-Out` | Which canonical instances one source row produces. Required when a row produces more than one entity instance.
+`##### Source Schema` | The source column table, including the `Destination` column.
+`##### Transform: <Name>` | One non-direct mapping rule. Repeated per rule.
+`##### Worked Examples` | Input rows and the exact instances they must produce.
+`##### Open Decisions` | Unresolved questions that block deterministic generation.
+
+The `Transform: ` prefix distinguishes mapping rules from the fixed sections. The transformation's identity in the Knowledge Graph is the heading text with the prefix removed.
+
+Transform detail may cover multiple canonical entities when mappings originate from the same source table.
+
+---
+
+#### Entity Fan-Out
+
+A source table whose rows each produce exactly one instance of one entity needs no fan-out declaration. Where a row produces several instances — because the source system combines concepts the domain model separates — the split must be declared explicitly. Without it, the number and identity of output instances is left to the generating agent to infer, and generation is not reproducible.
+
+The `produces:` block declares, for one source row, which canonical instances are emitted:
+
+````markdown
+##### Entity Fan-Out
+
+```yaml
+produces:
+  - entity: Address · Postal Address
+    cardinality: 0..1
+    deduplicated: true
+    identity: Address Uniqueness Merge
+
+  - entity: Location Involvement
+    cardinality: 1
+    identity: Location Involvement Mapping
+    references:
+      Address: Address Uniqueness Merge
+
+  - entity: Individual
+    cardinality: 0..1
+    condition: "OWNER_TYPE_ENUM == 1"
+    identity:
+      field: ADDRESS.OWNER_ID
+      maps_to: Party · Party Identifier
+```
+````
+
+Key | Purpose
+--- | ---
+`entity` | The canonical entity produced. Must resolve in the domain model. Use `Parent · Subtype` where the target is a subtype.
+`cardinality` | Instances emitted per source row: `1`, `0..1`, or `0..*`.
+`condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
+`identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
+`deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
+`references` | Which produced instance satisfies a relationship to another produced instance.
+
+A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
+
+Entities listed in `produces:` should appear in the source summary's Feeds table.
+
+---
+
+#### Source Schema
+
+The source column table declares the physical shape of the source table and where each column lands.
+
+Required columns:
 
 Column | Purpose
 --- | ---
@@ -1397,22 +1467,50 @@ Column | Purpose
 **Precision** | Numeric precision when applicable.
 **Scale** | Numeric scale when applicable.
 **Nulls** | Whether source column allows nulls.
-**Comment** | Source-system context or business notes.
-**Destination** | Canonical destination mapping (`Entity.Attribute`) or a link to a rule section for non-direct mappings.
+**Description** | Source-system context or business notes.
+**Destination** | Canonical destination mapping, or a link to a rule section for non-direct mappings.
 
-When mapping is direct, the `Destination` cell is sufficient and no additional YAML rule is required. Use a level-3 rule section only for non-direct mappings such as `conditional`, `derived`, `lookup`, `reconciliation`, or `aggregation`.
+When mapping is direct, the `Destination` cell is sufficient and no additional YAML rule is required. Use a rule section only for non-direct mappings such as `conditional`, `derived`, `lookup`, `reconciliation`, `deduplication`, or `aggregation`. Rule links point to the rule's anchor, for example `[Transform: Map Party Status](#transform-map-party-status)`.
 
-Rules are still expressed with level-3 headings and YAML blocks. Rule links in the `Destination` column point to the rule's anchor (for example `[Map Party Status](#map-party-status)`).
+##### Multiple destinations
 
-Transform detail may cover multiple canonical entities when mappings originate from the same source table.
-
-Example level-2 heading:
+A source column may legitimately feed more than one canonical attribute — a type code that determines both a classification and a temporal boundary, for example. The `Destination` cell accepts a comma-separated list of mappings and rule links:
 
 ```markdown
-## Account
+5|ADDRESS_TYPE_DID|NUMBER||38|0|YES|The address type|[Transform: Address Purpose Mapping](#transform-address-purpose-mapping), [Transform: Previous Address Closure](#transform-previous-address-closure)
 ```
 
-For non-direct mappings, use a level-3 rule heading following the Key-as-Name principle. The heading is the transformation's identity in the Knowledge Graph and must be unique within the source table's transform detail.
+The one-mapping-path constraint applies per *target attribute*, not per source column. Two rules may read the same column; two rules must not write the same attribute.
+
+##### Unmapped columns
+
+**A blank `Destination` means the column is deliberately not mapped from this source.** The column is either not required by the domain model or is contributed by another source. A blank cell is a decision, not an omission — agents must not infer a target for it.
+
+Columns whose mapping is genuinely undecided do not belong in a blank cell. Record them under `##### Open Decisions` so the difference between "not needed" and "not yet resolved" is never left to inference.
+
+---
+
+#### Open Decisions
+
+Transform detail is authored against real source systems, and real source systems have undocumented columns, contradictory type declarations, and codes nobody remembers. An unresolved question recorded in prose is invisible to generation; recorded here it is a declared blocker.
+
+```markdown
+##### Open Decisions
+
+Ref | Item | Impact
+--- | --- | ---
+OD-1 | `OWNER_TYPE_ENUM` is typed `NUMBER` but documented with character codes. Actual values unknown. | Subtype routing in Entity Fan-Out cannot be generated.
+```
+
+Where a placeholder must appear in YAML pending resolution, mark it inline and reference the decision:
+
+```yaml
+condition: "OWNER_TYPE_ENUM == <INDIVIDUAL_CODE>"   # UNRESOLVED — see OD-1
+```
+
+Generation against a model with open decisions should surface them rather than guess past them.
+
+---
 
 #### Source field references
 
@@ -1433,16 +1531,15 @@ The `target` field uses `Entity · Attribute` notation to identify the canonical
 target: Customer · Email Address
 ```
 
-The entity name must match an entity declared in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
+The entity name must match an entity declared in the canonical domain model, spelled as the model spells it. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
 
 #### Transformation types
 
-Transform detail uses the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML
-syntax is unchanged. The only differences from Section 8's syntax are:
+Transform detail uses the transformation types defined in [Section 8 — Transformations](./8-Transformations.md). All type-specific YAML syntax is unchanged. The only differences from Section 8's syntax are:
 
 - `system:` is omitted from all `source:` blocks (implicit from the owning source)
 - `target:` uses `Entity · Attribute` notation instead of bare attribute name
-- The H3 heading is the transformation identity (Key-as-Name, as elsewhere)
+- The rule heading is the transformation identity (Key-as-Name, as elsewhere)
 
 ---
 
@@ -1494,14 +1591,18 @@ These annotations belong in the transform detail, not in the canonical entity de
 
 ### **Complete Example**
 
-#### Source summary
+#### Source summary — `sources/sources.md`
 
 ````markdown
-# Salesforce CRM
+# [Financial Crime](../domain.md)
+
+## Sources
+
+### Salesforce CRM
 
 The primary CRM system used by Retail Banking. Salesforce is the operational system for all customer relationship management — onboarding, contact management, preference capture, and relationship history. It generates real-time CDC events for all customer record changes.
 
-## Metadata
+#### Metadata
 
 ```yaml
 id: salesforce
@@ -1511,63 +1612,45 @@ change_model: real-time-cdc
 change_events:
   - Customer Created
   - Customer Updated
-  - Contact Updated
-  - Account Deactivated
 data_quality_tier: 1
 status: Production
 version: "2.1.0"
 tags:
   - CRM
-  - CustomerData
   - Core
 ```
 
-### Source Overview Diagram
-
-```mermaid
----
-config:
-  layout: elk
----
-graph LR
-  Salesforce --> |real-time-cdc| Customer
-  Salesforce --> |real-time-cdc| ContactAddress
-  Salesforce --> |event-driven| CustomerPreferences
-
-  Customer["<a href='../../domains/customer/entities/customer.md'>Customer</a>"]
-  ContactAddress["<a href='../../domains/customer/entities/contact_address.md'>Contact Address</a>"]
-  CustomerPreferences["<a href='../../domains/customer/entities/customer_preferences.md'>Customer Preferences</a>"]
-```
-
-## [Financial Crime](../../domain.md) Feeds
+#### Feeds
 
 Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Party](../../entities/party.md#party) | [table_account](transforms/table_account.md) | Party Identifier, Party Status | real-time-cdc
-[Customer](../../entities/customer.md#customer) | [table_account](transforms/table_account.md) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
-[Contact Address](../../entities/contact_address.md#contact-address) | [table_contact_point](transforms/table_contact_point.md) | Street, City, Postal Code, Country Code | real-time-cdc
+[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
 ````
 
-#### Transform detail — `sources/salesforce-crm/transforms/table_contact.md`
+#### Transform detail — `sources/salesforce-crm/table_CONTACT.md`
 
 ````markdown
-# [Salesforce CRM](../source.md)
+# [Financial Crime](../../domain.md)
 
-## Customer
+## Sources
 
-Salesforce is the primary contributor to the Customer canonical entity for all contact and identity attributes. Financial attributes (balance, credit limit) are contributed by the Core Banking System.
+### [Salesforce CRM](../sources.md#salesforce-crm)
 
-### Map Customer Number
-Direct map from the Salesforce Account identifier.
+#### Contact
 
-```yaml
-type: direct
-target: Customer · Customer Number
-source:
-  field: Account.AccountNumber
-```
+##### Source Schema
 
-### Concatenate Full Name
+Pos|Column Name|Data Type|Max Len|Precision|Scale|Nulls|Description|Destination
+---|---|---|---|---|---|---|---|---
+1|AccountNumber|Text|32|||NO|Salesforce account identifier|Customer.Customer Number
+2|FirstName|Text|100|||YES|Given name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
+3|LastName|Text|100|||YES|Family name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
+4|Email|Text|255|||YES|Primary email; "N/A" used for missing|Customer.Email Address
+5|MailingCountry|Text|2|||YES|Legacy two-character country code|[Transform: Resolve Country Code](#transform-resolve-country-code)
+6|InternalSyncFlag|Boolean||||NO|Salesforce replication marker|
+
+##### Transform: Concatenate Full Name
+
 Salesforce stores given and family name separately. The canonical model uses a single Full Name attribute.
 
 ```yaml
@@ -1581,19 +1664,8 @@ inputs:
     field: Contact.LastName
 ```
 
-### Map Email Address
-Salesforce uses "N/A" as a null representation for missing email addresses.
+##### Transform: Resolve Country Code
 
-```yaml
-type: direct
-target: Customer · Email Address
-source:
-  field: Contact.Email
-  null_as: "N/A"
-  quality: nullable
-```
-
-### Resolve Country Code
 Salesforce stores legacy two-character country codes. The canonical model uses ISO 3166-1 alpha-3.
 
 ```yaml
@@ -1601,23 +1673,12 @@ type: lookup
 target: Customer · Country Code
 source:
   field: Contact.MailingCountry
+  null_as: null
 lookup:
   reference: Country Code
   match_on: Abbreviation
   return: ISO Code
 fallback: null
-```
-
-### Map Date of Birth
-Salesforce uses DD/MM/YYYY format for dates. Generation produces a format-aware cast to the canonical date type.
-
-```yaml
-type: direct
-target: Customer · Date of Birth
-source:
-  field: Contact.Birthdate
-  format: "DD/MM/YYYY"
-  cast: date
 ```
 ````
 
@@ -1639,11 +1700,15 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 4. **Source idiosyncrasies stay in transform detail.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
-5. **Domain feed section is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation in the same source folder, this is a validation error. If a transformation exists in the source folder but the entity is not listed in the feed table, this is a warning.
+5. **Feed table is authoritative.** If an attribute is listed in a feed table but has no corresponding transformation for that source, this is a validation error. If a transformation exists for a source but the entity is not listed in its feed table, this is a warning.
 
 6. **Change events may link to domain Events.** When a source's `change_events` list contains an event whose name matches a domain Event, event subscription logic can be generated. This linkage is by name — no explicit reference key is required.
 
 7. **Sources do not carry governance metadata.** Source declarations do not include a `governance:` block. Sources are governed transitively — the canonical entities they feed carry the governance posture, and data products that expose source-aligned data declare governance at the product level. This is by design: governance belongs to the meaning layer (entities and products), not the operational origin layer (sources).
+
+8. **Fan-out is declared, not inferred.** Where one source row produces more than one canonical instance, an `Entity Fan-Out` section must declare what is produced and under what condition. Multi-entity output left implicit is a validation error.
+
+9. **Blank means deliberately unmapped.** A blank `Destination` asserts that the column is not needed from this source. Undecided mappings belong in `Open Decisions`, not in a blank cell.
 
 *Part of the MD‑DDL Specification. See [1-Foundation.md](./1-Foundation.md) for core principles and document structure.*
 
@@ -1669,12 +1734,12 @@ Transformations are **first-class citizens** of the source layer. They are decla
 
 ### **Transformation Declaration**
 
-Transformations are declared in transform detail, organised by source table. That structure — source schema table, `Destination` column mechanics, and heading hierarchy — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
+Transformations are declared in transform detail, organised by source table. That structure — the source schema table, `Destination` column mechanics, and heading hierarchy — is defined in [Section 7 — Sources](./7-Sources.md); this section defines only the transformation types themselves.
 
-Each non-direct transformation uses a **level-3 heading** following the Key-as-Name principle — the heading is the transformation's identity in the Knowledge Graph:
+Each non-direct transformation is declared under its own heading following the Key-as-Name principle. The heading text, with the `Transform: ` prefix removed, is the transformation's identity in the Knowledge Graph:
 
 ```markdown
-### Concatenate Name Parts
+##### Transform: Concatenate Name Parts
 ```
 
 A short prose description of the business intent follows the heading, before the YAML block.
@@ -1694,7 +1759,9 @@ target: Entity · Attribute
 
 A transformation may also declare `quality_check: false` to indicate that a null target attribute after the transformation runs is legitimate (by default, generated quality tests assert non-null).
 
-`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block. Both are validated during generation.
+`target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
+
+Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A transformation targeting an abstract entity without a corresponding fan-out declaration is a validation error.
 
 Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
@@ -1713,15 +1780,14 @@ See [Section 7 — Sources](./7-Sources.md) for the source idiosyncrasy annotati
 
 A one-to-one field map with an optional type cast. Use when the source field and domain attribute are semantically identical but may differ in name or type.
 
-````yaml
-### Account Number
+````markdown
+##### Transform: Account Number
 Maps the legacy account identifier from the core banking system.
 
 ```yaml
 type: direct
-target: Account Number
+target: Account · Account Number
 source:
-  system: cbs
   field: ACCT_MASTER.ACCT_NO
   cast: string
 ```
@@ -1741,19 +1807,17 @@ Inputs are named and declared separately from the expression so they can be
 individually traced.
 
 ````markdown
-### Full Name
+##### Transform: Full Name
 Combines given and family names from CRM into a single display name.
 
 ```yaml
 type: derived
-target: Full Name
+target: Customer · Full Name
 expression: "trim(First Name) + ' ' + trim(Last Name)"
 inputs:
   First Name:
-    system: salesforce
     field: Contact.FirstName
   Last Name:
-    system: salesforce
     field: Contact.LastName
 ```
 ````
@@ -1765,11 +1829,14 @@ Operation | Syntax | Example
 --- | --- | ---
 Concatenation | `+` | `"First Name + ' ' + Last Name"`
 Arithmetic | `+` `-` `*` `/` | `"Amount * Exchange Rate"`
-String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)` | `"trim(Email Address)"`
+String functions | `trim()`, `uppercase()`, `lowercase()`, `substring(n, m)`, `collapse_whitespace()` | `"trim(Email Address)"`
 Date functions | `today()`, `date_diff(a, b, unit)`, `date_add(d, n, unit)` | `"date_diff(End Date, Start Date, 'days')"`
 Null handling | `coalesce(a, b)` | `"coalesce(Preferred Name, First Name)"`
+Branching | `if(condition, then, else)` | `"if(Company Name IS NOT NULL, Company Name, Full Name)"`
 
 The generating agent is responsible for translating these expressions into the target physical syntax (SQL, Spark, dbt). Authors write expressions against domain attribute names, not physical column names. The function set above is the portable core, not a closed list — additional functions may be used where the generating agent and target platform support them.
+
+Prefer `conditional` over a nested `if()` chain. `if()` is for a single branch inside an otherwise computational expression; multi-way value selection is what `conditional` is for, and it validates its case keys against the target's type.
 
 ---
 
@@ -1778,12 +1845,12 @@ The generating agent is responsible for translating these expressions into the t
 Resolves a domain attribute when the same data exists in multiple source systems and a priority rule determines which value to use.
 
 ````markdown
-### Preferred Email Address
+##### Transform: Preferred Email Address
 CRM is the master for contact data. The ERP value is used only when CRM has no email on record.
 
 ```yaml
 type: reconciliation
-target: Email Address
+target: Customer · Email Address
 strategy: priority_non_null
 sources:
   - priority: 1
@@ -1816,23 +1883,68 @@ sources:
     timestamp_field: Contact.LastModifiedDate
 ```
 
+`reconciliation` resolves an attribute **across source systems**. To collapse duplicate rows **within** one source table, use `deduplication`.
+
+---
+
+#### `deduplication`
+
+Derives an instance identifier and collapses multiple source rows that describe the same real-world thing into a single canonical instance. Use when the source system holds one row per *usage* of an entity that the domain model holds once as reference data — addresses, products, counterparties.
+
+`deduplication` is the only transformation type that determines how many instances exist. It targets an identifier attribute, and the instances that share a derived key become one.
+
+````markdown
+##### Transform: Address Uniqueness Merge
+
+Once we have a Delivery Point Id (DPID) for an address we can merge multiple usages of that address. Where no DPID is present the address cannot be merged on an external key, so a normalised composite of the address components is used instead.
+
+```yaml
+type: deduplication
+target: Address · Address Identifier
+key:
+  - when: "DPID_N IS NOT NULL"
+    using:
+      - field: ADDRESS.DPID_N
+    prefix: "DPID"
+  - when: "DPID_N IS NULL"
+    using:
+      - field: ADDRESS.ADDRESS1
+      - field: ADDRESS.POST_CODE
+      - field: ADDRESS.COUNTRY_CODE
+    normalise: [trim, uppercase, collapse_whitespace]
+    prefix: "COMP"
+survivorship:
+  strategy: most_recent
+  timestamp_field: ADDRESS.UPDATE_DATE
+```
+````
+
+`key` is an ordered list of derivation branches. The first branch whose `when` predicate holds supplies the key. A branch with no `when` is unconditional and must be last. Declaring at least one unconditional or exhaustive branch is the author's responsibility — a row matching no branch cannot be identified and is rejected.
+
+Key | Purpose
+--- | ---
+`using` | Ordered list of source fields composing the key.
+`normalise` | Normalisation applied to each field before composition: `trim`, `uppercase`, `lowercase`, `collapse_whitespace`, `strip_punctuation`.
+`prefix` | Literal prefix distinguishing keys from different branches, so a composite key can never collide with an external-identifier key.
+
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `consensus` — with `most_recent` requiring a `timestamp_field`. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+
+An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
+
 ---
 
 #### `lookup`
 
-Enriches a source value by joining to a domain enum or reference entity.
-Use when the source system uses codes, abbreviations, or legacy identifiers
-that the domain model has standardised.
+Enriches a source value by joining to a domain enum, a reference entity, or an inline mapping table. Use when the source system uses codes, abbreviations, or legacy identifiers that the domain model has standardised.
 
 ````markdown
-### Resolve Country Code
+##### Transform: Resolve Country Code
 Translates two-character legacy country abbreviations from the core banking system into ISO 3166-1 alpha-3 codes used in the domain model.
 
 ```yaml
 type: lookup
-target: Country Code
+target: Customer · Country Code
 source:
-  system: cbs
   field: Customer.CountryAbbrev
 lookup:
   reference: Country Code
@@ -1846,23 +1958,43 @@ fallback: null
 
 `reference` must name a domain Enum or Entity defined in the same model. `match_on` and `return` must be valid attribute or value names within that reference. `fallback` declares what to do when no match is found: `null`, `reject` (fail the record), or a literal default value.
 
+##### Inline lookups
+
+Domain enums declare values and their meaning; they do not carry source system codes. A source code table therefore has nowhere to live on the enum, and putting it there would push a source idiosyncrasy into the canonical model. Where the mapping is from opaque source codes to canonical values, declare it inline on the transformation:
+
+```yaml
+type: lookup
+target: Location Involvement · Address Purpose
+source:
+  field: ADDRESS.ADDRESS_TYPE_DID
+lookup:
+  inline:
+    101890: Mailing
+    101891: Residential
+    111418: Registered Office
+fallback: reject
+```
+
+`inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
+
+Use `inline` when the mapping is an opaque code table with no logic in it. Use `conditional` when a case needs a predicate rather than an equality match — a range, a compound test, or several codes collapsing to one value.
+
 ---
 
 #### `conditional`
 
-Maps a source value to domain values using explicit threshold or rule cases.
+Maps source values to domain values using explicit threshold or rule cases.
 Each case key is a valid domain attribute value or enum value.
 
 ````markdown
-### Classify Customer Risk
+##### Transform: Classify Customer Risk
 Derives the domain risk tier from the raw numeric risk score produced by
 the transaction monitoring system.
 
 ```yaml
 type: conditional
-target: Risk Rating
+target: Customer · Risk Rating
 source:
-  system: tms
   field: Customer.RiskScore
 cases:
   Low:        "RiskScore < 30"
@@ -1877,6 +2009,43 @@ fallback: null
 
 Case keys must be valid values of the attribute's declared type. If `target` is an `enum:` type, case keys must be valid enum values. `fallback` behaves identically to the lookup type.
 
+##### Multiple inputs
+
+A conditional whose cases test a single column declares it with `source:`. Where cases test several columns, declare them with `inputs:`, using the same syntax and operand-naming rules as `derived`:
+
+```yaml
+type: conditional
+target: Location Involvement · Verification Status
+inputs:
+  Is Validated:
+    field: ADDRESS.IS_VALIDATED
+  Confirmed By Customer:
+    field: ADDRESS.ADD_CONFIRMED_BY_CUSTOMER
+  Retired Date:
+    field: ADDRESS.DSS_END_DATE
+cases:
+  Expired:  "Retired Date IS NOT NULL AND Retired Date < today()"
+  Verified: "Confirmed By Customer == 1 OR Is Validated == 1"
+fallback: Unverified
+```
+
+`source:` and `inputs:` are mutually exclusive. Every field a case predicate references must be declared — a predicate reading an undeclared field is a validation error, because it breaks lineage tracing.
+
+##### Evaluation order
+
+Case predicates frequently overlap. An address that is both expired and customer-confirmed satisfies two cases, and which one wins changes the output. Declare the intent:
+
+```yaml
+evaluation: first_match
+```
+
+Value | Behaviour
+--- | ---
+`first_match` | Cases are evaluated in declaration order; the first matching case wins. Later overlapping cases are unreachable by design.
+`exclusive` | Cases are asserted to be mutually exclusive. Generation emits a data quality check that fails if a row matches more than one.
+
+`evaluation` defaults to `first_match`. Case declaration order is therefore significant, and generators must preserve it. Use `exclusive` where non-overlap is a property of the data worth testing rather than an assumption worth relying on.
+
 ---
 
 #### `aggregation`
@@ -1884,16 +2053,15 @@ Case keys must be valid values of the attribute's declared type. If `target` is 
 Collapses multiple source rows into a single domain attribute value. Use when the source system operates at a finer grain than the domain entity.
 
 ````markdown
-### Total Outstanding Balance
+##### Transform: Total Outstanding Balance
 Sums all active loan disbursement records from the core banking system
 to produce the entity-level balance figure.
 
 ```yaml
 type: aggregation
-target: Outstanding Balance
+target: Loan Agreement · Outstanding Balance
 function: sum
 source:
-  system: cbs
   field: Loan_Disbursements.DisbursedAmount
 filter: "Loan_Disbursements.Status == 'Active'"
 grain:
@@ -1910,6 +2078,58 @@ grain:
 
 ---
 
+### **Worked Examples**
+
+A transformation's YAML declares intent. A worked example declares *outcome* — a source row and the exact set of canonical instances it must produce. For anything beyond a direct map, this is the only device in MD-DDL that pins behaviour: prose can be read two ways, and a fan-out with conditional routing and deduplication has enough moving parts that two correct-looking generations can disagree.
+
+Worked examples are declared under `##### Worked Examples` in transform detail. They are a contract — a generated pipeline that does not reproduce these outputs from these inputs is incorrect — and they translate directly into test fixtures.
+
+````markdown
+##### Worked Examples
+
+```yaml
+example: Individual with a DPID-matched, customer-confirmed residential address
+given:
+  ADDRESS_ID: "3f2b-aaa1"
+  OWNER_ID: "8c14-p001"
+  OWNER_TYPE_ENUM: 1
+  ADDRESS_TYPE_DID: 101891
+  FIRST_NAME: "Jane"
+  LAST_NAME: "Whitcombe"
+  DPID_N: "1234567"
+  ADD_CONFIRMED_BY_CUSTOMER: 1
+produces:
+  - entity: Address · Postal Address
+    Address Identifier: "DPID:1234567"
+    Delivery Point ID: 1234567
+  - entity: Location Involvement
+    Location Involvement Identifier: "8c14-p001:3f2b-aaa1"
+    Address Purpose: Residential
+    Verification Status: Verified
+  - entity: Individual
+    Party Identifier: "8c14-p001"
+    Legal Name: "Jane Whitcombe"
+notes: >
+  Party is abstract, so the concrete instance is an Individual, selected by the
+  OWNER_TYPE_ENUM condition in Entity Fan-Out.
+```
+````
+
+Key | Purpose
+--- | ---
+`example` | Short name for the case being pinned. Unique within the source table.
+`given` | The source row. A list of rows where the example demonstrates cross-row behaviour such as deduplication.
+`produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
+`notes` | Why the output is what it is. Written for the reader who expected something else.
+
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump.
+
+`produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
+
+Cover the cases where the model could reasonably be read two ways: each branch of a fan-out condition, each branch of a deduplication key, and any case whose evaluation order is load-bearing.
+
+---
+
 ### **Brownfield Adoption Note**
 
 Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference for creating MD-DDL transformation YAML. The transformation spec defines the target state; the baseline documents the current state. Reconciliation between the two is part of the adoption journey. See [Section 10 — Adoption](./10-Adoption.md) for the full adoption workflow.
@@ -1918,19 +2138,23 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 ### **Transformation Rules**
 
-1. **Key-as-Name:** The H3 heading is the transformation's identity in the Knowledge Graph. It must be unique within the source table's transform detail and is the authoritative name used in lineage tracing and generated output.
+1. **Key-as-Name:** The rule heading is the transformation's identity in the Knowledge Graph. It must be unique within the source table's transform detail and is the authoritative name used in lineage tracing and generated output. The `Transform: ` prefix is not part of the name.
 
-2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model. Both the entity name and the attribute name are validated during generation.
+2. **Target must exist:** The entity and attribute in `target` must be declared in the canonical domain model, or inherited from a parent entity. Both are validated during generation.
 
 3. **Source system is implicit:** Within transform detail, the source system is not declared on individual transformations — it is inherited from the owning source. Source idiosyncrasies (`null_as`, `quality`, `format`) are declared on the `source:` block within the transformation.
 
-4. **One mapping path per canonical attribute per source table:** Use exactly one `Destination` entry per target attribute from a given source table. If mapping is non-direct, the `Destination` entry must link to a single rule section that defines the logic.
+4. **One mapping path per canonical attribute per source table:** Use exactly one mapping path per target attribute from a given source table. The constraint is on the target, not the source — several rules may read the same source column, but two rules must not write the same attribute. Where mapping is non-direct, the `Destination` entry must link to the rule section that defines the logic.
 
 5. **No transformation logic in constraints:** Constraints validate; they do not transform. The transformation defines the inbound mapping; the constraint defines the validation rule on the result.
 
-6. **Expression operands use domain attribute names:** In `derived` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
+6. **Expression operands use declared input names:** In `derived` and multi-input `conditional` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
+7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype.
+
+8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
+
+9. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 
 ---
 
@@ -1939,11 +2163,16 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 See [Section 7 — Sources](./7-Sources.md) for the complete example. The following shows the transformation type syntax in context:
 
 ````markdown
-# [Salesforce CRM](../source.md)
+# [Financial Crime](../../domain.md)
 
-## Customer
+## Sources
 
-### Concatenate Full Name
+### [Salesforce CRM](../sources.md#salesforce-crm)
+
+#### Contact
+
+##### Transform: Concatenate Full Name
+
 ```yaml
 type: derived
 target: Customer · Full Name
@@ -1955,7 +2184,8 @@ inputs:
     field: Contact.LastName
 ```
 
-### Resolve Country Code
+##### Transform: Resolve Country Code
+
 ```yaml
 type: lookup
 target: Customer · Country Code

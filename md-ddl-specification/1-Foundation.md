@@ -82,11 +82,10 @@ domains/customer/diagrams/overview.md
 Example source layout:
 
 ```shell
-sources/salesforce-crm/source.md
-sources/salesforce-crm/transforms/table_account.md
-sources/salesforce-crm/transforms/table_contact_point.md
-sources/sap-fraud-management/source.md
-sources/temenos-payment/source.md
+sources/sources.md                          ← all source summaries for the domain
+sources/salesforce-crm/table_ACCOUNT.md
+sources/salesforce-crm/table_CONTACT_POINT.md
+sources/sap-fraud-management/table_ALERT_CASE.md
 ```
 
 ---
@@ -114,7 +113,7 @@ sources/temenos-payment/source.md
 Authors may organise detail files to suit their modelling style — for example, one entity per file, one file per subdomain cluster, or a file combining an entity with its enumerations and originating relationships, or use a file per aggregate root.
 The only structural requirement is that every file maintains the heading hierarchy (with a links back to the domain level).
 
-Source transform files follow the same two-layer pattern but are scoped to a source system. Details begin with a level-1 heading linking back to the source summary, followed by a level-2 heading for the source table and optional level-3 rule sections for complex mappings.
+Source files follow the same two-layer pattern and the same domain-rooted hierarchy. `## Sources` is a domain section like `## Entities`: summaries sit at level 3 under it, and transform detail for a source table sits at level 4 with optional level-5 rule sections for complex mappings. Detail files repeat the hierarchy from the domain down, linking the source heading back to its summary.
 
 ---
 

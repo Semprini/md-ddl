@@ -91,7 +91,7 @@ Use a Markdown table with the following columns:
 
 Column | Purpose
 --- | ---
-**Business Application** | Source application or product name, expressed as a Markdown link to the source declaration.
+**Business Application** | Source application or product name, expressed as a Markdown link to the source's summary heading in the source layer.
 **Platform** | Technology platform or deployment model.
 **Capability Domain** | Business capability or functional area served by the source.
 
@@ -102,9 +102,11 @@ Example:
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
+[Temenos Payment](sources/sources.md#temenos-payment) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sources.md#sap-fraud-management) | SAP | Fraud
 ````
+
+This table is the domain-level summary; the source layer holds the detail. See [Section 7 — Sources](./7-Sources.md) for the source summary and transform detail structure.
 
 #### **Diagrams**
 
@@ -170,8 +172,8 @@ entities/party-role.md   ← Party Role entity + Party Role Uses Contact Address
 entities/address.md      ← Address entity (no outbound relationships)
 products/analytics.md    ← Consumer-aligned data products
 products/canonical.md    ← Domain-aligned data products
-sources/temenos-payment/source.md
-sources/sap-fraud-management/source.md
+sources/sources.md       ← All source summaries for the domain
+sources/temenos-payment/table_PAYMENT_EVENT.md
 ```
 
 #### **Source Systems Table**

@@ -275,11 +275,14 @@ adoption maturity model.
    standard Entity Modelling skill for attribute decisions, type choices,
    and structural patterns.
 
-4. **Create source transform files.** For each canonical entity, create
-   transform files in `sources/*/transforms/` that define how source fields
-   map to canonical attributes. If existing ETL code is available, parse it
-   to generate draft transforms (see schema-import skill, Part 4). The
-   transform file *is* the mapping — no separate mapping block is needed.
+4. **Create source transform detail.** For each source table, create a
+   transform file at `sources/<system-id>/table_<TABLE>.md` defining how source
+   fields map to canonical attributes. Where one source row populates more than
+   one canonical entity, declare an `Entity Fan-Out` block — legacy tables
+   routinely combine concepts the canonical model separates. If existing ETL
+   code is available, parse it to generate draft transforms (see schema-import
+   skill, Part 4). The transform file *is* the mapping — no separate mapping
+   block is needed. See `../source-mapping/SKILL.md`.
 
 5. **Update domain adoption maturity.** When all identified entities have
    been created and transform files exist, update the domain metadata:
@@ -382,9 +385,13 @@ references the skill that owns detailed guidance.
   - Actor, entity, emitted_on, payload, governance
   - Guidance: `../relationship-events/SKILL.md` (Event checklist)
 
-6. **Source system files** - `sources/*/source.md`
-  - Change model, feeds table, data quality tier
-  - Guidance: `../source-mapping/SKILL.md` (Source File checklist)
+6. **Source summaries** - `sources/sources.md` (split per system only once large)
+  - Change model, data quality tier, overview diagram, Feeds table
+  - Guidance: `../source-mapping/SKILL.md` (Source summary checklist)
+
+6b. **Source transform detail** - `sources/<system-id>/table_<TABLE>.md`
+  - Entity fan-out, source schema, transform rules, worked examples, open decisions
+  - Guidance: `../source-mapping/SKILL.md` (Transform detail checklist)
 
 7. **Data product files** - `products/*.md`
   - Class, entities, SLA, governance overrides, masking

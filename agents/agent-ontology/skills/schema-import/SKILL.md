@@ -222,16 +222,22 @@ CASE / IF expressions | `conditional` | `CASE WHEN score > 70 THEN 'High'` → c
 JOIN to lookup/reference table | `lookup` | `LEFT JOIN country_codes ON ...` → lookup transform
 Aggregation (SUM, COUNT, etc.) | `aggregation` | `SUM(amount) GROUP BY customer_id` → aggregation transform
 COALESCE across sources | `reconciliation` | `COALESCE(crm.email, erp.email)` → reconciliation with priority
+DISTINCT / MERGE / dedupe window | `deduplication` | `ROW_NUMBER() OVER (PARTITION BY dpid ORDER BY updated DESC)` → deduplication with key and survivorship
+INSERT into several targets from one SELECT | *(not a type)* | One row producing several entities → declare an `Entity Fan-Out` block, not a transform
 
 ### Output
 
 For each source system identified in the ETL, produce:
 
-1. **Draft `source.md`** in `sources/<system>/` if it does not exist
-2. **Draft transform files** in `sources/<system>/transforms/` with:
-   - Source schema table mapping columns to destinations
-   - Named transform sections for non-direct mappings
+1. **Draft the source summary** as a `### <System>` section under `## Sources` in `sources/sources.md`, with metadata, overview diagram, and Feeds table
+2. **Draft transform detail** at `sources/<system-id>/table_<TABLE>.md`, named for the source table and matching its casing, with:
+   - `Entity Fan-Out` wherever one row populates more than one entity — ETL that fans a single SELECT into several INSERTs is the signal
+   - Source schema table mapping columns to destinations, using the `Description` column
+   - `Transform: ` sections for non-direct mappings
+   - `Open Decisions` for columns whose purpose the ETL does not reveal
    - `# INFERRED: [rationale]` comments on medium-confidence transforms
+
+Reverse-engineered ETL is a rich source of worked examples. Where the baseline includes test fixtures or sample rows, carry them into a `Worked Examples` section — they pin behaviour the SQL only implies.
 
 Present transforms alongside the canonical entities so the user can see
 the full picture: "here are your entities, and here is how your existing

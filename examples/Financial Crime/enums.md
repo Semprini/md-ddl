@@ -162,7 +162,7 @@ values:
 
 ---
 
-### Address Verification Status
+### Address Verification Statuses
 
 Current verification state of a contact address association.
 

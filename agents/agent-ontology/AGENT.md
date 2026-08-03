@@ -27,7 +27,7 @@ for every engagement.
 
 ## Skills
 
-You have eight specialist skills. Before responding to any modelling request, identify
+You have nine specialist skills. Before responding to any modelling request, identify
 which skill applies and read its SKILL.md. Multiple skills may apply in a single
 conversation — load them as needed.
 
@@ -38,7 +38,7 @@ conversation — load them as needed.
 | **Relationship & Events** | Connecting entities; "what happens when"; modelling business events; cardinality or ownership questions | `skills/relationship-events/SKILL.md` |
 | **Standards Alignment** | User mentions a named standard (BIAN, ISO 20022, FHIR, etc.); modelling an industry domain; adding Reference column values; finalizing existence/mutability/granularity/temporal choices that may be standard-constrained | `skills/standards-alignment/SKILL.md` |
 | **Domain Review** | User asks to review/audit/validate an existing domain and its detail files; readiness checks before declaring complete; quality review of structural and modelling decisions | `skills/domain-review/SKILL.md` |
-| **Source Mapping** | User wants to declare source systems, create source.md files, author domain feed tables, define field-level transformations, or map source fields to canonical entities; "where does this data come from?"; connecting an operational system to the domain model | `skills/source-mapping/SKILL.md` |
+| **Source Mapping** | User wants to declare source systems, author source summaries or Feeds tables, define field-level transformations, or map source fields to canonical entities; one source table splits into several domain entities; instance identity or deduplication must be derived; a source column needs conditional or lookup logic; "where does this data come from?"; "will an agent generate the same thing twice from this?" | `skills/source-mapping/SKILL.md` |
 | **Baseline Capture** | User wants to document existing schemas, models, ETL pipelines, or catalog metadata as baselines; "capture", "import", "document existing", "baseline", "record current state" | `skills/baseline-capture/SKILL.md` |
 | **Schema Import** | Fast-track brownfield path; "import schema", "reverse engineer", "I have a database", "here's my DDL", "start from existing tables", "convert my schema"; user provides CREATE TABLE or dbt schema.yml expecting a canonical domain | `skills/schema-import/SKILL.md` |
 | **Lifecycle** | Promoting a domain through lifecycle stages; "promote to active"; "bump version"; "deprecate this domain"; version management; lifecycle history generation | `skills/lifecycle/SKILL.md` |
@@ -72,6 +72,9 @@ For source system integration and field-level mapping:
 - Load `skills/source-mapping/SKILL.md` first.
 - If transformation types or expression syntax questions arise, the skill references the Transformations spec.
 - Confirm the domain model and entity detail files exist before authoring source files. If they don't, defer to Domain Scoping and Entity Modelling first.
+- **Verify every `target` against the entity file before writing it.** Transform detail that names an attribute the domain model does not declare is the most common defect in this layer, and it fails at generation rather than at authoring.
+- Where the domain model has no home for a source column, that is a modelling decision for the domain owner — record it in `Open Decisions` and raise it. Do not map it to the nearest plausible attribute name, and do not add attributes to entity files from within source mapping.
+- Run the skill's Determinism Test before declaring transform detail complete. Source tables that combine several canonical concepts in one row are the normal case, not the exception, and require an `Entity Fan-Out` declaration.
 
 For lifecycle management (promotion, versioning, deprecation):
 
@@ -156,8 +159,9 @@ These apply regardless of which skill is active:
 - Never generate detail files before the domain summary is approved.
 - Every entity must have at least one `identifier: true` attribute.
 - Mermaid diagrams must use the ELK layout engine.
-- Domain files use **Markdown tables** for Entities, Enums, Relationships, and Events.
-- Detail files use **level-3 headings** with YAML blocks.
+- Domain files use **Markdown tables** for Source Systems, Entities, Enums, Relationships, and Events.
+- Detail files repeat the hierarchy from the domain down and are always rooted at the domain. Entity, enum, relationship, and event definitions sit at **level 3**; source summaries at level 3, with their transform detail at **level 4** (source table) and **level 5** (mapping rules).
+- Never write a transform `target:` naming an entity or attribute you have not confirmed exists in the domain model.
 
 ---
 

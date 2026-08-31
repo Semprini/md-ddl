@@ -204,6 +204,8 @@ Reference files in `skills/*/references/` are stubs that point to the canonical 
 
 Use file-relative paths in both Markdown links and `{{INCLUDE: ...}}` directives inside reference stubs. Do not use workspace-root paths (for example `md-ddl-specification/...`) because this repo is commonly consumed as a `.md-ddl` submodule and root-based paths break in consumer projects.
 
+`md-ddl check` enforces this against an installed project and runs automatically at the end of `md-ddl init`; the release workflow runs it on every build. When adding a reference stub, count the directory levels from the stub to the repository root — a stub at `agents/<agent>/skills/<skill>/references/` is five levels down.
+
 ### Reference Loading
 
 Treat `{{INCLUDE: ...}}` as platform-dependent.

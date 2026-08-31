@@ -171,7 +171,7 @@ product framing. It is read by people deciding whether to adopt md-ddl.
 
 **Review lens:**
 
-- Does `md-ddl-specification/1-Foundation.md` contain a "Validation Model" section that defines the two-tier model, and does its pre-flight scope match the rule set in `guides/validation-tooling.md § Pre-Flight Check Scope` and the rules implemented in `scripts/md_ddl_lint.py`? All three must agree.
+- Does `md-ddl-specification/1-Foundation.md` contain a "Validation Model" section that defines the two-tier model, and does its pre-flight scope match the rule set in `guides/validation-tooling.md § Pre-Flight Check Scope` and the rules implemented in `src/md_ddl/lint.py`? All three must agree.
 - Are the pre-flight rules confined to syntax, reference integrity, and a model contradicting its own representations — with anything requiring domain context reported as a warning rather than an error?
 - Do all agent SKILL.md files use `flag` / `note` / `suggest` / `observe` language for convention and quality concerns (Levels 3–5)?
 - Is `error` / `reject` / `fail` language in agent prompts limited to syntax-level failures (Level 1)?

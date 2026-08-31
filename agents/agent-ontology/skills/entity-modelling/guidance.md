@@ -514,9 +514,3 @@ Has own lifecycle? | ✅ Yes | ❌ No | ❌ No
 Managed by team? | ✅ Yes | Maybe | ❌ No
 
 ---
-
-## Related Guidance
-
-- [inheritance/guidance.md](../inheritance/guidance.md) - Once classified as entity, design hierarchy
-- [relationship-design/guidance.md](../relationship-design/guidance.md) - When classified as relationship attribute
-- [constraint-logic/guidance.md](../constraint-logic/guidance.md) - Constraints differ for entities vs enums

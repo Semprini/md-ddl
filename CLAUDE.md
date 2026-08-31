@@ -38,6 +38,18 @@ When activating an agent, also follow its skill-loading protocol — read the ap
 
 MD-DDL uses **agent-driven quality review**, plus lightweight linting. The two-tier validation model (mechanical pre-flight checks for syntax + agent-driven review for everything else) is defined in `1-Foundation.md`. Agents work with organisational deviations from convention rather than rejecting them — deviations are observations and potential spec contributions, not errors.
 
+The linter lives at `src/md_ddl/lint.py`. Run it in this repo with `python scripts/md_ddl_lint.py <domain-folder>`; installed from PyPI it is `md-ddl lint <domain-folder>`.
+
+## Packaging
+
+This repository is also the `md-ddl` PyPI distribution. `src/md_ddl/` holds the package; `pyproject.toml` force-includes `agents/`, `md-ddl-specification/`, `guides/`, `examples/`, and `references/architecture/` as package data, and the agent wrappers from `.github/agents/` and `.claude/commands/`. `references/industry_standards/` is deliberately excluded — 63 MB of raw snapshots.
+
+`md-ddl init` unpacks that payload into a consuming project's `.md-ddl/`, mirroring what the submodule flow in `scripts/start-project.sh` does. When you add an agent, a spec section, or a guide, it is packaged automatically; when you add a new *top-level* directory that agents read, add it to `DOCS_PAYLOAD` in `src/md_ddl/__init__.py` and to the force-include table in `pyproject.toml`.
+
+`{{INCLUDE: ...}}` directives must use file-relative paths so they resolve both in this repo and from `.md-ddl/` in a consuming project. `src/md_ddl/includes.py` implements the check; `md-ddl init` runs it after unpacking and `md-ddl check` re-runs it on demand.
+
+Releases publish from `.github/workflows/publish.yml` via PyPI Trusted Publishing. Bump `__version__` in `src/md_ddl/__init__.py`, tag `v<version>`, publish a GitHub release.
+
 ## Review Output
 
 All review, evaluation, and post-mortem outputs must be written to `roadmap/review/`,

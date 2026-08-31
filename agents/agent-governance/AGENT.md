@@ -34,7 +34,7 @@ apply the foundation principles for every engagement.
 
 <md_ddl_foundation>
 <!-- Platform note: {{INCLUDE}} is processed by VS Code Copilot custom agents. Other platforms should load this file directly. -->
-{{INCLUDE: md-ddl-specification/1-Foundation.md}}
+{{INCLUDE: ../../md-ddl-specification/1-Foundation.md}}
 </md_ddl_foundation>
 
 ---

@@ -1,0 +1,87 @@
+[build-system]
+# 1.27+ for the PEP 639 `license` expression.
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "md-ddl"
+dynamic = ["version"]
+description = "Markdown Data Definition Language — an AI-native standard for domain ontology and semantic data models, with the agents that drive it"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "CC-BY-4.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Paul Atkinson" }]
+keywords = [
+    "data-modelling",
+    "data-model",
+    "ontology",
+    "semantic-model",
+    "data-mesh",
+    "data-products",
+    "data-governance",
+    "markdown",
+    "ddl",
+    "ai-agents",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Code Generators",
+]
+dependencies = ["pyyaml>=5.1"]
+
+[project.urls]
+Homepage = "https://github.com/Semprini/md-ddl"
+Repository = "https://github.com/Semprini/md-ddl"
+Specification = "https://github.com/Semprini/md-ddl/blob/main/md-ddl-specification/1-Foundation.md"
+Issues = "https://github.com/Semprini/md-ddl/issues"
+
+[project.scripts]
+md-ddl = "md_ddl.cli:main"
+
+[tool.hatch.version]
+path = "src/md_ddl/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/md_ddl"]
+
+# The standard itself ships as package data. `references/industry_standards/`
+# is deliberately absent — the raw BIAN/FHIR/TM Forum snapshots are 63 MB, and
+# the distilled markdown the agents load lives under `agents/`.
+[tool.hatch.build.targets.wheel.force-include]
+"agents" = "md_ddl/docs/agents"
+"md-ddl-specification" = "md_ddl/docs/md-ddl-specification"
+"guides" = "md_ddl/docs/guides"
+"examples" = "md_ddl/docs/examples"
+"references/architecture" = "md_ddl/docs/references/architecture"
+".github/agents" = "md_ddl/wrappers/copilot"
+".claude/commands" = "md_ddl/wrappers/claude"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/agents",
+    "/md-ddl-specification",
+    "/guides",
+    "/examples",
+    "/references/architecture",
+    "/scripts",
+    "/.github/agents",
+    "/.claude/commands",
+    "/CLAUDE.md",
+    "/LICENSE",
+    "/README.md",
+]

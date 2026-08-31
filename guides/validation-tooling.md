@@ -81,14 +81,18 @@ Any tool implementing pre-flight checks must conform to this interface:
 - **Severity:** two levels. `error` for syntax and reference integrity — the model contradicts itself or fails to parse. `warning` for structural observations, where a deliberate organisational choice is a legitimate explanation. Only errors fail the run.
 - **Configuration:** rules may be disabled by id, and warnings may be promoted to failures. Nothing else is configurable — the check set itself is fixed and closed.
 
-The reference implementation lives at `scripts/md_ddl_lint.py` in the MD-DDL source repository:
+The reference implementation ships with the `md-ddl` PyPI package (`pip install md-ddl`):
 
 ```shell
-python scripts/md_ddl_lint.py <domain-folder>
-python scripts/md_ddl_lint.py <folder-of-domains> --strict
-python scripts/md_ddl_lint.py <file.md> --format json
-python scripts/md_ddl_lint.py --list-rules
+md-ddl lint <domain-folder>
+md-ddl lint <folder-of-domains> --strict
+md-ddl lint <file.md> --format json
+md-ddl lint --list-rules
 ```
+
+From a checkout of the MD-DDL source repository, with no install step, the same
+linter runs as `python scripts/md_ddl_lint.py <domain-folder>`. Its source is
+`src/md_ddl/lint.py`.
 
 `--format json` emits findings as `{file, line, column, severity, rule, message}`, for editor integration. `--disable <rule-id>,...` skips named rules. `--strict` makes warnings fail the run. Exit code is `1` when any error is reported, `0` otherwise.
 
@@ -110,6 +114,8 @@ The directive appears on its own line and takes a file-relative path:
 {{INCLUDE: ../../../md-ddl-specification/3-Entities.md}}
 ```
 
-Paths must be relative to the file containing the directive. Do not use workspace-root paths, as MD-DDL repositories are commonly consumed as submodules where absolute paths break.
+Paths must be relative to the file containing the directive. Do not use workspace-root paths, as MD-DDL repositories are commonly consumed as submodules where absolute paths break: `md-ddl-specification/1-Foundation.md` resolves in the source repository and fails in every project that vendors the standard at `.md-ddl/`, whereas `../../md-ddl-specification/1-Foundation.md` resolves in both.
+
+`md-ddl check` verifies this for an installed project, and `md-ddl init` runs it automatically after unpacking. It resolves every directive in `.md-ddl/` and in the project's own agent wrappers, and reports any that miss. Occurrences inside fenced code blocks — like the example above — are documentation of the syntax and are not resolved. The wrapper templates inside a vendored standard (`.md-ddl/.github/agents/`, `.md-ddl/.claude/commands/`) are also skipped: they are copied out to the project before use, and their paths resolve from that destination.
 
 This mechanism enables the spec reference stub pattern: skill reference files contain a brief description and an `{{INCLUDE}}` pointing to the canonical spec section, so that spec updates propagate automatically without duplicating content across agent files.

@@ -36,13 +36,19 @@ several domains, or a single markdown file, may also be passed.
 ### 2 — Run the script
 
 ```bash
+md-ddl lint "<domain-folder>"
+```
+
+From a checkout of the MD-DDL source repository, the equivalent is:
+
+```bash
 python scripts/md_ddl_lint.py "<domain-folder>"
 ```
 
-If the `pyyaml` package is not installed, instruct the user to run:
+If the `md-ddl` command is not found, instruct the user to run:
 
 ```bash
-pip install pyyaml
+pip install md-ddl
 ```
 
 Use `--list-rules` to show the available rule ids, `--disable <id>,...` to

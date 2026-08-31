@@ -25,7 +25,32 @@ md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantic
 
 ## Quick Start
 
-**Start a new project** using the bootstrap script — it sets up git, adds MD-DDL as a submodule, and installs the agent wrappers for your AI tool in one step.
+**Install from PyPI** — the standard, its agents, and the linter ship as a Python package, so it can be pulled through a corporate artifactory like any other dependency.
+
+```bash
+pip install md-ddl
+md-ddl init
+```
+
+`md-ddl init` unpacks the standard into `.md-ddl/` and installs the agent wrappers for Claude Code and GitHub Copilot, with their paths rewritten to resolve against the unpacked copy. Run it in an existing project or in an empty directory.
+
+```text
+md-ddl init [DIR] --ai claude|copilot|both   which wrappers to install (default: both)
+                  --name NAME                project name for the generated instructions
+                  --force                    overwrite existing wrappers and instructions
+                  --no-instructions          skip CLAUDE.md / copilot-instructions.md
+                  --track                    commit .md-ddl/ instead of ignoring it
+```
+
+By default `.md-ddl/` ignores itself, so the unpacked standard stays out of your history — upgrade it with `pip install --upgrade md-ddl && md-ddl init`.
+
+`init` finishes by verifying that every `{{INCLUDE: ...}}` directive in the installed agent prompts resolves, so a prompt that cannot reach its spec section is reported at setup time instead of silently loading truncated. Re-run that check at any time with `md-ddl check`. The package also installs the pre-flight linter as `md-ddl lint <domain-folder>`.
+
+The PyPI package carries the specification, agents, guides, examples, and the architecture references. It omits `references/industry_standards/` — the 63 MB of raw BIAN, FHIR and TM Forum snapshots — which stays in this repository; the distilled standards markdown the agents actually load ships with the agents.
+
+---
+
+**Or start a new project** using the bootstrap script — it sets up git, adds MD-DDL as a submodule, and installs the agent wrappers for your AI tool in one step.
 
 Bash (macOS / Linux / WSL):
 
@@ -79,7 +104,7 @@ Agent Guide helps you navigate between these stages and explains any concept alo
 
 ## Using MD-DDL in your project
 
-MD-DDL is designed to be used as a git submodule dependency. Your model files live in your own repository; MD-DDL provides the specification, agents, and examples.
+Your model files live in your own repository; MD-DDL provides the specification, agents, and examples. Bring it in either as a pip dependency (`pip install md-ddl && md-ddl init`, above) or as a git submodule.
 
 ### Manual setup
 
@@ -182,6 +207,10 @@ examples/                    Reference examples
 references/                  Architecture and industry reference data
   industry_standards/        BIAN, FHIR, TM Forum reference datasets
   architecture/              Data Autonomy blog series, external references, Mermaid diagrams
+
+src/md_ddl/                  The `md-ddl` PyPI package
+  cli.py                     `md-ddl init` / `md-ddl lint` / `md-ddl path`
+  lint.py                    Pre-flight linter (also `python scripts/md_ddl_lint.py`)
 ```
 
 ---

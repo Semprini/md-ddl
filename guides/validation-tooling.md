@@ -79,7 +79,7 @@ Any tool implementing pre-flight checks must conform to this interface:
 - **Output:** a list of findings, each with file path, line number, rule id, severity, and message
 - **Exit behaviour:** report all findings; do not stop on first error
 - **Severity:** two levels. `error` for syntax and reference integrity — the model contradicts itself or fails to parse. `warning` for structural observations, where a deliberate organisational choice is a legitimate explanation. Only errors fail the run.
-- **Configuration:** rules may be disabled by id, and warnings may be promoted to failures. Nothing else is configurable — the check set itself is fixed and closed.
+- **Configuration:** rules may be disabled by id, warnings may be promoted to failures, and lint path exclusions come from `.md-ddlignore`. The check set itself is fixed and closed.
 
 The reference implementation ships with the `md-ddl` PyPI package (`pip install md-ddl`):
 
@@ -95,6 +95,8 @@ linter runs as `python scripts/md_ddl_lint.py <domain-folder>`. Its source is
 `src/md_ddl/lint.py`.
 
 `--format json` emits findings as `{file, line, column, severity, rule, message}`, for editor integration. `--disable <rule-id>,...` skips named rules. `--strict` makes warnings fail the run. Exit code is `1` when any error is reported, `0` otherwise.
+
+`md-ddl lint` reads `.md-ddlignore` from the current working directory and excludes matching paths during target discovery and file traversal. `md-ddl init` creates this file by default with `.md-ddl/` and `venv/`.
 
 ## Agent-Driven Quality Review
 

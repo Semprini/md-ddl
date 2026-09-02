@@ -35,6 +35,9 @@ Options:
     --disable RULE,...   Comma-separated rule ids to skip
     --list-rules         Print the rule ids and exit
 
+`.md-ddlignore` in the current working directory excludes matching paths from
+target discovery and lint traversal.
+
 Requires: Python 3.9+, pyyaml   (installed with the md-ddl package)
 
 Exit codes:
@@ -46,6 +49,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import re
 import sys
@@ -103,6 +107,44 @@ NON_ENTITY_REF_DIRS = {"sources", "products", "baselines"}
 
 # Level-2 sections that mark a file as an MD-DDL detail file.
 DETAIL_SECTIONS = {"entities", "enums", "relationships", "events", "data products"}
+IGNORE_FILE = ".md-ddlignore"
+
+
+@dataclass(frozen=True)
+class IgnoreConfig:
+    root: Path
+    patterns: tuple[str, ...] = ()
+
+    def ignores(self, path: Path) -> bool:
+        if not self.patterns:
+            return False
+        try:
+            rel = path.resolve().relative_to(self.root).as_posix()
+        except ValueError:
+            return False
+
+        for pattern in self.patterns:
+            if pattern.endswith("/"):
+                prefix = pattern.rstrip("/")
+                if rel == prefix or rel.startswith(f"{prefix}/"):
+                    return True
+                continue
+            if fnmatch.fnmatch(rel, pattern):
+                return True
+        return False
+
+
+def load_ignore_config(root: Path) -> IgnoreConfig:
+    ignore_file = root / IGNORE_FILE
+    if not ignore_file.exists():
+        return IgnoreConfig(root=root)
+    patterns = []
+    for line in ignore_file.read_text(encoding="utf-8", errors="replace").splitlines():
+        pattern = line.strip()
+        if not pattern or pattern.startswith("#"):
+            continue
+        patterns.append(pattern)
+    return IgnoreConfig(root=root, patterns=tuple(patterns))
 
 
 # ---------------------------------------------------------------------------
@@ -1277,11 +1319,19 @@ def _truthy_identifier(value: object) -> bool:
 # Project traversal
 # ---------------------------------------------------------------------------
 
-def markdown_files(root: Path) -> list[Path]:
-    return sorted(p for p in root.rglob("*.md") if p.is_file())
+def markdown_files(root: Path, ignore: IgnoreConfig) -> list[Path]:
+    return sorted(
+        p for p in root.rglob("*.md")
+        if p.is_file() and not ignore.ignores(p)
+    )
 
 
-def lint_domain(report: Report, domain_file: Path, only: set[Path] | None = None) -> None:
+def lint_domain(
+    report: Report,
+    domain_file: Path,
+    ignore: IgnoreConfig,
+    only: set[Path] | None = None,
+) -> None:
     domain_root = domain_file.parent
     domain_doc = load_doc(domain_file)
     if domain_doc is None:
@@ -1290,7 +1340,7 @@ def lint_domain(report: Report, domain_file: Path, only: set[Path] | None = None
 
     summary = read_domain(domain_doc)
 
-    for path in markdown_files(domain_root):
+    for path in markdown_files(domain_root, ignore):
         if only is not None and path.resolve() not in only:
             continue
         doc = load_doc(path)
@@ -1325,7 +1375,9 @@ def lint_domain(report: Report, domain_file: Path, only: set[Path] | None = None
                 check_entity_section(report, doc, heading, span)
 
 
-def discover_targets(paths: Iterable[str]) -> tuple[list[Path], dict[Path, set[Path]]]:
+def discover_targets(
+    paths: Iterable[str], ignore: IgnoreConfig
+) -> tuple[list[Path], dict[Path, set[Path]]]:
     """Map each requested path onto the domain(s) it belongs to."""
     domains: list[Path] = []
     file_filter: dict[Path, set[Path]] = {}
@@ -1337,6 +1389,8 @@ def discover_targets(paths: Iterable[str]) -> tuple[list[Path], dict[Path, set[P
             sys.exit(2)
 
         if p.is_file():
+            if ignore.ignores(p):
+                continue
             domain_file = _find_domain_file(p.parent)
             if domain_file is None:
                 print(f"error: no domain.md found above {raw}", file=sys.stderr)
@@ -1347,16 +1401,25 @@ def discover_targets(paths: Iterable[str]) -> tuple[list[Path], dict[Path, set[P
             continue
 
         local = p / "domain.md"
-        if local.exists():
+        if local.exists() and not ignore.ignores(local):
             found = [local]
         else:
-            found = sorted(f.resolve() for f in p.rglob("domain.md"))
+            found = sorted(
+                f.resolve()
+                for f in p.rglob("domain.md")
+                if not ignore.ignores(f)
+            )
         if not found:
             print(f"error: no domain.md found in or under {raw}", file=sys.stderr)
             sys.exit(2)
         for f in found:
             if f not in domains:
                 domains.append(f)
+
+    if not domains:
+        print("error: no lintable domain.md found after applying .md-ddlignore",
+              file=sys.stderr)
+        sys.exit(2)
 
     return domains, file_filter
 
@@ -1447,10 +1510,11 @@ def main(argv: list[str] | None = None, prog: str | None = None) -> int:
         print(f"error: unknown rule id(s): {', '.join(sorted(unknown))}", file=sys.stderr)
         return 2
 
-    domains, file_filter = discover_targets(args.paths or ["."])
+    ignore = load_ignore_config(Path.cwd().resolve())
+    domains, file_filter = discover_targets(args.paths or ["."], ignore)
     report = Report(disabled)
     for domain_file in domains:
-        lint_domain(report, domain_file, file_filter.get(domain_file))
+        lint_domain(report, domain_file, ignore, file_filter.get(domain_file))
 
     findings = sorted(report.findings, key=lambda f: (str(f.file), f.line, f.rule))
     if args.format == "json":

@@ -34,6 +34,12 @@ TOOL_TARGETS = {
     "claude": Path(".claude") / "commands",
     "copilot": Path(".github") / "agents",
 }
+IGNORE_FILE = ".md-ddlignore"
+DEFAULT_IGNORE_CONTENT = (
+    "# Paths excluded by `md-ddl lint`.\n"
+    ".md-ddl/\n"
+    "venv/\n"
+)
 
 AGENTS = (
     ("agent-guide", "Agent Guide",
@@ -101,6 +107,8 @@ MD-DDL provides AI agents for every stage of the modelling lifecycle.
 ## Validation
 
 Run the mechanical pre-flight checks with `md-ddl lint <domain-folder>`.
+Use `.md-ddlignore` in your project root to exclude paths (created by default
+with `.md-ddl/` and `venv/`).
 Everything beyond syntax is agent-driven review — see
 `{DOCS_DIRNAME}/guides/validation-tooling.md`.
 
@@ -148,6 +156,15 @@ def _install_docs(target: Path) -> list[str]:
         shutil.copytree(source, destination)
         log.append(f"  {DOCS_DIRNAME}/{dest}")
     return log
+
+
+def _install_lint_ignore(target: Path) -> tuple[bool, str]:
+    """Create .md-ddlignore with safe defaults if it doesn't exist."""
+    ignore_path = target / IGNORE_FILE
+    if ignore_path.exists():
+        return False, IGNORE_FILE
+    ignore_path.write_text(DEFAULT_IGNORE_CONTENT, encoding="utf-8")
+    return True, IGNORE_FILE
 
 
 def _install_wrappers(target: Path, tool: str, force: bool) -> tuple[list[str], list[str]]:
@@ -241,6 +258,12 @@ def cmd_init(args: argparse.Namespace) -> int:
             encoding="utf-8",
         )
         print(f"  {DOCS_DIRNAME}/.gitignore  (pass --track to commit the standard instead)")
+
+    ignore_created, ignore_name = _install_lint_ignore(target)
+    if ignore_created:
+        print(f"  {ignore_name}  (default lint excludes: .md-ddl/, venv/)")
+    else:
+        print(f"  {ignore_name}  (exists, skipped)")
 
     for tool in tools:
         written, skipped = _install_wrappers(target, tool, args.force)

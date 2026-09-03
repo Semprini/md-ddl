@@ -44,7 +44,9 @@ md-ddl init [DIR] --ai claude|copilot|both   which wrappers to install (default:
 
 By default `.md-ddl/` ignores itself, so the unpacked standard stays out of your history — upgrade it with `pip install --upgrade md-ddl && md-ddl init`.
 
-`init` finishes by verifying that every `{{INCLUDE: ...}}` directive in the installed agent prompts resolves, so a prompt that cannot reach its spec section is reported at setup time instead of silently loading truncated. Re-run that check at any time with `md-ddl check`. The package also installs the pre-flight linter as `md-ddl lint <domain-folder>`.
+`md-ddl init` also creates `.md-ddlignore` (if missing) with `.md-ddl/` and `venv/`, so `md-ddl lint .` focuses on your model files instead of the installed standard and virtual environment.
+
+`init` finishes by verifying that every `{{INCLUDE: ...}}` directive in the installed agent prompts resolves, so a prompt that cannot reach its spec section is reported at setup time instead of silently loading truncated. Re-run that check at any time with `md-ddl check`. The package also installs the pre-flight linter as `md-ddl lint <domain-folder>`; exclusions come from `.md-ddlignore`.
 
 The PyPI package carries the specification, agents, guides, examples, and the architecture references. It omits `references/industry_standards/` — the 63 MB of raw BIAN, FHIR and TM Forum snapshots — which stays in this repository; the distilled standards markdown the agents actually load ships with the agents.
 

@@ -4,6 +4,42 @@
 **Follows:** [2026-09-29-agent-definitions-review.md](2026-09-29-agent-definitions-review.md), which simplified the core prompts and named the skills as the next step.
 **Scope:** Instruction files only: each `SKILL.md` and the guidance files it loads. Reference data is out of scope and unchanged: industry-standard extracts, regulator files, the ODPS schema, dialect notes, the `references/` include stubs, and the Python runtime.
 
+## Summary
+
+Agent | Before | After
+--- | --- | ---
+Agent Guide | 1,470 | 533
+Agent Ontology | 3,422 | 2,175
+Agent Artifact | 2,177 | 1,733
+Agent Architect | 1,327 | 1,242
+Agent Governance | 909 | 476
+Agent Test | 288 | 290
+**Total** | **9,593** | **6,449**
+
+The line count matters less than the defects. The review found about 40 bugs where a
+skill taught something wrong. The most serious were:
+
+- **Invalid syntax.** Skills taught syntax the spec doesn't accept: `identifier: true`,
+  `required:`, `specializes:`, list-form event attributes, and a domain governance wrapper.
+  An agent following them produces files that fail review.
+- **False audit findings.** Compliance Audit contradicted governance inheritance and would
+  have flagged every well-modelled domain.
+- **Broken paths and imports.** Cross-agent paths didn't resolve, the faker template's
+  import could never run, and Standards Conformance pointed at snapshots that aren't installed.
+- **Fabricated or contradictory references.** Standards Alignment's BIAN worked example
+  cited class names absent from the index, and ISO 20022 guidance contradicted its own
+  local file.
+- **Stale facts.** There was a "no linter" claim, pre-`md-ddl init` setup steps,
+  wrong example values and folder names, and a stub file with literal placeholders.
+
+Every retained factual claim was checked against the repository. Code in skills was
+executed where it could be. The Agent Artifact section corrects the agent-definitions
+review, which wrongly recorded the generation skills' paths as correct.
+
+Spec and example follow-ups are listed under each agent. The main ones: governance
+extension fields as spec candidates, `masking` placement in `9-Data-Products.md`,
+`products/` vs `data_products/`, and two Financial Crime BIAN references to verify.
+
 ## Principles
 
 The same as for the core prompts, plus three specific to skills:
@@ -61,7 +97,7 @@ schema-import | 288 | 289
 lifecycle | 192 | 191
 preflight | 127 | 128
 baseline-capture (unchanged) | 125 | 125
-**Total** | **3,422** | **2,375**
+**Total** | **3,422** | **2,175**
 
 **Bugs**
 
@@ -240,3 +276,28 @@ standards-conformance | 164 | 160
   (`data_residency`, `audit_all_access`, `breach_notification_required`,
   `notification_timeframe`) are candidates for `3-Entities.md § Governance Metadata
   Schema`. Until then, they're a documented organisational extension.
+
+---
+
+## Agent Test
+
+File | Before | After
+--- | --- | ---
+test-strategy | 119 | 121
+worked-example-compilation | 169 | 169
+
+Written last session in the current style. All references resolve. Test Strategy's
+readiness check now requires `md-ddl lint` to pass, since a worked example with broken YAML
+can't be compiled faithfully.
+
+The shared dbt-project skill's paths were made relative to the skill file itself, because
+Agent Test loads it from outside Agent Artifact.
+
+## Verification
+
+- `md-ddl init` in a fresh project, then `md-ddl check`: all 50 include directives resolve.
+- A script resolved every backticked path in the agents and skills. The only remaining
+  unresolved names are placeholders for user-project files (`domain.md`, `LIFECYCLE.md`,
+  `sources/sources.md`) and filenames cited in prose next to their folder.
+- The faker skill's code pattern ran in both PII modes, with and without a profile.
+  `enterprise_profile.py` imported successfully using the documented copy-alongside pattern.

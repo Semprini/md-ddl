@@ -31,6 +31,8 @@ hand off to Agent Ontology before continuing.
 
 Also check:
 
+- `md-ddl lint` passes on the domain. A worked example with broken YAML can't be
+  compiled faithfully.
 - Generated models exist (or are about to), so tests have something to run against.
 - The product declares a consistency posture and null strategy. Without them,
   `NOT NULL` placement is a guess. Hand off to Agent Architect.

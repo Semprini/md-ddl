@@ -174,7 +174,7 @@ This is the part a structural check misses. Ask whether a generating agent would
 - **Predicate types match** — predicates compare columns against values of the source column's actual type
 - **Blanks are decisions** — blank `Destination` cells mean deliberately unmapped, and the file states this convention
 - **Unresolved is recorded** — undecided mappings, unknown code values, and contradictory source metadata appear in `Open Decisions`, not as blanks or guesses
-- **Worked examples present** — anything beyond direct maps has examples covering each fan-out branch and each key branch, and every entity they produce is declared in the fan-out
+- **Worked examples present** — anything beyond direct maps has examples covering each fan-out branch and each key branch, and every entity they produce is declared in the fan-out; entities fed by more than one source have a fan-in example
 
 #### Source-Domain Consistency
 

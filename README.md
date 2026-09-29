@@ -98,7 +98,8 @@ Example prompts (Claude AI uses `/agent-guide`, CoPilot uses `@agent-guide`):
 4. **Map sources** — declare source systems and column-level transforms
 5. **Publish** — declare data products with scope, shape, SLA, and masking
 6. **Generate** — produce physical artifacts and synthetic test data with Agent Artifact
-7. **Govern** — audit standards conformance and regulatory posture with Agent Governance
+7. **Test** — compile worked examples, constraints, and SLAs into tests and run them locally (dbt-core + DuckLake) with Agent Test
+8. **Govern** — audit standards conformance and regulatory posture with Agent Governance
 
 Agent Guide helps you navigate between these stages and explains any concept along the way.
 
@@ -197,6 +198,7 @@ agents/                      Canonical agent prompts and skills
   agent-artifact/            Physical schema generation
   agent-architect/           Architecture philosophy, data product design, ODPS
   agent-governance/          Standards conformance and compliance auditing
+  agent-test/                Test generation and local execution from worked examples
 
 examples/                    Reference examples
   Simple Customer/

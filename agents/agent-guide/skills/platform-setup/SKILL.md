@@ -55,6 +55,7 @@ cp .md-ddl/.github/agents/agent-ontology.agent.md .github/agents/
 cp .md-ddl/.github/agents/agent-artifact.agent.md .github/agents/
 cp .md-ddl/.github/agents/agent-architect.agent.md .github/agents/
 cp .md-ddl/.github/agents/agent-governance.agent.md .github/agents/
+cp .md-ddl/.github/agents/agent-test.agent.md .github/agents/
 ```
 
 These are lightweight wrappers that include the full agent prompts from the
@@ -70,6 +71,7 @@ agents listed:
 - `@agent-artifact` — Physical schema generation
 - `@agent-architect` — Data product design
 - `@agent-governance` — Compliance auditing
+- `@agent-test` — Test generation and local runs
 
 If agents do not appear, check:
 
@@ -89,6 +91,7 @@ Type `@agent-name` in Copilot Chat to invoke a specific agent:
 - `@agent-artifact Generate Snowflake DDL for the Customer domain` — Generate schemas
 - `@agent-architect Design a data product for the analytics team` — Design products
 - `@agent-governance Audit the Customer domain against GDPR` — Run compliance audit
+- `@agent-test Compile the worked examples for the Customer product into dbt unit tests` — Generate and run tests
 
 #### Context Tips
 
@@ -113,6 +116,7 @@ your-project/
       agent-artifact.agent.md
       agent-architect.agent.md
       agent-governance.agent.md
+      agent-test.agent.md
   domains/
     customer/
       domain.md               ← Your domain models
@@ -164,6 +168,7 @@ For domain modelling, read: `.md-ddl/agents/agent-ontology/AGENT.md`
 For physical schema generation, read: `.md-ddl/agents/agent-artifact/AGENT.md`
 For data product design, read: `.md-ddl/agents/agent-architect/AGENT.md`
 For compliance auditing, read: `.md-ddl/agents/agent-governance/AGENT.md`
+For testing generated output, read: `.md-ddl/agents/agent-test/AGENT.md`
 
 ## Key References
 

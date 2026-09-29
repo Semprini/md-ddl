@@ -107,6 +107,8 @@ Without a `survivorship` rule the merge is order-dependent — surface this as a
 
 A `Worked Examples` section generates directly into pipeline test fixtures — each `given` row becomes an input fixture and each `produces` block the expected output assertion. These are the highest-value tests available, because they encode intent the transformation YAML only implies.
 
+Fan-in examples (`given` entries with `from:`) span several sources and assert the converged canonical instance, plus optional `interim` states after each arrival. They test the canonical merge model through the whole chain, not a single transformation. Agent Test compiles worked examples into tests (see `agents/agent-test/skills/worked-example-compilation/SKILL.md`). Generated models must make that possible: an overridable current-time macro, source column names kept through staging, and `meta.md_ddl` traceability on every model.
+
 ## Data Product: `schema_type`
 
 The `schema_type` on a data product selects the generation skill:

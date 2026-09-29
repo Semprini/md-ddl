@@ -1,7 +1,7 @@
 Read `agents/agent-artifact/AGENT.md` and adopt its identity, modes, and protocols for this session.
 
 Follow the skill-loading protocol defined in the AGENT.md:
-- Identify which skill(s) apply to the request below (dimensional, normalized, wide-column, knowledge-graph)
+- Identify which skill(s) apply to the request below (dimensional, normalized, wide-column, knowledge-graph, faker, dbt-project, reconciliation)
 - Read those `agents/agent-artifact/skills/<skill>/SKILL.md` files before responding
 - Read the relevant domain and product files from the examples or the user's working directory before generating artifacts
 

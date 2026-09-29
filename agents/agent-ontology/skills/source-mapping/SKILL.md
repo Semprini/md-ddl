@@ -98,6 +98,8 @@ Ask the SME to walk through two or three real rows and state what should come ou
 
 Prioritise: each branch of a fan-out condition, each branch of a deduplication key, and any case whose evaluation order matters.
 
+When this source is not the only one feeding an entity, also ask for a **fan-in example**: the same real-world thing as it appears in each contributing source, in the order the sources usually arrive, and what the canonical instance should look like at the end. If the consuming data product accepts eventual consistency, ask what the instance should look like before the slower sources arrive and record it under `interim`. Declare the example once, beside the `reconciliation` transformation that governs the conflict (8-Transformations § Fan-in examples).
+
 ### Step 7 — Source Governance Context
 
 - Any PII in this source not already declared on the canonical entity?
@@ -383,6 +385,7 @@ If source tables carry PII not yet declared in entity governance, flag it for do
 - [ ] Every field referenced by a predicate is declared in `inputs:`
 - [ ] Blank `Destination` cells are decisions, and the convention is stated in the file
 - [ ] Worked examples cover each fan-out branch and each key branch
+- [ ] Entities fed by more than one source have a fan-in example covering each reachable `reconciliation` branch
 - [ ] Unresolved items recorded in `Open Decisions`, not left blank
 
 ---

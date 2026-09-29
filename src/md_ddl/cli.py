@@ -52,6 +52,8 @@ AGENTS = (
      "Data product design, architecture discussion, ODPS manifests."),
     ("agent-governance", "Agent Governance",
      "Standards conformance, compliance auditing, governance assurance."),
+    ("agent-test", "Agent Test",
+     "Tests from worked examples, constraints, and SLAs; local dbt + DuckLake runs."),
 )
 
 

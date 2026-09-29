@@ -121,7 +121,8 @@ Step | What happens | Agent
 **Model** | Draft domain files — entities, attributes, relationships, events, enums | Agent Ontology
 **Map** | Declare source systems and write transformation rules | Agent Ontology
 **Publish** | Design data products — audience, schema type, governance, masking | Agent Architect
-**Generate** | Produce physical schemas (DDL, JSON Schema, Parquet, Cypher) | Agent Artifact
+**Generate** | Produce physical schemas (DDL, JSON Schema, Parquet, Cypher) and dbt projects | Agent Artifact
+**Test** | Compile worked examples and constraints into tests; run them locally before promotion | Agent Test
 **Govern** | Audit and maintain compliance metadata over time | Agent Governance
 
 > "You can start at any step. Most people start with **Discover + Model** using

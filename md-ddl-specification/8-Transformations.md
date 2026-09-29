@@ -220,7 +220,7 @@ Key | Purpose
 
 The key is composed as the `prefix`, a colon, and the normalised `using` values joined with `|` in declaration order. A null value contributes an empty string. The Address example above therefore yields `DPID:1234567` or `COMP:12 HARBOUR ST|6011|NZ`.
 
-`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Its `timestamp_field` must be a creation time: a last-modified time lets an edited original lose to a newer duplicate. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
 
 An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
 
@@ -268,7 +268,7 @@ lookup:
 fallback: reject
 ```
 
-`inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
+`fallback: reject` rejects the source row: no instance is produced from it, and it is reported. `inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
 
 Use `inline` when the mapping is an opaque code table with no logic in it. Use `conditional` when a case needs a predicate rather than an equality match — a range, a compound test, or several codes collapsing to one value.
 
@@ -394,7 +394,7 @@ given:
 produces:
   - entity: Address · Postal Address
     Address Identifier: "DPID:1234567"
-    Delivery Point ID: 1234567
+    Delivery Point ID: "1234567"
   - entity: Location Involvement
     Location Involvement Identifier: "8c14-p001:3f2b-aaa1"
     Address Purpose: Residential
@@ -404,7 +404,8 @@ produces:
     Legal Name: "Jane Whitcombe"
 notes: >
   Party is abstract, so the concrete instance is an Individual, selected by the
-  OWNER_TYPE_ENUM condition in Entity Fan-Out.
+  OWNER_TYPE_ENUM condition in Entity Fan-Out. (The identity transformations this
+  example relies on are declared in the same transform detail; see Entity Fan-Out.)
 ```
 ````
 
@@ -415,7 +416,7 @@ Key | Purpose
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
-Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way.
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way. An entry with `cardinality: 0` asserts that the entity is not produced from the given rows. A fan-in example is needed wherever rows from more than one source table converge on an instance, whether the tables belong to one source or several.
 
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 

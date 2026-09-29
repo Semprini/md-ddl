@@ -62,6 +62,11 @@ re-derive them by eye. Classify them by what they break:
 
 Warnings and observations feed the sections below.
 
+Findings the linter can't see are classified by effect. **Critical:** the model contradicts
+itself or the spec so that no correct artifact can be generated. **Major:** generation would
+be non-deterministic or wrong for some artifact type (for example, pipelines but not DDL).
+**Minor:** clarity and consistency.
+
 ### 1) Inventory and Coverage
 
 Confirm all modeled artifacts are present and navigable:

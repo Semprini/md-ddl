@@ -145,3 +145,50 @@ join admissibility, graph mapping. They were trimmed, not rewritten.
   needed. Wide-column no longer loads both sibling skills.
 - faker: 609 lines down to 288, removing a duplicate profile walkthrough, the scripted
   offers, and a 150-line example factory.
+
+---
+
+## Agent Architect
+
+File | Before | After
+--- | --- | ---
+architecture | 489 | 420
+product-design (+ platform-posture) | 511 | 496
+odps-alignment | 327 | 326
+**Total** | **1,327** | **1,242**
+
+These skills are mostly substantive: the tenet table with counter-positions, the
+comparison framework, output formats, and the product design steps. The changes here
+are corrections more than cuts.
+
+**Bugs**
+
+- AA1: odps-alignment mapped a `Production` status that MD-DDL products don't have, and
+  had no mapping for `Active` or `Retired`. It is now Draft → draft, Active →
+  production, Deprecated → sunset, Retired → retired, all checked against the local ODPS
+  vocabulary.
+- AA2: odps-alignment mapped `dimensional` to format `SQL`, but SQL is an ODPS output
+  port type, not a format. It also treated `schema_type` as deciding the delivery
+  channel. The channel is now proposed and marked for confirmation.
+- AA3: odps-alignment presented invented data-quality objectives (PII implies 98%
+  accuracy, more than 80% not-null implies 95% completeness) as if derived from the
+  model. They are now marked `# PROPOSED`, the accuracy target is left to the owner,
+  and Agent Test's data-test results are named as better evidence.
+- AA4: odps-alignment's reference path was relative to the wrong folder.
+- AA5: product-design's declaration template omitted the `Retired` status.
+- AA6: `platform-posture.md` pointed to "AGENT.md discovery step 3", which no longer exists.
+
+**Simplifications**
+
+- architecture's teaching protocol repeated Agent Guide's progressive-depth loop. It now
+  references that loop and keeps its concept anchor table. The Discussion Triggers list
+  duplicated the frontmatter. The extensibility section (30 lines of
+  repository-maintenance steps) became one paragraph.
+- Scripted questions in all three skills became plain instructions. product-design's
+  Status Propagation bullets duplicated the domain-status table beside them.
+
+**Follow-up (spec)**
+
+- `9-Data-Products.md` lists `masking` as a top-level optional field but nests it under
+  `governance` in its example. The skills follow the example. The spec should settle on
+  one of them.

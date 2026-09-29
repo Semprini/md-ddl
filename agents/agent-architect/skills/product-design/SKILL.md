@@ -21,9 +21,6 @@ Read `md-ddl-specification/9-Data-Products.md` for normative rules, and
 `platform-posture.md` (in this skill folder) for the platform posture
 architecture guidance that shapes class selection and artifact targets.
 
-Platform note: `{{INCLUDE}}` blocks are only processed by include-aware
-platforms (for example, VS Code Copilot custom agents). In other platforms,
-load the file path above directly.
 
 ## Product Design Process
 
@@ -60,13 +57,12 @@ If the platform posture is not yet in the domain metadata, propose adding it.
 
 ### Step 3 — Identify Consumers
 
-Ask the user:
+For each consumer of the domain's data, ask:
 
-> "Who consumes data from this domain? For each consumer, tell me:
-> 1. Their name (team, system, report, or regulatory body)
-> 2. What they need (which entities/attributes)
-> 3. How they consume it (API, dashboard, batch file, regulatory submission)
-> 4. How fresh it needs to be (real-time, hourly, daily, on-demand)"
+- who they are (a team, system, report, or regulatory body)
+- what they need (which entities and attributes)
+- how they consume it (API, dashboard, batch file, regulatory submission)
+- how fresh it must be (real-time, hourly, daily, on-demand)
 
 Group consumers by access pattern — consumers with similar needs may share a product.
 
@@ -172,11 +168,9 @@ Strategy | Use When
 
 #### Consistency Posture
 
-Before setting the freshness SLA, ask the user:
-
-> "Does this product require **strong consistency** (all sources must propagate
-> before the product updates) or **eventual consistency** (sources propagate
-> independently; the product converges within a declared window)?"
+Before setting the freshness SLA, ask whether the product needs **strong consistency**
+(all sources propagate before the product updates) or **eventual consistency** (sources
+propagate independently, and the product converges within a declared window).
 
 Use the source systems' declared `change_model` values to guide the answer:
 - If all sources are `real-time-cdc` and the product can wait for all → **strong**
@@ -251,7 +245,7 @@ owner: [team or individual email]
 consumers:
   - [Consumer 1]
   - [Consumer 2]
-status: [Draft | Active | Deprecated]
+status: [Draft | Active | Deprecated | Retired]
 version: "[semver]"
 
 entities:                    # or 'source:' for source-aligned
@@ -341,15 +335,6 @@ The anchor is the product name in lowercase with spaces replaced by hyphens.
 
 Data products inherit lifecycle context from their parent domain. When designing
 or reviewing products, apply these lifecycle-aware rules:
-
-### Status Propagation
-
-- A product's `status` should not be more advanced than its parent domain's `status`.
-  A product cannot be `Active` in a `Draft` or `Review` domain.
-- When a domain transitions to `Deprecated`, flag all products within that domain.
-  Products built on a deprecated domain should either be deprecated themselves or
-  declare a documented `migration_note`.
-- When a domain transitions to `Retired`, all products must be `Retired`.
 
 ### Domain Status and Product Design
 

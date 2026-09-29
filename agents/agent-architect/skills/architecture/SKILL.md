@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Use this skill when the user asks about architecture philosophy, Data Autonomy, "why does MD-DDL work this way", "what's the philosophy behind", canonical data models, data products as architecture quantum, model-driven generation, "why not [alternative approach]", "what problems does MD-DDL solve", comparison with Data Mesh / Data Fabric / TOGAF / EDW / Lakehouse / API-first, positioning for governance councils or CIOs, architecture decision records, or any question about the design rationale behind MD-DDL. Also use when the user wants to prepare presentation material, talking points, executive summaries, or comparison tables for architectural positioning. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling.
+description: Use for MD-DDL's architectural philosophy and positioning: Data Autonomy and its 13 tenets, canonical models, data products as architecture quantum, model-driven generation, "why MD-DDL" or "why not X", comparisons with Data Mesh, Data Fabric, TOGAF, EDW, Lakehouse, API-first, or BIAN, material for governance councils or CIOs (talking points, executive summaries, comparison tables, ADRs, diagrams), and consistency posture decisions (strong vs eventual consistency, propagation lag, null handling across storage, transport, and DDL).
 ---
 
 # Architecture
@@ -21,10 +21,8 @@ Select the interaction mode based on user signals, not assumed role:
   framing for a specific audience, or challenging a tenet. Follow the Discussion
   Protocol (Step 1–5 below).
 
-When in doubt, ask:
-
-> "Would you like me to explain this concept, or are you looking to discuss and
-> position it for a specific audience?"
+If the signal is unclear, ask whether the user wants the concept explained or wants to
+position it for an audience.
 
 A Data Architect may sometimes want Teach mode for an unfamiliar concept. A Data
 Engineer may sometimes want Discuss mode to push back on an approach. Mode is selected
@@ -208,54 +206,23 @@ via the handoff note so DDL generation applies the correct nullable strategy.
   products with a declared convergence SLA and a view-based completeness check are
   more honest and more testable.
 
-### Discussion Triggers
-
-Engage this section when the user says any of:
-- "How do we handle updates from multiple sources?"
-- "What if one source is slower than another?"
-- "Our freshness SLA is X — is that achievable?"
-- "Can we have NOT NULL columns if data arrives in stages?"
-- "How does Parquet/Avro handle fields that haven't arrived yet?"
-- "What is the difference between strong and eventual consistency for data products?"
 
 ---
 
 ## Teaching Protocol (Teach Mode)
 
-Follow this sequence for concept questions. Adjust depth based on user signals.
-This follows the same progressive-depth pattern as the concept-explorer skill.
+Use the progressive-depth loop from Agent Guide's concept explorer: anchor to something
+familiar, give a two-sentence summary, connect the concept to the tenets it implements,
+and go deeper only on request. Load a reference group for depth. Hand off to Agent
+Ontology to start modelling, or switch to Product Design to design products.
 
-### Step 1 — Anchor to the Familiar
+Anchors for the three concepts people ask about most:
 
-Connect the architectural concept to something the user already knows. Use the
-archetype (from the core prompt or user signals) to select the right frame:
-
-Concept | Data Engineer frame | Data Steward frame | Product Owner frame | Compliance frame
+Concept | Data Engineer | Data Steward | Product Owner | Compliance
 --- | --- | --- | --- | ---
-Data Autonomy | "Like microservices but for data ownership — each domain owns its canonical data" | "Data classified and governed at the source, not after the fact" | "Each business domain publishes data products like a product team ships features" | "Governance baked into the model, not bolted on via a separate catalogue"
-Canonical model | "One agreed schema that all apps translate to/from — no more point-to-point mappings" | "A single vocabulary for the business meaning of data" | "A shared language so every team talks about the same 'Customer'" | "One place to define retention, masking, classification — inherited by every product"
-Model-driven generation | "Write the model once, generate DDL/JSON Schema/Parquet from it" | "Governance metadata flows into every generated artifact automatically" | "3x faster delivery because you model once and generate many outputs" | "Audit trail from model to physical schema — no manual translation errors"
-
-### Step 2 — Two-Sentence Summary
-
-Give a concise definition. Do not quote the blog posts verbatim — rephrase for clarity.
-
-### Step 3 — Connect to Tenets
-
-Identify which tenets underpin the concept and explain the rationale:
-
-> "This design choice implements Tenet 3 (Design for loose coupling) because..."
-
-### Step 4 — Check Understanding
-
-> "Does that match how you think about this? Or would you like me to go deeper
-> into the architecture or show how it connects to the MD-DDL spec?"
-
-### Step 5 — Go Deeper or Hand Off
-
-If the user wants more depth, load the relevant reference group and walk through
-the source material. If the user wants to start modelling, hand off to Agent Ontology.
-If the user wants to design data products, transition to the Product Design skill.
+Data Autonomy | Microservices for data ownership: each domain owns its canonical data | Data classified and governed at the source, not after the fact | Each domain ships data products the way a product team ships features | Governance built into the model, not bolted on via a catalogue
+Canonical model | One agreed schema every app translates to and from; no point-to-point mappings | One vocabulary for business meaning | A shared language, so every team means the same "Customer" | One place to define retention, masking, and classification, inherited by every product
+Model-driven generation | Write the model once; generate DDL, JSON Schema, Parquet, and dbt from it | Governance metadata flows into every generated artifact | Faster delivery: model once, generate many outputs | An audit trail from model to physical schema, with no manual translation
 
 ---
 
@@ -274,8 +241,6 @@ Understand the user's situation before positioning anything:
 - What alternatives are they comparing against?
 - What constraints do they operate under? (regulatory, platform, organisational)
 
-> "Before I can help you position this effectively — what does your current data
-> architecture look like, and what's driving the conversation?"
 
 ### Step 2 — Position with Rationale
 
@@ -292,10 +257,8 @@ and go deep.
 
 ### Step 3 — Invite Challenge
 
-Actively solicit pushback:
-
-> "That's the position. Where does it not fit your context? What would your
-> stakeholders push back on?"
+Actively ask where the position doesn't fit the user's context, and what their
+stakeholders will push back on.
 
 When the user raises objections:
 
@@ -316,22 +279,14 @@ Adapt the architecture to the user's specific situation:
 
 ### Step 5 — Present
 
-Help the user produce outputs for their target audience (see Presentation Output
-Formats below):
-
-> "What format does your governance council expect? I can help you structure this
-> as talking points, a comparison table, or a one-page architectural position."
+Ask what format the audience expects, then produce it using the Presentation Output
+Formats below.
 
 ### Production Work Handoff
 
-When an architect in Discuss mode says "let's start modelling my domain" or moves
-toward implementation — that is a handoff to Agent Ontology, not a continuation of
-the architecture discussion. Recognise production-work triggers and hand off
-explicitly:
-
-> "That sounds like you're ready to start modelling. Switch to @agent-ontology —
-> it will guide you through domain scoping and entity design. The architectural
-> tenets we discussed will inform the modelling decisions."
+When the architect moves to implementation ("let's start modelling my domain"), hand off
+to Agent Ontology rather than continuing the discussion. Carry the tenets you agreed on
+into the handoff block.
 
 ---
 
@@ -456,34 +411,10 @@ BIAN Coreless Banking | Complementary layers — BIAN provides industry-standard
 
 ---
 
-## Extensibility — Adding New References
+## Extending the References
 
-The architecture skill supports adding new references over time.
-
-### Adding a new blog post
-
-Drop the markdown file into `references/architecture/`. Add it to the appropriate
-thematic reference stub in `skills/architecture/references/` by adding another
-`{{INCLUDE:}}` directive. If it introduces a new tenet, add the tenet to the tenet
-table above.
-
-### Adding a new theme group
-
-If a new post does not fit existing groups, create a new reference stub in
-`skills/architecture/references/` and add it to the reference loading table above.
-
-### Adding diagram conversions
-
-Drop Mermaid `.md` files into `references/architecture/diagrams_converted/`. Inline
-the Mermaid into the referring blog post(s) to replace broken image links.
-
-### Adding non-blog references
-
-External articles, whitepapers, or framework references go into
-`references/architecture/` (alongside blog posts). Create or update reference stubs
-as needed. Tag with source and date for attribution.
-
-### Tenet evolution
-
-If a new reference changes or extends an architectural tenet, update the tenet table
-above. Blog posts are historical; tenets are living.
+New blog posts and external articles go in `references/architecture/`, with a source and
+date. Add an `{{INCLUDE:}}` line for each to the matching stub in `references/`, or
+create a new stub and add it to the Reference Loading table. Converted diagrams go in
+`references/architecture/diagrams_converted/`. When a new reference changes or adds a
+tenet, update the tenet table. The posts are historical; the tenets are maintained.

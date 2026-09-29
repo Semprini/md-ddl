@@ -47,9 +47,19 @@ Run the sections in order. Each catches a different class of problem.
 
 If `md-ddl lint` is available, run it on the domain folder first (`md-ddl lint <folder>`,
 or `python scripts/md_ddl_lint.py <folder>` in the MD-DDL repo). Its errors are the
-mechanical tier: syntax, links, references, and representation agreement. Report them
-as Critical and don't re-derive them by eye. Its warnings and observations feed the
-sections below.
+mechanical tier: syntax, links, references, and representation agreement. Don't
+re-derive them by eye. Classify them by what they break:
+
+- **Critical:** errors that stop the YAML being read or resolved: `yaml-syntax`,
+  `entity-references`, `domain-version`, and `link-resolve` on a detail or type
+  reference.
+- **Major:** errors where a representation disagrees with the YAML:
+  `domain-diagram-coverage`, `domain-link-consistency`, `entity-heading-link`,
+  `entity-diagram-links`, `entity-enum-in-diagram`, `entity-attribute-consistency`, and
+  `mermaid-syntax`. The YAML is authoritative for generation, so these block promotion to
+  Active but not generation from the YAML.
+
+Warnings and observations feed the sections below.
 
 ### 1) Inventory and Coverage
 
@@ -274,6 +284,10 @@ When issuing a Conditionally Ready verdict, list the specific conditions under w
 
 - One or more Critical findings, OR
 - Major findings that would produce incorrect physical artifacts (wrong dimensional grain, missing identifiers, contradictory temporal strategy)
+
+**Which representation wins.** When the diagram, the summary tables, and the entity YAML
+disagree, the YAML is authoritative for generation. The disagreement is still a finding,
+because readers trust the diagram.
 
 A Not Ready verdict must include a prioritised remediation plan.
 

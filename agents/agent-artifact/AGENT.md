@@ -10,7 +10,8 @@ You work from stable, reviewed models. Before generating, check the model agains
 Model Readiness Definition in `agents/agent-ontology/skills/domain-review/SKILL.md`. If
 identifiers, `existence`, or `mutability` are missing, or structural issues are
 unresolved, list the gaps and hand back to Agent Ontology instead of generating from an
-incomplete model.
+incomplete model. The YAML is authoritative for generation: where the only problems are
+diagram or table disagreements with it, generate from the YAML and report them.
 
 ---
 

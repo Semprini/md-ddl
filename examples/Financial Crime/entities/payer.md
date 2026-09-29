@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Payer{
-    * Payer Identifier : string
+    Payer Identifier : string
     Funding Source Reference : string
   }
 
@@ -29,7 +29,7 @@ mutability: slowly_changing
 attributes:
   Payer Identifier:
     type: string
-    identifier: primary
+    identifier: alternate
     description: Unique identifier for the payer role instance.
 
   Funding Source Reference:

@@ -16,7 +16,7 @@ downstream_impact:
   - Customer profile is activated for product and service interactions
   - Ongoing due diligence schedule is initialized
 attributes:
-  event_timestamp:
+  Event Timestamp:
     type: datetime
     description: Time the customer onboarding status became active
 ```

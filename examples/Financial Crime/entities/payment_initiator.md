@@ -13,12 +13,13 @@ config:
 ---
 classDiagram
   class PaymentInitiator{
-    * Payment Initiator Identifier : string
-    Initiation Channel : string
+    Payment Initiator Identifier : string
+    Initiation Channel : enum~TransactionChannel~
   }
 
   PaymentInitiator --|> PartyRole
 
+  class TransactionChannel["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-channel'>Transaction Channel</a>"]{<<enumeration>>}
   class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
 ```
 
@@ -29,12 +30,12 @@ mutability: slowly_changing
 attributes:
   Payment Initiator Identifier:
     type: string
-    identifier: primary
+    identifier: alternate
     description: Unique identifier for the payment initiator role instance.
 
   Initiation Channel:
-    type: string
-    description: Channel used to initiate payment instructions.
+    type: enum:Transaction Channel
+    description: Channel through which the initiator submits payment instructions, using the domain's Transaction Channel vocabulary.
 ```
 
 ```yaml

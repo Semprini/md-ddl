@@ -22,15 +22,15 @@ classDiagram
     Role Status : enum~PartyRoleStatus~
     Role Start Date : date
     Role End Date : date
-    Due Diligence Status : enum~DDStatus~
+    Due Diligence Status : enum~DueDiligenceStatus~
   }
 
-  class Customer
-  class Merchant
-  class Payee
-  class Payer
-  class Teller
-  class PaymentInitiator
+  class Customer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/customer.md'>Customer</a>"]
+  class Merchant["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/merchant.md'>Merchant</a>"]
+  class Payee["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payee.md'>Payee</a>"]
+  class Payer["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payer.md'>Payer</a>"]
+  class Teller["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/teller.md'>Teller</a>"]
+  class PaymentInitiator["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payment_initiator.md'>Payment Initiator</a>"]
 
   Customer --|> PartyRole
   Merchant --|> PartyRole
@@ -39,12 +39,12 @@ classDiagram
   Teller --|> PartyRole
   PaymentInitiator --|> PartyRole
 
-  PartyRole "1" <-- "0..*" Party : assumes
+  Party "1" --> "0..*" PartyRole : assumes
   PartyRole "0..*" --> "0..*" ContactAddress : uses
-  PartyRole "0..*" --> "0..1" Agreement : governed by
+  Agreement "0..*" --> "0..*" PartyRole : involves
 
   class PartyRoleStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#party-role-status'>Party Role Status</a>"]{<<enumeration>>}
-  class DDStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#due-diligence-status'>Due Diligence Status</a>"]{<<enumeration>>}
+  class DueDiligenceStatus["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#due-diligence-status'>Due Diligence Status</a>"]{<<enumeration>>}
 
   class Party["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party.md'>Party</a>"]
   class ContactAddress["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/contact_address.md'>Contact Address</a>"]
@@ -137,11 +137,13 @@ constraints:
 governance:
   pii: false
   classification: Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
+  retention: "10 years from Role End Date"
+  retention_basis: >
+    AUSTRAC AML/CTF Act 2006 requires 7 years; the domain's conservative 10 years applies,
+    counted from the end of the role.
   description: >
-    Role records must be retained for 7 years from Role End Date, aligned
-    to AUSTRAC and RBNZ record-keeping obligations. Roles must never be
+    A role records a party's capacity (customer, payer, teller), not personal details, so it
+    is not PII; the party it belongs to carries the marking. Roles must never be
     deleted — closure via Role End Date and Role Status is the only
     permitted termination mechanism.
   access_role:
@@ -167,19 +169,6 @@ source: Party Role
 type: associates_with
 target: Contact Address
 cardinality: many-to-many
-granularity: atomic
-ownership: Party Role
-```
-
-### Party Role Governed By Agreement
-
-A Party Role may be governed by a specific Agreement that defines obligations and permissions.
-
-```yaml
-source: Party Role
-type: references
-target: Agreement
-cardinality: many-to-one
 granularity: atomic
 ownership: Party Role
 ```

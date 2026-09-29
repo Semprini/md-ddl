@@ -69,13 +69,18 @@ governance:
 
 ### Agreement Involves Party Roles
 
-An Agreement governs and involves one or more Party Roles participating in the contract.
+An Agreement involves the Party Roles that are party to it: a Customer as borrower, a
+guarantor, joint holders. A role can be party to several agreements (a guarantor may
+guarantee more than one loan), so the relationship is many-to-many, and the capacity in
+which the role participates is an attribute of the link.
 
 ```yaml
 source: Agreement
 type: governs
 target: Party Role
-cardinality: one-to-many
+cardinality: many-to-many
 granularity: atomic
 ownership: Agreement
+relationship_attributes:
+  - Role In Agreement
 ```

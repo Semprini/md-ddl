@@ -30,6 +30,7 @@ classDiagram
   Transaction "0..*" --> "1" Currency : denominated in
   Transaction "0..*" --> "0..1" Account : debits
   Transaction "0..*" --> "0..1" Account : credits
+  Transaction "1" --> "0..*" TransactionAlert : raises
 
   class TransactionType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-type'>Transaction Type</a>"]{<<enumeration>>}
   class TransactionChannel["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/enums.md#transaction-channel'>Transaction Channel</a>"]{<<enumeration>>}
@@ -38,6 +39,7 @@ classDiagram
   class Payee["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payee.md'>Payee</a>"]
   class PaymentInitiator["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/payment_initiator.md'>Payment Initiator</a>"]
   class Currency["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/currency.md'>Currency</a>"]
+  class TransactionAlert["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/transaction-alert.md'>Transaction Alert</a>"]
   class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]  
 ```
 
@@ -134,11 +136,13 @@ constraints:
 governance:
   pii: false
   classification: Highly Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
+  retention: "10 years from the transaction date"
+  retention_basis: >
+    AUSTRAC AML/CTF Act 2006 requires 7 years from completion; the domain's conservative 10
+    years applies, counted from the transaction date.
   description: >
-    Transaction records must be retained for 7 years from the transaction date, aligned
-    to AUSTRAC AML/CTF Act 2006 record-keeping obligations. Records are append-only and
+    Transaction attributes describe a movement of value; the parties are linked through
+    Payer and Payee roles, which carry the PII posture. Records are append-only and
     must never be modified or deleted. Reversals are represented as new records.
   access_role:
     - FINANCIAL_CRIME_ANALYST
@@ -160,25 +164,38 @@ governance:
 
 ### Transaction Has Debtor
 
-A Transaction has one Payer representing the party from whom funds are debited.
+A Transaction has exactly one Payer, the party from whom funds are debited (the ISO 20022 Debtor). A Payer can be debtor on many Transactions.
 
 ```yaml
 source: Transaction
 type: has
 target: Payer
-cardinality: one-to-many
+cardinality: many-to-one
 granularity: atomic
 ownership: Transaction
 ```
 
 ### Transaction Has Creditor
 
-A Transaction has one Payee representing the party to whom funds are credited.
+A Transaction has exactly one Payee, the party to whom funds are credited (the ISO 20022 Creditor). A Payee can be creditor on many Transactions. A Merchant receiving a payment is the Payee on it, so no separate Merchant–Transaction relationship is declared.
 
 ```yaml
 source: Transaction
 type: has
 target: Payee
+cardinality: many-to-one
+granularity: atomic
+ownership: Transaction
+```
+
+### Transaction Raises Alerts
+
+Transaction monitoring may raise one or more alerts on a transaction. Each alert belongs to exactly one transaction and has no meaning without it.
+
+```yaml
+source: Transaction
+type: owns
+target: Transaction Alert
 cardinality: one-to-many
 granularity: atomic
 ownership: Transaction

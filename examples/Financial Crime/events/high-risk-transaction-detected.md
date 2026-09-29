@@ -16,22 +16,22 @@ downstream_impact:
   - Alert and case management workflows are initiated
   - Potential reporting obligations may be triggered
 attributes:
-  event_timestamp:
+  Event Timestamp:
     type: datetime
     description: Time the high-risk detection decision was produced
-  alert_type:
+  Alert Type:
     type: string
     description: Category of the detection rule that triggered (e.g. structuring, velocity, geographic)
-  severity:
+  Severity:
     type: string
     description: Assessed severity level of the alert (low, medium, high, critical)
-  detection_method:
+  Detection Method:
     type: string
     description: Name of the detection model or rule that produced the alert
-  threshold_breached:
+  Threshold Breached:
     type: string
     description: The specific threshold or limit that was exceeded
-  risk_score:
+  Risk Score:
     type: decimal
     description: Numeric risk score assigned by the detection engine
 ```

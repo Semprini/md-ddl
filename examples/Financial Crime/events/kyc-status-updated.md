@@ -16,7 +16,7 @@ downstream_impact:
   - Risk scoring and monitoring thresholds may be recalculated
   - Relationship restrictions or approvals may be adjusted
 attributes:
-  event_timestamp:
+  Event Timestamp:
     type: datetime
     description: Time the KYC status update took effect
 ```

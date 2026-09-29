@@ -17,7 +17,7 @@ consumers:
   - Customer Domain
   - Regulatory Reporting
 status: Active
-version: "1.0.0"
+version: "2.0.0"
 
 entities:
   - Party
@@ -39,6 +39,15 @@ lineage:
       - table_sanctions_screening
       - table_customer_risk_profile
 
+governance:
+  description: >
+    Integration consumers need unmasked identity data to match and link parties across
+    domains, so this product publishes PII without masking. Access is restricted to the
+    named integration and regulatory reporting consumers. Consumer-aligned products built
+    on it apply masking.
+
+# Consistency posture: eventual (convergence SLA: < 1 hour)
+# Null strategy: nullable-staging (partial rows in staging; consumers read the converged view)
 sla:
   freshness: "< 1 hour"
   availability: "99.95%"
@@ -66,9 +75,11 @@ classDiagram
   }
 
   class Person{
+    Given Name : string
+    Family Name : string
     Date of Birth : date
     Country of Birth : string
-    Nationality : string[]
+    Nationality : string[1..*]
     Country of Residence : string
     Politically Exposed Person Status : enum~PEPStatus~
   }
@@ -77,6 +88,8 @@ classDiagram
     Company Registration Number : string
     Incorporation Country : string
     Incorporation Date : date
+    Legal Structure : enum~CompanyLegalStructure~
+    Tax Identifier : string
   }
 
   class PartyRole{
@@ -85,13 +98,15 @@ classDiagram
     Role Status : enum~PartyRoleStatus~
     Role Start Date : date
     Role End Date : date
-    Due Diligence Status : enum~DDStatus~
+    Due Diligence Status : enum~DueDiligenceStatus~
   }
 
   class Customer{
-    * Customer Number : string
+    Customer Number : string
     Onboarding Date : date
     Relationship Start Date : date
+    Risk Review Required : boolean
+    Enhanced Due Diligence Trigger : enum~EDDTriggerStatus~
   }
 
   class ContactAddress{

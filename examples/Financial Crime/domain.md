@@ -19,18 +19,15 @@ technical_leads:
 classification: "Highly Confidential"
 pii: true
 regulatory_scope:
-  - AML (Anti-Money Laundering)
-  - KYC (Know Your Customer)
-  - CTF (Counter-Terrorist Financing)
+  - AUSTRAC AML/CTF Act 2006 (Australia)
+  - NZ AML/CFT Act 2009 (RBNZ-supervised)
+  - APRA CPS 234
   - FATF Recommendations
-  - BSA (Bank Secrecy Act)
-  - EU 5AMLD / 6AMLD
-  - USA PATRIOT Act
 default_retention: "10 years post relationship end"
 
 # Lifecycle & Discovery
 status: "Active"
-version: "1.0.0"
+version: "2.0.0"
 tags:
   - Compliance
   - Risk
@@ -71,7 +68,7 @@ graph TD
   PartyRole --> |uses|ContactAddress
   Customer --> |holds|Account
   Customer --> |has|CustomerPreferences
-  PartyRole --> |governed by|Agreement
+  Transaction --> |raises|TransactionAlert
   
   Transaction --> |has debtor|Payer
   Transaction --> |has creditor|Payee
@@ -82,7 +79,6 @@ graph TD
   
   Teller --> |processes|Transaction
   Teller --> |assigned to|Branch
-  Merchant --> |receives payment via|Transaction
   Merchant --> |settles into|Account
 
   Account --> |instance of|Product
@@ -90,7 +86,7 @@ graph TD
   Branch --> |services|Account
 
   Product --> |in terms of|Agreement
-  Agreement --> |governs|PartyRole
+  Agreement --> |involves|PartyRole
   
   ContactAddress --> |references|Address
 
@@ -119,6 +115,7 @@ graph TD
   Branch["<a href='./entities/branch.md'>Branch</a>"]
   Currency["<a href='./entities/currency.md'>Currency</a>"]
   ExchangeRate["<a href='./entities/exchange-rate.md'>Exchange Rate</a>"]
+  TransactionAlert["<a href='./entities/transaction-alert.md'>Transaction Alert</a>"]
 ```
 
 
@@ -126,9 +123,9 @@ graph TD
 
 Business Application | Platform | Capability Domain
 --- | --- | ---
-[Temenos Payment](sources/temenos-payment/source.md) | Temenos SaaS | Payment Execution
-[SAP Fraud Management](sources/sap-fraud-management/source.md) | SAP | Fraud
-[Salesforce CRM](sources/salesforce-crm/source.md) | Salesforce | Customer Relationship Management
+[Temenos Payment](sources/temenos-payment/source.md#temenos-payment) | Temenos SaaS | Payment Execution
+[SAP Fraud Management](sources/sap-fraud-management/source.md#sap-fraud-management) | SAP | Fraud
+[Salesforce CRM](sources/salesforce-crm/source.md#salesforce-crm) | Salesforce | Customer Relationship Management
 
 ## Entities
 
@@ -136,7 +133,7 @@ Name | Specializes | Description | Reference
 --- | --- | --- | ---
 [Party](entities/party.md#party) | | The abstract representation of any individual or organization that can participate in financial activities. Core business object that abstracts concepts like customer, correspondent, and supplier. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
 [Person](entities/person.md#person) | [Party](entities/party.md#party) | A natural person who participates in financial activities. | [BIAN BOM - Person](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Person)
-[Company](entities/company.md#company) | [Party](entities/party.md#party) | An organization, corporation, or other legally recognized entity. Also referred to as Legal Entity or Organisation in BIAN. | [BIAN BOM - Legal Entity](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LegalEntity)
+[Company](entities/company.md#company) | [Party](entities/party.md#party) | An organization, corporation, or other legally recognized entity. Also referred to as Legal Entity or Organisation in BIAN. | [BIAN BOM - Organisation](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Organisation) (partial: BIAN has no legal-person class)
 [Party Role](entities/party_role.md#party-role) | | The abstract representation of a Party's involvement in a specific business context. Serves as base for specific role types like Customer, Merchant, Creditor, etc. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 [Customer](entities/customer.md#customer) | [Party Role](entities/party_role.md#party-role) | A Party that holds accounts, uses products/services, or has an active relationship with the institution. First-class business concept with distinct ownership and governance. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 [Merchant](entities/merchant.md#merchant) | [Party Role](entities/party_role.md#party-role) | A Party that accepts payments for goods or services, typically through the institution's payment systems. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
@@ -147,14 +144,15 @@ Name | Specializes | Description | Reference
 [Account](entities/account.md#account) | | A financial account held with the institution. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 [Contact Address](entities/contact_address.md#contact-address) | | Physical, postal, or electronic address associated with a Party. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Address](entities/address.md#address) | | The canonical record of a physical or postal location. Reference data shared across parties — a single Address record is referenced by all Contact Addresses at that location, enabling network analysis without fuzzy matching. | [BIAN BOM - Location](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Location)
-[Customer Preferences](entities/customer-preferences.md#customer-preferences) | | Customer-specific settings for communication, privacy, and interaction preferences. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
-[Product](entities/product.md#product) | | A financial product or service offered by the institution. | [BIAN BOM - Product](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Product)
+[Customer Preferences](entities/customer-preferences.md#customer-preferences) | | Customer-specific settings for communication, privacy, and interaction preferences. | [BIAN BOM - Access Preference Arrangement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/AccessPreferenceArrangement) (partial: channel preferences only)
+[Product](entities/product.md#product) | | A financial product or service offered by the institution. | [BIAN BOM - Banking Product](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/BankingProduct)
 [Agreement](entities/agreement.md#agreement) | | A formal agreement between the institution and one or more Parties. In BIAN called Agreement or Arrangement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
 [Term Deposit Agreement](entities/term-deposit-agreement.md#term-deposit-agreement) | [Agreement](entities/agreement.md#agreement) | An agreement for a term deposit product. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
 [Loan Agreement](entities/loan-agreement.md#loan-agreement) | [Agreement](entities/agreement.md#agreement) | An agreement for a loan product. | [BIAN BOM - Loan Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LoanAgreement)
-[Transaction](entities/transaction.md#transaction) | | A financial transaction involving the movement of funds. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Currency](entities/currency.md#currency) | | A currency recognized by the system for transactions and positions. | [BIAN BOM - Currency](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Currency)
-[Exchange Rate](entities/exchange-rate.md#exchange-rate) | | The rate at which one currency can be exchanged for another at a specific point in time. | [BIAN BOM - Exchange Rate](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ExchangeRate)
+[Transaction](entities/transaction.md#transaction) | | A financial transaction involving the movement of funds. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Currency](entities/currency.md#currency) | | A currency recognized by the system for transactions and positions. | [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
+[Exchange Rate](entities/exchange-rate.md#exchange-rate) | | The rate at which one currency can be exchanged for another at a specific point in time. | -
+[Transaction Alert](entities/transaction-alert.md#transaction-alert) | | A transaction monitoring alert with its risk score and review disposition. | -
 [Branch](entities/branch.md#branch) | | A physical or operational branch of the financial institution. In BIAN called Location. | [BIAN BOM - Location](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Location)
 
 ## Enums
@@ -162,7 +160,7 @@ Name | Specializes | Description | Reference
 Name | Description | Reference
 --- | --- | ---
 [Party Status](enums.md#party-status) | Operational status of a party record. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
-[Financial Crime Risk Rating](enums.md#financial-crime-risk-rating) | Institution-assessed ML/TF risk level for a party. | [BIAN BOM - Rating](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Rating)
+[Financial Crime Risk Rating](enums.md#financial-crime-risk-rating) | Institution-assessed ML/TF risk level for a party. | -
 [Sanctions Screen Status](enums.md#sanctions-screen-status) | Outcome of sanctions screening checks. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
 [Party Role Status](enums.md#party-role-status) | Lifecycle status of a specific party role instance. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 [Due Diligence Status](enums.md#due-diligence-status) | CDD/EDD completion state for a role. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
@@ -172,16 +170,18 @@ Name | Description | Reference
 [Address Verification Status](enums.md#address-verification-status) | Current verification state of a contact address association. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Verification Method](enums.md#verification-method) | Method used to verify an address. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Currency Code](enums.md#currency-code) | ISO 4217 currency codes for transaction and account values. | [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
-[Transaction Type](enums.md#transaction-type) | Payment mechanism and clearing pathway classification. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Status](enums.md#transaction-status) | Lifecycle state of a transaction from initiation through settlement. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Channel](enums.md#transaction-channel) | Channel through which a transaction was initiated or processed. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Transaction Type](enums.md#transaction-type) | Payment mechanism and clearing pathway classification. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Status](enums.md#transaction-status) | Lifecycle state of a transaction from initiation through settlement. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Channel](enums.md#transaction-channel) | Channel through which a transaction was initiated or processed. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
 [Account Status](enums.md#account-status) | Operational lifecycle state of an account. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 [Account Type](enums.md#account-type) | Classification of an account by primary purpose and product characteristics. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 [Agreement Status](enums.md#agreement-status) | Lifecycle state of a formal agreement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
-[Contact Preference](enums.md#contact-preference) | Customer's preferred outbound communication channel. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
-[Company Legal Structure](enums.md#company-legal-structure) | Legal form under which a company or organisation is constituted. | [BIAN BOM - Legal Entity](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/LegalEntity)
+[Contact Preference](enums.md#contact-preference) | Customer's preferred outbound communication channel. | [BIAN BOM - Access Preference Arrangement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/AccessPreferenceArrangement) (partial: channel preferences only)
+[Company Legal Structure](enums.md#company-legal-structure) | Legal form under which a company or organisation is constituted. | [BIAN BOM - Organisation](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Organisation) (partial: BIAN has no legal-person class)
 [Association Type](enums.md#association-type) | Nature of the relationship between two parties in a network association. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
 [Account Holder Type](enums.md#account-holder-type) | Nature of a customer's holding relationship with an account. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
+[EDD Trigger Status](enums.md#edd-trigger-status) | Whether a customer's risk profile has triggered Enhanced Customer Due Diligence. | -
+[Monitoring Outcome](enums.md#monitoring-outcome) | Disposition of a transaction monitoring alert. | -
 
 ## Relationships
 
@@ -190,15 +190,14 @@ Name | Description | Reference
 [Party Assumes Roles](entities/party.md#party-assumes-roles) | A Party can assume multiple Party Roles (Customer, Merchant, Creditor, etc.) across different contexts and time periods. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 [Party Has Contact Addresses](entities/party.md#party-has-contact-addresses) | A Party can have multiple contact addresses for different purposes. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
 [Customer Holds Account](entities/customer.md#customer-holds-account) | A Customer can hold one or more Accounts. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
-[Customer Has Preferences](entities/customer.md#customer-has-preferences) | A Customer has associated preferences for communication and interaction. | [BIAN BOM - Party Preference](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyPreference)
+[Customer Has Preferences](entities/customer.md#customer-has-preferences) | A Customer has associated preferences for communication and interaction. | [BIAN BOM - Access Preference Arrangement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/AccessPreferenceArrangement) (partial: channel preferences only)
 [Party Role Uses Contact Addresses](entities/party_role.md#party-role-uses-contact-addresses) | A Party Role can use one or more contact addresses associated with the Party. | [BIAN BOM - Contact Point](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ContactPoint)
-[Party Role Governed By Agreement](entities/party_role.md#party-role-governed-by-agreement) | A Party Role may be governed by a specific Agreement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
-[Agreement Involves Party Roles](entities/agreement.md#agreement-involves-party-roles) | Agreements involve multiple Parties in specific roles (Customer as borrower, Company as guarantor, etc.). | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
-[Transaction Has Debtor](entities/transaction.md#transaction-has-debtor) | A Transaction has one or more Debtors (parties from whom funds are debited). | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Has Creditor](entities/transaction.md#transaction-has-creditor) | A Transaction has one or more Creditors (parties to whom funds are credited). | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Initiated By Instructing Agent](entities/transaction.md#transaction-initiated-by-instructing-agent) | An Instructing Agent initiates or instructs a transaction on behalf of another party. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Teller Processes Transaction](entities/teller.md#teller-processes-transaction) | A Teller processes transactions at a branch location. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Merchant Receives Payment](entities/merchant.md#merchant-receives-payment) | A Merchant receives payment through transactions. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Agreement Involves Party Roles](entities/agreement.md#agreement-involves-party-roles) | Agreements involve Party Roles in specific capacities (Customer as borrower, guarantor, joint holder); a role can be party to several agreements. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
+[Transaction Has Debtor](entities/transaction.md#transaction-has-debtor) | A Transaction has exactly one Debtor (the Payer from whom funds are debited). | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Has Creditor](entities/transaction.md#transaction-has-creditor) | A Transaction has exactly one Creditor (the Payee to whom funds are credited). | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Initiated By Instructing Agent](entities/transaction.md#transaction-initiated-by-instructing-agent) | An Instructing Agent initiates or instructs a transaction on behalf of another party. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Raises Alerts](entities/transaction.md#transaction-raises-alerts) | Transaction monitoring may raise one or more alerts on a transaction. | -
+[Teller Processes Transaction](entities/teller.md#teller-processes-transaction) | A Teller processes transactions at a branch location. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
 [Account Holds Product](entities/account.md#account-holds-product) | An Account is an instance of a Product. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 [Branch Services Account](entities/branch.md#branch-services-account) | Accounts are serviced by a specific Branch (Location). | [BIAN BOM - Location](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Location)
 [Product In Terms Of Agreement](entities/product.md#product-in-terms-of-agreement) | A Product is defined in terms of an Agreement. | [BIAN BOM - Agreement](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Agreement)
@@ -207,11 +206,11 @@ Name | Description | Reference
 [Party Role At Point In Time](entities/party_role.md#party-role-at-point-in-time) | Period snapshot of Party Role state for regulatory reporting. | -
 [Party Related To Party](entities/party.md#party-related-to-party) | A Party may be related to one or more other Parties through ownership, control, family, or association ties. Structural basis for beneficial ownership mapping and PEP network analysis. | [BIAN BOM - Party](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Party)
 [Teller Assigned To Branch](entities/teller.md#teller-assigned-to-branch) | A Teller is assigned to a Branch for operational responsibilities. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
-[Exchange Rate References Base Currency](entities/exchange-rate.md#exchange-rate-references-base-currency) | Each Exchange Rate references one base Currency. | [BIAN BOM - Exchange Rate](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ExchangeRate)
-[Exchange Rate References Quote Currency](entities/exchange-rate.md#exchange-rate-references-quote-currency) | Each Exchange Rate references one quote Currency. | [BIAN BOM - Exchange Rate](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/ExchangeRate)
-[Transaction Denominated In Currency](entities/transaction.md#transaction-denominated-in-currency) | A Transaction is denominated in exactly one Currency. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Has Debit Account](entities/transaction.md#transaction-has-debit-account) | A Transaction debits one internal Account. Null for externally-held debit accounts. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
-[Transaction Has Credit Account](entities/transaction.md#transaction-has-credit-account) | A Transaction credits one internal Account. Null for externally-held credit accounts. | [BIAN BOM - Payment](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Payment)
+[Exchange Rate References Base Currency](entities/exchange-rate.md#exchange-rate-references-base-currency) | Each Exchange Rate references one base Currency. | -
+[Exchange Rate References Quote Currency](entities/exchange-rate.md#exchange-rate-references-quote-currency) | Each Exchange Rate references one quote Currency. | -
+[Transaction Denominated In Currency](entities/transaction.md#transaction-denominated-in-currency) | A Transaction is denominated in exactly one Currency. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Has Debit Account](entities/transaction.md#transaction-has-debit-account) | A Transaction debits one internal Account. Null for externally-held debit accounts. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
+[Transaction Has Credit Account](entities/transaction.md#transaction-has-credit-account) | A Transaction credits one internal Account. Null for externally-held credit accounts. | [BIAN BOM - Payment Transaction](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PaymentTransaction)
 [Account Denominated In Currency](entities/account.md#account-denominated-in-currency) | An Account is denominated in exactly one Currency. | [BIAN BOM - Account](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/Account)
 [Merchant Has Settlement Account](entities/merchant.md#merchant-has-settlement-account) | A Merchant may have a designated Account for settlement credit. | [BIAN BOM - Party Role](https://bian-modelapi-v4.azurewebsites.net/BOClassByName/PartyRole)
 
@@ -231,7 +230,7 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration | Active
+[Canonical Party](products/canonical.md#canonical-party) | domain-aligned | Cross-domain Integration; Customer Domain; Regulatory Reporting | Active
 [Transaction Risk Summary](products/analytics.md#transaction-risk-summary) | consumer-aligned | Financial Crime Analytics | Active
 [Patient Financial Fraud Detection](products/patient-fraud-detection.md#patient-financial-fraud-detection) | consumer-aligned | Financial Crime Analytics; Enterprise Fraud Operations; Clinical Revenue Integrity | Active
 [Salesforce CRM Raw Feed](products/source-feeds.md#salesforce-crm-raw-feed) | source-aligned | Data Engineering | Active

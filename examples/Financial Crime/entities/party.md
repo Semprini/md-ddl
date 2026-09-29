@@ -8,7 +8,7 @@ A Party is any individual or legal entity that has, or may have, a financial rel
 
 In the Financial Crime domain a Party represents any subject that may be assessed for risk, screened against watchlists, investigated, or reported to a regulatory authority. A Party does not hold relationships directly — it participates through a Party Role (e.g., Account Holder, Beneficial Owner, Signatory). The same Party may hold multiple roles across multiple products simultaneously.
 
-Specialisations of Party — Person and Legal Entity — carry the attributes that are specific to a natural person or an incorporated body respectively.
+Specialisations of Party — Person and Company — carry the attributes that are specific to a natural person or an incorporated body respectively.
 
 ```mermaid
 ---
@@ -27,10 +27,8 @@ classDiagram
     Next Review Date : date
   }
 
-  class Person
-
-  class Company{
-  }
+  class Person["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/person.md'>Person</a>"]
+  class Company["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/company.md'>Company</a>"]
 
   Person --|> Party
   Company --|> Party
@@ -115,12 +113,10 @@ constraints:
 
 ```yaml
 governance:
-  pii: true
-  classification: Highly Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
-    Minimum 7-year retention from the end of the business relationship, aligned to AUSTRAC record-keeping obligations under the AML/CTF Act 2006 and RBNZ AML/CFT Act 2009 section 58.
+    Inherits the domain posture (Highly Confidential, PII, 10 years post relationship end).
+    The 10 years exceeds the 7-year minimum under the AUSTRAC AML/CTF Act 2006 and the
+    NZ AML/CFT Act 2009 section 58.
   access_role:
     - FINANCIAL_CRIME_ANALYST
     - KYC_OFFICER

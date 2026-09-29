@@ -162,7 +162,7 @@ values:
 
 ---
 
-### Address Verification Statuses
+### Address Verification Status
 
 Current verification state of a contact address association.
 
@@ -228,6 +228,10 @@ values:
     description: Swiss Franc
   CAD:
     description: Canadian Dollar
+standard:
+  name: ISO 4217
+  url: https://www.iso.org/iso-4217-currency-codes.html
+  note: Representative subset - the full standard defines 180+ active currency codes
 ```
 
 ---
@@ -461,4 +465,36 @@ values:
     description: Individual acting as legal guardian for a minor or incapacitated account holder
   Attorney:
     description: Individual holding power of attorney to operate the account on behalf of the primary holder
+```
+
+---
+
+### EDD Trigger Status
+
+Whether a customer's risk profile has triggered Enhanced Customer Due Diligence.
+
+```yaml
+values:
+  Not Triggered:
+    description: Risk profile does not require enhanced due diligence
+  Pending Assessment:
+    description: Risk indicators are being assessed and a decision is outstanding
+  Triggered:
+    description: Enhanced due diligence is required before further service
+```
+
+---
+
+### Monitoring Outcome
+
+Disposition of a transaction monitoring alert.
+
+```yaml
+values:
+  Under Review:
+    description: Alert is open and awaiting analyst disposition
+  Escalated:
+    description: Alert escalated for investigation or suspicious matter reporting
+  Cleared:
+    description: Alert reviewed and closed with no further action
 ```

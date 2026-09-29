@@ -106,10 +106,13 @@ constraints:
 governance:
   pii: false
   classification: Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
+  retention: "10 years from closure of the last Contact Address referencing it"
+  retention_basis: >
+    AUSTRAC AML/CTF Act 2006 requires 7 years; the domain's conservative 10 years applies,
+    counted from the last referencing Contact Address.
   description: >
-    Address records must be retained for 7 years from the date the last Contact Address referencing this record is closed. Address records must not be modified or deleted — they are immutable reference data.
+    A deduplicated postal location is not PII on its own; it becomes personal only through
+    Contact Address, which is marked PII. Address records must not be modified or deleted — they are immutable reference data.
     Changes to an address (e.g., a street renamed) should result in a new Address record; existing Contact Address records are not retrospectively updated so that historical point-in-time queries remain accurate.
   access_role:
     - FINANCIAL_CRIME_ANALYST

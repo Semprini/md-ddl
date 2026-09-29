@@ -13,7 +13,7 @@ config:
 ---
 classDiagram
   class Payee{
-    * Payee Identifier : string
+    Payee Identifier : string
     Beneficiary Reference : string
   }
 
@@ -29,7 +29,7 @@ mutability: slowly_changing
 attributes:
   Payee Identifier:
     type: string
-    identifier: primary
+    identifier: alternate
     description: Unique identifier for the payee role instance.
 
   Beneficiary Reference:

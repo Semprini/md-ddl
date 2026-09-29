@@ -43,7 +43,9 @@ Load `md-ddl-specification/3-Entities.md` and `4-Enumerations.md`. Also load
 
 ## Type Mapping
 
-Apply the field-name overrides first, then the base type.
+Apply the field-name overrides first, then the base type. The most specific pattern wins:
+`*tax_identifier*` uses the tax rule, not the generic `*identifier*` rule, which applies only
+to the primary identifier.
 
 **Base types**
 

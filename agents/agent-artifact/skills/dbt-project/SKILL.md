@@ -89,6 +89,9 @@ Data product `schema_type` + logical model | Product models shaped by the matchi
 Product `masking` | Organisation masking macro or warehouse masking policy via `post-hook`; recorded in `meta` | product models
 Entity and product governance | `meta:` on models and columns (`classification`, `pii`, `retention`) | model YAML
 
+`<source_id>` in model and file names is the source's `id` with hyphens replaced by
+underscores (`salesforce-crm` becomes `salesforce_crm`), since dbt names must be valid identifiers.
+
 Every model and column carries `meta.md_ddl` with the declaration it came from
 (file path and heading anchor). This is how Agent Test and reconciliation trace a
 failing assertion back to the spec.

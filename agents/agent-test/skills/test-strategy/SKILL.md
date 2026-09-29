@@ -92,6 +92,12 @@ Cloud | dbt Cloud + warehouse | Everything local, plus masking, grants, source f
 Tag cloud-only tests (`tags: [cloud_only]`) and exclude them from the local selector.
 Do not write separate local and cloud versions of the same test.
 
+**Counting.** A declaration is *testable now* when the test can be written and would run
+against existing or about-to-be-generated models without waiting on anyone. It is *blocked*
+when an owner must act first (an Open Decision, a declaration defect, a missing consistency
+posture, or no models yet), and a *gap* when the declaration exists but no worked example
+covers the case.
+
 ### Step 5 — Output the Coverage Report
 
 ```markdown

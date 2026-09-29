@@ -83,7 +83,7 @@ MD-DDL Governance | ODPS Component | Mapping Notes
 MD-DDL SLA | ODPS SLA Dimension | Mapping Notes
 --- | --- | ---
 `sla.availability` | `SLA.declarative.default.dimensions[uptime]` | Parse percentage value
-`sla.freshness` | `SLA.declarative.default.dimensions[updateFrequency]` | Parse time value and unit
+`sla.freshness` | `SLA.declarative.default.dimensions[updateFrequency]` | Parse time value and unit. `sla.freshness` takes precedence; fall back to the `refresh` cadence (below) only when no freshness is declared.
 `sla.latency_p99` | `SLA.declarative.default.dimensions[responseTime]` | Parse milliseconds value
 
 #### Refresh → ODPS Mapping

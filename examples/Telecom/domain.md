@@ -26,7 +26,7 @@ regulatory_scope:
 default_retention: "7 years post contract end"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "1.0.0"
 tags:
   - Telecom
@@ -134,10 +134,10 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Canonical Subscriber](products/canonical.md#canonical-subscriber) | domain-aligned | Cross-domain Integration | Production
-[Subscriber Usage Analytics](products/analytics.md#subscriber-usage-analytics) | consumer-aligned | Network Analytics; Revenue Assurance | Production
-[Telecom Fraud Intelligence](products/fraud-intelligence.md#telecom-fraud-intelligence) | consumer-aligned | Financial Crime Analytics; Telecom Fraud Operations | Production
-[CDR Raw Feed](products/cdr-feed.md#cdr-raw-feed) | source-aligned | Data Engineering | Production
+[Canonical Subscriber](products/canonical.md#canonical-subscriber) | domain-aligned | Cross-domain Integration | Active
+[Subscriber Usage Analytics](products/analytics.md#subscriber-usage-analytics) | consumer-aligned | Network Analytics; Revenue Assurance | Active
+[Telecom Fraud Intelligence](products/fraud-intelligence.md#telecom-fraud-intelligence) | consumer-aligned | Financial Crime Analytics; Telecom Fraud Operations | Active
+[CDR Raw Feed](products/cdr-feed.md#cdr-raw-feed) | source-aligned | Data Engineering | Active
 [Subscriber Report (Legacy)](products/subscriber-report-legacy.md#subscriber-report-legacy) | consumer-aligned | Customer Analytics (migrating) | Deprecated
 
 ---

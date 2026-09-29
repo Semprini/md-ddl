@@ -51,7 +51,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
 
-Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A transformation targeting an abstract entity without a corresponding fan-out declaration is a validation error.
+Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A source that only contributes attributes to an instance another source established declares `contributes: true` on its fan-out entry instead (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)). A transformation targeting an abstract entity with neither is a validation error.
 
 Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
@@ -492,7 +492,7 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use declared input names:** In `derived` and multi-input `conditional` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype.
+7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype, or by a `contributes: true` entry when the source only adds attributes to an instance whose subtype another source establishes.
 
 8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
 

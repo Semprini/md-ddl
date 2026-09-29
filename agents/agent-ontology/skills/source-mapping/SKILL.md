@@ -173,6 +173,15 @@ another, each need a `condition`.
 which instance receives it. The fan-out entry whose `condition` matched supplies that
 binding. A transform targeting an abstract entity without a fan-out is a validation error.
 
+**Contributing sources.** A source that only adds attributes to an instance another source
+establishes (a screening system updating a Party the CRM created) declares `contributes: true`
+on its entry, matched on the same identity. It may then name the abstract entity, because it
+never creates the instance.
+
+**No joins between source tables.** Each row is mapped on its own. If a child table needs its
+parent's key to reference the right canonical instance, the extract must carry that key. Ask
+the SME for it, or record it as an Open Decision.
+
 ---
 
 ## Transformation Type Selection

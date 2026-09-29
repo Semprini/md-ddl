@@ -44,7 +44,7 @@ category (Residential Mortgage, Corporate, Retail) as an attribute or enum on th
 RBNZ requires certain data to be stored in New Zealand.
 
 ```yaml
-data_residency: ["New Zealand"]   # extension field; domain default or entity override
+data_residency: ["New Zealand"] ; domain default or entity override
 ```
 
 ## Dual Regulation (APRA + RBNZ)

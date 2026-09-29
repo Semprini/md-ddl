@@ -6,9 +6,8 @@ description: Use to evaluate MD-DDL domain, entity, and product files for govern
 # Skill: Compliance Audit
 
 Audit governance metadata against the regulator files loaded through the
-regulatory-compliance skill. That skill also defines the field schema: the spec's core
-fields plus the labelled extension fields. This is a quality review, not a lint pass
-(`1-Foundation.md § Validation Model`).
+regulatory-compliance skill. The fields are those of `3-Entities.md § Governance Metadata
+Schema`. This is a quality review, not a lint pass (`1-Foundation.md § Validation Model`).
 
 Two principles govern every finding:
 
@@ -76,7 +75,7 @@ Field | Check
 `retention` | Not shorter than the regulatory minimum. Its lifecycle trigger (e.g. "post relationship end") exists in the entity.
 `compliance_relevance` | Lists the specific acts that apply directly to the entity
 `regulatory_reporting` | Names the reports and submissions the entity feeds
-`audit_all_access`, `breach_notification_required`, `notification_timeframe`, `data_residency` | Extension fields. Required where a loaded regulator file requires them, and `notification_timeframe` whenever breach notification is required.
+`audit_all_access`, `breach_notification_required`, `notification_timeframe`, `data_residency` | Security fields. Required where a loaded regulator file requires them, and `notification_timeframe` whenever breach notification is required.
 
 **PII.** When an entity is PII-bearing (its own or the domain's `pii: true`), review its
 attributes against the loaded frameworks' definitions. Look at names, date of birth,
@@ -160,13 +159,13 @@ side until the conflict has been reviewed.
 - GDPR special-category data with no Article 9 treatment
 - an unmasked PII attribute in a product
 - a residency conflict
-- a regulator-required extension field that's absent
+- a regulator-required security field that's absent
 
 **Advisory:** a best practice is unmet, or something needs confirmation:
 
 - `retention_basis` missing
 - a sensitivity-suggesting attribute left unmarked
-- a recommended (not mandated) extension field missing
+- a recommended (not mandated) security field missing
 - an explicit exclusion that may be outdated
 - a vocabulary deviation
 

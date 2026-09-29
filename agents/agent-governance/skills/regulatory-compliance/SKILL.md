@@ -43,9 +43,8 @@ Domain metadata (top level, no `governance:` wrapper) | `classification`, `pii`,
 Entity `governance:` (overrides only) | `pii`, `pii_fields`, `classification`, `retention`, `retention_basis`, `access_role`, `description` | Only fields that differ from the domain. A weaker posture needs a justification.
 Entity `governance:` (entity-specific) | `compliance_relevance` (the acts and standards that apply), `regulatory_reporting` (named reports and submissions) | Map domain frameworks to specific obligations
 
-**Extension fields.** These are used by the regulator files and compliance-audit but
-aren't yet in the spec schema. Use them where a regulator file requires them, and treat
-them as candidates for the spec:
+**Security and residency fields.** These are defined in the same spec section and may be set
+as domain defaults or entity overrides:
 
 Field | Meaning
 --- | ---
@@ -55,7 +54,7 @@ Field | Meaning
 `breach_notification_required` | Breaches must be notified to a regulator
 `notification_timeframe` | The notification deadline, e.g. `"72 hours"` under GDPR, taken from the regulator file
 
-Don't invent further fields. Express reports and AML/CTF scope through
+These fields and the core fields are the whole schema. Don't invent further fields. Express reports and AML/CTF scope through
 `regulatory_reporting` and `compliance_relevance`, not new keys.
 
 ## Applying It

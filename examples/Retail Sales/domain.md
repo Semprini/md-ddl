@@ -24,7 +24,7 @@ regulatory_scope:
 default_retention: "5 years post last purchase"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "1.0.0"
 tags:
   - Retail
@@ -95,8 +95,8 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Sales Domain Model](products/domain-aligned.md#sales-domain-model) | domain-aligned | Cross-domain Integration | Production
-[Customer 360](products/customer-360.md#customer-360) | consumer-aligned | Customer Experience; Marketing | Production
+[Sales Domain Model](products/domain-aligned.md#sales-domain-model) | domain-aligned | Cross-domain Integration | Active
+[Customer 360](products/customer-360.md#customer-360) | consumer-aligned | Customer Experience; Marketing | Active
 [Sales Funnel Report (Legacy)](products/sales-funnel-legacy.md#sales-funnel-report-legacy) | consumer-aligned | Marketing Analytics (migrating) | Deprecated
 
 ---

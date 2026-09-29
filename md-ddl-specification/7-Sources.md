@@ -223,6 +223,8 @@ The `Transform: ` prefix distinguishes mapping rules from the fixed sections. Th
 
 Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
+Each source row is mapped on its own. MD-DDL doesn't declare joins between source tables, so where a mapping needs a value held on another table of the same source — typically the parent's key, so a child row can reference its parent's canonical instance — the extract must carry it. Record a missing key as an Open Decision rather than implying a join.
+
 ---
 
 #### Entity Fan-Out
@@ -264,8 +266,11 @@ Key | Purpose
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
 `references` | Which produced instance satisfies a relationship to another produced instance.
+`contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
+
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 

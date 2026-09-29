@@ -12,8 +12,8 @@ general and life insurers, and superannuation funds. Load this file when modelli
 Australian APRA-regulated entity, or an NZ bank owned by an Australian parent (with
 `rbnz.md`).
 
-Examples below use the governance schema from the regulatory-compliance skill: the spec's
-core fields plus the labelled extension fields. Where a standard implies *business data*
+Examples below use the governance fields of `3-Entities.md § Governance Metadata Schema`.
+Where a standard implies *business data*
 (risk categories, service providers), model it as entity attributes or relationships with
 Agent Ontology, not as governance keys.
 
@@ -31,7 +31,7 @@ Agent Ontology, not as governance keys.
 classification: "Highly Confidential"
 regulatory_scope:
   - APRA CPS 234
-breach_notification_required: true      # extension field
+breach_notification_required: true    
 notification_timeframe: "72 hours"      # material incidents; control weaknesses: 10 business days
 ```
 
@@ -61,7 +61,7 @@ facts. Model them as attributes or enums where the domain needs them. Cite the s
 ## APS 222 — Associations with Related Entities
 
 Model related-entity associations as relationships (e.g. a Related Entity relationship on
-Party) so they can be reported on. Cross-border flows use the extension fields:
+Party) so they can be reported on. Cross-border flows use the security and residency fields:
 
 ```yaml
 governance:

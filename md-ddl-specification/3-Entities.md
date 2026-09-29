@@ -132,6 +132,18 @@ Field | Type | Required | Description
 `regulatory_reporting` | string[] | No | Named regulatory reports or submissions that include data from this entity (e.g., `"Suspicious Matter Report (SMR)"`, `"Threshold Transaction Report (TTR)"`).
 `description` | string | No | Free-text explanation of the governance posture for this entity — why the override exists and what regulatory obligation drives it.
 
+#### Security and Residency Fields
+
+These fields record obligations that come from data-protection, prudential, and breach-notification rules. They may be declared in the domain metadata as defaults, or in an entity's `governance:` block where the entity differs.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`data_residency` | string[] | No | Jurisdictions in which the data must be stored (e.g., `["Australia", "New Zealand"]`).
+`cross_border_transfer` | boolean | No | Whether the data is transferred across jurisdictional borders. Declare `data_residency` alongside it.
+`audit_all_access` | boolean | No | Whether every access to the data must be logged.
+`breach_notification_required` | boolean | No | Whether a breach involving the data must be notified to a regulator or data subjects.
+`notification_timeframe` | string | No | The notification deadline from the applicable rule (e.g., `"72 hours"`). Declare it whenever `breach_notification_required` is true.
+
 #### Governance Inheritance Rules
 
 1. **Domain defaults apply everywhere.** Every entity, relationship, and event inherits the domain's `classification`, `pii`, `regulatory_scope`, and `default_retention` unless explicitly overridden.
@@ -139,6 +151,7 @@ Field | Type | Required | Description
 3. **Strictness direction.** An entity may declare a higher `classification` or longer `retention` than the domain default. Declaring a weaker posture requires a documented justification in the `description` or `retention_basis` field.
 4. **`access_role` is additive context.** It restricts who may access entity data. It does not exist at the domain level — it is entity-specific.
 5. **`compliance_relevance` and `regulatory_reporting` are entity-specific.** They document which specific regulations and reports apply to a particular entity. Domain-level `regulatory_scope` declares the applicable frameworks; entity-level fields map those frameworks to specific obligations.
+6. **Security and residency fields inherit like the core fields.** A domain default applies to every entity unless the entity overrides it.
 
 #### Example: Domain-Level Governance (in domain metadata)
 

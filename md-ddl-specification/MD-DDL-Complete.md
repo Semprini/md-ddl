@@ -618,6 +618,18 @@ Field | Type | Required | Description
 `regulatory_reporting` | string[] | No | Named regulatory reports or submissions that include data from this entity (e.g., `"Suspicious Matter Report (SMR)"`, `"Threshold Transaction Report (TTR)"`).
 `description` | string | No | Free-text explanation of the governance posture for this entity — why the override exists and what regulatory obligation drives it.
 
+#### Security and Residency Fields
+
+These fields record obligations that come from data-protection, prudential, and breach-notification rules. They may be declared in the domain metadata as defaults, or in an entity's `governance:` block where the entity differs.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`data_residency` | string[] | No | Jurisdictions in which the data must be stored (e.g., `["Australia", "New Zealand"]`).
+`cross_border_transfer` | boolean | No | Whether the data is transferred across jurisdictional borders. Declare `data_residency` alongside it.
+`audit_all_access` | boolean | No | Whether every access to the data must be logged.
+`breach_notification_required` | boolean | No | Whether a breach involving the data must be notified to a regulator or data subjects.
+`notification_timeframe` | string | No | The notification deadline from the applicable rule (e.g., `"72 hours"`). Declare it whenever `breach_notification_required` is true.
+
 #### Governance Inheritance Rules
 
 1. **Domain defaults apply everywhere.** Every entity, relationship, and event inherits the domain's `classification`, `pii`, `regulatory_scope`, and `default_retention` unless explicitly overridden.
@@ -625,6 +637,7 @@ Field | Type | Required | Description
 3. **Strictness direction.** An entity may declare a higher `classification` or longer `retention` than the domain default. Declaring a weaker posture requires a documented justification in the `description` or `retention_basis` field.
 4. **`access_role` is additive context.** It restricts who may access entity data. It does not exist at the domain level — it is entity-specific.
 5. **`compliance_relevance` and `regulatory_reporting` are entity-specific.** They document which specific regulations and reports apply to a particular entity. Domain-level `regulatory_scope` declares the applicable frameworks; entity-level fields map those frameworks to specific obligations.
+6. **Security and residency fields inherit like the core fields.** A domain default applies to every entity unless the entity overrides it.
 
 #### Example: Domain-Level Governance (in domain metadata)
 
@@ -1021,7 +1034,7 @@ self_referential: true
 
 #### Edge Attributes
 
-When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. These become columns on the bridge table in physical generation:
+When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. This applies to any relationship whose link has attributes (typically many-to-many, such as a holder type on Customer Holds Account), not only self-referential ones. These become columns on the bridge or association table in physical generation:
 
 ```yaml
 self_referential: true
@@ -1418,6 +1431,8 @@ The `Transform: ` prefix distinguishes mapping rules from the fixed sections. Th
 
 Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
+Each source row is mapped on its own. MD-DDL doesn't declare joins between source tables, so where a mapping needs a value held on another table of the same source — typically the parent's key, so a child row can reference its parent's canonical instance — the extract must carry it. Record a missing key as an Open Decision rather than implying a join.
+
 ---
 
 #### Entity Fan-Out
@@ -1459,8 +1474,11 @@ Key | Purpose
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
 `references` | Which produced instance satisfies a relationship to another produced instance.
+`contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
+
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -1775,7 +1793,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
 
-Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A transformation targeting an abstract entity without a corresponding fan-out declaration is a validation error.
+Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A source that only contributes attributes to an instance another source established declares `contributes: true` on its fan-out entry instead (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)). A transformation targeting an abstract entity with neither is a validation error.
 
 Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
@@ -2216,7 +2234,7 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use declared input names:** In `derived` and multi-input `conditional` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype.
+7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype, or by a `contributes: true` entry when the source only adds attributes to an instance whose subtype another source establishes.
 
 8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
 
@@ -2419,8 +2437,7 @@ Field | Purpose
 Field | Purpose
 --- | ---
 `version` | Semantic version of the product definition.
-`governance` | Governance overrides that differ from domain defaults. Only declare fields that differ.
-`masking` | Attribute-level masking rules for sensitive data. Each entry names the product attribute and a masking strategy.
+`governance` | Governance overrides that differ from domain defaults, and the product's `masking` rules. Only declare fields that differ. `masking` is a list under `governance`: each entry names a product attribute and a masking strategy (see [Masking Strategies](#masking-strategies)).
 `sla` | Service-level attributes (freshness, availability, latency).
 `refresh` | Refresh cadence: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
 
@@ -2623,7 +2640,7 @@ Domain-aligned products do not require an attribute mapping because their entiti
 
 ### **Masking Strategies**
 
-When a data product exposes PII or sensitive attributes, `masking` entries define how those attributes are protected in the published output.
+When a data product exposes PII or sensitive attributes, `governance.masking` entries define how those attributes are protected in the published output.
 
 Strategy | Behaviour
 --- | ---

@@ -13,7 +13,7 @@ owner: domain.sales@retailer.com
 consumers:
   - Cross-domain Integration
   - Customer Experience Platform
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:
@@ -32,9 +32,9 @@ governance:
   classification: Internal
   pii: true
 
-masking:
-  - attribute: "Customer.Email Address"
-    strategy: hash
+  masking:
+    - attribute: "Customer.Email Address"
+      strategy: hash
 
 sla:
   freshness: "< 10 minutes"

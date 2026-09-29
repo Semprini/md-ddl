@@ -153,8 +153,7 @@ Field | Purpose
 Field | Purpose
 --- | ---
 `version` | Semantic version of the product definition.
-`governance` | Governance overrides that differ from domain defaults. Only declare fields that differ.
-`masking` | Attribute-level masking rules for sensitive data. Each entry names the product attribute and a masking strategy.
+`governance` | Governance overrides that differ from domain defaults, and the product's `masking` rules. Only declare fields that differ. `masking` is a list under `governance`: each entry names a product attribute and a masking strategy (see [Masking Strategies](#masking-strategies)).
 `sla` | Service-level attributes (freshness, availability, latency).
 `refresh` | Refresh cadence: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
 
@@ -357,7 +356,7 @@ Domain-aligned products do not require an attribute mapping because their entiti
 
 ### **Masking Strategies**
 
-When a data product exposes PII or sensitive attributes, `masking` entries define how those attributes are protected in the published output.
+When a data product exposes PII or sensitive attributes, `governance.masking` entries define how those attributes are protected in the published output.
 
 Strategy | Behaviour
 --- | ---

@@ -16,7 +16,7 @@ owner: health.it@hospital.org
 consumers:
   - Data Engineering
   - Clinical Informatics
-status: Production
+status: Active
 version: "1.0.0"
 
 governance:

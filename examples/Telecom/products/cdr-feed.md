@@ -13,7 +13,7 @@ owner: platform.engineering@telco.com
 consumers:
   - Data Engineering
   - Revenue Assurance
-status: Production
+status: Active
 version: "1.0.0"
 
 governance:

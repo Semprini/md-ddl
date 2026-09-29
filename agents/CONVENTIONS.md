@@ -1,63 +1,43 @@
 # Agent Conventions
 
-Shared conventions for MD-DDL agents. Individual agent behaviour is defined in each agent's `AGENT.md`; this file covers cross-agent protocols that all work-performing agents follow.
+Protocols shared by every MD-DDL agent. Each agent's `AGENT.md` says *when* to hand off and *to whom*; this file says *how*.
 
 ---
 
-## Handoff Artifact Files (V2)
+## Handoff Protocol
 
-### Purpose
+Agents own distinct parts of the work (see each agent's Boundaries table). When a request crosses into another agent's part, hand off. Do not do the other agent's work.
 
-When a user closes one agent session and opens a new session with a different agent, the inline handoff context block (V1) is lost with the conversation. Handoff artifact files provide **cross-session durability** — a persistent record of decisions, rejected alternatives, and task instructions that the receiving agent can read at startup.
+### Sending
 
-### Relationship to Inline Handoff Blocks (V1)
+1. Produce a **handoff block** (format below) in the conversation. It carries what was decided, so the next agent does not ask again.
+2. Name the receiving agent (`@agent-<id>` or `/agent-<id>`), suggest an opening request, and tell the user to paste the block into it.
+3. If the user will continue in a new session, also write the block to a **handoff file** (below) with `status: pending`.
 
-V1 and V2 are complementary, not alternative:
+### Receiving
 
-- **V1 (inline block)** — Required for all handoffs. Produced at the moment of handoff, lives in the conversation. Solves same-session transitions.
-- **V2 (file)** — Optional enhancement for cross-session durability. The sending agent writes the file when the user will switch to a new session. The receiving agent reads it at startup.
+At session start, before loading domain files:
 
-The file format mirrors the inline block format — the difference is persistence. An agent implementing V2 produces the inline block first, then writes it to file if cross-session durability is needed.
+1. If the user names a domain, look in its folder for `handoff-to-<your-id>.md` with `status: pending`. Read it, then set `status: consumed`.
+2. If the opening message contains a `## Handoff Context —` block, read it.
+3. Don't re-ask questions the handoff answers. Treat anything under "Do not re-open" as settled.
 
-### File Location
+### Returned work
 
-Handoff files live in the domain folder alongside `domain.md`:
+When another agent hands back a defect in your part of the work (a missing entity, a model that does not implement a transformation, a governance gap in a product), treat it as a change request to your own artifacts. Fix the artifact. Do not change the other agent's output to make the problem go away.
 
-```
-examples/Financial Crime/
-  domain.md
-  entities/
-  handoff-to-artifact.md       ← written by Agent Ontology
-  handoff-to-governance.md     ← written by Agent Ontology or Agent Artifact
-  handoff-to-ontology.md       ← written by Agent Artifact, Architect, or Governance
-  handoff-to-architect.md      ← written by Agent Ontology
-  handoff-to-test.md           ← written by Agent Artifact
-```
+---
 
-### File Naming
-
-`handoff-to-<agent-id>.md` — the file name encodes the destination. The receiving agent looks for its own handoff file on startup.
-
-### Frontmatter Schema
-
-Field | Type | Required | Description
---- | --- | --- | ---
-`from` | string | Yes | Sending agent ID (e.g., `agent-ontology`)
-`to` | string | Yes | Receiving agent ID (e.g., `agent-artifact`)
-`domain` | string | Yes | Domain name
-`domain_path` | string | Yes | Relative path to domain.md
-`created` | date | Yes | Date the file was written
-`status` | enum | Yes | `pending` · `consumed` · `archived`
-
-### Content Block Template
+## Handoff Block
 
 ```markdown
 ## Handoff Context — [Sending Agent] → [Receiving Agent]
 
-**Scope:** [entities, relationships, or aspects covered]
+**Domain:** [name and path to domain.md]
+**Scope:** [entities, relationships, products, or files covered]
 
 **Key decisions:**
-- [decision and brief rationale — especially non-obvious choices]
+- [decision and brief rationale, especially non-obvious choices]
 
 **Rejected alternatives:**
 - [what was considered but not chosen, and why]
@@ -66,24 +46,32 @@ Field | Type | Required | Description
 - [questions already resolved that the next agent should accept as settled]
 
 **Task for next agent:**
-[Clear description of what needs to be done]
+[What needs to be done]
 ```
 
-### Lifecycle
+---
 
-1. **Sending agent writes** the file at handoff time, drawing on session context. Set `status: pending`.
-2. **Receiving agent reads** the file at session start — before loading domain files. Accept decisions marked "Do not re-open" as settled.
-3. **Receiving agent updates** `status: consumed` in the frontmatter after reading.
-4. **User or agent archives** the file (`status: archived`) when the work it describes is complete. Archived files are informational history.
+## Handoff Artifact Files
 
-### Multiple Handoffs to the Same Agent
+The inline block is lost when the conversation ends. A handoff file keeps it across sessions.
 
-Status-driven: only one `pending` file per destination agent is allowed. The previous handoff file must be `archived` before a new one is written. The receiving agent looks for the file with `status: pending`.
+**Location and name:** in the domain folder next to `domain.md`, named `handoff-to-<agent-id>.md` (e.g. `handoff-to-artifact.md`, `handoff-to-test.md`). The name encodes the destination.
 
-### Cross-Domain Handoffs
+**Frontmatter:**
 
-A consumer-aligned data product may span multiple domains. The handoff file lives in the primary domain's folder. The Scope section explicitly names any cross-domain entities referenced.
+Field | Required | Description
+--- | --- | ---
+`from` | Yes | Sending agent ID (e.g. `agent-ontology`)
+`to` | Yes | Receiving agent ID (e.g. `agent-artifact`)
+`domain` | Yes | Domain name
+`domain_path` | Yes | Relative path to `domain.md`
+`created` | Yes | Date written
+`status` | Yes | `pending` · `consumed` · `archived`
 
-### Version Control
+The body is the handoff block.
 
-Handoff files should be committed to version control. They are living documentation of modelling decisions. `archived` files are the audit trail; `consumed` files show what the receiving agent was told. `.gitignore` should not exclude them.
+**Lifecycle:** the sender writes it as `pending`; the receiver sets it to `consumed` after reading; the user or an agent sets it to `archived` when the work is done. Only one `pending` file per destination may exist. Archive the previous one before writing a new one.
+
+**Cross-domain work:** a consumer-aligned product may span domains. The file lives in the primary domain's folder, and the block's Scope names the other domains' entities.
+
+**Version control:** commit handoff files. `consumed` files show what an agent was told; `archived` files are the audit trail.

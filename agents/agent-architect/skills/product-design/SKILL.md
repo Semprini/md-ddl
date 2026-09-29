@@ -41,8 +41,8 @@ Read the domain file and build a mental model:
 ### Step 2 — Establish Platform Posture
 
 Check the domain's `platform` metadata block. If present, use it to scope the
-design. If absent, ask the platform posture question (see Agent Architect
-Mode 2 — Assessment).
+design. If absent, ask the platform posture question (see Agent Architect's
+Assessment step).
 
 Platform posture affects design decisions throughout this process:
 

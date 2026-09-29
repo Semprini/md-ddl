@@ -336,7 +336,35 @@ automatically until the conflict section is reviewed.
 
 ## Producing the Gap Report
 
-Use the gap report format defined in `agents/agent-governance/AGENT.md`.
+Use this format:
+
+```markdown
+## Compliance Gap Report — [Domain Name]
+**Assessed against:** [list of loaded frameworks]
+**Assessment date:** [date]
+
+### Summary
+[n] gaps identified across [n] entities. [n] critical, [n] advisory.
+
+### Regulatory Disclaimer
+> Regulatory requirements stated in this report are based on regulator guidance
+> files last verified on the dates shown. This is not legal advice. Confirm all
+> regulatory obligations with qualified legal or compliance counsel before applying.
+
+### Critical Gaps
+| Entity | Gap | Required by | Recommended Fix |
+|---|---|---|---|
+| Customer | `retention` absent | APRA CPS 234 s.3.2 | Add `retention: "7 years post relationship end"` |
+
+### Advisory Gaps
+| Entity | Gap | Framework | Recommended Action |
+|---|---|---|---|
+| Transaction | `audit_all_access` not set | APRA CPS 234 | Confirm with compliance team whether audit logging applies |
+
+### Not Assessed
+Entities or fields that could not be assessed, and why.
+```
+
 Apply these severity rules when classifying gaps:
 
 ### Critical
@@ -374,8 +402,8 @@ Gaps that cannot be evaluated due to missing information:
 
 ## Incremental Audit (Post-Monitoring)
 
-When running an audit triggered by a regulatory monitoring pass (Mode 2 in
-AGENT.md), focus the audit scope on the specific changes identified:
+When running an audit triggered by a regulatory monitoring pass (Regulatory Monitoring
+mode in AGENT.md), focus the audit scope on the specific changes identified:
 
 1. Load the monitoring report
 2. For each material change flagged, identify the affected metadata fields
@@ -499,5 +527,5 @@ Conflicts detected: [n — list frameworks in conflict if any]
 Refer to the gap report below for details and recommended remediation.
 Note: This audit reflects requirements as defined in the loaded regulator files.
 If those files have not been updated recently, run a regulatory monitoring pass
-(Mode 2) to confirm currency before treating this audit as definitive.
+(Regulatory Monitoring mode) to confirm currency before treating this audit as definitive.
 ```

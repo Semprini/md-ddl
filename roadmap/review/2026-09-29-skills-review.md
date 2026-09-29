@@ -89,3 +89,59 @@ baseline-capture (unchanged) | 125 | 125
 
 - Financial Crime's `domain.md` references BIAN `LegalEntity` and `Payment`, which aren't in the local v13 class index. They may come from the v4 API naming. This needs a standards check by Agent Ontology.
 - The spec's example layout uses `products/`, while the example domains use `data_products/`. One of them should change.
+
+---
+
+## Agent Artifact
+
+File | Before | After
+--- | --- | ---
+dimensional | 279 | 231
+normalized | 326 | 278
+wide-column | 264 | 248
+knowledge-graph | 288 | 277
+reconciliation | 188 | 188
+faker | 609 | 288
+dbt-project (current) | 223 | 223
+**Total** | **2,177** | **1,733**
+
+The generation skills carry real design knowledge: inheritance DDL patterns, grain and
+join admissibility, graph mapping. They were trimmed, not rewritten.
+
+**Bugs**
+
+- AR1: dimensional, normalized, wide-column, and knowledge-graph referenced
+  `../../agent-ontology/...`. From `skills/<name>/`, that resolves to a folder that doesn't
+  exist (`agents/agent-artifact/agent-ontology/`). The correct path is
+  `../../../agent-ontology/...`. The agent-definitions review wrongly recorded these as correct.
+- AR2: faker's code template imported
+  `agents.agent_artifact.skills.faker.runtime.enterprise_profile`. The folder is
+  hyphenated and `agents/` isn't a package, so the import fails
+  (`ModuleNotFoundError`). The template now imports the runtime copied alongside the
+  module. The code pattern was executed to confirm it runs in both PII modes, with and
+  without a profile.
+- AR3: faker's example factory generated realistic birth dates in `safe` mode,
+  contradicting its own override table. It also put product, amount, and currency on
+  Party. The example now follows the table and models Party alone.
+- AR4: faker described the US fintech profile's markets as "US, ES, ZH". The profile's
+  locales are `es_US` and `zh_CN` customer segments, and "ZH" is not a country.
+- AR5: knowledge-graph offered a Cypher `CHECK` constraint for enum values, which Neo4j
+  doesn't have. Its "composite" node-key example used one property, and it didn't note
+  that `NODE KEY` is Enterprise-only.
+- AR6: normalized described the classDiagram inheritance arrow as "Entity YAML".
+- AR7: reconciliation handed baseline status updates to "the baseline-capture skill",
+  which belongs to Agent Ontology and can't be loaded by Agent Artifact.
+
+**Simplifications**
+
+- The existence, mutability, and temporal matrices in dimensional and normalized repeated
+  `references/generation-semantics.md`, which `AGENT.md` loads for every generation. Only
+  the style-specific notes were kept.
+- The "Output Contract" and "Generation Limitations" sections duplicated `AGENT.md`'s
+  Generate step and Limits. Where a skill's output contract was style-specific
+  (wide-column's grain statement, knowledge-graph's templates), it was kept.
+- Generation skills no longer load Agent Ontology's authoring skills (entity-modelling,
+  relationship-events) on every request. Only `conceptual-to-physical-realisation.md` is
+  needed. Wide-column no longer loads both sibling skills.
+- faker: 609 lines down to 288, removing a duplicate profile walkthrough, the scripted
+  offers, and a 150-line example factory.

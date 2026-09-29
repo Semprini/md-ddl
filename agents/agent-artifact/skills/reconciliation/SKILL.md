@@ -169,8 +169,8 @@ the user can hand to platform-native migration tooling.
   reveals gaps in the canonical model, recommend changes and defer to Agent
   Ontology for implementation.
 - **This skill does not modify baseline files.** Baseline status updates
-  (`superseded`, `archived`) are done by the user or by the baseline-capture
-  skill after reconciliation is accepted.
+  (`superseded`, `archived`) are made by the user or by Agent Ontology's
+  baseline-capture skill once reconciliation is accepted.
 - **This skill produces reports, not deployments.** The gap report is a
   decision-support artifact. Actual deployment or migration is outside
   MD-DDL's scope.
@@ -183,6 +183,6 @@ After reconciliation:
 
 - **To fix canonical model gaps** → Agent Ontology (brownfield modelling)
 - **To review product version impact** → Agent Architect (product lifecycle)
-- **To update baseline status** → baseline-capture skill
+- **To update baseline status** → Agent Ontology (baseline-capture skill)
 - **To proceed with deployment or migration execution** → outside MD-DDL scope;
   user's CI/CD or migration tooling

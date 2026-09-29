@@ -51,7 +51,7 @@ graph LR
 
 Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Transaction](../../entities/transaction.md#transaction) | [table_payment_event](transforms/table_payment_event.md#paymentevent), [table_initiation](transforms/table_initiation.md#initiation) | Transaction Identifier, Amount, Settlement Date Time, Transaction Status; Transaction Channel (from Initiation) | real-time-cdc
+[Transaction](../../entities/transaction.md#transaction) | [table_payment_event](transforms/table_payment_event.md#paymentevent), [table_initiation](transforms/table_initiation.md#initiation), [table_payment_parties](transforms/table_payment_parties.md#paymentparties) | Transaction Identifier, Amount, Settlement Date Time, Transaction Status; Transaction Channel and initiator link (from Initiation); debtor and creditor links (from PaymentParties) | real-time-cdc
 [Account](../../entities/account.md#account) | [table_account_ref](transforms/table_account_ref.md#accountref) | Account Identifier, Account Number, Account Status | real-time-cdc
 [Payment Initiator](../../entities/payment_initiator.md#payment-initiator) | [table_initiation](transforms/table_initiation.md#initiation) | Role Identifier | event-driven
 [Payer](../../entities/payer.md#payer) | [table_payment_parties](transforms/table_payment_parties.md#paymentparties) | Role Identifier | event-driven

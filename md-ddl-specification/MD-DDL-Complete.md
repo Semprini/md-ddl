@@ -1468,6 +1468,8 @@ produces:
 ```
 ````
 
+`Address Uniqueness Merge` and `Location Involvement Mapping` stand for transformations declared under the same table's `##### Transform:` headings; they are not shown here.
+
 Key | Purpose
 --- | ---
 `entity` | The canonical entity produced. Must resolve in the domain model. Use `Parent · Subtype` where the target is a subtype.
@@ -1475,12 +1477,15 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which instance satisfies each relationship from this entry to another entity. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A reference never creates the referenced instance.
+`references` | Which instance satisfies each relationship from this entry to another entity. Declare it on the entry whose entity relates to at most one instance of the other (the many side of a one-to-many or many-to-one, where a foreign key would sit), whichever side `ownership` names; for a many-to-many relationship either side may declare it. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A transformation used only here computes a key: its `target` names the referenced entity's identifier, which it matches rather than writes. A reference never creates the referenced instance, and may point to reference data (mutability `reference`) maintained outside the sources.
 `contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
+`when_absent` | For a contributing entry: `hold` (default) keeps the row until the instance exists; `reject` drops and reports it.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
 
 A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype. A worked example for such a table assumes the instance exists and asserts only the attributes the row contributes; a fan-in example shows the establishing and contributing rows together.
+
+A contribution never edits history. It follows the target entity's temporal tracking: on an entity with transaction-time or bitemporal tracking, including an `append_only` one, each contribution records a new version that carries the earlier attributes forward; on a `slowly_changing` or `frequently_changing` entity it updates the instance as the entity's tracking prescribes. An `immutable` entity accepts no contributions; model late-arriving facts about it as a separate dependent entity.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -1666,7 +1671,7 @@ tags:
 
 Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Full Name, Email Address, Country Code | real-time-cdc
 ````
 
 #### Transform detail — `sources/salesforce-crm/table_CONTACT.md`
@@ -1687,7 +1692,7 @@ Pos|Column Name|Data Type|Max Len|Precision|Scale|Nulls|Description|Destination
 1|AccountNumber|Text|32|||NO|Salesforce account identifier|Customer.Customer Number
 2|FirstName|Text|100|||YES|Given name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
 3|LastName|Text|100|||YES|Family name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
-4|Email|Text|255|||YES|Primary email; "N/A" used for missing|Customer.Email Address
+4|Email|Text|255|||YES|Primary email; "N/A" used for missing|[Transform: Email Address](#transform-email-address)
 5|MailingCountry|Text|2|||YES|Legacy two-character country code|[Transform: Resolve Country Code](#transform-resolve-country-code)
 6|InternalSyncFlag|Boolean||||NO|Salesforce replication marker|
 
@@ -1704,6 +1709,18 @@ inputs:
     field: Contact.FirstName
   Last Name:
     field: Contact.LastName
+```
+
+##### Transform: Email Address
+
+Salesforce writes "N/A" where no email is held, so that value is read as null.
+
+```yaml
+type: direct
+target: Customer · Email Address
+source:
+  field: Contact.Email
+  null_as: "N/A"
 ```
 
 ##### Transform: Resolve Country Code
@@ -1972,7 +1989,7 @@ Key | Purpose
 
 The key is composed as the `prefix`, a colon, and the normalised `using` values joined with `|` in declaration order. A null value contributes an empty string. The Address example above therefore yields `DPID:1234567` or `COMP:12 HARBOUR ST|6011|NZ`.
 
-`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Its `timestamp_field` must be a creation time: a last-modified time lets an edited original lose to a newer duplicate. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
 
 An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
 
@@ -2020,7 +2037,7 @@ lookup:
 fallback: reject
 ```
 
-`inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
+`fallback: reject` rejects the source row: no instance is produced from it, and it is reported. `inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
 
 Use `inline` when the mapping is an opaque code table with no logic in it. Use `conditional` when a case needs a predicate rather than an equality match — a range, a compound test, or several codes collapsing to one value.
 
@@ -2146,7 +2163,7 @@ given:
 produces:
   - entity: Address · Postal Address
     Address Identifier: "DPID:1234567"
-    Delivery Point ID: 1234567
+    Delivery Point ID: "1234567"
   - entity: Location Involvement
     Location Involvement Identifier: "8c14-p001:3f2b-aaa1"
     Address Purpose: Residential
@@ -2156,7 +2173,8 @@ produces:
     Legal Name: "Jane Whitcombe"
 notes: >
   Party is abstract, so the concrete instance is an Individual, selected by the
-  OWNER_TYPE_ENUM condition in Entity Fan-Out.
+  OWNER_TYPE_ENUM condition in Entity Fan-Out. (The identity transformations this
+  example relies on are declared in the same transform detail; see Entity Fan-Out.)
 ```
 ````
 
@@ -2167,7 +2185,7 @@ Key | Purpose
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
-Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way.
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way. An entry with `cardinality: 0` asserts that the entity is not produced from the given rows. A fan-in example is needed wherever rows from more than one source table converge on an instance, whether the tables belong to one source or several.
 
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 

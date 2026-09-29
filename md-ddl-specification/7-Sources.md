@@ -258,6 +258,8 @@ produces:
 ```
 ````
 
+`Address Uniqueness Merge` and `Location Involvement Mapping` stand for transformations declared under the same table's `##### Transform:` headings; they are not shown here.
+
 Key | Purpose
 --- | ---
 `entity` | The canonical entity produced. Must resolve in the domain model. Use `Parent · Subtype` where the target is a subtype.
@@ -265,7 +267,7 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which instance satisfies each relationship from this entry to another entity. Declare it on the entry whose entity owns the relationship (its `ownership` side), because that is where the link is stored. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A transformation used only here computes a key: its `target` names the referenced entity's identifier, which it matches rather than writes. A reference never creates the referenced instance, and may point to reference data (mutability `reference`) maintained outside the sources.
+`references` | Which instance satisfies each relationship from this entry to another entity. Declare it on the entry whose entity relates to at most one instance of the other (the many side of a one-to-many or many-to-one, where a foreign key would sit), whichever side `ownership` names; for a many-to-many relationship either side may declare it. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A transformation used only here computes a key: its `target` names the referenced entity's identifier, which it matches rather than writes. A reference never creates the referenced instance, and may point to reference data (mutability `reference`) maintained outside the sources.
 `contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
 `when_absent` | For a contributing entry: `hold` (default) keeps the row until the instance exists; `reject` drops and reports it.
 

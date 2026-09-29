@@ -108,6 +108,29 @@ B11 | New lint rules `transform-target-resolve` (including `Reference:` destinat
 
 All seven examples lint with no findings, including under the two new rules. Financial Crime is rebuilt as domain 2.0.0 (see its `LIFECYCLE.md`). Healthcare's transform targets were corrected. Telecom, Brownfield Retail, and Simple Customer diagram and summary defects were fixed, and a same-file enum false positive in the linter was removed.
 
+### Follow-up reviews
+
+Two further independent domain reviews of the rebuilt Financial Crime source layer were run.
+Their findings were fixed in the example and, where the spec left the answer open, in the spec:
+
+- **Reference direction.** `references` sits on the entry whose entity relates to at most one
+  instance of the other (where a foreign key would sit). Temenos PaymentParties and Initiation
+  now contribute to the Transaction, which references its Payer, Payee, and Payment Initiator.
+- **Contribution versioning.** A contribution follows the target's temporal tracking: on a
+  transaction-time or append-only entity it records a new version; an `immutable` entity takes
+  none. PaymentEvent has a Transaction fan-in example across three tables. `when_absent`
+  (`hold` by default, or `reject`) says what happens when the instance doesn't exist yet.
+- **Reversal.** A REVERSED status records a new version of the original Transaction; a
+  reversing movement is its own Transaction.
+- **Unsourced references.** References may point to reference data; otherwise the gap is an
+  Open Decision (Products and external counterparty Parties). AccountRef carries its currency.
+- **Survivorship.** `earliest` needs a creation timestamp, not a last-modified one.
+- **Worked-example semantics.** `fallback: reject` rejects the whole row; `cardinality: 0`
+  asserts an entity isn't produced; fan-in examples assert only the listed attributes.
+  The ContactPoint and P-1003 examples were strengthened to match.
+- **Review severity.** Domain review now grades semantic defects (Critical, Major, Minor), not
+  only lint findings.
+
 ### Remaining
 
 - Healthcare's and Telecom's source layers still use the pre-spec layout (source-rooted headings, a `Comment` column, no fan-out or worked examples, benign fallbacks such as `fallback: Active`). They lint clean but would fail a domain review's Determinism Test. Rebuild them the way Financial Crime was rebuilt.

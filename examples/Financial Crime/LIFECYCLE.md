@@ -92,6 +92,10 @@ changes:
     description: "Governance aligned: retention values state their trigger, descriptions no longer contradict the 10-year retention, PII overrides are justified, and the domain regulatory scope matches the AU/NZ frameworks the entities cite."
   - type: corrective
     scope: entity
+    entity: Transaction
+    description: "Temporal description states that status changes (including reversal) and late contributions record new transaction-time versions; a reversing movement is its own Transaction referencing the original."
+  - type: corrective
+    scope: entity
     entity: Company
     description: "BIAN references corrected to classes present in the v13 index (Organisation partial, PaymentTransaction, BankingProduct, AccessPreferenceArrangement partial); unverifiable references removed."
 
@@ -135,6 +139,14 @@ affected_products:
 - The payment channel is recorded on Transaction (Transaction Channel), not on the reusable
   Payment Initiator role. Payer, Payee, and Payment Initiator roles are keyed on their parties
   (`PAYER-`, `PAYEE-`, `INIT-` prefixes), as Customer is (`CUST-`).
+- Temenos Initiation and PaymentParties contribute to the Transaction that PaymentEvent
+  establishes, and the Transaction entry references its Payment Initiator, Payer, and Payee
+  (the relationships are many-to-one from Transaction). PaymentEvent has a fan-in example
+  across the three tables.
+- AccountRef carries the account's currency, and ProductCode is required. Open Decisions
+  record that no mapped source establishes Products, or Parties for external counterparties.
+- Address survivorship uses the Salesforce `CreatedDate`, so editing an old row can't change
+  which row came first.
 
 ### Removed
 

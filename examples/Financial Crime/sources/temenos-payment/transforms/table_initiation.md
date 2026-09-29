@@ -17,7 +17,6 @@ produces:
     identity: Derive Initiator Role Identifier
     references:
       Party: Initiation.ActorPartyId
-      Transaction: Initiation.PaymentId
 
   - entity: Transaction
     cardinality: 1
@@ -25,6 +24,8 @@ produces:
     identity:
       field: Initiation.PaymentId
       maps_to: Transaction · Transaction Identifier
+    references:
+      Payment Initiator: Derive Initiator Role Identifier
 ```
 
 ##### Source Schema
@@ -81,5 +82,6 @@ produces:
     Transaction Identifier: "PAY-900001"
     Transaction Channel: Third Party
 notes: >
-  The Transaction already exists from PaymentEvent; this row contributes its channel.
+  The Transaction already exists from PaymentEvent; this row contributes its channel and links
+  it to INIT-P-1001 through Transaction Initiated By Instructing Agent.
 ```

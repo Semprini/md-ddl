@@ -49,18 +49,20 @@ mutability: append_only
 temporal:
   tracking: transaction_time
   description: >
-    Transactions are append-only records. Once settled they must not be modified.
-    Transaction time captures when the institution recorded the transaction.
-    Reversals are recorded as new transaction records referencing the original
-    Transaction Identifier, not as updates to the original.
+    Transactions are append-only records and are never updated in place. Transaction
+    time captures when the institution recorded each version: a status change (for
+    example Settled to Reversed) or a late-arriving contribution such as the channel
+    or the parties records a new version that carries the earlier attributes forward.
+    When a reversal moves value back, that movement is its own Transaction with its
+    own identifier, referencing the original Transaction Identifier in Reference.
 attributes:
   Transaction Identifier:
     type: string
     identifier: primary
     description: >
       Globally unique identifier for the transaction event. Immutable once assigned.
-      For reversed transactions, the reversal carries its own identifier and references
-      this identifier in the Reference field.
+      A reversing movement carries its own identifier and references this identifier
+      in the Reference field.
 
   Transaction Date Time:
     type: datetime
@@ -143,7 +145,7 @@ governance:
   description: >
     Transaction attributes describe a movement of value; the parties are linked through
     Payer and Payee roles, which carry the PII posture. Records are append-only and
-    must never be modified or deleted. Reversals are represented as new records.
+    must never be modified or deleted. Changes, including reversal, are recorded as new versions.
   access_role:
     - FINANCIAL_CRIME_ANALYST
     - TRANSACTION_MONITORING_SYSTEM

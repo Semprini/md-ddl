@@ -149,6 +149,7 @@ given:
       ExternalPartyId: "P-1003"
       RecordStatus: "Active"
       LegalEntityName: "Coral Trading Ltd"
+      CompanyRegistrationNumber: "NZBN 9429041234567"
       CustomerNumber: "C-20003"
   - from: SAP Fraud Management · SanctionsScreening
     row:
@@ -164,6 +165,7 @@ produces:
     Party Identifier: "P-1003"
     Party Status: Active
     Legal Name: "Coral Trading Ltd"
+    Company Registration Number: "NZBN 9429041234567"
     Sanctions Screen Status: Potential Match
   - entity: Customer
     Role Identifier: "CUST-P-1003"

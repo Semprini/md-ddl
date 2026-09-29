@@ -46,11 +46,12 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Descriptio
 11 | VerifiedDate | Date | | | | yes | Date verification completed | Contact Address.Verification Date
 12 | ValidFromDate | Date | | | | no | Effective-from date | Contact Address.Valid From
 13 | ValidToDate | Date | | | | yes | Effective-to date | Contact Address.Valid To
-14 | LastModifiedDate | DateTime | | | | no | Last change to the row | [Transform: Address Uniqueness Merge](#transform-address-uniqueness-merge)
+14 | CreatedDate | DateTime | | | | no | When the row was created | [Transform: Address Uniqueness Merge](#transform-address-uniqueness-merge)
+15 | LastModifiedDate | DateTime | | | | no | Last change to the row |
 
 ##### Transform: Address Uniqueness Merge
 
-Parties who share a physical address share one Address instance, which is what makes shared-address network analysis possible. The key is the normalised street, postcode, and country. Address is immutable reference data, so when merged rows disagree on the other fields, the first recorded row's values stand.
+Parties who share a physical address share one Address instance, which is what makes shared-address network analysis possible. The key is the normalised street, postcode, and country. Address is immutable reference data, so when merged rows disagree on the other fields, the first created row's values stand. Survivorship uses `CreatedDate`, not `LastModifiedDate`, because editing an old row must not change which row came first.
 
 ```yaml
 type: deduplication
@@ -64,7 +65,7 @@ key:
     prefix: "ADDR"
 survivorship:
   strategy: earliest
-  timestamp_field: ContactPoint.LastModifiedDate
+  timestamp_field: ContactPoint.CreatedDate
 ```
 
 ##### Transform: Map Address Purpose
@@ -119,7 +120,7 @@ given:
     VerificationResult: "PASS"
     VerifiedDate: "2024-03-01"
     ValidFromDate: "2024-03-01"
-    LastModifiedDate: "2024-03-01T09:00:00Z"
+    CreatedDate: "2024-03-01T09:00:00Z"
   - Id: "0PA000000000002"
     PartyExternalId: "P-1005"
     Street: " 12  harbour st "
@@ -130,7 +131,7 @@ given:
     IsPrimary: true
     VerificationResult: "PENDING"
     ValidFromDate: "2024-05-20"
-    LastModifiedDate: "2024-05-20T14:30:00Z"
+    CreatedDate: "2024-05-20T14:30:00Z"
 produces:
   - entity: Address
     cardinality: 1
@@ -167,7 +168,7 @@ given:
     IsPrimary: true
     VerificationResult: "FAIL"
     ValidFromDate: "2024-01-10"
-    LastModifiedDate: "2024-01-10T08:00:00Z"
+    CreatedDate: "2024-01-10T08:00:00Z"
   - Id: "0PA000000000004"
     PartyExternalId: "P-1001"
     Street: "PO Box 77"
@@ -176,14 +177,22 @@ given:
     PurposeCode: "SHIP"
     IsPrimary: false
     ValidFromDate: "2024-01-10"
-    LastModifiedDate: "2024-01-10T08:00:00Z"
+    CreatedDate: "2024-01-10T08:05:00Z"
 produces:
+  - entity: Address
+    cardinality: 1
+    Address Identifier: "ADDR:1 QUAY RD|2000|AU"
+    Address Line 1: "1 Quay Rd"
+    Postcode: "2000"
+    Country: "AU"
   - entity: Contact Address
+    cardinality: 1
     Contact Address Identifier: "0PA000000000003"
     Address Purpose: Registered Office
     Verification Status: Rejected
 notes: >
   FAIL maps to Rejected. The second row's purpose code SHIP isn't in the code table, and
-  the lookup's fallback is reject, so that row produces nothing and is reported rather
-  than loaded with a guessed purpose.
+  the lookup's fallback is reject, which rejects the whole row: it produces neither a
+  Contact Address nor the Address ADDR:PO BOX 77|2000|AU, and is reported rather than
+  loaded with a guessed purpose. Only the first row's Address and Contact Address exist.
 ```

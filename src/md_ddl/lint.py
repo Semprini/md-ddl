@@ -81,6 +81,8 @@ RULES = {
     "entity-diagram-links": "Outgoing and inheritance targets must link to detail markdown",
     "entity-enum-in-diagram": "Enums used in attributes must appear in the diagram",
     "entity-attribute-consistency": "Diagram attributes must match the YAML attributes",
+    "transform-target-resolve": "Transform targets and direct Destination mappings must name a declared entity attribute",
+    "transform-case-values": "Conditional case keys and fallbacks must be valid values of an enum or boolean target",
 }
 
 # Mermaid diagram types recognised by the spec.
@@ -1057,6 +1059,185 @@ def check_entity_references(report: Report, doc: Doc, summary: DomainSummary) ->
 
 
 # ---------------------------------------------------------------------------
+# Model index: entity attributes and enum values across the domain's detail files
+# ---------------------------------------------------------------------------
+
+@dataclass
+class EntityInfo:
+    name: str
+    attributes: dict[str, str] = field(default_factory=dict)   # normalised name -> type
+    extends: str | None = None
+
+
+@dataclass
+class EnumInfo:
+    name: str
+    values: set[str] = field(default_factory=set)               # normalised values
+    external: bool = False                                      # declares `standard:`: a subset
+
+
+@dataclass
+class ModelIndex:
+    entities: dict[str, EntityInfo] = field(default_factory=dict)
+    enums: dict[str, EnumInfo] = field(default_factory=dict)
+
+    def attribute_type(self, entity: str, attribute: str) -> str | None:
+        """Type of `attribute` on `entity` or an ancestor; '' if untyped; None if absent."""
+        seen: set[str] = set()
+        key = normalise(entity)
+        while key and key not in seen and key in self.entities:
+            seen.add(key)
+            info = self.entities[key]
+            if normalise(attribute) in info.attributes:
+                return info.attributes[normalise(attribute)]
+            key = normalise(info.extends) if info.extends else ""
+        return None
+
+
+def _attribute_items(raw: object) -> list[tuple[str, object]]:
+    if isinstance(raw, dict):
+        return list(raw.items())
+    if isinstance(raw, list):
+        items: list[tuple[str, object]] = []
+        for entry in raw:
+            if isinstance(entry, dict):
+                items.extend(entry.items())
+        return items
+    return []
+
+
+def build_model_index(docs: list[Doc]) -> ModelIndex:
+    index = ModelIndex()
+    for doc in docs:
+        span = doc.section(2, "Entities")
+        if span:
+            for heading, sub in doc.subsections(span, 3):
+                name = link_text_and_target(heading.text)[0] or heading.text
+                info = EntityInfo(name)
+                for block in doc.blocks_of("yaml", sub):
+                    data = load_yaml(block)
+                    if not data:
+                        continue
+                    if isinstance(data.get("extends"), str):
+                        info.extends = data["extends"]
+                    for attr, spec in _attribute_items(data.get("attributes")):
+                        typ = spec.get("type", "") if isinstance(spec, dict) else ""
+                        info.attributes[normalise(str(attr))] = str(typ or "")
+                index.entities[normalise(name)] = info
+        span = doc.section(2, "Enums")
+        if span:
+            for heading, sub in doc.subsections(span, 3):
+                name = link_text_and_target(heading.text)[0] or heading.text
+                info = EnumInfo(name)
+                for block in doc.blocks_of("yaml", sub):
+                    data = load_yaml(block)
+                    if not data:
+                        continue
+                    values = data.get("values")
+                    if isinstance(values, dict):
+                        info.values |= {normalise(str(v)) for v in values}
+                    elif isinstance(values, list):
+                        for v in values:
+                            if isinstance(v, dict):
+                                info.values |= {normalise(str(k)) for k in v}
+                            else:
+                                info.values.add(normalise(str(v)))
+                    if data.get("standard"):
+                        info.external = True
+                index.enums[normalise(name)] = info
+    return index
+
+
+# ---------------------------------------------------------------------------
+# Check: transform targets resolve; conditional case values are valid
+# ---------------------------------------------------------------------------
+
+TARGET_SEP_RE = re.compile(r"\s*[·•]\s*")
+DIRECT_DEST_RE = re.compile(r"^(?P<entity>[A-Za-z][\w ]*?)\.(?P<attr>[A-Za-z][\w ()/-]*)$")
+
+
+def _split_target(value: str) -> tuple[str, str] | None:
+    parts = [p for p in TARGET_SEP_RE.split(value.strip()) if p]
+    if len(parts) < 2:
+        return None
+    return parts[-2], parts[-1]
+
+
+def _check_target(report: Report, doc: Doc, line: int, index: ModelIndex,
+                  entity: str, attribute: str, shown: str) -> str | None:
+    if normalise(entity) not in index.entities:
+        report.error(doc.path, line, "transform-target-resolve",
+                     f"'{shown}': entity '{entity}' is not declared in this domain")
+        return None
+    typ = index.attribute_type(entity, attribute)
+    if typ is None:
+        report.error(doc.path, line, "transform-target-resolve",
+                     f"'{shown}': '{entity}' has no attribute '{attribute}' (own or inherited)")
+    return typ
+
+
+def check_transform_targets(report: Report, doc: Doc, index: ModelIndex) -> None:
+    if not index.entities:
+        return
+    for block in doc.blocks_of("yaml"):
+        data = load_yaml(block)
+        if not data or not isinstance(data.get("target"), str):
+            continue
+        split = _split_target(data["target"])
+        if not split:
+            continue
+        entity, attribute = split
+        typ = _check_target(report, doc, yaml_key_line(block, "target"), index,
+                            entity, attribute, data["target"])
+        if typ is not None and data.get("type") == "conditional":
+            _check_case_values(report, doc, block, data, index, typ)
+
+    seen_rows: set[int] = set()
+    for i, heading in enumerate(doc.headings):
+        if heading.level < 2:
+            continue
+        header, rows = parse_table(doc, (heading.line, doc._span_end(i)))
+        if not any(normalise(h) == "destination" for h in header):
+            continue
+        for row in rows:
+            if row.line in seen_rows:
+                continue
+            seen_rows.add(row.line)
+            for part in (p.strip() for p in column(row, "Destination").split(",")):
+                if not part or "[" in part:
+                    continue
+                m = DIRECT_DEST_RE.match(part)
+                if m:
+                    _check_target(report, doc, row.line, index,
+                                  m.group("entity").strip(), m.group("attr").strip(), part)
+
+
+def _check_case_values(report: Report, doc: Doc, block: CodeBlock, data: dict,
+                       index: ModelIndex, target_type: str) -> None:
+    cases = data.get("cases")
+    if not isinstance(cases, dict):
+        return
+    keys = [str(k) for k in cases]
+    if data.get("fallback") is not None:
+        keys.append(str(data["fallback"]))
+    enum_name = enum_name_from_type(target_type)
+    if enum_name:
+        enum = index.enums.get(normalise(enum_name))
+        if enum is None or enum.external or not enum.values:
+            return
+        valid, label = enum.values, f"enum '{enum.name}'"
+    elif target_type.strip().lower() == "boolean":
+        valid, label = {"true", "false"}, "boolean"
+    else:
+        return
+    for key in dict.fromkeys(keys):
+        if normalise(key) not in valid:
+            report.error(doc.path, yaml_key_line(block, "cases"), "transform-case-values",
+                         f"case value '{key}' is not a valid {label} value for "
+                         f"target '{data.get('target')}'")
+
+
+# ---------------------------------------------------------------------------
 # Check: domain metadata version field
 # ---------------------------------------------------------------------------
 
@@ -1339,8 +1520,18 @@ def lint_domain(
         return
 
     summary = read_domain(domain_doc)
+    paths = markdown_files(domain_root, ignore)
+    index_docs = []
+    for path in paths:
+        rel = path.relative_to(domain_root).parts
+        if rel and rel[0] in NON_ENTITY_REF_DIRS:
+            continue
+        loaded = load_doc(path)
+        if loaded is not None and is_detail_file(loaded):
+            index_docs.append(loaded)
+    index = build_model_index(index_docs)
 
-    for path in markdown_files(domain_root, ignore):
+    for path in paths:
         if only is not None and path.resolve() not in only:
             continue
         doc = load_doc(path)
@@ -1354,6 +1545,8 @@ def lint_domain(
         rel_parts = path.relative_to(domain_root).parts
         if not (rel_parts and rel_parts[0] in NON_ENTITY_REF_DIRS):
             check_entity_references(report, doc, summary)
+        if rel_parts and rel_parts[0] == "sources":
+            check_transform_targets(report, doc, index)
 
         if path.resolve() == domain_file.resolve():
             check_domain_version(report, summary)

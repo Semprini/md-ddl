@@ -14,12 +14,13 @@ The latest sanctions screening result for a party.
 produces:
   - entity: Party
     cardinality: 1
+    contributes: true
     identity:
       field: SanctionsScreening.PartyExternalId
       maps_to: Party · Party Identifier
 ```
 
-Screening updates an existing Party that Salesforce CRM has already established as a Person or a Company, so this entry names the abstract Party and is matched on its identifier.
+Screening updates an existing Party that Salesforce CRM has already established as a Person or a Company. The entry is `contributes: true`, so it names the abstract Party and never creates one. A screening row for an unknown party is held until the CRM establishes it.
 
 ##### Source Schema
 

@@ -14,6 +14,7 @@ The fraud system's current risk assessment for a customer.
 produces:
   - entity: Customer
     cardinality: 1
+    contributes: true
     identity: Derive Customer Role Identifier
 ```
 

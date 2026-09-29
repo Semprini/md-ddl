@@ -408,7 +408,7 @@ notes: >
 Key | Purpose
 --- | ---
 `example` | Short name for the case being pinned. Unique within the source table.
-`given` | The source row. A list of rows where the example demonstrates cross-row behaviour such as deduplication.
+`given` | The source row. A list of rows where the example demonstrates cross-row behaviour such as deduplication. A list of `from`/`row` entries where rows come from several sources (see [Fan-in examples](#fan-in-examples)).
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
@@ -417,6 +417,58 @@ Only the columns and attributes that matter to the example need to be listed —
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 
 Cover the cases where the model could reasonably be read two ways: each branch of a fan-out condition, each branch of a deduplication key, and any case whose evaluation order is load-bearing.
+
+#### Fan-in examples
+
+Fan-out is one source row producing several instances. Fan-in is the reverse: rows from several sources converging on one canonical instance, each contributing attributes and some competing for the same one. Most merge, survivorship, and consistency defects occur here, and an example confined to one source table cannot show them.
+
+A fan-in example is a worked example whose `given` entries each name the source table they come from:
+
+````markdown
+##### Worked Examples
+
+```yaml
+example: CRM has no email on record, so the ERP value is used
+given:
+  - from: Salesforce CRM · Contact
+    row:
+      ContactId: "C-1001"
+      FirstName: "Jane"
+      LastName: "Whitcombe"
+      Email: null
+  - from: SAP ERP · Customer
+    row:
+      KUNNR: "C-1001"
+      EmailAddress: "jane.whitcombe@example.invalid"
+produces:
+  - entity: Customer
+    Customer Number: "C-1001"
+    Full Name: "Jane Whitcombe"
+    Email Address: "jane.whitcombe@example.invalid"
+interim:
+  - after: 1
+    produces:
+      - entity: Customer
+        Customer Number: "C-1001"
+        Full Name: "Jane Whitcombe"
+        Email Address: null
+notes: >
+  Preferred Email Address is priority_non_null with CRM first. CRM's null does not
+  win; the ERP value fills the gap once it arrives. Until then the instance exists
+  with no email.
+```
+````
+
+Key | Purpose
+--- | ---
+`from` | The contributing source table, as `Source · Table` using the source summary and transform detail headings.
+`row` | The source row from that table. Only the columns that matter need be listed.
+`given` order | Arrival order. Where the result depends on which source arrives first, the order is part of the assertion.
+`interim` | Optional. The instance as it stands `after` the first *n* arrivals. Use it where the consuming data product accepts eventual consistency, to pin what a partially converged instance looks like, including which attributes are still null. An empty `produces` asserts that no instance exists yet.
+
+A fan-in example is declared once, in the transform detail of one contributing source table. Where a `reconciliation` transformation governs the conflict, the example goes beside it; otherwise it goes with the source whose fan-out establishes the instance's identity. Every contributing source's Entity Fan-Out must declare the produced entity, and every `given` row must resolve to the same instance identifier. An example whose rows converge on different identifiers is showing two instances, not one.
+
+Cover each `reconciliation` strategy branch that the data can reach: the higher-priority source present, absent, and null; conflicting values under `most_recent` and `consensus`; and, for products that accept eventual consistency, the order in which sources usually arrive.
 
 ---
 

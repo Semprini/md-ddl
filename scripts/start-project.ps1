@@ -82,6 +82,7 @@ Command | Agent | Purpose
 ``/agent-artifact`` | Agent Artifact | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher).
 ``/agent-architect`` | Agent Architect | Data product design, architecture discussion, ODPS manifests.
 ``/agent-governance`` | Agent Governance | Standards conformance, compliance auditing, governance assurance.
+``/agent-test`` | Agent Test | Tests from worked examples, constraints, and SLAs; local dbt + DuckLake runs.
 
 ## Key references
 
@@ -129,6 +130,7 @@ Agent | Purpose
 ``agent-artifact`` | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher).
 ``agent-architect`` | Data product design, architecture discussion, ODPS manifests.
 ``agent-governance`` | Standards conformance, compliance auditing, governance assurance.
+``agent-test`` | Tests from worked examples, constraints, and SLAs; local dbt + DuckLake runs.
 
 ## Key references
 

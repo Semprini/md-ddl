@@ -132,6 +132,7 @@ Agent | When to use | What it expects
 **Agent Artifact** | Generate physical schemas — SQL DDL, JSON Schema, Parquet, Cypher | An MD-DDL domain and a target physical style (dimensional, 3NF, wide-column, knowledge-graph) + platform dialect
 **Agent Architect** | Discuss architecture philosophy; compare MD-DDL to Data Mesh/TOGAF/other approaches; prepare material for governance councils or CIOs; design data products with logical models and lineage; choose product class and schema type; define masking and attribute mapping; generate ODPS manifests | An architecture topic to discuss, a domain to design products for, or products to publish
 **Agent Governance** | Audit governance metadata; check compliance against regulations; check standards conformance; monitor regulatory change | A domain to audit, applicable standards or jurisdictions/frameworks, or a remediation request
+**Agent Test** | Turn worked examples, constraints, temporal rules, and product SLAs into tests; report test coverage and missing worked examples; run tests locally with dbt-core + DuckLake before promotion to the cloud warehouse | A domain or data product, its generated dbt project, and the organisation's template project if any
 **review-md-ddl** | Run layered and viewpoint-based reviews of the MD-DDL standard, agents, and examples | Review target, desired layers/viewpoints, and output format expectations
 
 ---
@@ -177,7 +178,8 @@ each agent fits. This helps users see the big picture before diving into details
   │ Agent       │  │ Agent        │  │ Agent        │
   │ Ontology    │──│ Architect +  │──│ Governance   │
   │             │  │ Agent        │  │              │
-  │             │  │ Artifact     │  │              │
+  │             │  │ Artifact +   │  │              │
+  │             │  │ Agent Test   │  │              │
   └─────────────┘  └──────────────┘  └──────────────┘
 ```
 
@@ -185,7 +187,8 @@ each agent fits. This helps users see the big picture before diving into details
 2. **Model** — Agent Ontology drafts domain files, entity details, relationships, events
 3. **Map** — Agent Ontology captures source systems and transformation rules
 4. **Publish** — Agent Architect designs data products, sets governance and masking
-5. **Generate** — Agent Artifact produces physical schemas scoped by data products
+5. **Generate** — Agent Artifact produces physical schemas and dbt projects scoped by data products
+   - **Test** — Agent Test compiles worked examples and constraints into tests and runs them locally before promotion
 6. **Govern** — Agent Governance audits and maintains compliance and standards conformance over time
 
 ---

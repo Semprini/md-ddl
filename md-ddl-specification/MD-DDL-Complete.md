@@ -127,6 +127,20 @@ Agents treat organisational deviations from convention — a field named `phi` i
 
 The full validation level taxonomy, pre-flight check definitions, the tool interface, and the `{{INCLUDE}}` directive used by agent prompt files are collected in the non-normative [Validation Tooling Guide](../guides/validation-tooling.md).
 
+### **Verification of Generated Artefacts**
+
+Validation checks the model. Verification checks what is generated from it. A model states outcomes as well as structure, and each stated outcome is an assertion that generated pipelines and schemas can be tested against. The default convention is that generating tooling derives its test suite from these declarations rather than writing tests separately:
+
+Declaration | Asserts | Test level
+--- | --- | ---
+[Worked Examples](./8-Transformations.md#worked-examples), including fan-in examples | Given source rows produce exactly the stated instances and values | Unit
+[Entity Fan-Out](./7-Sources.md#entity-fan-out), `conditional`, `lookup`, `deduplication` | Each declared branch routes and derives as declared | Unit
+Primary identifier, entity constraints, enumerations, relationships | Produced data is valid: unique, non-null, in range, referentially intact | Data
+Temporal tracking and mutability | History is coherent: one current version, closed periods, no overlaps | Data
+Data product SLA, consistency posture, masking | The published product converges, stays fresh, and masks as declared | Integration
+
+Test levels are tool-neutral: a unit test runs one transformation on fixed input, a data test checks produced data against a rule, and an integration test checks the running product. Worked examples outrank every other test. A generated pipeline that fails a worked example is incorrect, whatever else passes. Tests derived mechanically from transformation YAML confirm that generation followed the YAML; only worked examples, written by people who know the domain, can show that the YAML itself is right.
+
 ## **Domains**
 
 In MD-DDL, the domain level is the domain's **ontology** — the shared vocabulary of concepts a business uses and the named, meaningful relationships between them. It is also the router for the Knowledge Graph: the detail level supplies the DNA (attributes and constraints), while the domain level supplies the anatomy — which concepts exist, how they specialise one another, and how they relate.
@@ -1397,7 +1411,7 @@ Section | Purpose
 `##### Entity Fan-Out` | Which canonical instances one source row produces. Required when a row produces more than one entity instance.
 `##### Source Schema` | The source column table, including the `Destination` column.
 `##### Transform: <Name>` | One non-direct mapping rule. Repeated per rule.
-`##### Worked Examples` | Input rows and the exact instances they must produce.
+`##### Worked Examples` | Input rows and the exact instances they must produce, including rows from other sources where instances converge ([fan-in](./8-Transformations.md#fan-in-examples)).
 `##### Open Decisions` | Unresolved questions that block deterministic generation.
 
 The `Transform: ` prefix distinguishes mapping rules from the fixed sections. The transformation's identity in the Knowledge Graph is the heading text with the prefix removed.
@@ -1696,7 +1710,7 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 2. **Canonical entities stay pure.** Entity definitions contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
-3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly.
+3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly. Its expected outcome is pinned by a fan-in worked example, declared once beside that transformation.
 
 4. **Source idiosyncrasies stay in transform detail.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 
@@ -2118,7 +2132,7 @@ notes: >
 Key | Purpose
 --- | ---
 `example` | Short name for the case being pinned. Unique within the source table.
-`given` | The source row. A list of rows where the example demonstrates cross-row behaviour such as deduplication.
+`given` | The source row. A list of rows where the example demonstrates cross-row behaviour such as deduplication. A list of `from`/`row` entries where rows come from several sources (see [Fan-in examples](#fan-in-examples)).
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
@@ -2127,6 +2141,58 @@ Only the columns and attributes that matter to the example need to be listed —
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 
 Cover the cases where the model could reasonably be read two ways: each branch of a fan-out condition, each branch of a deduplication key, and any case whose evaluation order is load-bearing.
+
+#### Fan-in examples
+
+Fan-out is one source row producing several instances. Fan-in is the reverse: rows from several sources converging on one canonical instance, each contributing attributes and some competing for the same one. Most merge, survivorship, and consistency defects occur here, and an example confined to one source table cannot show them.
+
+A fan-in example is a worked example whose `given` entries each name the source table they come from:
+
+````markdown
+##### Worked Examples
+
+```yaml
+example: CRM has no email on record, so the ERP value is used
+given:
+  - from: Salesforce CRM · Contact
+    row:
+      ContactId: "C-1001"
+      FirstName: "Jane"
+      LastName: "Whitcombe"
+      Email: null
+  - from: SAP ERP · Customer
+    row:
+      KUNNR: "C-1001"
+      EmailAddress: "jane.whitcombe@example.invalid"
+produces:
+  - entity: Customer
+    Customer Number: "C-1001"
+    Full Name: "Jane Whitcombe"
+    Email Address: "jane.whitcombe@example.invalid"
+interim:
+  - after: 1
+    produces:
+      - entity: Customer
+        Customer Number: "C-1001"
+        Full Name: "Jane Whitcombe"
+        Email Address: null
+notes: >
+  Preferred Email Address is priority_non_null with CRM first. CRM's null does not
+  win; the ERP value fills the gap once it arrives. Until then the instance exists
+  with no email.
+```
+````
+
+Key | Purpose
+--- | ---
+`from` | The contributing source table, as `Source · Table` using the source summary and transform detail headings.
+`row` | The source row from that table. Only the columns that matter need be listed.
+`given` order | Arrival order. Where the result depends on which source arrives first, the order is part of the assertion.
+`interim` | Optional. The instance as it stands `after` the first *n* arrivals. Use it where the consuming data product accepts eventual consistency, to pin what a partially converged instance looks like, including which attributes are still null. An empty `produces` asserts that no instance exists yet.
+
+A fan-in example is declared once, in the transform detail of one contributing source table. Where a `reconciliation` transformation governs the conflict, the example goes beside it; otherwise it goes with the source whose fan-out establishes the instance's identity. Every contributing source's Entity Fan-Out must declare the produced entity, and every `given` row must resolve to the same instance identifier. An example whose rows converge on different identifiers is showing two instances, not one.
+
+Cover each `reconciliation` strategy branch that the data can reach: the higher-priority source present, absent, and null; conflicting values under `most_recent` and `consensus`; and, for products that accept eventual consistency, the order in which sources usually arrive.
 
 ---
 

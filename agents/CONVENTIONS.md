@@ -31,6 +31,7 @@ examples/Financial Crime/
   handoff-to-governance.md     ← written by Agent Ontology or Agent Artifact
   handoff-to-ontology.md       ← written by Agent Artifact, Architect, or Governance
   handoff-to-architect.md      ← written by Agent Ontology
+  handoff-to-test.md           ← written by Agent Artifact
 ```
 
 ### File Naming

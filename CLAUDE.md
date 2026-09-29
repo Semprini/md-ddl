@@ -14,6 +14,7 @@ Command | Agent | Purpose
 `/agent-artifact` | Agent Artifact | Physical schema generation (SQL DDL, JSON Schema, Parquet, Cypher).
 `/agent-architect` | Agent Architect | Data product design, architecture discussion, ODPS manifests.
 `/agent-governance` | Agent Governance | Standards conformance, compliance auditing, governance assurance.
+`/agent-test` | Agent Test | Tests from worked examples, constraints, and SLAs; local dbt + DuckLake runs.
 
 Agent prompts: `agents/<agent-name>/AGENT.md`
 
@@ -30,6 +31,7 @@ Generating DDL, JSON Schema, Parquet, Cypher | Read `agents/agent-artifact/AGENT
 Reconcile generated vs existing, gap analysis | Read `agents/agent-artifact/AGENT.md` (reconciliation skill)
 Data product design, architecture, ODPS | Read `agents/agent-architect/AGENT.md`
 Compliance audit, governance review, standards check | Read `agents/agent-governance/AGENT.md`
+Testing generated output, compiling worked examples, dbt unit tests, local DuckLake runs | Read `agents/agent-test/AGENT.md`
 Review, evaluate, audit the standard itself | Read `.prompts/md-ddl-layered-review-process.md` for orchestration, then load the appropriate layer prompt from `.prompts/`
 
 When activating an agent, also follow its skill-loading protocol — read the applicable `SKILL.md` files before responding.

@@ -127,6 +127,20 @@ Agents treat organisational deviations from convention — a field named `phi` i
 
 The full validation level taxonomy, pre-flight check definitions, the tool interface, and the `{{INCLUDE}}` directive used by agent prompt files are collected in the non-normative [Validation Tooling Guide](../guides/validation-tooling.md).
 
+### **Verification of Generated Artefacts**
+
+Validation checks the model. Verification checks what is generated from it. A model states outcomes as well as structure, and each stated outcome is an assertion that generated pipelines and schemas can be tested against. The default convention is that generating tooling derives its test suite from these declarations rather than writing tests separately:
+
+Declaration | Asserts | Test level
+--- | --- | ---
+[Worked Examples](./8-Transformations.md#worked-examples), including fan-in examples | Given source rows produce exactly the stated instances and values | Unit
+[Entity Fan-Out](./7-Sources.md#entity-fan-out), `conditional`, `lookup`, `deduplication` | Each declared branch routes and derives as declared | Unit
+Primary identifier, entity constraints, enumerations, relationships | Produced data is valid: unique, non-null, in range, referentially intact | Data
+Temporal tracking and mutability | History is coherent: one current version, closed periods, no overlaps | Data
+Data product SLA, consistency posture, masking | The published product converges, stays fresh, and masks as declared | Integration
+
+Test levels are tool-neutral: a unit test runs one transformation on fixed input, a data test checks produced data against a rule, and an integration test checks the running product. Worked examples outrank every other test. A generated pipeline that fails a worked example is incorrect, whatever else passes. Tests derived mechanically from transformation YAML confirm that generation followed the YAML; only worked examples, written by people who know the domain, can show that the YAML itself is right.
+
 ---
 
 ...next: [Domains](2-Domains.md)

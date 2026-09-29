@@ -216,7 +216,7 @@ Section | Purpose
 `##### Entity Fan-Out` | Which canonical instances one source row produces. Required when a row produces more than one entity instance.
 `##### Source Schema` | The source column table, including the `Destination` column.
 `##### Transform: <Name>` | One non-direct mapping rule. Repeated per rule.
-`##### Worked Examples` | Input rows and the exact instances they must produce.
+`##### Worked Examples` | Input rows and the exact instances they must produce, including rows from other sources where instances converge ([fan-in](./8-Transformations.md#fan-in-examples)).
 `##### Open Decisions` | Unresolved questions that block deterministic generation.
 
 The `Transform: ` prefix distinguishes mapping rules from the fixed sections. The transformation's identity in the Knowledge Graph is the heading text with the prefix removed.
@@ -515,7 +515,7 @@ When adopting MD-DDL into an existing environment, source declarations may initi
 
 2. **Canonical entities stay pure.** Entity definitions contain no source references. The canonical model defines meaning; sources define operational reality. This separation is structural — a source reference in entity YAML would be interpreted as part of the canonical meaning and corrupt generation.
 
-3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly.
+3. **Transform detail is source-scoped.** Transform detail belongs to exactly one source and one domain context. Cross-source reconciliation (where multiple sources contribute to the same attribute) is expressed using the `reconciliation` transformation type, listing the contributing sources explicitly. Its expected outcome is pinned by a fan-in worked example, declared once beside that transformation.
 
 4. **Source idiosyncrasies stay in transform detail.** Null representations, format quirks, quality notes, and encoding variations belong in the `source:` block of the relevant transform. They do not propagate into the canonical entity definition.
 

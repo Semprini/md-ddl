@@ -74,3 +74,41 @@ should come before adding more features.
 2. Repair Financial Crime with Agent Ontology, using the domain review in this run as its
    work list.
 3. Take B5, B7, and B11 into the next spec and tooling round.
+
+---
+
+## Resolution (same day)
+
+### Instruction defects
+
+ID | Resolution
+--- | ---
+B1 | compliance-audit no longer quotes notification windows; it defers to the regulator file. `apra.md` now records the CPS 234 windows, checked against apra.gov.au: 72 hours for material incidents, 10 business days for material control weaknesses.
+B2 | faker keeps `pii: true` fields at safe-mode placeholders even with a profile. A new `country_for_locale()` helper derives the country from the sampled locale. The skill shows the profile import and covers subtypes. The code pattern was executed in three modes.
+B3 | ODPS version quoted; units follow the reference (`percent` for SLA, `percentage` for data quality, minutes for timeliness); uniqueness counts identifiers; SQL ports have no `format`; unmasked PII goes to Agent Governance; `sla.freshness` takes precedence over `refresh`.
+B4 | The BIAN README points at the index files that exist.
+B5 | `apra.md`, `basel.md`, and `rbnz.md` use only schema fields; business facts (risk categories, PD/LGD, providers) become modelled attributes. `apra.md` records CPS 230's 1 July 2025 commencement, replacing CPS 231. A new `austrac.md` records the verified AML/CTF record-keeping periods. The regulator mapping splits the AU and NZ rows.
+B6 | Claude command wrappers tell the model to read `{{INCLUDE}}` targets.
+B7 | Domain review separates lint errors that break the YAML (Critical) from representation disagreements (Major, which block promotion but not generation). The YAML is authoritative. The handoff conventions cover consumed and archived files, and multiple recipients.
+B8 | Agent Artifact runs its output when a database or runtime is available, and says when it hasn't.
+B9 | Bridge columns are named `source_`/`target_` plus the referenced key column, so they follow the dialect.
+B10 | Concept Explorer explains the local and cloud dbt tiers.
+B11 | New lint rules `transform-target-resolve` (including `Reference:` destinations) and `transform-case-values`.
+
+### Spec decisions
+
+- Security and residency fields (`data_residency`, `cross_border_transfer`, `audit_all_access`, `breach_notification_required`, `notification_timeframe`) are part of the governance schema.
+- `masking` is declared under `governance`. Products declare `consistency` (posture, null strategy) as a field, not a comment.
+- Entity Fan-Out gains `contributes: true` for sources that add to an instance another source establishes. `references` may name existing instances. Reference-only columns use `Reference: <Entity>`. Joins between source tables aren't declared, so extracts carry parent keys.
+- Identity: `derived` suffices when rows don't merge. Composite deduplication keys are `prefix:v1|v2|…`. Survivorship gains `earliest`.
+- `abstract: true` declares abstract entities in YAML. `relationship_attributes` applies to any relationship with link attributes. Columns omitted from a worked example's `given` are null.
+- Example folders are `products/`, as the spec says. `Production` isn't a lifecycle status, so the examples use `Active`.
+
+### Examples
+
+All seven examples lint with no findings, including under the two new rules. Financial Crime is rebuilt as domain 2.0.0 (see its `LIFECYCLE.md`). Healthcare's transform targets were corrected. Telecom, Brownfield Retail, and Simple Customer diagram and summary defects were fixed, and a same-file enum false positive in the linter was removed.
+
+### Remaining
+
+- Healthcare's and Telecom's source layers still use the pre-spec layout (source-rooted headings, a `Comment` column, no fan-out or worked examples, benign fallbacks such as `fallback: Active`). They lint clean but would fail a domain review's Determinism Test. Rebuild them the way Financial Crime was rebuilt.
+- `rbnz.md` was last verified on 2025-03-08. It needs re-verification by Agent Governance, including the NZ AML/CFT Act section 58 retention that Financial Crime cites. The RBNZ and AUSTRAC sites couldn't be fetched from this environment, so only search-visible facts were verified.

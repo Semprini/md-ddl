@@ -1,259 +1,87 @@
 ---
 name: worked-examples
-description: Use this skill when the user asks to see an example, says "walk me through", "show me how [concept] looks in practice", mentions the Simple Customer or Financial Crime example, or wants to understand how a complete MD-DDL model is structured. Also use when a user asks for a concrete demonstration of a concept after it has been explained.
+description: Use when the user asks to see an example, says "walk me through" or "show me how [concept] looks in practice", mentions an example domain (Simple Customer, Financial Crime, Healthcare, Telecom, Retail, Brownfield Retail), or wants to see how a complete MD-DDL model fits together.
 ---
 
 # Skill: Worked Examples
 
-Covers interactive walkthroughs of the three reference examples in this repository.
-Teaches by exploring real artifacts — domain files, entity details, relationships,
-events, governance metadata, and data products — with guided commentary.
+Teach by walking through the real example domains in `examples/`. Read the files as you
+go rather than describing them from memory. The examples change, and their details are
+the lesson.
+
+## Choosing an Example
+
+`examples/README.md` lists every example with its complexity, and includes a feature
+coverage matrix showing which spec features each one uses. Use it to pick the example
+for the user's question:
+
+- **First look:** Simple Customer. The smallest complete model: `domain.md` plus `details.md`.
+- **Production-quality reference:** Financial Crime. Inheritance, governance, BIAN
+  alignment, sources, data products, lifecycle history, synthetic data.
+- **Healthcare and FHIR:** Healthcare. Bitemporal and transaction-time patterns, a
+  knowledge-graph product.
+- **Specific features:** find them in the coverage matrix (associative entities are in
+  Telecom and Retail Sales; bounded contexts in Retail Sales and Retail Service).
+- **Brownfield adoption:** Brownfield Retail (below).
 
 ---
 
-## Example Tracks
+## Walking Through an Example
 
-### Track 1 — Simple Customer (Beginner)
+1. **Big picture.** Open `domain.md`: description, metadata (ownership, governance,
+   regulatory scope), overview diagram, and summary tables. The domain file is a table
+   of contents, and detail lives in linked files.
+2. **One entity.** Let the user choose, or suggest one that suits their archetype:
+   inheritance for modellers, PII and governance for stewards, constraints and temporal
+   tracking for engineers, regulatory scope for compliance. Walk through the heading
+   hierarchy, the YAML (attributes, `existence`, `mutability`, `temporal`, governance),
+   and the diagram.
+3. **A design decision.** This teaches how to *think* in MD-DDL. Check the decision
+   against the files before presenting it. Examples:
+   - Simple Customer: Party Role is abstract and exists only to be specialised (Customer
+     extends it). Loyalty Tier is an enum because it has no attributes or lifecycle of
+     its own. Customer Preference is `existence: dependent` because it can't exist
+     without its customer.
+   - Financial Crime: Party is abstract, with Person and Company as concrete subtypes,
+     because a party is always one or the other and each adds different attributes.
+     Payer, Payee, and Payment Initiator are Party Role specialisations, because the same
+     party plays different roles in different transactions. Transaction is
+     `existence: dependent` and `append_only` with transaction-time tracking: a
+     settled transaction is never modified. The file doesn't state why it's dependent.
+     Ask the user what they would choose and why, which makes a good discussion.
 
-**Location:** `examples/Simple Customer/`
-**Scope:** 3 entities, 1 enum, 1 relationship, 1 event
-**Best for:** First-time users, users who want the smallest complete example
+   Then ask whether the user's domain has a similar either/or choice.
+4. **Connections.** Show how the entity links to the rest: relationship YAML
+   (cardinality, identifying or not), events that affect it, data products that publish
+   it (`data_products/`), and sources that feed it, including transform detail and
+   worked examples where present (`sources/`).
+5. **Their own concept.** Invite the user to describe a concept from their domain and
+   sketch it in MD-DDL, marked as a demonstration. When they're ready to build it for
+   real, offer a drafted opening request for Agent Ontology.
 
-**Files:**
-
-- `domain.md` — Domain declaration, metadata, overview diagram, summary tables
-- `details.md` — Entity detail YAML, enum values, relationship YAML, event YAML
-
-### Track 2 — Financial Crime (Intermediate)
-
-**Location:** `examples/Financial Crime/`
-**Scope:** 21 entities (with inheritance hierarchies), 10 enums, 14 relationships,
-7 events, 3 data products, 3 source systems
-**Best for:** Users who want a production-quality reference; exploring advanced
-features like inheritance, governance metadata, standards alignment, data products
-
-**Files:**
-
-- `domain.md` — Full domain with metadata, overview diagram, all summary tables
-- `entities/` — One file per entity with full YAML, diagrams, and constraints
-- `events/` — One file per event with YAML definitions
-- `products/` — Data product declarations (canonical, analytics, source-feeds)
-- `sources/` — Source system declarations with transformation mappings
-
-### Track 3 — Healthcare (Intermediate)
-
-**Location:** `examples/Healthcare/`
-**Scope:** 12 entities, 11 enums, 14 relationships, 4 events, 2 data products,
-2 source systems
-**Best for:** Users exploring standards-aligned healthcare modelling (FHIR),
-transaction_time and bitemporal temporal patterns, and knowledge-graph products
-
-**Files:**
-
-- `domain.md` — Full healthcare domain with metadata, overview diagram, and summary tables
-- `entities/` — One file per clinical entity with full YAML, diagrams, and constraints
-- `events/` — Clinical workflow events with payload attributes
-- `products/` — Canonical and analytics product declarations
-- `sources/` — EHR and LIS source declarations with transformation mappings
+If the user would rather explore than follow a sequence, jump straight to what they ask
+for: inheritance, governance metadata, a data product, source mapping, an event. Use the
+coverage matrix to find the best instance.
 
 ---
 
-## Teaching Protocol
+## Brownfield Retail: From Star Schema to Declarative MD-DDL
 
-Follow this sequence when walking through an example. Adapt depth and pace to the
-user's archetype and signals.
+`examples/Brownfield Retail/` shows the adoption journey for a retail domain that
+starts from a Snowflake star schema. Walk it phase by phase, reading the files:
 
-### Step 1 — Big Picture First
+1. **Documented (Level 1).** `baselines/` records the existing state: dimensional tables
+   (`fact_sales`, `dim_product`, `dim_store`), an ETL pipeline, and Collibra catalogue
+   metadata. Each file has a `baseline:` metadata block, type-specific YAML, and a
+   free-form body of business rules and known issues.
+2. **Mapped (Level 2).** `entities/` holds canonical entities derived from the baselines
+   (Sale, not `fact_sales`), with natural-language attributes and audit columns dropped.
+   `sources/pos-system/` carries the lineage from baseline fields to canonical attributes.
+3. **Governed (Level 3).** Classification, PII, retention, regulatory scope, and a
+   passing domain review.
+4. **Declarative (Level 3 → 4).** Agent Artifact regenerates the star schema from the
+   canonical model and reconciles it against the baseline. The differences are either
+   intentional improvements or prompts to update the model. Superseded baselines are
+   marked `status: superseded`.
 
-Open the domain file and present the overview:
-
-> "This is the [Simple Customer / Financial Crime] domain. Let me show you the
-> big picture before we dive into details."
-
-Highlight:
-
-- **Domain description** — What business area does this model represent?
-- **Metadata block** — Who owns it, what governance applies, what regulations scope it
-- **Overview diagram** — How the entities connect visually
-- **Summary tables** — The four (or five) tables: Entities, Enums, Relationships, Events (and Data Products if present)
-
-Explain that the domain file is a table of contents — summary-level. Detail lives
-in linked files.
-
-### Step 2 — Pick One Entity to Explore
-
-Let the user choose, or suggest one based on their archetype:
-
-- **For modellers:** Start with an entity that uses inheritance (e.g., `Party` →
-  `Person` / `Company` in Financial Crime, or `Party Role` → `Customer` in Simple Customer)
-- **For data stewards:** Start with an entity that has governance metadata
-  (e.g., `Customer` with PII attributes)
-- **For engineers:** Start with an entity that has complex attributes or
-  constraints (e.g., `Transaction` in Financial Crime)
-- **For compliance users:** Start with an entity that has regulatory scope
-  (e.g., `Party` with AML/KYC references)
-
-Walk through the entity detail file:
-
-1. **Heading structure** — H1 links to domain, H2 is entity name, H3 is `### Attributes`
-2. **YAML block** — Each attribute with name, type, required, identifier, description
-3. **Metadata fields** — existence, mutability, governance annotations
-4. **Diagram** — classDiagram showing the entity and its relationships
-
-Explain each element's purpose and connect to the user's frame of reference.
-
-### Step 3 — Highlight a Decision Point
-
-Every model contains design decisions. Surfacing one teaches the user *how to
-think* in MD-DDL, not just how to read it:
-
-**Simple Customer decisions:**
-
-- **Why is Party Role abstract?** — It exists only as a base for specialisation.
-  Customer inherits from it. This avoids duplicating common attributes.
-- **Why is Loyalty Tier an enum, not an entity?** — It has no attributes, no
-  relationships, no lifecycle of its own. It is just a set of labels.
-- **Why does Customer Preference have `existence: dependent`?** — A preference
-  cannot exist without a customer. It is owned, not independent.
-
-**Financial Crime decisions:**
-
-- **Why is Party abstract with Person and Company as concrete subtypes?** —
-  A party can be either a person or a company, but never just "a party". The
-  subtypes add meaningfully different attributes (Date of Birth vs Registration Number).
-- **Why is Transaction not dependent on Account?** — A transaction connects
-  a payer, payee, and payment initiator. It has its own lifecycle and identifiers.
-- **Why are there separate Payer, Payee, and Payment Initiator entities?** —
-  They are specialisations of Party Role with distinct attributes and rules.
-
-After presenting the decision, ask:
-
-> "In your domain, do you have a similar situation? Something that could be
-> modelled as either [option A] or [option B]?"
-
-### Step 4 — Connect to the Lifecycle
-
-Show how the example entity connects to other stages of the MD-DDL workflow:
-
-- **Relationships** — How does this entity relate to others? Show the relationship
-  YAML and explain cardinality and identifying vs non-identifying.
-- **Events** — What happens to this entity over time? Show an event definition
-  and explain the temporal tracking connection.
-- **Data Products** (Financial Crime only) — How does this entity appear in data
-  product declarations? Show how the product's `entities` list scopes generation.
-- **Sources** (Financial Crime only) — Where does this entity's data come from?
-  Show a source mapping and transformation rule.
-
-> "So the model is not just entities in isolation — it captures how they connect,
-> what happens to them, where their data comes from, and how they are published.
-> This is the full lifecycle that MD-DDL supports."
-
-### Step 5 — Build Your Own (Bridge to Agent Ontology)
-
-After the walkthrough, invite the user to describe a concept from their own domain:
-
-> "Now that you have seen how [example entity] is structured, think about a
-> concept from your own domain. Describe it in a couple of sentences and I will
-> sketch how it might look in MD-DDL."
-
-Sketch it as a **demonstration** — mark it clearly as an illustration:
-
-> "Here is how that might look — this is a sketch, not a production artifact.
-> When you are ready to build the real thing, Agent Ontology will walk you through
-> the full modelling process."
-
-If the user is ready:
-
-> "Would you like me to hand you off to Agent Ontology? I can formulate an opening
-> prompt based on what you have described."
-
----
-
-## Guided Exploration Patterns
-
-If the user does not want a linear walkthrough, support exploration:
-
-- **"Show me how inheritance works"** → Jump to Party → Person / Company in
-  Financial Crime. Show the Specializes column in the entities table, then the
-  entity detail files. Explain abstract vs concrete.
-- **"Show me governance metadata"** → Jump to domain metadata block. Show
-  classification, PII, retention, regulatory scope. Then show entity-level
-  governance in an entity detail file.
-- **"Show me a data product"** → Jump to `products/` in Financial Crime. Show
-  the canonical product and the analytics product. Explain product class, entities
-  list, schema type, masking.
-- **"Show me source mapping"** → Jump to `sources/` in Financial Crime. Show
-  a source declaration and a transformation file. Explain change models and
-  mapping types.
-- **"Show me an event"** → Jump to any event in `events/`. Show the YAML
-  structure. Explain actor, entity, and temporal tracking.
-
-Always connect back to the user's archetype and domain when exploring.
-
----
-
-## Brownfield Adoption Walkthrough
-
-When the user asks about brownfield adoption, migration from existing systems,
-or how the adoption maturity model works in practice, walk through this
-narrative using the Brownfield Retail example.
-
-### Narrative: From Star Schema to Declarative MD-DDL
-
-**Location:** `examples/Brownfield Retail/`
-
-This example shows a realistic brownfield adoption journey for a retail
-domain that starts with an existing Snowflake data warehouse star schema.
-
-#### Phase 1 — Document Existing State (Level 1: Documented)
-
-Walk through the `baselines/` folder:
-
-- `baselines/dimensional/fact_sales.md` — an existing star schema fact table
-  documented with the dimensional baseline template
-- `baselines/dimensional/dim_product.md` — a dimension table documented
-- `baselines/dimensional/dim_store.md` — another dimension
-- `baselines/etl/daily_sales_load.md` — the existing ETL pipeline documented
-- `baselines/catalog/collibra_product.md` — governance catalog metadata
-
-Highlight:
-- Each file has the required `baseline:` metadata block
-- Type-specific YAML captures the structure (columns, grain, dimensions)
-- Free-form body captures context (business rules, quality issues)
-- The domain's `adoption.maturity` is `documented`
-
-#### Phase 2 — Create Canonical Entities (Level 2: Mapped)
-
-Walk through the `entities/` folder:
-
-- `entities/sale.md` — canonical entity derived from `fact_sales`
-- `entities/product.md` — canonical entity derived from `dim_product`
-- `entities/store.md` — canonical entity derived from `dim_store`
-
-Highlight:
-- Entity names are business-semantic (Sale, not fact_sales)
-- Attributes use natural language (not snake_case)
-- Technical/audit columns from the star schema are excluded
-- Source transform detail in `sources/pos-system/` defines the lineage from baseline fields to canonical attributes
-
-#### Phase 3 — Add Governance (Level 3: Governed)
-
-Show how governance metadata is added to entities and the domain:
-
-- Classification, PII markers, retention rules
-- Regulatory scope on the domain
-- Domain review passes
-
-#### Phase 4 — Generate and Reconcile (Level 3 → 4 transition)
-
-Explain the reconciliation process:
-
-- Agent Artifact generates a star schema from the canonical model
-- The generated schema is compared against the existing `fact_sales` baseline
-- Differences are reviewed: some intentional (improved types, removed audit
-  columns), some requiring model updates
-- Baseline files marked `status: superseded`
-
-> "This is the adoption journey from documented existing state to declarative
-> MD-DDL — each phase builds on the last, and the baseline files are
-> eventually superseded by the canonical model."
+Check the domain's `adoption` metadata for its current maturity rather than assuming it.

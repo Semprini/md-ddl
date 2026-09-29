@@ -27,7 +27,7 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Descriptio
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | AccountNumber | Text | 34 | | | no | Account reference number | Account.Account Identifier, Account.Account Number
 2 | AccountState | Text | 20 | | | yes | Account servicing state | [Transform: Map Account Status](#transform-map-account-status)
-3 | ProductCode | Text | 30 | | | yes | Product the account is an instance of | Product.Product Identifier
+3 | ProductCode | Text | 30 | | | yes | Product the account is an instance of | Reference: Product
 
 ##### Transform: Map Account Status
 

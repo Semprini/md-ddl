@@ -133,8 +133,11 @@ produces:
   - entity: Party · Company
     Party Identifier: "P-1004"
     Party Status: Under Review
+  - entity: Customer
+    cardinality: 0
 notes: >
-  Archived matches no case, so the fallback applies. Under Review is deliberate: an unknown
+  Archived matches no case, so the fallback applies. CustomerNumber isn't given, so it's
+  null and no Customer is produced. Under Review is deliberate: an unknown
   status on a compliance-relevant field is escalated, not guessed.
 ```
 
@@ -179,12 +182,54 @@ interim:
         Risk Review Required: null
         Enhanced Due Diligence Trigger: null
 notes: >
-  Fan-in: the three sources contribute disjoint attributes to the same Party and Customer,
+  Fan-in: two sources (three tables) contribute disjoint attributes to the same Party and Customer,
   so no reconciliation is needed. SAP rows carry the enterprise party identifier, and the
   customer role identifier is derived from it the same way on both sides. Until SAP
   arrives, the screening and risk attributes are null. The Canonical Party product
   declares eventual consistency with a nullable-staging null strategy, so these interim
   rows are visible in staging but not in the converged view.
+```
+
+```yaml
+example: A person assembled from CRM account, CRM contact, and SAP screening
+given:
+  - from: Salesforce CRM · Account
+    row:
+      ExternalPartyId: "P-1006"
+      RecordStatus: "Active"
+      LegalEntityName: null
+  - from: Salesforce CRM · Contact
+    row:
+      PartyExternalId: "P-1006"
+      FirstName: "Lena"
+      LastName: "Kowalski"
+      CompliancePepFlag: "N"
+  - from: SAP Fraud Management · SanctionsScreening
+    row:
+      PartyExternalId: "P-1006"
+      ResultCode: "CLEAR"
+produces:
+  - entity: Party · Person
+    Party Identifier: "P-1006"
+    Party Status: Active
+    Given Name: "Lena"
+    Family Name: "Kowalski"
+    Legal Name: "Lena Kowalski"
+    Politically Exposed Person Status: Not PEP
+    Sanctions Screen Status: Clear
+interim:
+  - after: 1
+    produces:
+      - entity: Party · Person
+        Party Identifier: "P-1006"
+        Party Status: Active
+        Legal Name: null
+        Sanctions Screen Status: null
+notes: >
+  The Account row establishes the Person, because there's no legal entity name. The Contact
+  row adds the personal details and SAP adds the screening outcome, both matched on the same
+  party identifier (both are contributing entries). Before they arrive, the Person exists
+  with only its CRM status.
 ```
 
 ##### Open Decisions

@@ -26,14 +26,14 @@ produces:
 Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Description | Destination
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | Id | Text | 18 | | | no | Salesforce record identifier | Customer Preferences.Preference Identifier
-2 | PartyExternalId | Text | 40 | | | no | Enterprise party identifier of the customer | [Transform: Derive Customer Role Identifier](#transform-derive-customer-role-identifier)
+2 | PartyExternalId | Text | 40 | | | no | Enterprise party identifier of the customer | Reference: Customer
 3 | PreferredChannelCode | Text | 10 | | | yes | Preferred communication channel code | [Transform: Map Contact Preference](#transform-map-contact-preference)
 4 | MarketingOptInFlag | Text | 1 | | | yes | Opt-in indicator for marketing messages (Y/N) | [Transform: Map Marketing Consent](#transform-map-marketing-consent)
 5 | EffectiveDate | Date | | | | no | Date the preferences took effect | Customer Preferences.Effective From
 
 ##### Transform: Derive Customer Role Identifier
 
-Links the preferences to the Customer role, derived from the enterprise party identifier exactly as the Account table derives it.
+Computes the key of the existing Customer role these preferences belong to, exactly as the Account table derives it. It's used only in `references`: it identifies the Customer, and never creates or updates one.
 
 ```yaml
 type: derived
@@ -101,7 +101,7 @@ notes: The preferences attach to the Customer role CUST-P-1001.
 example: No consent answer recorded
 given:
   Id: "a0P000000000002"
-  PartyExternalId: "P-1002"
+  PartyExternalId: "P-1003"
   PreferredChannelCode: "NONE"
   MarketingOptInFlag: null
   EffectiveDate: "2024-05-20"

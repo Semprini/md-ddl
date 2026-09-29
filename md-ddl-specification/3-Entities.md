@@ -101,6 +101,8 @@ governance:
 ```
 ````
 
+An entity that is never instantiated directly — only through its subtypes — declares `abstract: true` in its YAML. The `<<abstract>>` stereotype in the diagram renders that declaration; as everywhere, the YAML is authoritative. Sources that populate an abstract entity's attributes must bind them to a concrete subtype (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)).
+
 ### Governance Metadata Schema
 
 Governance metadata is declared at the domain level (in the `## Metadata` block) and optionally overridden per entity (in a `governance:` block within the entity's definition). Entities inherit all governance fields from the domain. Include a `governance:` block on an entity only when specifying an override or stricter requirement than the domain default.

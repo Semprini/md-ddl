@@ -6,7 +6,7 @@
 
 #### PaymentParties
 
-The debtor and creditor of a payment. One row produces both roles.
+The debtor and creditor of a payment. One row produces both roles, each keyed on its party.
 
 ##### Entity Fan-Out
 
@@ -14,18 +14,16 @@ The debtor and creditor of a payment. One row produces both roles.
 produces:
   - entity: Payer
     cardinality: 1
-    identity:
-      field: PaymentParties.DebtorRoleId
-      maps_to: Payer · Role Identifier
+    identity: Derive Payer Role Identifier
     references:
+      Party: PaymentParties.DebtorPartyId
       Transaction: PaymentParties.PaymentId
 
   - entity: Payee
     cardinality: 1
-    identity:
-      field: PaymentParties.CreditorRoleId
-      maps_to: Payee · Role Identifier
+    identity: Derive Payee Role Identifier
     references:
+      Party: PaymentParties.CreditorPartyId
       Transaction: PaymentParties.PaymentId
 ```
 
@@ -33,9 +31,33 @@ produces:
 
 Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Description | Destination
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-1 | PaymentId | Text | 64 | | | no | Payment the parties belong to | Transaction.Transaction Identifier
-2 | DebtorRoleId | Text | 64 | | | no | Debtor role identifier in payment context | Payer.Role Identifier
-3 | CreditorRoleId | Text | 64 | | | no | Creditor role identifier in payment context | Payee.Role Identifier
+1 | PaymentId | Text | 64 | | | no | Payment the parties belong to | Reference: Transaction
+2 | DebtorPartyId | Text | 40 | | | no | Enterprise party identifier of the debtor | [Transform: Derive Payer Role Identifier](#transform-derive-payer-role-identifier)
+3 | CreditorPartyId | Text | 40 | | | no | Enterprise party identifier of the creditor | [Transform: Derive Payee Role Identifier](#transform-derive-payee-role-identifier)
+
+##### Transform: Derive Payer Role Identifier
+
+```yaml
+type: derived
+target: Payer · Role Identifier
+expression: "'PAYER-' + Debtor Party Id"
+inputs:
+  Debtor Party Id:
+    field: PaymentParties.DebtorPartyId
+```
+
+##### Transform: Derive Payee Role Identifier
+
+```yaml
+type: derived
+target: Payee · Role Identifier
+expression: "'PAYEE-' + Creditor Party Id"
+inputs:
+  Creditor Party Id:
+    field: PaymentParties.CreditorPartyId
+```
+
+The prefixes keep each role type's identifiers apart in the shared Party Role key space.
 
 ##### Worked Examples
 
@@ -43,14 +65,15 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Descriptio
 example: One row yields the debtor and creditor of a payment
 given:
   PaymentId: "PAY-900001"
-  DebtorRoleId: "PAYER-5501"
-  CreditorRoleId: "PAYEE-7702"
+  DebtorPartyId: "P-1001"
+  CreditorPartyId: "P-1003"
 produces:
   - entity: Payer
-    Role Identifier: "PAYER-5501"
+    Role Identifier: "PAYER-P-1001"
   - entity: Payee
-    Role Identifier: "PAYEE-7702"
+    Role Identifier: "PAYEE-P-1003"
 notes: >
-  Each role references PAY-900001, which has exactly one Payer and one Payee (Transaction
-  Has Debtor and Transaction Has Creditor are many-to-one from Transaction).
+  Each role belongs to its party and references PAY-900001, which has exactly one Payer and
+  one Payee (Transaction Has Debtor and Transaction Has Creditor are many-to-one from
+  Transaction).
 ```

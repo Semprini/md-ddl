@@ -14,6 +14,7 @@ Personal details for the individual behind a person account. Each Contact row ad
 produces:
   - entity: Party · Person
     cardinality: 1
+    contributes: true
     identity:
       field: Contact.PartyExternalId
       maps_to: Party · Party Identifier

@@ -176,37 +176,26 @@ Use the source systems' declared `change_model` values to guide the answer:
 - If all sources are `real-time-cdc` and the product can wait for all → **strong**
 - If sources have mixed cadences (e.g., one `real-time-cdc`, one `batch-intraday`) → **eventual**
 
-Record the decision as a comment in the product YAML:
+If the user chooses eventual consistency, also decide the null strategy for rows where
+some source attributes have arrived and others haven't:
+
+Strategy | Physical effect
+--- | ---
+`nullable-staging` | Partial rows land with nulls; a converged view enforces completeness for consumers
+`reject-partial` | Rows are held until every source has contributed; `NOT NULL` on the base structure (effectively strong)
+`nullable-final` | The published structure stays nullable; consumers handle incomplete rows
+
+Declare both in the product YAML (`9-Data-Products.md § SLA Declaration`):
 
 ```yaml
-# Consistency posture: eventual (convergence SLA: < 1 hour)
-# Consistency posture: strong (synchronous propagation required)
+consistency:
+  posture: eventual
+  null_strategy: nullable-staging
 ```
 
-#### Null Strategy Under Eventual Consistency
-
-If the user chooses eventual consistency, also decide the null strategy for
-partially-received rows — rows where some source attributes have arrived but
-others have not yet propagated:
-
-| Strategy | Description | Physical schema implication |
-| --- | --- | --- |
-| `nullable-staging` | Partial rows inserted with `NULL`s; a view enforces completeness for consumers | `NOT NULL` on view, `NULL` in staging table |
-| `reject-partial` | Application blocks insert until all sources have contributed | `NOT NULL` on base table — effectively strong consistency |
-| `nullable-final` | Schema accepts `NULL` permanently; convergence window is advisory | `NULL` allowed on base table; consumers handle nulls |
-
-Add the null strategy as a comment alongside the consistency posture:
-
-```yaml
-# Null strategy: nullable-staging (partial rows in base; converged view for consumers)
-```
-
-**Important:** Communicate both the consistency posture and null strategy to
-Agent Artifact in your handoff note. Agent Artifact's DDL skills generate `NOT NULL`
-constraints from the entity's `not_null` attribute declarations — but under eventual
-consistency with `nullable-staging`, those columns must be nullable in the base
-table and enforced only at the view layer. Without this signal, Agent Artifact
-will generate physically incorrect DDL.
+Agent Artifact and Agent Test read this field to decide where `NOT NULL` goes: an attribute
+the model declares `not_null` stays nullable in a `nullable-staging` base structure. Without
+it, generated DDL is wrong for late-arriving attributes.
 
 #### SLA and Refresh
 

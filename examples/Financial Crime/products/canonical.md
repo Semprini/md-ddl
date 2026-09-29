@@ -46,8 +46,10 @@ governance:
     named integration and regulatory reporting consumers. Consumer-aligned products built
     on it apply masking.
 
-# Consistency posture: eventual (convergence SLA: < 1 hour)
-# Null strategy: nullable-staging (partial rows in staging; consumers read the converged view)
+consistency:
+  posture: eventual
+  null_strategy: nullable-staging
+
 sla:
   freshness: "< 1 hour"
   availability: "99.95%"

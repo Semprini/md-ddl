@@ -1153,6 +1153,7 @@ def build_model_index(docs: list[Doc]) -> ModelIndex:
 # ---------------------------------------------------------------------------
 
 TARGET_SEP_RE = re.compile(r"\s*[·•]\s*")
+REFERENCE_DEST_RE = re.compile(r"^Reference:\s*(?P<entity>.+?)\s*$", re.IGNORECASE)
 DIRECT_DEST_RE = re.compile(r"^(?P<entity>[A-Za-z][\w ]*?)\.(?P<attr>[A-Za-z][\w ()/-]*)$")
 
 
@@ -1205,6 +1206,12 @@ def check_transform_targets(report: Report, doc: Doc, index: ModelIndex) -> None
             seen_rows.add(row.line)
             for part in (p.strip() for p in column(row, "Destination").split(",")):
                 if not part or "[" in part:
+                    continue
+                ref = REFERENCE_DEST_RE.match(part)
+                if ref:
+                    if normalise(ref.group("entity")) not in index.entities:
+                        report.error(doc.path, row.line, "transform-target-resolve",
+                                     f"'{part}': entity '{ref.group('entity')}' is not declared in this domain")
                     continue
                 m = DIRECT_DEST_RE.match(part)
                 if m:

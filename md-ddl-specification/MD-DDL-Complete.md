@@ -587,6 +587,8 @@ governance:
 ```
 ````
 
+An entity that is never instantiated directly — only through its subtypes — declares `abstract: true` in its YAML. The `<<abstract>>` stereotype in the diagram renders that declaration; as everywhere, the YAML is authoritative. Sources that populate an abstract entity's attributes must bind them to a concrete subtype (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)).
+
 ### Governance Metadata Schema
 
 Governance metadata is declared at the domain level (in the `## Metadata` block) and optionally overridden per entity (in a `governance:` block within the entity's definition). Entities inherit all governance fields from the domain. Include a `governance:` block on an entity only when specifying an override or stricter requirement than the domain default.
@@ -1473,12 +1475,12 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which produced instance satisfies a relationship to another produced instance.
+`references` | Which instance satisfies each relationship from this entry to another entity. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A reference never creates the referenced instance.
 `contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
 
-A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype.
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype. A worked example for such a table assumes the instance exists and asserts only the attributes the row contributes; a fan-in example shows the establishing and contributing rows together.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -1513,6 +1515,14 @@ A source column may legitimately feed more than one canonical attribute — a ty
 ```
 
 The one-mapping-path constraint applies per *target attribute*, not per source column. Two rules may read the same column; two rules must not write the same attribute.
+
+##### Reference-only columns
+
+A column that only identifies a related instance — a parent's key used in `references` — populates no attribute of this table's entities. Its Destination is `Reference: <Entity>`, naming the entity it identifies:
+
+```markdown
+2|PARTY_ID|VARCHAR2|40|||NO|Owning party|Reference: Party
+```
 
 ##### Unmapped columns
 
@@ -1901,6 +1911,7 @@ Strategy | Behaviour
 `priority_non_null` | Take the highest-priority non-null value
 `priority_always` | Always take the highest-priority value, even if null
 `most_recent` | Take the value with the most recent timestamp; requires `timestamp_field` on each source
+`earliest` | Take the value with the earliest timestamp; requires `timestamp_field` on each source. Suits immutable reference data, where the first recorded value stands.
 `consensus` | Take a value only when all sources agree; otherwise null
 
 These strategies cover the common cases and are not a closed list — an organisation may declare another strategy, described in the transformation's prose, and the generating agent should confirm its interpretation rather than guess.
@@ -1959,7 +1970,9 @@ Key | Purpose
 `normalise` | Normalisation applied to each field before composition: `trim`, `uppercase`, `lowercase`, `collapse_whitespace`, `strip_punctuation`.
 `prefix` | Literal prefix distinguishing keys from different branches, so a composite key can never collide with an external-identifier key.
 
-`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `consensus` — with `most_recent` requiring a `timestamp_field`. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+The key is composed as the `prefix`, a colon, and the normalised `using` values joined with `|` in declaration order. A null value contributes an empty string. The Address example above therefore yields `DPID:1234567` or `COMP:12 HARBOUR ST|6011|NZ`.
+
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
 
 An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
 
@@ -2154,7 +2167,7 @@ Key | Purpose
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
-Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump.
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way.
 
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 
@@ -2236,7 +2249,7 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype, or by a `contributes: true` entry when the source only adds attributes to an instance whose subtype another source establishes.
 
-8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
+8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a transformation must declare how it is derived. A `derived` transformation suffices when the identifier comes deterministically from the row itself (for example a prefix plus a source key) and no two rows describe the same instance. Where rows must collapse into one instance, a `deduplication` transformation is required, with its conflict resolution.
 
 9. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 
@@ -2440,6 +2453,7 @@ Field | Purpose
 `governance` | Governance overrides that differ from domain defaults, and the product's `masking` rules. Only declare fields that differ. `masking` is a list under `governance`: each entry names a product attribute and a masking strategy (see [Masking Strategies](#masking-strategies)).
 `sla` | Service-level attributes (freshness, availability, latency).
 `refresh` | Refresh cadence: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
+`consistency` | How the product converges when its sources update at different speeds: `posture` (`strong` or `eventual`) and, for eventual, `null_strategy`. See [SLA Declaration](#sla-declaration).
 
 #### Source-Aligned Metadata
 
@@ -2677,6 +2691,27 @@ sla:
 ```
 
 SLA fields are informational — they document expectations but do not generate runtime enforcement. Monitoring and alerting are orchestration concerns outside MD-DDL's scope.
+
+A product fed by sources with different change models declares its consistency posture, because it decides the physical schema:
+
+```yaml
+consistency:
+  posture: eventual                 # strong | eventual
+  null_strategy: nullable-staging   # eventual only: nullable-staging | reject-partial | nullable-final
+```
+
+Posture | Meaning
+--- | ---
+`strong` | The product updates only once every contributing source has propagated. `freshness` is bounded by the slowest source.
+`eventual` | Sources propagate independently, and the product converges within `sla.freshness`.
+
+Null strategy | Physical effect
+--- | ---
+`nullable-staging` | Attributes that may arrive late are nullable in the base structure. Consumers read a converged view that enforces completeness.
+`reject-partial` | A row is held until every source has contributed. `NOT NULL` applies to the base structure.
+`nullable-final` | The published structure stays nullable, and consumers handle incomplete rows.
+
+Generation reads `consistency` to decide where `NOT NULL` constraints go: an attribute declared `not_null` in the model may be nullable in a `nullable-staging` base structure.
 
 ---
 

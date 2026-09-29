@@ -34,6 +34,7 @@ classDiagram
 ```
 
 ```yaml
+abstract: true
 existence: independent
 mutability: reference
 attributes:

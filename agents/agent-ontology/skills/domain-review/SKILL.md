@@ -51,8 +51,9 @@ mechanical tier: syntax, links, references, and representation agreement. Don't
 re-derive them by eye. Classify them by what they break:
 
 - **Critical:** errors that stop the YAML being read or resolved: `yaml-syntax`,
-  `entity-references`, `domain-version`, and `link-resolve` on a detail or type
-  reference.
+  `entity-references`, `domain-version`, `link-resolve` on a detail or type reference,
+  `transform-target-resolve`, and `transform-case-values` (the last two break pipeline
+  generation, not DDL).
 - **Major:** errors where a representation disagrees with the YAML:
   `domain-diagram-coverage`, `domain-link-consistency`, `entity-heading-link`,
   `entity-diagram-links`, `entity-enum-in-diagram`, `entity-attribute-consistency`, and
@@ -183,7 +184,7 @@ This is the part a structural check misses. Ask whether a generating agent would
 
 - **Fan-out declared** — wherever one source row produces more than one canonical instance, an `Entity Fan-Out` section with a `produces:` block exists
 - **Abstract targets bound** — any transform targeting an attribute on an abstract entity has a fan-out entry binding it to a concrete subtype
-- **Identity derived** — wherever an instance identifier is not a direct map from a source column, a `deduplication` transform declares how it is derived
+- **Identity derived** — wherever an instance identifier is not a direct map from a source column, a transform declares how it is derived: `derived` when it comes deterministically from the row, `deduplication` when rows must collapse into one instance
 - **Survivorship declared** — wherever rows can merge, a `survivorship` rule exists; without one, output is order-dependent
 - **Key branches exhaustive** — a `deduplication` key has a branch covering the case where the external identifier is absent
 - **Evaluation order declared** — wherever `conditional` cases can overlap, `evaluation` is stated

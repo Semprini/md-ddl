@@ -265,12 +265,12 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which produced instance satisfies a relationship to another produced instance.
+`references` | Which instance satisfies each relationship from this entry to another entity. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A reference never creates the referenced instance.
 `contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
 
-A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype.
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype. A worked example for such a table assumes the instance exists and asserts only the attributes the row contributes; a fan-in example shows the establishing and contributing rows together.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -305,6 +305,14 @@ A source column may legitimately feed more than one canonical attribute — a ty
 ```
 
 The one-mapping-path constraint applies per *target attribute*, not per source column. Two rules may read the same column; two rules must not write the same attribute.
+
+##### Reference-only columns
+
+A column that only identifies a related instance — a parent's key used in `references` — populates no attribute of this table's entities. Its Destination is `Reference: <Entity>`, naming the entity it identifies:
+
+```markdown
+2|PARTY_ID|VARCHAR2|40|||NO|Owning party|Reference: Party
+```
 
 ##### Unmapped columns
 

@@ -27,7 +27,7 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Descriptio
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | PaymentId | Text | 64 | | | no | Unique payment identifier | Transaction.Transaction Identifier
 2 | SettlementAmount | Decimal | | 18 | 4 | no | Settled payment amount | Transaction.Amount
-3 | SettlementCurrency | Text | 3 | | | no | ISO 4217 currency code | Currency.Currency Code
+3 | SettlementCurrency | Text | 3 | | | no | ISO 4217 currency code | Reference: Currency
 4 | ExecutionDateTime | DateTime | | | | yes | When the payment was executed | Transaction.Settlement Date Time
 5 | PaymentStatus | Text | 20 | | | yes | Payment lifecycle status | [Transform: Map Transaction Status](#transform-map-transaction-status)
 

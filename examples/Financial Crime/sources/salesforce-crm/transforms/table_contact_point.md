@@ -34,7 +34,7 @@ A blank Destination means the column is deliberately not mapped.
 Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Description | Destination
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | Id | Text | 18 | | | no | Salesforce record identifier | Contact Address.Contact Address Identifier
-2 | PartyExternalId | Text | 40 | | | no | Enterprise party identifier of the owning account | Party.Party Identifier
+2 | PartyExternalId | Text | 40 | | | no | Enterprise party identifier of the owning account | Reference: Party
 3 | Street | Text | 255 | | | no | Street line | Address.Address Line 1, [Transform: Address Uniqueness Merge](#transform-address-uniqueness-merge)
 4 | City | Text | 80 | | | yes | City or town | Address.City
 5 | State | Text | 80 | | | yes | State or region | Address.State Or Region
@@ -50,7 +50,7 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Descriptio
 
 ##### Transform: Address Uniqueness Merge
 
-Parties who share a physical address share one Address instance, which is what makes shared-address network analysis possible. The key is the normalised street, postcode, and country. When merged rows disagree on the other address fields, the most recently modified row wins.
+Parties who share a physical address share one Address instance, which is what makes shared-address network analysis possible. The key is the normalised street, postcode, and country. Address is immutable reference data, so when merged rows disagree on the other fields, the first recorded row's values stand.
 
 ```yaml
 type: deduplication
@@ -63,7 +63,7 @@ key:
     normalise: [trim, uppercase, collapse_whitespace]
     prefix: "ADDR"
 survivorship:
-  strategy: most_recent
+  strategy: earliest
   timestamp_field: ContactPoint.LastModifiedDate
 ```
 
@@ -134,7 +134,8 @@ given:
 produces:
   - entity: Address
     cardinality: 1
-    Address Line 1: " 12  harbour st "
+    Address Identifier: "ADDR:12 HARBOUR ST|6011|NZ"
+    Address Line 1: "12 Harbour St"
     Postcode: "6011"
     Country: "NZ"
   - entity: Contact Address
@@ -148,10 +149,10 @@ produces:
     Verification Status: Unverified
 notes: >
   After trimming, uppercasing, and collapsing whitespace, both streets normalise to
-  "12 HARBOUR ST", so the rows share one Address key and one Address instance. Both
-  Contact Addresses reference it. Survivorship keeps the most recently modified row's
-  values, so Address Line 1 is the second row's raw text: normalisation applies to the
-  key, not the stored value.
+  "12 HARBOUR ST", so the rows share the key ADDR:12 HARBOUR ST|6011|NZ and one Address
+  instance, which both Contact Addresses reference. Survivorship is earliest, so the
+  first row's values stand and the second row's untidy spelling doesn't overwrite them:
+  normalisation shapes the key, not the stored value.
 ```
 
 ```yaml

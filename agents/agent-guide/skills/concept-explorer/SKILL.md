@@ -183,8 +183,7 @@ within a TTL (architect); a master record whose fields different feeds update
 1. Each source's `change_model` sets its expected lag.
 2. Bitemporal tracking on the entity records when each update arrived.
 3. The product's `sla.freshness` is the convergence window.
-4. The product records its consistency posture and null strategy (Agent Architect
-   product-design, Step 8).
+4. The product declares `consistency` (posture and null strategy).
 5. Fan-in worked examples with `interim` states pin what a partly converged instance
    looks like.
 

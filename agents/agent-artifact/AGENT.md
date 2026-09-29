@@ -87,7 +87,7 @@ temporal, enum, and inheritance strategies, and any assumptions and open questio
   nullability, and partitioning. Cypher includes constraint and index DDL, parameterised
   creation templates, and validation queries.
 - Where the product declares a consistency posture and null strategy, `NOT NULL` placement
-  follows it (Agent Architect product-design, Step 8).
+  follows it (the product's `consistency` field).
 
 ## Boundaries
 

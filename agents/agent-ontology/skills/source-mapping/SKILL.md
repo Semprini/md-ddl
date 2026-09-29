@@ -32,7 +32,7 @@ Apply this before declaring transform detail complete. It is the single most use
 For each source table, ask:
 
 1. **How many instances does one row produce?** If the answer is anything other than "exactly one, of one entity", an `Entity Fan-Out` section is required.
-2. **Where does each instance's identifier come from?** If it is not a direct map from a source column, a `deduplication` transformation must derive it.
+2. **Where does each instance's identifier come from?** If it is not a direct map from a source column, a transformation must derive it: `derived` when it follows deterministically from the row, `deduplication` when several rows describe the same instance.
 3. **When two rows describe the same thing, which one wins?** If merging is possible, a `survivorship` rule is required. Without it, output is order-dependent.
 4. **When two case predicates both match, which fires?** If cases can overlap, `evaluation` must be declared.
 5. **Does every referenced field exist in the declaration?** A predicate reading an undeclared field breaks lineage tracing.
@@ -177,6 +177,10 @@ binding. A transform targeting an abstract entity without a fan-out is a validat
 establishes (a screening system updating a Party the CRM created) declares `contributes: true`
 on its entry, matched on the same identity. It may then name the abstract entity, because it
 never creates the instance.
+
+**Reference-only columns.** A column that only identifies a related instance (a parent's
+key used in `references`) gets the Destination `Reference: <Entity>`. It never populates or
+creates that entity.
 
 **No joins between source tables.** Each row is mapped on its own. If a child table needs its
 parent's key to reference the right canonical instance, the extract must carry that key. Ask

@@ -26,7 +26,7 @@ produces:
 Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Description | Destination
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | CaseId | Text | 64 | | | no | Unique SAP alert case identifier | Transaction Alert.Alert Reference
-2 | PaymentId | Text | 64 | | | no | Payment identifier of the alerted transaction | Transaction.Transaction Identifier
+2 | PaymentId | Text | 64 | | | no | Payment identifier of the alerted transaction | Reference: Transaction
 3 | TxRiskScore | Decimal | | 18 | 6 | yes | Computed transaction ML/TF risk score | Transaction Alert.Financial Crime Risk Score
 4 | DecisionStatus | Text | 30 | | | yes | Alert workflow decision status | [Transform: Map Monitoring Outcome](#transform-map-monitoring-outcome)
 5 | RaisedAt | DateTime | | | | no | When the alert was raised | Transaction Alert.Raised Date Time

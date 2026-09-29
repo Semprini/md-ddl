@@ -6,7 +6,7 @@
 
 #### Initiation
 
-Who initiated a payment, and through which channel.
+Who initiated a payment, and through which channel. The channel is a fact about this payment, so it lands on the Transaction. The initiator is a Party Role of the initiating party, keyed on that party like every other role.
 
 ##### Entity Fan-Out
 
@@ -14,11 +14,17 @@ Who initiated a payment, and through which channel.
 produces:
   - entity: Payment Initiator
     cardinality: 1
-    identity:
-      field: Initiation.ActorRoleId
-      maps_to: Payment Initiator · Role Identifier
+    identity: Derive Initiator Role Identifier
     references:
+      Party: Initiation.ActorPartyId
       Transaction: Initiation.PaymentId
+
+  - entity: Transaction
+    cardinality: 1
+    contributes: true
+    identity:
+      field: Initiation.PaymentId
+      maps_to: Transaction · Transaction Identifier
 ```
 
 ##### Source Schema
@@ -26,16 +32,29 @@ produces:
 Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Description | Destination
 --- | --- | --- | --- | --- | --- | --- | --- | ---
 1 | PaymentId | Text | 64 | | | no | Payment the initiation belongs to | Transaction.Transaction Identifier
-2 | ActorRoleId | Text | 64 | | | no | Role identifier of the initiator | Payment Initiator.Role Identifier
-3 | ChannelCode | Text | 20 | | | yes | Channel where initiation occurred | [Transform: Map Initiation Channel](#transform-map-initiation-channel)
+2 | ActorPartyId | Text | 40 | | | no | Enterprise party identifier of the initiator | [Transform: Derive Initiator Role Identifier](#transform-derive-initiator-role-identifier)
+3 | ChannelCode | Text | 20 | | | yes | Channel where initiation occurred | [Transform: Map Transaction Channel](#transform-map-transaction-channel)
 
-##### Transform: Map Initiation Channel
+##### Transform: Derive Initiator Role Identifier
 
-API initiations come from third-party providers, so they map to Third Party in the domain's channel vocabulary.
+Initiator roles are keyed on the initiating party, like Customer, so the same party always has the same initiator role.
+
+```yaml
+type: derived
+target: Payment Initiator · Role Identifier
+expression: "'INIT-' + Actor Party Id"
+inputs:
+  Actor Party Id:
+    field: Initiation.ActorPartyId
+```
+
+##### Transform: Map Transaction Channel
+
+API initiations come from third-party providers, so they map to Third Party.
 
 ```yaml
 type: conditional
-target: Payment Initiator · Initiation Channel
+target: Transaction · Transaction Channel
 evaluation: exclusive
 source:
   field: Initiation.ChannelCode
@@ -53,10 +72,14 @@ fallback: null
 example: Payment initiated through a third-party API
 given:
   PaymentId: "PAY-900001"
-  ActorRoleId: "INIT-3301"
+  ActorPartyId: "P-1001"
   ChannelCode: "API"
 produces:
   - entity: Payment Initiator
-    Role Identifier: "INIT-3301"
-    Initiation Channel: Third Party
+    Role Identifier: "INIT-P-1001"
+  - entity: Transaction
+    Transaction Identifier: "PAY-900001"
+    Transaction Channel: Third Party
+notes: >
+  The Transaction already exists from PaymentEvent; this row contributes its channel.
 ```

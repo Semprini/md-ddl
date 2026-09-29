@@ -52,6 +52,7 @@ classDiagram
 ```
 
 ```yaml
+abstract: true
 existence: independent
 mutability: slowly_changing
 temporal:

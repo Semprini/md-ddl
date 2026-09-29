@@ -127,6 +127,14 @@ affected_products:
   identifier on every Salesforce and SAP table, and the payment identifier on Temenos party and
   initiation tables.
 - Event payload attributes use natural-language names.
+- Party and Party Role declare `abstract: true` in YAML, and Canonical Party declares its
+  `consistency` (eventual, nullable-staging) as a field.
+- Relationship-key columns use the `Reference: <Entity>` Destination. SAP and Salesforce
+  Contact rows are contributing entries on instances that Salesforce Account establishes.
+- Address merges keep the earliest recorded values (Address is immutable reference data).
+- The payment channel is recorded on Transaction (Transaction Channel), not on the reusable
+  Payment Initiator role. Payer, Payee, and Payment Initiator roles are keyed on their parties
+  (`PAYER-`, `PAYEE-`, `INIT-` prefixes), as Customer is (`CUST-`).
 
 ### Removed
 

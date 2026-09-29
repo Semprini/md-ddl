@@ -39,7 +39,7 @@ Also read, without editing:
 
 - `../agent-artifact/references/generation-semantics.md`: the temporal structures your temporal tests assert
 - `../agent-ontology/skills/domain-review/SKILL.md`, Model Readiness Definition: a Not Ready model isn't ready to test
-- `../agent-architect/skills/product-design/SKILL.md`, Step 8: consistency posture and null strategy, which decide where `NOT NULL` is asserted
+- the product's `consistency` field (`9-Data-Products.md § SLA Declaration`): posture and null strategy, which decide where `NOT NULL` is asserted
 
 ---
 

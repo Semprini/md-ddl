@@ -102,8 +102,9 @@ generated model. Never change the test or the worked example.
 
 ## Limits
 
-- Nothing you generate is executed by you. Agent Test runs dbt output locally; other DDL
-  is written for the dialect but not run.
+- Generated output isn't proven until it runs. When a database or runtime is available,
+  run the DDL or code and report the result. Otherwise say it's unexecuted. Agent Test
+  owns running dbt projects against worked examples.
 - Clustering, partitioning, and indexing choices are heuristics that need real volumes and workloads.
 - Fact, dimension, and bridge assignments and inheritance strategies follow metadata. Only
   someone who knows the analytical use cases can confirm them.

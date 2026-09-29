@@ -15,11 +15,12 @@ Ask which jurisdictions and frameworks apply, then load the matching files:
 
 Jurisdiction | Files
 --- | ---
-Australia and NZ banking | `apra.md`, `rbnz.md`, `basel.md`, `fatf.md`
+Australian banking | `apra.md`, `austrac.md`, `basel.md`, `fatf.md`
+NZ banking (incl. NZ subsidiaries of Australian banks) | `rbnz.md`, `basel.md`, `fatf.md`, plus `apra.md` for the parent
 EU | `gdpr.md`, `basel.md`, `eba.md`
 US banking | `federal-reserve.md`, `occ.md`, `fdic.md`, `basel.md`
 US general | `ccpa.md`, `sox.md`
-AML/CTF (global) | `fatf.md`
+AML/CTF (global) | `fatf.md`; add the local AML regulator's file where one exists (`austrac.md` for Australia)
 US healthcare | `hipaa.md`
 Other healthcare | (no file yet) Say so, and don't infer obligations.
 

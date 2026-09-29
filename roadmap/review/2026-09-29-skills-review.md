@@ -192,3 +192,51 @@ are corrections more than cuts.
 - `9-Data-Products.md` lists `masking` as a top-level optional field but nests it under
   `governance` in its example. The skills follow the example. The spec should settle on
   one of them.
+
+---
+
+## Agent Governance
+
+File | Before | After
+--- | --- | ---
+compliance-audit | 531 | 214
+regulatory-compliance | 214 | 102
+standards-conformance | 164 | 160
+**Total** | **909** | **476**
+
+**Bugs**
+
+- GO1: compliance-audit contradicted the spec's inheritance model. It treated an entity
+  with no `governance:` block as a gap, required `classification` and `pii` in every
+  entity block, and flagged "entity-level classification not declared" as advisory. Under
+  `3-Entities.md § Governance Metadata Schema`, blocks hold overrides only and
+  inheriting is correct. An audit run as written would have produced false findings on
+  every well-modelled domain.
+- GO2: compliance-audit rated "PII declared but `pii_fields` empty" as Critical. The spec
+  makes `pii_fields` optional, with attribute-level `pii: true` as the default mechanism,
+  so the product masking check that read only `pii_fields` could miss PII. Both now
+  accept either mechanism.
+- GO3: regulatory-compliance presented a parallel governance schema. Extension fields
+  (`data_residency`, `audit_all_access`, `breach_notification_required`,
+  `notification_timeframe`, `cross_border_transfer`) appeared as if standard. It also
+  invented one-off structures (`apra_reporting.arf_320_0`, `aml_relevant`,
+  `screening_lists`, `dual_reporting`) instead of the spec's `regulatory_reporting` and
+  `compliance_relevance`, which no Governance skill used. The skill now separates the
+  spec's core fields from labelled extension fields and routes reports and AML scope
+  through the spec fields.
+- GO4: regulatory-compliance's domain example wrapped the defaults in `governance:`. The
+  spec places them at the top level of the domain metadata.
+- GO5: standards-conformance loaded standards from `industry_standards/bian/`, `fhir/r4/`,
+  and `tmforum/v4/`. Those raw snapshots are excluded from the PyPI package, so the paths
+  don't exist in installed projects. It now uses the shipped guidance under Agent
+  Ontology's standards-alignment skill, and treats a name missing from the index as a
+  finding.
+- GO6: compliance-audit's levels ran 1, 2, 3, 5, then 4 after the report section. The
+  description also had a typo ("gulatory").
+
+**Follow-up (spec)**
+
+- The four extension fields used consistently across the regulator files and the audit
+  (`data_residency`, `audit_all_access`, `breach_notification_required`,
+  `notification_timeframe`) are candidates for `3-Entities.md § Governance Metadata
+  Schema`. Until then, they're a documented organisational extension.

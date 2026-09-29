@@ -1,531 +1,214 @@
 ---
 name: compliance-audit
-description: Systematically evaluate MD-DDL domain and entity files for governance metadata completeness and correctness against loaded gulatory frameworks. Use when auditing a domain file or corpus for compliance gaps, when the user asks "is this compliant" or "what's missing", when preparing a gap report, or after a regulatory monitoring pass identifies a potential impact. Always load the regulatory-compliance skill and relevant regulator files before running an audit — this skill defines how to audit, not what the requirements are.
+description: Use to evaluate MD-DDL domain, entity, and product files for governance completeness and correctness against loaded regulatory frameworks, when the user asks "is this compliant?", "what's missing?", or for a gap report, and after a regulatory monitoring pass flags a change. Defines how to audit; the requirements come from the regulatory-compliance skill and its regulator files, which must be loaded first.
 ---
 
 # Skill: Compliance Audit
 
-Defines the systematic process for evaluating MD-DDL files against regulatory
-requirements. This skill does not contain regulatory requirements — those live
-in `skills/regulatory-compliance/` and its regulator reference files. Load those
-first, then use this skill to drive the audit.
+Audit governance metadata against the regulator files loaded through the
+regulatory-compliance skill. That skill also defines the field schema: the spec's core
+fields plus the labelled extension fields. This is a quality review, not a lint pass
+(`1-Foundation.md § Validation Model`).
 
-**Validation model alignment:** This audit is a quality review, not a lint pass. It distinguishes between two categories of governance concern:
+Two principles govern every finding:
 
-- **Structurally missing governance** — the YAML key is completely absent (e.g., no `governance:` block at all, no `classification` field). This is a pre-flight-adjacent concern: a missing structural anchor prevents downstream processing. Flag as a gap.
-- **Substantively incomplete governance** — the field exists but its value may be insufficient (e.g., `retention: "7 years"` that may not meet a specific regulatory minimum). This is a quality concern requiring judgment. Flag as advisory with a rationale.
-
-**On vocabulary deviations:** When a domain uses non-standard governance vocabulary (e.g., `phi` instead of `pii`, `data_sensitivity` instead of `classification`), flag it as a **potential spec vocabulary gap** — not a compliance failure. Note what the standard vocabulary is and invite the owner to confirm the intent. Do not assign Critical severity for vocabulary differences unless the deviation creates actual regulatory exposure (e.g., a field is completely missing, not just renamed).
-
-See `md-ddl-specification/1-Foundation.md` "Validation Model" for the normative definition of what constitutes a mechanical check versus an agent-driven review.
-
----
-
-## Pre-Audit Setup
-
-Before beginning any audit, complete this setup. Do not skip steps.
-
-### 1. Establish the regulatory frame
-
-Confirm with the user which jurisdictions and frameworks apply. Do not infer
-jurisdiction from domain content alone — a Financial Crime domain at an
-Australian bank and the same domain at a US bank have different obligations.
-
-If `regulatory_scope` is declared in the domain metadata, use it as the starting
-point but ask the user to confirm it is complete:
-
-> "Your domain metadata declares [frameworks]. Before I audit, can you confirm
-> this list is complete and current? Are there jurisdictions or frameworks that
-> apply but aren't listed here?"
-
-If `regulatory_scope` is absent, ask directly:
-
-> "I don't see a `regulatory_scope` declared in this domain's metadata. Before
-> I can audit effectively, I need to know which regulatory frameworks apply.
-> What jurisdictions does this data operate under?"
-
-### 2. Load regulator files
-
-Load only the regulator files that apply. Reference
-`skills/regulatory-compliance/SKILL.md` for the jurisdiction-to-file mapping.
-Confirm which files are loaded before proceeding:
-
-> "I've loaded requirements for: [list]. I'll audit against these frameworks only.
-> Anything not covered by these files is out of scope for this audit."
-
-### 3. Establish corpus scope
-
-Determine what is being audited:
-
-- **Single domain file** — audit the domain metadata and all entity references
-  within it, then follow links to entity detail files if available
-- **Entity detail file only** — audit that entity in isolation; note that
-  domain-level context may be missing
-- **Full corpus** — audit all domain files; treat each domain as a separate
-  audit scope with its own regulatory frame
-
-For full corpus audits, process one domain at a time and produce a gap report
-per domain, then a summary across all domains.
+- **Inheritance is correct by default.** Domain metadata sets the posture, and an entity
+  or product without a `governance:` block inherits it. A missing block is a gap only
+  when that entity has obligations the domain defaults don't satisfy.
+- **Vocabulary deviations are observations.** `phi` for `pii`, or `data_sensitivity` for
+  `classification`, is a "potential spec vocabulary gap", not a failure. It's never
+  Critical unless an obligation is left unrepresented.
 
 ---
 
-## The Three Governance Levels
+## Setup
 
-MD-DDL governance obligations exist at three distinct levels. An audit must
-check all three — gaps at any level are compliance risks.
-
-```
-Level 1: Domain Metadata          (domain.md → ## Metadata → YAML block)
-Level 2: Entity Governance Block  (entity detail file → ## Entities → ### Entity → governance: YAML)
-Level 3: Attribute-Level Flags    (entity detail file → attributes: → individual fields)
-Level 4: Product Governance       (products/*.md → ### Product → governance: + masking: YAML)
-Level 5: Lifecycle Validation     (domain.md + entity files + products/*.md → status/version consistency)
-```
-
-**Inheritance rule:** Domain-level metadata sets the default posture. Entities
-inherit that posture unless they explicitly override it. An entity with no
-`governance:` block is not automatically compliant — it inherits the domain
-defaults, which may themselves be incomplete. Products inherit domain governance
-and must justify any overrides.
+1. **Regulatory frame.** Start from `regulatory_scope` and ask the user to confirm it's
+   complete. If it's absent, ask which jurisdictions apply. Don't infer jurisdiction
+   from domain content: the same Financial Crime domain has different obligations at an
+   Australian bank and a US bank.
+2. **Regulator files.** Load only those that apply, using the mapping in the
+   regulatory-compliance skill, and check their `last_verified` dates. Tell the user which
+   frameworks the audit covers. Anything else is out of scope.
+3. **Scope.** A domain file (following links to detail files), a single entity (note the
+   missing domain context), or a whole corpus (one domain at a time, then a summary).
 
 ---
 
-## Level 1 — Domain Metadata Audit
+## Level 1 — Domain Metadata
 
-Evaluate the domain `## Metadata` YAML block.
+The `## Metadata` block of `domain.md`:
 
-### Required fields checklist
-
-For every domain, regardless of regulatory frame, check:
-
-| Field | Check | Gap if absent |
-|---|---|---|
-| `classification` | Present and uses a valid tier | Domain sensitivity undefined |
-| `pii` | Present as boolean | PII posture not declared |
-| `regulatory_scope` | Present, non-empty list | No regulatory frame established |
-| `default_retention` | Present with a defined period | Retention obligations unknown |
-| `owners` | At least one entry | No data accountability |
-| `stewards` | At least one entry | No governance accountability |
-
-### Regulatory frame checks
-
-Once regulator files are loaded, evaluate additional fields:
-
-**For any jurisdiction with data localisation requirements (e.g. APRA, PDPA):**
-- Is `data_residency` declared?
-- Does the declared residency satisfy the loaded requirements?
-
-**For multi-jurisdiction domains:**
-- Is `dual_reporting` declared where applicable?
-- Are all `reporting_frameworks` listed?
-
-**For AML/CTF scope (FATF loaded):**
-- Is the domain's AML/CTF relevance indicated in `regulatory_scope`?
-
-### Classification consistency check
-
-The `classification` value at domain level must be at least as restrictive as
-the most sensitive entity within the domain. If you find an entity with
-`classification: "Highly Confidential"` in a domain marked `classification:
-"Internal"`, that is a Level 1 gap.
-
----
-
-## Level 2 — Entity Governance Block Audit
-
-For each entity in the domain, locate the `governance:` block in its detail file
-and evaluate it. If the detail file is not available, note this and audit only
-what can be seen from the domain summary table.
-
-### Distinguishing absence types
-
-Before logging a gap, determine *why* a `governance:` block is absent:
-
-**Type A — Not yet applied:** The entity has no `governance:` block and no
-`# No specific regulatory requirements identified` annotation. Treat as a gap.
-Recommend: full governance pass by Agent Governance.
-
-**Type B — Explicitly excluded:** The entity has a `# No specific regulatory
-requirements identified` annotation. Do not log as a gap. Note in the audit
-report as "Governance explicitly excluded — confirm this is still accurate."
-
-**Type C — Inherited from domain:** The entity has no `governance:` block but
-the domain-level metadata covers all applicable obligations for this entity type.
-Evaluate the domain-level metadata against entity-specific requirements. Log a
-gap only if entity-specific obligations exist that cannot be satisfied by domain
-inheritance.
-
-### Entity governance checklist
-
-For each entity with a `governance:` block (or where one is required):
-
-| Field | Check | When required |
-|---|---|---|
-| `classification` | Present and consistent with domain level | Always |
-| `pii` | Present as boolean | Always |
-| `pii_fields` | Lists specific attributes containing PII | When `pii: true` |
-| `regulatory_scope` | Lists applicable frameworks for this entity | When entity has specific obligations beyond domain defaults |
-| `retention` | Specific period declared | When retention obligation applies |
-| `retention_basis` | Cites the specific regulatory source | When `retention` is present |
-| `audit_all_access` | Declared | When regulator requires access logging |
-| `breach_notification_required` | Declared | When regulator requires notification |
-| `notification_timeframe` | Declared | When `breach_notification_required: true` |
-| `data_residency` | Declared | When entity data may be subject to localisation rules different from domain default |
-
-### Retention consistency check
-
-When an entity has a `retention` value, verify it is consistent with the loaded
-regulator guidance. Flag as a gap if:
-- The declared period is shorter than the regulatory minimum
-- The declared period references a lifecycle event not defined in the entity
-  (e.g. "post relationship end" when no relationship end date attribute exists)
-- The `retention_basis` cites a standard that is not in the loaded regulator files
-
-### PII completeness check
-
-When `pii: true` is declared on an entity:
-1. Review the entity's attributes (from detail file YAML or domain summary)
-2. Identify attributes that carry personal data under the loaded regulatory
-   definitions of PII
-3. Compare against the declared `pii_fields` list
-4. Flag as a gap if attributes that qualify as PII under the loaded frameworks
-   are not listed
-
-Common PII attributes to check for: name fields, date of birth, government
-identifiers (tax numbers, passport, licence), contact details (email, phone,
-address), biometric data, financial account numbers, IP addresses (under GDPR).
-
-### Notification timeframe verification
-
-When `breach_notification_required: true` is declared, verify the
-`notification_timeframe` against the loaded regulator requirement. Flag as
-critical if:
-- The declared timeframe exceeds the regulatory maximum
-- The field is absent when `breach_notification_required: true`
-
-Common timeframes to verify against loaded files: GDPR 72 hours, APRA
-"as soon as possible", RBNZ 72 hours, US state laws vary.
-
----
-
-## Level 3 — Attribute-Level Audit
-
-Evaluate individual attributes within entity YAML for PII and sensitivity flags
-that may be missing or inconsistent.
-
-### When to run Level 3
-
-Level 3 audit is triggered by:
-- `pii: true` on an entity — verify individual attribute flags are consistent
-- A regulator file that specifies attribute-level obligations (e.g. GDPR special
-  categories of personal data)
-- A specific concern raised in the user's audit request
-
-### Attribute flags to check
-
-| Flag | Check |
-|---|---|
-| `pii: true` on attribute | Present on attributes identified as PII in Level 2 check |
-| `classification` on attribute | Present if attribute sensitivity exceeds entity default |
-| Sensitive type patterns | Attributes with names suggesting high sensitivity but no PII flag (e.g. `Health Status`, `Biometric Data`, `Sexual Orientation`) |
-
-### Special categories check (GDPR)
-
-If GDPR is in the loaded frameworks, check for attributes that may constitute
-special categories of personal data under Article 9:
-racial or ethnic origin, political opinions, religious beliefs, trade union
-membership, genetic data, biometric data, health data, sex life or orientation data.
-
-If any such attributes are present without explicit GDPR special category
-governance metadata, log as a critical gap.
-
----
-
-## Level 5 — Lifecycle Field Validation
-
-Evaluate domain, entity, and product lifecycle metadata for consistency and completeness.
-This level checks the structural integrity of lifecycle fields — it does not
-assess whether the domain is *ready* for promotion (that is Agent Ontology's
-lifecycle skill responsibility).
-
-### When to run Level 5
-
-Level 5 is triggered by:
-
-- Full domain audit (always include)
-- User asks about lifecycle compliance or version consistency
-- After a lifecycle promotion or version bump
-
-### Domain-level lifecycle checks
-
-Check | What to verify | Gap if failed
---- | --- | ---
-**Status present** | `status` field exists in domain metadata | Domain lifecycle state unknown
-**Status valid** | `status` value is one of: `Draft`, `Review`, `Active`, `Deprecated`, `Retired` | Invalid lifecycle state
-**Version present when Active** | Domains with `status: Active` must have a `version` field | Active domain without version tracking
-**Version format** | `version` field follows semantic versioning (`MAJOR.MINOR.PATCH`) | Invalid version format
-**Version ≥ 1.0.0 when Active** | Domains with `status: Active` should have `version` ≥ `1.0.0` | Pre-release version on active domain
-**Deprecated has superseded_by** | Domains with `status: Deprecated` should declare `superseded_by` | Deprecated domain with no migration path (Advisory)
-
-### Entity-level lifecycle checks
-
-Check | What to verify | Gap if failed
---- | --- | ---
-**Entity status consistency** | Entity `status` must not be more advanced than domain `status` (e.g., entity `Active` in `Draft` domain) | Entity lifecycle more advanced than domain
-**Deprecated entity fields** | Entities with `status: Deprecated` should have `deprecated_at` set | Deprecated entity without version provenance
-**Since field on new entities** | Entities added after the initial release should have `since` set | New entity without version provenance (Advisory)
-
-### Product-level lifecycle checks
-
-Check | What to verify | Gap if failed
---- | --- | ---
-**Product status consistency** | Product `status` must not be more advanced than the owning domain `status` | Product lifecycle more advanced than domain
-**Product version present when Active** | Products with `status: Active` should declare a `version` field | Active product without version tracking
-**Product version format** | Product `version` follows semantic versioning (`MAJOR.MINOR.PATCH`) when present | Invalid product version format
-**Deprecated upstream handling** | Products referencing deprecated entities or deprecated `lineage` dependencies are themselves `Deprecated` or declare `migration_note` | Active product with no migration path for deprecated upstream dependency
-**Deprecated product fields** | Products with `status: Deprecated` should declare `deprecated_date` and should declare `successor` when one exists | Deprecated product without retirement provenance
-
-### Lifecycle severity rules
-
-Gap | Severity
+Field | Gap if
 --- | ---
+`classification` | Absent or not a valid tier
+`pii` | Absent
+`regulatory_scope` | Absent or empty
+`default_retention` | Absent
+`owners`, `stewards` | Absent: no accountability
+
+Then check it against the loaded frameworks:
+
+- **Residency:** where a framework localises data (e.g. APRA, PDPA), is `data_residency`
+  declared, and does it satisfy the requirement?
+- **Multiple jurisdictions:** does `regulatory_scope` cover every applicable framework?
+- **AML/CTF:** when FATF is loaded, is AML/CTF scope present in `regulatory_scope`?
+- **Consistency:** is the domain `classification` at least as restrictive as the most
+  sensitive entity override in the domain?
+
+## Level 2 — Entity Governance
+
+For each entity, first decide whether it has obligations beyond the domain defaults. The
+signals are a stricter retention period, specific reporting, access logging, breach
+notification, and residency. Then:
+
+- **It has none, and there's no block.** Correct. It inherits. Not a gap.
+- **It has some, but there's no block.** A gap: name the obligation and the missing field.
+- **An annotation says "No specific regulatory requirements identified".** Not a gap. Note
+  it as "explicitly excluded; confirm still accurate".
+
+Where a block exists or is needed:
+
+Field | Check
+--- | ---
+`pii`, `classification`, `retention` | Present only where they differ from the domain. A weaker posture than the domain's needs a justification.
+`retention_basis` | Cites the regulatory source whenever `retention` is overridden
+`retention` | Not shorter than the regulatory minimum. Its lifecycle trigger (e.g. "post relationship end") exists in the entity.
+`compliance_relevance` | Lists the specific acts that apply directly to the entity
+`regulatory_reporting` | Names the reports and submissions the entity feeds
+`audit_all_access`, `breach_notification_required`, `notification_timeframe`, `data_residency` | Extension fields. Required where a loaded regulator file requires them, and `notification_timeframe` whenever breach notification is required.
+
+**PII.** When an entity is PII-bearing (its own or the domain's `pii: true`), review its
+attributes against the loaded frameworks' definitions. Look at names, date of birth,
+government identifiers, contact details, biometrics, account numbers, and IP addresses
+under GDPR. Check that each is marked, either by `pii: true` on the attribute or by
+listing it in `pii_fields`. `pii_fields` itself is optional; it's required only where a
+loaded framework demands an enumerated inventory (GDPR Article 30, HIPAA Safe Harbor).
+
+**Breach notification.** Check `notification_timeframe` against the loaded file (for
+example GDPR 72 hours, RBNZ 72 hours, APRA "as soon as possible"; US state laws vary).
+
+## Level 3 — Attributes
+
+Run this level when an entity is PII-bearing, when a regulator file sets attribute-level
+obligations, or when the user asks. Look for:
+
+- attributes whose names suggest sensitivity (Health Status, Biometric Data) but which
+  aren't marked PII
+- attribute `classification` above the entity's
+- under GDPR, Article 9 special categories: ethnicity, political opinions, religion,
+  union membership, genetic, biometric, health, and sex life or orientation data
+
+## Level 4 — Data Products
+
+Run this level for full-corpus audits, product questions, and after product design.
+Products may narrow visibility by design, but must never weaken protections below what
+regulation requires.
+
+Check | Gap if
+--- | ---
+Classification override | Lower than the domain's without justification
+PII masking | A PII attribute from any included entity (attribute markers or `pii_fields`) has no `masking` entry
+Masking adequacy | The strategy is too weak (e.g. `truncate` on a government ID) or too strong for the need (e.g. `redact` where joinability is required)
+Source-aligned raw feeds | Raw PII without restricted consumers, declared retention, and either masking or a documented justification (e.g. audit replay)
+Multi-domain lineage | Classification below the highest contributing domain's; retention below the longest; PII or regulatory scope from another domain unacknowledged
+Overrides | An override without a stated reason
+Consumers | Broad audiences on a highly confidential product
+Declaration completeness | Missing `lineage`, missing a logical model where `schema_type` is set, or a consumer-aligned product without an Attribute Mapping
+
+Masking and scope fixes are recommendations. Agent Architect applies them.
+
+## Level 5 — Lifecycle Consistency
+
+This checks the integrity of lifecycle fields, not promotion readiness (that's Agent
+Ontology's lifecycle skill).
+
+Check | Severity
+--- | ---
+Domain, entity, or product `status` invalid, or more advanced than its parent domain | Critical
 Active domain without `version` | Critical
-Entity status more advanced than domain | Critical
-Product status more advanced than domain | Critical
-Invalid `status` value | Critical
-Invalid product `status` value | Critical
-Active product without `version` | Advisory
-Invalid product `version` format | Advisory
-Active product with deprecated upstream dependency and no `migration_note` | Advisory
-Pre-release version on active domain | Advisory
-Missing `since` on post-1.0.0 entity | Advisory
-Missing `superseded_by` on deprecated domain | Advisory
-Missing `deprecated_at` on deprecated entity | Advisory
-Missing `deprecated_date` on deprecated product | Advisory
+Active domain below `1.0.0`; invalid semver | Advisory
+Deprecated domain without `superseded_by`; deprecated entity without `deprecated_at`; post-1.0.0 entity without `since` | Advisory
+Active product without `version`; deprecated product without `deprecated_date` (and `successor` where one exists) | Advisory
+Active product depending on deprecated entities or domains, with no `migration_note` | Advisory
 
 ---
 
-## Multi-Jurisdiction Conflict Detection
+## Jurisdiction Conflicts
 
-When multiple regulator files are loaded, conflicts may exist between their
-requirements. Detect and surface these before producing the gap report.
+When several regulator files are loaded, look for conflicts before reporting:
 
-### Conflict types
+Conflict | Default
+--- | ---
+Retention | The longer period
+Classification | The higher tier
+Notification timeframe | The shorter window
+Residency | None. It needs a legal decision, so report it as Critical.
 
-**Retention conflict:** Two frameworks require different retention periods.
-Resolution: apply the longer period; note the conflict.
+List conflicts in a Jurisdiction Conflicts section of the report and don't apply either
+side until the conflict has been reviewed.
 
-**Classification conflict:** Two frameworks classify the same data type at
-different sensitivity levels.
-Resolution: apply the higher classification; note the conflict.
+## Severity
 
-**Residency conflict:** Two frameworks require data to reside in different
-jurisdictions.
-Resolution: do not resolve automatically — this requires legal/compliance
-team input. Flag as a critical gap requiring human decision.
+**Critical:** an obligation is clearly unmet, or a required anchor is missing entirely:
 
-**Notification conflict:** Two frameworks require notification within different
-timeframes.
-Resolution: apply the shorter timeframe; note the conflict.
+- a missing Level 1 field
+- retention below the regulatory minimum
+- a notification window exceeding the maximum
+- PII attributes unmarked where the loaded framework requires identification
+- GDPR special-category data with no Article 9 treatment
+- an unmasked PII attribute in a product
+- a residency conflict
+- a regulator-required extension field that's absent
 
-When a conflict is detected, add it to the gap report under a dedicated
-"Jurisdiction Conflicts" section and do not apply either requirement
-automatically until the conflict section is reviewed.
+**Advisory:** a best practice is unmet, or something needs confirmation:
+
+- `retention_basis` missing
+- a sensitivity-suggesting attribute left unmarked
+- a recommended (not mandated) extension field missing
+- an explicit exclusion that may be outdated
+- a vocabulary deviation
+
+**Not assessed:** there wasn't enough information. For example, detail files were
+unavailable, jurisdiction was unconfirmed, or attributes weren't visible.
 
 ---
 
-## Producing the Gap Report
-
-Use this format:
+## Gap Report
 
 ```markdown
 ## Compliance Gap Report — [Domain Name]
-**Assessed against:** [list of loaded frameworks]
-**Assessment date:** [date]
+**Assessed against:** [frameworks] | **Regulator files verified:** [dates] | **Date:** [date]
+**Scope:** [full | incremental — triggered by <change>; last full audit <date>]
 
 ### Summary
-[n] gaps identified across [n] entities. [n] critical, [n] advisory.
+[n] gaps across [n] entities and [n] products: [n] critical, [n] advisory, [n] not assessed.
 
-### Regulatory Disclaimer
-> Regulatory requirements stated in this report are based on regulator guidance
-> files last verified on the dates shown. This is not legal advice. Confirm all
-> regulatory obligations with qualified legal or compliance counsel before applying.
+> Requirements are taken from regulator guidance files last verified on the dates shown.
+> This is not legal advice. Confirm obligations with qualified legal or compliance counsel.
 
 ### Critical Gaps
-| Entity | Gap | Required by | Recommended Fix |
-|---|---|---|---|
-| Customer | `retention` absent | APRA CPS 234 s.3.2 | Add `retention: "7 years post relationship end"` |
+| Level | Entity / Product | Gap | Required by | Recommended fix |
 
 ### Advisory Gaps
-| Entity | Gap | Framework | Recommended Action |
-|---|---|---|---|
-| Transaction | `audit_all_access` not set | APRA CPS 234 | Confirm with compliance team whether audit logging applies |
+| Level | Entity / Product | Gap | Framework | Recommended action |
+
+### Jurisdiction Conflicts
+| Frameworks | Conflict | Default applied | Decision needed |
+
+### Observations
+Vocabulary deviations and explicit exclusions to confirm.
 
 ### Not Assessed
-Entities or fields that could not be assessed, and why.
+What couldn't be assessed, and why.
+
+### Coverage
+Entities [n of n] · Attribute level [run / not run, and why] · Products [run / not run] · Lifecycle [run / not run]
 ```
 
-Apply these severity rules when classifying gaps:
+**Incremental audits** follow a Regulatory Monitoring pass. Audit only the fields affected
+by each material change, and say so in the report header. Otherwise already-known gaps
+resurface as noise.
 
-### Critical
-A regulatory obligation is clearly unmet and the gap creates direct exposure, OR downstream processing is broken by a structural absence:
-- Required field absent entirely (structural absence — no key at all)
-- Retention period shorter than regulatory minimum
-- Breach notification timeframe exceeds regulatory maximum
-- PII declared but `pii_fields` empty
-- GDPR special category data with no Article 9 governance metadata
-- Jurisdiction conflict on data residency (human decision required)
-- `breach_notification_required` absent on entities in scope
-
-**Critical severity is reserved for things that break downstream processing or create direct regulatory exposure.** Convention deviations and vocabulary differences do not qualify as Critical unless they result in a required obligation being unrepresented.
-
-### Advisory
-Best practice is not met, a field needs confirmation, or governance exists but may be substantively insufficient:
-- `retention_basis` absent (retention is declared but source not cited)
-- Entity-level `classification` not declared (inheriting from domain — confirm
-  this is correct)
-- `audit_all_access` not set on entities where regulator guidance recommends
-  but does not mandate it
-- `regulatory_scope` at entity level not declared where entity has obligations
-  that differ from the domain default
-- Attributes with sensitivity-suggesting names but no PII flag
-- Type B absences (explicit exclusion annotations that may be outdated)
-- Governance vocabulary deviations (e.g., `phi` instead of `pii`) — note as "potential spec vocabulary gap" with a recommendation to align to standard vocabulary
-
-### Not Assessed
-Gaps that cannot be evaluated due to missing information:
-- Entity detail file not available (only domain summary table accessible)
-- `regulatory_scope` absent and user was unable to confirm jurisdiction
-- Attribute list not visible (cannot complete Level 3 audit)
-
----
-
-## Incremental Audit (Post-Monitoring)
-
-When running an audit triggered by a regulatory monitoring pass (Regulatory Monitoring
-mode in AGENT.md), focus the audit scope on the specific changes identified:
-
-1. Load the monitoring report
-2. For each material change flagged, identify the affected metadata fields
-3. Audit only those fields across the relevant domains — do not re-run the
-   full audit unless requested
-4. Note in the gap report header: "Incremental audit — triggered by [change].
-   Full audit last run [date if known]."
-
-This keeps monitoring-triggered audits focused and actionable rather than
-producing noise by re-surfacing already-known gaps.
-
----
-
-## Level 4 — Product Governance Audit
-
-Evaluate each data product declaration for governance adequacy. Product governance
-sits on top of domain and entity governance — a product may relax visibility
-(by design) but must not weaken protections below what regulations require.
-
-### When to run Level 4
-
-Level 4 is triggered by:
-
-- User asks "are the governance overrides appropriate for each product?"
-- User asks about product-level compliance or masking adequacy
-- Full corpus audit (always include Level 4 if product declarations exist)
-- After product design or modification (as a quality gate)
-
-### Product governance checklist
-
-For each product declaration (files under `products/`):
-
-Check | What to verify | Gap if failed
---- | --- | ---
-**Classification override** | If product declares `classification` lower than domain default, is there a justified reason? | Unjustified classification downgrade
-**PII exposure** | If product includes entities where `pii: true`, does the product declare `masking` entries? | PII-bearing product with no masking strategy
-**Masking completeness** | Every attribute listed in included entities' `pii_fields` has a corresponding `masking` entry in the product | PII attribute exposed without masking
-**Masking strategy adequacy** | Masking strategy is appropriate for the attribute type and consumer context | Weak masking for high-sensitivity attribute
-**Source-aligned raw exposure** | Source-aligned products that expose raw PII: is retention constrained and access restricted? | Raw PII feed with permissive governance
-**Multi-domain governance** | For multi-domain `lineage`: does the product honour the governance posture of each referenced domain? | External entity exposed with weaker controls than source domain
-**Governance override justification** | Every field in the product's `governance:` block that differs from domain default has a documented rationale | Override present without justification
-**Consumer appropriateness** | Are the declared `consumers` appropriate for the product's classification and PII posture? | Highly confidential product visible to broad audiences
-
-### Masking adequacy cross-reference
-
-This is the critical product-level check that connects entity PII declarations
-to product masking rules.
-
-For each product where `pii: true` applies (inherited or declared):
-
-1. Collect all entities in the product's `entities` list
-2. For each entity, read its `pii_fields` from the entity governance block
-3. Build a complete list of PII attributes exposed by this product
-4. Compare against the product's `masking` entries
-5. Flag gaps:
-
-Gap Type | Severity | Description
---- | --- | ---
-PII attribute with no masking entry | Critical | Attribute is exposed unmasked to product consumers
-Masking strategy mismatch | Advisory | Strategy may be too weak (e.g., `truncate` for a government ID) or too strong (e.g., `redact` when joinability is needed)
-PII attribute not in `pii_fields` | Critical | Attribute appears to be PII but is not declared — escalate to Level 2/3
-
-### Source-aligned product controls
-
-Source-aligned products are inherently higher-risk because they expose raw or
-lightly cleansed data. Apply these checks:
-
-- `classification` should be at least as restrictive as any entity in the source feed
-- `retention` should be declared (raw data often has shorter retention than canonical)
-- `consumers` should be limited to data engineering and audit teams
-- If the source contains PII, the product should either declare `masking` or
-  document why raw PII access is justified (e.g., audit replay requirements)
-
-### Multi-domain governance consistency
-
-For consumer-aligned products with multi-domain `lineage`, verify that governance
-conflicts between the owning domain and referenced domains are resolved correctly:
-
-Check | What to verify | Gap if failed
---- | --- | ---
-**Classification floor** | Product classification is at least as restrictive as the highest classification among all contributing domains | Multi-domain classification downgrade without justification
-**Retention ceiling** | Product retention meets the longest period required by any contributing domain | Multi-domain retention shorter than referenced domain requires
-**PII union** | If any referenced domain declares `pii: true`, the product declares `pii: true` with masking or justifies omission | PII from referenced domain exposed without acknowledgement
-**Regulatory scope union** | Product's owning domain `regulatory_scope` covers all frameworks from referenced domains, or product-level overrides address the gap | Product subject to unacknowledged regulatory framework from referenced domain
-**Masking multi-domain PII** | PII attributes from `lineage` entities in other domains are covered by the product's `masking` entries | External PII attribute exposed without masking strategy
-**Lineage completeness** | Consumer-aligned products have `lineage` declared tracing to canonical entities; domain-aligned products have `lineage` declared tracing to source system tables | Missing data provenance declaration
-**Logical model present** | Products with `schema_type` include a `#### Logical Model` Mermaid class diagram | Product cannot drive physical generation without a logical model
-**Attribute mapping present** | Consumer-aligned products include an `#### Attribute Mapping` section with table-based mappings tracing every product attribute to its canonical source | Consumer-aligned product attributes not traceable to canonical sources
-
-### Product governance gap report format
-
-Add a "Product Governance" section to the gap report:
-
-```markdown
-### Product Governance Gaps
-
-| Product | Gap | Severity | Recommended Fix |
-|---|---|---|---|
-| Transaction Risk Summary | `Date of Birth` in Customer entity not covered by `masking` entries | Critical | Add `masking: - attribute: "Date of Birth" strategy: year-only` |
-| Salesforce Raw Feed | Source-aligned product exposes raw PII with no masking | Advisory | Confirm audit-replay justification or add masking entries |
-```
-
----
-
-## Audit Completion Statement
-
-Close every audit with a structured statement before handing the gap report
-to the user:
-
-```
-Audit complete.
-Scope: [domain name(s)]
-Frameworks assessed: [list]
-Regulator files loaded: [list]
-Entities assessed: [n] of [n] (note any not assessed)
-Attribute-level audit: [run / not run — reason if not run]
-Lifecycle audit: [run / not run — reason if not run]
-Gaps identified: [n] critical, [n] advisory, [n] not assessed
-Conflicts detected: [n — list frameworks in conflict if any]
-
-Refer to the gap report below for details and recommended remediation.
-Note: This audit reflects requirements as defined in the loaded regulator files.
-If those files have not been updated recently, run a regulatory monitoring pass
-(Regulatory Monitoring mode) to confirm currency before treating this audit as definitive.
-```
+If the regulator files are stale, recommend a Regulatory Monitoring pass before treating
+the audit as definitive.

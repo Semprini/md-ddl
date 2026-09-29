@@ -97,19 +97,12 @@ class EnterpriseProfile:
         return _weighted_choice(self.geo_weights)
 
     def sample_country(self) -> str:
+        """Return an ISO 3166-1 alpha-2 country code for a freshly sampled locale.
+
+        To keep a record's locale and country consistent, sample the locale once
+        and call country_for_locale() on it instead.
         """
-        Return an ISO 3166-1 alpha-2 country code derived from the sampled locale.
-        For locales like 'en_GB' the suffix is used; for bare codes like 'es' a
-        best-effort mapping is applied.
-        """
-        locale = self.sample_locale()
-        parts = locale.split("_")
-        if len(parts) >= 2:
-            return parts[-1].upper()
-        # bare locale codes — map to primary country
-        _bare = {"en": "US", "es": "ES", "fr": "FR", "de": "DE",
-                 "zh": "CN", "ja": "JP", "ko": "KR", "pt": "BR"}
-        return _bare.get(parts[0], parts[0].upper())
+        return country_for_locale(self.sample_locale())
 
     def sample_age(self) -> int:
         """Return an age (integer years) sampled from age_bands."""
@@ -179,6 +172,16 @@ class EnterpriseProfile:
 
 
 # ─── Internal helpers ──────────────────────────────────────────────────────────
+
+def country_for_locale(locale: str) -> str:
+    """Map a Faker locale ('en_GB', 'zh_TW', 'es') to an ISO 3166-1 alpha-2 code."""
+    parts = locale.split("_")
+    if len(parts) >= 2:
+        return parts[-1].upper()
+    bare = {"en": "US", "es": "ES", "fr": "FR", "de": "DE",
+            "zh": "CN", "ja": "JP", "ko": "KR", "pt": "BR"}
+    return bare.get(parts[0], parts[0].upper())
+
 
 def _weighted_choice(weights: dict[str, float]) -> str:
     keys = list(weights)

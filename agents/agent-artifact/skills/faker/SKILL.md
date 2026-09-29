@@ -147,16 +147,23 @@ Function | For | Locales and currency
 
 Field pattern | With a profile
 --- | ---
-`*country*`, `*locale*`, `*region*` | `profile.sample_country()`. Build a per-record `Faker(profile.sample_locale())` for locale-appropriate names and addresses.
-`*date_of_birth*`, `*dob*` | `profile.sample_date_of_birth()`
+`*country*`, `*locale*`, `*region*` | Sample the locale once per record (`locale = profile.sample_locale()`), build `Faker(locale)` from it, and take the country from `country_for_locale(locale)`, so a record's names, address, and country agree.
+`*date_of_birth*`, `*dob*` | `profile.sample_date_of_birth()` in realistic mode only (it's PII)
 `*customer_type*`, `*party_type*`, `*entity_type*` | `profile.sample_customer_type()`
 `*product_code*`, `*product_name*`, `*product_type*` | `profile.sample_product(customer_type)`, filtered by eligibility
 `*amount*`, `*balance*`, `*premium*`, `*limit*` | `profile.sample_amount(product)`
 `*currency*` | `profile.sample_currency(product)`
 `*sector*`, `*industry*` | `profile.sample_sector()`
 
-A profile doesn't lift PII mode. In `safe` mode, names and contact details stay obviously
-fake even when the locale varies.
+A profile doesn't lift PII mode. In `safe` mode, every attribute marked `pii: true` (names,
+contact details, date of birth, nationality, and so on) keeps its safe-mode placeholder,
+even when a profile is active. The profile still shapes the non-PII fields: customer
+type, products, amounts, currency, and non-PII country fields.
+
+**Subtypes.** For an entity that `extends` a parent (Person and Company extend Party),
+generate one factory per concrete subtype. Each builds the parent's attributes plus its
+own, shares the parent's identifier, and inherits the parent's temporal tracking. Don't
+generate rows for an abstract parent on its own.
 
 ---
 
@@ -176,10 +183,10 @@ import random, uuid
 from datetime import date, datetime, timedelta, timezone
 from faker import Faker
 
-try:
-    from enterprise_profile import EnterpriseProfile
+try:  # copy enterprise_profile.py from the faker runtime to use a profile
+    from enterprise_profile import country_for_locale, uk_retail_bank_profile
 except ImportError:
-    EnterpriseProfile = None
+    country_for_locale = uk_retail_bank_profile = None
 
 # Enum pools, from the domain's enums
 PARTY_STATUS_VALUES = ["Active", "Under Review", "Inactive", "Closed"]
@@ -205,13 +212,18 @@ class PartyFactory:
     def build(self, with_history: bool = False, **overrides) -> list[dict]:
         seq = _next_seq()
         realistic = self.pii_mode == "realistic"
-        f = Faker(self.profile.sample_locale()) if self.profile else self.fake
+        locale = self.profile.sample_locale() if self.profile else None
+        f = Faker(locale) if locale else self.fake
 
-        if self.profile:
-            dob, country = self.profile.sample_date_of_birth(), self.profile.sample_country()
+        # date_of_birth is PII: safe mode keeps the placeholder even with a profile.
+        if not realistic:
+            dob = date(1970, 1, 1)
+        elif self.profile:
+            dob = self.profile.sample_date_of_birth()
         else:
-            dob = f.date_of_birth(minimum_age=18, maximum_age=80) if realistic else date(1970, 1, 1)
-            country = f.country_code(representation="alpha-2") if realistic else "AU"
+            dob = f.date_of_birth(minimum_age=18, maximum_age=80)
+        # country is not PII here, so the profile shapes it in either mode.
+        country = country_for_locale(locale) if locale else ("AU" if not realistic else f.country_code())
 
         now = datetime.now(tz=timezone.utc)
         prior_end = now - timedelta(days=random.randint(30, 730))

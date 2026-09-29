@@ -67,7 +67,7 @@ Description | `product.details.en.description` | Direct mapping
 `owner` | `product.dataHolder.en.email` | Owner email maps to dataHolder contact
 `consumers` | `product.details.en.visibility` | If consumers are named internal teams → `organisation`; if cross-org → `dataspace`; if public → `public`
 `entities` | `product.details.en.description` | Entity list is included in the description. No direct ODPS field for entity-level scoping.
-`schema_type` | `product.dataAccess.default.outputPorttype` and `format` | `schema_type` suggests the channel but doesn't decide it. For example: dimensional or normalized warehouse tables → port `SQL`; a file export → port `file` with a CSV or Parquet format; knowledge-graph → port `API` with `GraphQL`. Propose one and mark it `# TODO: confirm delivery channel`.
+`schema_type` | `product.dataAccess.default.outputPorttype` and `format` | `schema_type` suggests the channel but doesn't decide it. For example: dimensional or normalized warehouse tables → port `SQL`; a file export → port `file` with a CSV or Parquet format; knowledge-graph → port `API` with `GraphQL`. ODPS `format` describes a payload or file (JSON, CSV, Parquet, GraphQL); for a `SQL` port there's no payload format, so omit `format` and put the table or view reference in the access details. Propose a channel and mark it `# TODO: confirm delivery channel`.
 
 #### Governance → ODPS Mapping
 
@@ -103,7 +103,7 @@ business input beyond MD-DDL with `# TODO: [what's needed]`.
 
 ```yaml
 schema: https://opendataproducts.org/v4.0/schema/odps.yaml
-version: 4.0
+version: "4.0"                 # a string in ODPS; unquoted YAML parses as a number
 product:
   details:
     en:
@@ -211,7 +211,7 @@ MD-DDL Constraint | ODPS Dimension | Inference Logic
 --- | --- | ---
 `not_null` on attributes | `completeness` | Count NOT NULL attributes / total attributes across product entities. If >80% are NOT NULL → objective: 95. If >50% → objective: 90. If <50% → objective: 85.
 `check` constraints | `validity` | Presence of CHECK constraints implies data rules exist. Set objective: 95 (high confidence in source validation).
-`unique` constraints | `uniqueness` | Presence of UNIQUE key attributes implies deduplication. Add a uniqueness dimension with objective: 99.
+`identifier: primary`, `identifier: alternate`, or `unique` | `uniqueness` | Keys imply one row per instance. Add a uniqueness dimension with a proposed objective of 99.
 `temporal.tracking` declared | `timeliness` | If entities declare temporal tracking, infer a timeliness dimension. Map `refresh` cadence: `real-time` → objective 1 minute; `hourly` → 60 minutes; `daily` → 24 hours.
 `pii: true` on entities | `accuracy` | Propose an accuracy dimension, since errors in personal data carry regulatory risk. Leave the objective for the owner to set.
 No constraints found | Generic fallback | Use completeness: 90 as baseline. Add TODO for user to define explicit DQ dimensions.
@@ -221,7 +221,7 @@ No constraints found | Generic fallback | Use completeness: 90 as baseline. Add 
 Given a product including `Customer` entity with:
 
 - 12 attributes, 8 marked NOT NULL → completeness objective: 95%
-- `customer_id` marked unique → uniqueness objective: 99%
+- `Customer Number` is the primary identifier → uniqueness objective: 99%
 - `pii: true`, `pii_fields: [Full Name, Date of Birth, Tax ID]` → accuracy dimension, objective left for the owner
 - `refresh: daily` → timeliness objective: 24 hours
 
@@ -250,9 +250,14 @@ dataQuality:
         - dimension: timeliness
           displaytitle:
             en: Data Timeliness
-          objective: 24        # from refresh: daily
-          unit: hours
+          objective: 1440      # from refresh: daily
+          unit: minutes
 ```
+
+**PII without masking.** If the product exposes PII-bearing attributes (entity or
+attribute `pii: true`) and declares no `masking`, don't publish silently. List it
+first under gaps and hand it to Agent Governance for a Level 4 review before the
+manifest goes to a catalogue.
 
 ### Step 5 — Identify Gaps
 
@@ -317,7 +322,8 @@ ODPS Component | MD-DDL Coverage | Notes
 Before declaring an ODPS manifest complete:
 
 - [ ] Schema URL is `https://opendataproducts.org/v4.0/schema/odps.yaml`
-- [ ] Version is `4.0`
+- [ ] Version is the string `"4.0"`
+- [ ] Units come from the reference: SLA uses `percent` and time units (`minutes`, `days`, …); data-quality dimensions use `percentage`
 - [ ] Product name, productID, visibility, status, and type are populated (ODPS required fields)
 - [ ] All TODO markers have been reviewed with the user
 - [ ] SLA dimensions have valid objectives and units

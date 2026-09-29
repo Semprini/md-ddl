@@ -85,8 +85,9 @@ under GDPR. Check that each is marked, either by `pii: true` on the attribute or
 listing it in `pii_fields`. `pii_fields` itself is optional; it's required only where a
 loaded framework demands an enumerated inventory (GDPR Article 30, HIPAA Safe Harbor).
 
-**Breach notification.** Check `notification_timeframe` against the loaded file (for
-example GDPR 72 hours, RBNZ 72 hours, APRA "as soon as possible"; US state laws vary).
+**Breach notification.** Check `notification_timeframe` against the loaded regulator
+file's stated window. Don't quote timeframes from memory: they differ by framework and
+change (US state laws also vary).
 
 ## Level 3 — Attributes
 

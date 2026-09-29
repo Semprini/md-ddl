@@ -13,7 +13,7 @@ data product metadata. Released July 2025.*
 
 ```yaml
 schema: https://opendataproducts.org/v4.0/schema/odps.yaml
-version: 4.0
+version: "4.0"
 product:
   # all product components below
 ```
@@ -334,7 +334,7 @@ product:
 
 ```yaml
 schema: https://opendataproducts.org/v4.0/schema/odps.yaml
-version: 4.0
+version: "4.0"
 product:
   details:
     en:

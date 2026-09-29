@@ -41,28 +41,24 @@ Ask the user which standard(s) they want to audit against. If the domain file
 declares a `standards_reference` or `Reference` column in its Entities table,
 use that as a starting point.
 
-Supported standards:
+The standard references ship with Agent Ontology's standards-alignment skill. Each
+README defines the lookup order and local index files. The raw snapshots in
+`references/industry_standards/` exist only in the MD-DDL source repository and aren't
+installed by `md-ddl init`, so don't depend on them.
 
-Standard | Reference location
+Standard | Local guidance (read-only)
 --- | ---
-BIAN | `industry_standards/bian/`
-FHIR R4 | `industry_standards/fhir/r4/`
-TM Forum | `industry_standards/tmforum/v4/`
-ISO 20022 | Load from standards-alignment references
-ACORD | Load from standards-alignment references
+BIAN (v13 default) | `../../../agent-ontology/skills/standards-alignment/standards/bian/README.md`
+FHIR R4 | `../../../agent-ontology/skills/standards-alignment/standards/fhir/README.md`
+TM Forum SID | `../../../agent-ontology/skills/standards-alignment/standards/tmforum/README.md`
+ISO 20022 (Business Model) | `../../../agent-ontology/skills/standards-alignment/standards/iso20022.md`
+ACORD (membership-gated, so state your confidence) | `../../../agent-ontology/skills/standards-alignment/standards/acord/README.md`
 
 ### Step 2 — Load Standard References
 
-Load the relevant industry standard reference files **before** assessing
-conformance. Do not assess conformance from training knowledge alone.
-
-For BIAN: Load business object definitions, service domain mappings, and
-enumeration lists from `industry_standards/bian/`.
-
-For FHIR: Load resource type definitions and profiles from
-`industry_standards/fhir/r4/`.
-
-For TM Forum: Load entity type definitions from `industry_standards/tmforum/v4/`.
+Follow the README's lookup process and check every class, resource, or entity name
+against its local index before grading. Never assess conformance from training
+knowledge alone. A name that isn't in the index is a finding, not a match.
 
 ### Step 3 — Read the Domain Model
 

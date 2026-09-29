@@ -1,246 +1,141 @@
 ---
 name: entity-modelling
-description: Use this skill when modelling entities or their attributes, when the user says "types of" or "kinds of" something, when inheritance questions arise, or when deciding whether a concept should be a first-class entity, an enum, an attribute, or a relationship attribute. Also use when the user is unsure whether two similar concepts are the same entity or separate ones.
+description: Use when modelling entities or attributes, when the user says "types of" or "kinds of", when inheritance questions arise, when deciding whether a concept is an entity, enum, attribute, or relationship attribute, when two similar concepts might be the same thing, when choosing existence, mutability, or temporal tracking, or when user stories should drive those choices.
 ---
 
 # Skill: Entity Modelling
 
-Covers concept realisation decisions, inheritance hierarchies, entity YAML structure, attribute definitions, constraints, and enumeration definitions.
+Covers concept classification, inheritance, existence and mutability, governance while
+authoring, and the entity and enum detail files.
 
 ## MD-DDL Reference
 
-- Full entity specification: `md-ddl-specification/3-Entities.md`
-  (reference stub: `references/entities-spec.md`)
-- Full enumeration specification: `md-ddl-specification/4-Enumerations.md`
-  (reference stub: `references/enumerations-spec.md`)
-- Entity classDiagram conventions: `guides/diagram-style.md`
-  (non-normative — subject/reference classes, enum rendering, ordering)
-- Conceptual-to-physical realization guidance: `conceptual-to-physical-realisation.md`
-  (use for ownership/cardinality decisions, dimensional implementation reasoning, and final `existence` value selection)
-- Entity-vs-enum classification deep guidance: `guidance.md`
-  (use when concept boundaries are ambiguous or multiple structures are plausible)
-- Inheritance pattern deep guidance: `inheritance-patterns.md`
-  (use when evaluating subtype hierarchies, abstract parents, and discriminator alternatives)
-- Physical realization guidance: defer to **Agent Artifact**
-  (when user asks for dimensional/star-schema design, SQL DDL, 3NF outputs, or non-dimensional physical artifacts)
-- Cross-skill standards guidance: `../standards-alignment/SKILL.md`
-  (load before locking entity structure in industry-standard domains)
-
-Read the relevant reference before drafting any entity or enum. Key sections:
-
-**Entities spec:** Entity Declaration, Entity Diagram rules, Entity Definition (YAML),
-Key-as-Name principle, Attribute Properties, Type System, Constraint Definition, Temporal Tracking, Existence, Mutability, Naming Rules.
-
-**Enumerations spec:** Enum Declaration, Simple vs. Dictionary format,
-Naming Rules (natural language values).
-
-If modelling in a recognized industry domain (banking, payments, insurance,
-healthcare, telecom), load `../standards-alignment/SKILL.md` before finalizing:
-- entity boundary (entity vs enum vs relationship attribute)
-- `existence`
-- `mutability`
-- temporal tracking strategy
+- `md-ddl-specification/3-Entities.md` (stub: `references/entities-spec.md`): YAML,
+  attributes, types, constraints, temporal tracking, existence, mutability, governance schema
+- `md-ddl-specification/4-Enumerations.md` (stub: `references/enumerations-spec.md`)
+- `guides/diagram-style.md`: classDiagram conventions (non-normative)
+- `guidance.md`: industry patterns, hard cases, and inheritance, for ambiguous
+  classification
+- `conceptual-to-physical-realisation.md`: ownership vs existence, and how many-to-many
+  and roles realise physically. Use it before finalising `existence`.
+- `../standards-alignment/SKILL.md`: in industry domains, load before settling entity
+  boundaries, `existence`, `mutability`, or temporal tracking
 
 ---
 
-## Concept Realisation Framework
+## Classifying a Concept
 
-When the user is uncertain what a concept *is*, apply this framework and explain your reasoning before drafting anything.
+When the user is unsure what a concept is, reason it through with them before drafting.
 
-### Make it an Entity if:
-- It has its own identity and lifecycle independent of other entities
-- It will have relationships to multiple other entities
-- It will accumulate attributes over time
-- It is auditable or requires its own governance posture
-- It can exist before or after the things it relates to
+Make it | When
+--- | ---
+**Entity** | It has its own identity and lifecycle, relates to several other entities, will gather attributes, needs its own audit or governance, and can exist before or after what it relates to
+**Enum** | It's a controlled vocabulary that classifies something, with nothing beyond a label and light metadata. Nobody will ask "tell me everything about this value".
+**Relationship attribute** | It only means something while two particular entities are connected (an effective date on a role assignment, a limit on a facility link)
+**Attribute** | It's a simple property with no lifecycle, only ever reached through its parent, and not shared
 
-### Make it an Enum if:
-- It is a fixed or slowly-changing controlled vocabulary
-- It classifies or categorises another entity
-- It has no attributes beyond a label and optional metadata (description, sort order)
-- No one will ever say "tell me everything about this [value]"
+When it's genuinely ambiguous, show the trade-off: an entity gives governance, audit, and
+room to grow, at the cost of more relationships; an attribute is simpler but has no
+lifecycle or audit; an enum costs nothing while stable, but can't carry attributes
+without a refactor. `guidance.md` has the industry patterns and hard cases.
 
-### Make it a Relationship Attribute if:
-- The property only makes sense when two specific entities are connected
-- It describes the terms or nature of a connection, not a standalone fact
-- Examples: `effective_date` on a role assignment; `limit` on a credit facility link
+## Inheritance
 
-### Make it an Attribute of an existing Entity if:
-- It is a simple property with no independent lifecycle
-- It is only ever referenced through its parent entity
-- It cannot be shared across or re-used by other entities
+Work through these questions with the user rather than choosing silently:
 
-**When it is genuinely ambiguous**, present the options to the user as a short trade-off table:
+1. **Do subtypes share real attributes and constraints,** or just a label? A label calls
+   for an enum discriminator on a single entity.
+2. **Is the parent ever instantiated directly?** If not, mark it `<<abstract>>`.
+3. **Do subtypes add meaningful attributes or constraints** (roughly three or more, or
+   different rules)? If so, use `extends:`. If they're identical apart from a label,
+   use a discriminator.
+4. **Will they diverge?** If divergence is expected, separate them now even if they look
+   alike today.
 
-Option | Advantage | Disadvantage
---- | --- | ---
-Separate entity | Full governance, auditable, extensible | More relationships to manage
-Attribute | Simpler model | No independent lifecycle or audit trail
-Enum | Zero maintenance if stable | Can't evolve to carry attributes later without a refactor
-
----
-
-## Inheritance Reasoning
-
-When a user describes "types of" something, or entities that share common properties, walk through this logic explicitly before committing to a hierarchy.
-
-**Step 1 — Is shared behaviour real?**
-Do the candidate subtypes share actual attributes and constraints, or just a label?
-If only a label → use an Enum discriminator on a single entity, not inheritance.
-
-**Step 2 — Is the parent instantiated directly?**
-Will anyone ever create a bare instance of the parent, or only ever a specific subtype?
-If only subtypes → mark the parent `<<abstract>>` in the classDiagram.
-
-**Step 3 — Do subtypes add meaningful attributes or constraints?**
-If the subtypes are identical except for a type label → discriminator attribute is cleaner.
-If subtypes add 3+ distinct attributes or meaningfully different constraints → separate entities with inheritance.
-
-**Step 4 — Will subtypes diverge over time?**
-High divergence expected → separate entities now, even if they look similar today.
-Stable and similar → discriminator attribute with an enum.
-
-Present this reasoning to the user before drafting. Do not silently choose a pattern.
-
----
+Roles are not subtypes. If an instance can hold several at once, or change between them,
+model them as Party Roles (`guidance.md § Inheritance`).
 
 ## Existence and Mutability
 
-Before finalizing these in an industry-standard domain, confirm Standards Alignment
-has been loaded so the decision reflects standard semantics (for example, BIAN role
-abstractions, ISO payment concepts, or FHIR resource boundaries).
+Decide both for every entity. They drive physical generation directly, and a wrong
+`existence` produces a wrong dimensional model. Ask when they aren't obvious.
 
-These should be defined for every entity. They directly drive physical artifact generation — do not omit them or leave them as defaults without a conscious decision that the user will never want to generate schemas.
-
-**Existence** (what is this entity's independence?)
-
-Value | Use when | Generation hint
+`existence` | Meaning | Typical physical form
 --- | --- | ---
-`independent` | Meaningful on its own | Candidate dimension
-`dependent` | Only meaningful in context of other entities | Candidate fact
-`associative` | Resolves a many-to-many; carries relationship attributes | Bridge table
+`independent` | Meaningful on its own | Dimension
+`dependent` | Only meaningful in the context of other entities | Fact
+`associative` | Resolves a many-to-many and carries its own attributes | Bridge
 
-**Mutability** (how does this entity's data change?)
-
-Value | Use when | Generation hint
+`mutability` | Meaning | Typical physical form
 --- | --- | ---
-`immutable` | Once written, never changes | Ledger / event store
-`append_only` | New rows added; existing rows never updated | Log / transaction
+`immutable` | Never changes once written | Ledger, event store
+`append_only` | New rows only | Log, transaction table
 `slowly_changing` | Changes occasionally; history may matter | SCD Type 2
-`frequently_changing` | Changes often; current value is what matters | Overwrite
-`reference` | Essentially static; admin-managed | Small lookup table
+`frequently_changing` | Changes often; the current value matters | Overwrite
+`reference` | Essentially static, admin-managed | Small lookup
 
-Ask the user explicitly if these are not obvious. A wrong existence value produces a wrong dimensional model.
+Ownership of a relationship doesn't decide existence. An entity can be `independent`
+and still be owned by another entity's relationship (`conceptual-to-physical-realisation.md`).
 
-When relationship cardinality/ownership materially affects dimensional realization, apply `conceptual-to-physical-realisation.md` before finalizing `existence`.
+## User Stories as Evidence
 
----
+User stories hold the *why* behind existence, mutability, and temporal choices. Before
+deciding, gather every story that mentions the entity:
 
-## User Story to Modelling Signals
-
-When user stories are available (from a BA, product owner, or requirements doc),
-parse each story before deciding existence, mutability, and temporal tracking.
-User stories encode the *why* behind these decisions; deriving them from
-structural abstractions alone misses the business intent.
-
-### Story Pattern → Modelling Decision
-
-Story pattern | Existence signal | Mutability signal | Other signal
---- | --- | --- | ---
-"…see all [X]s for a [Y] over time" | X is `dependent` on Y | X is `append_only` or `immutable` | Temporal tracking likely needed on X
-"…reconstruct what [X] looked like at [date]" | — | `append_only` or bi-temporal | Temporal tracking required; flag for compliance review
-"…query [X] with [Y] and [Z] context in real time" | X is likely `dependent` | X is `append_only` or `immutable` | Consumer-aligned product; SLA required; relationship granularity between X–Y and X–Z matters
-"…analyse trends in [X] over [period]" | X is `independent` or `dependent` | `append_only` | Analytical product; wide-column or dimensional schema type
-"…manage [X]" (CRUD operations) | X is `independent` | `frequently_changing` or `slowly_changing` | Operational product; normalized schema type
-"…look up [X] by [identifier]" | X is `independent` | `reference` or `slowly_changing` | Lookup / reference data pattern
-"…flag [X] when [condition]" | — | — | Constraint or event on X; consider an event rather than a polling pattern
-"…see current [X] for [Y]" | X is `dependent` | `frequently_changing` | Current-state product; no temporal tracking needed
-"…audit who changed [X] and when" | — | — | `audit` stereotype on X; governance `compliance_relevance` field
-
-### How to Apply
-
-1. Before deciding existence and mutability, collect all user stories that mention
-   the entity.
-2. Apply the table to each story. If stories conflict (e.g., one needs current state,
-   another needs history), surface the tension to the user explicitly — it often
-   signals two separate data products from one canonical entity.
-3. Where a story implies a product access pattern, note it for Agent Architect:
-   the entity's existence and mutability decisions should align with the product
-   class and schema type the story implies.
-
-> "I see two user stories that conflict: one needs current state of [X], the other
-> needs full history. The canonical entity can support both — `append_only` mutability
-> with a current-state view in one product and a history view in another. Shall I
-> model it that way?"
-
----
-
-## Governance Authoring Protocol
-
-Apply governance metadata to every entity during drafting — do not defer governance to a later pass. The spec defines the authoritative schema in `3-Entities.md § Governance Metadata Schema`.
-
-### Domain-Level Governance (set once in domain.md)
-
-Every domain file must declare these four fields in its metadata YAML:
-
-Field | Purpose
+Story pattern | Signal
 --- | ---
-`classification` | Data sensitivity tier (`Public`, `Internal`, `Confidential`, `Highly Confidential`)
-`pii` | Whether the domain handles personal data by default
-`regulatory_scope` | Applicable regulations and frameworks (list)
-`default_retention` | Base retention period for entities that do not override
+"…see all X for a Y over time" | X `dependent` on Y; `append_only`; temporal tracking
+"…reconstruct what X looked like at a date" | `append_only` or bitemporal; flag for compliance review
+"…query X with Y and Z context in real time" | X likely `dependent`, `append_only`; consumer-aligned product with an SLA; relationship granularity matters
+"…analyse trends in X over a period" | `append_only`; analytical product (wide-column or dimensional)
+"…manage X" (create, update, delete) | X `independent`; slowly or frequently changing; normalized operational product
+"…look up X by an identifier" | X `independent`; `reference` or `slowly_changing`
+"…flag X when a condition holds" | A constraint, or an event rather than polling
+"…see the current X for Y" | X `dependent`; `frequently_changing`; no temporal tracking
+"…audit who changed X and when" | Audit stereotype; `compliance_relevance`
 
-Set these during domain scoping (see `../domain-scoping/SKILL.md`). They become the inherited defaults for all entities in the domain.
+When stories conflict (one needs current state, another needs history), say so. It
+usually means one canonical entity feeds two products, for example an `append_only`
+entity with a current-state view and a history view. Note the implied product
+access patterns for Agent Architect.
 
-### Entity-Level Governance (override only what differs)
+## Governance While Authoring
 
-Entity governance blocks are optional overrides. Include a `governance:` YAML block on an entity only when it needs to differ from or extend the domain defaults.
+Apply governance as you draft; don't leave it for a later pass. The schema and
+inheritance rules are in `3-Entities.md § Governance Metadata Schema`.
 
-**Override fields** (replace the domain default for this entity):
-- `pii`, `classification`, `retention`, `access_role`
-
-**Extension fields** (add entity-specific detail, no domain default exists):
-- `retention_basis`, `compliance_relevance`, `regulatory_reporting`, `description`
-
-When drafting an entity:
-
-1. **Check domain defaults** — if the entity's governance posture matches the domain, add only `retention_basis` explaining why it inherits the default.
-2. **Override where needed** — if `pii`, `classification`, `retention`, or `access_role` differ from the domain, include those fields.
-3. **Add compliance detail for regulated entities** — entities directly involved in regulatory reporting should include `compliance_relevance` and `regulatory_reporting` listing specific obligations.
-4. **Mark uncertainty** — if you cannot determine governance posture, add `# TODO: Confirm classification with data steward` rather than guessing.
-
-### Handoff to Regulation Agent
-
-Entity-modelling sets first-pass governance during authoring. Agent Governance audits and maintains that metadata over time. Do not attempt to resolve jurisdiction-specific compliance questions — flag them and defer to Agent Governance.
+- **Domain defaults** (`classification`, `pii`, `regulatory_scope`,
+  `default_retention`) are set once in `domain.md` during domain scoping, and every
+  entity inherits them.
+- **Entity `governance:` blocks hold overrides only.** Include `pii`, `classification`,
+  `retention`, or `access_role` only where they differ from the domain. Entities
+  directly involved in regulatory reporting add `compliance_relevance` and
+  `regulatory_reporting`. A weaker posture than the domain's needs a justification in
+  `description` or `retention_basis`.
+- **Inheriting entities** need no block. A block containing only `retention_basis` may
+  optionally record *why* the default fits.
+- **Unknowns** get `# TODO: confirm with data steward` rather than a guess. Leave
+  jurisdiction-specific compliance questions to Agent Governance.
 
 ---
 
 ## Entity Detail File Checklist
 
-Before presenting a drafted entity detail file:
+- H1 is the domain name linked to `domain.md`. The entity is an H3 under `## Entities`.
+- The classDiagram comes after the description and before the YAML, using the ELK layout.
+  The subject class lists its own attributes only (not inherited ones), with the primary
+  identifier prefixed `*`. Abstract entities are `<<abstract>>`. Reference classes are
+  linked, not defined.
+- The YAML has an `identifier: primary` attribute (or a deliberate Logic Object), plus
+  `existence` and `mutability`, and no foreign-key attributes.
+- Governance follows the rules above.
+- Constraint keys are natural language (Key-as-Name).
 
-- [ ] File begins with H1 heading with domain name as a link to domain.md
-- [ ] Entity introduced with H3 heading under `## Entities`
-- [ ] classDiagram present immediately after description, before YAML
-- [ ] ELK layout engine declared in diagram config
-- [ ] Subject class shows all attributes with correct Mermaid type syntax
-- [ ] Inherited attributes are **not** repeated in the subject class
-- [ ] Primary identifier prefixed with `*` in diagram
-- [ ] Abstract entities marked `<<abstract>>`
-- [ ] All reference classes defined at bottom of diagram with hyperlinks
-- [ ] At least one attribute with `identifier: true` in YAML
-- [ ] `existence` and `mutability` declared
-- [ ] No foreign key attributes present
-- [ ] Domain-level governance defaults are confirmed for the entity
-- [ ] If a `governance:` block is present, it contains only override fields and `# TODO:` where required
-- [ ] Constraint keys use natural language (Key-as-Name principle)
+## Enum Checklist
 
----
-
-## Enum Detail File Checklist
-
-- [ ] File begins with domain H1 heading and link back to domain.md
-- [ ] Enum under H3 heading within `## Enums` section
-- [ ] Values use natural language (not PT, ACTIVE, HI_CONF)
-- [ ] Dictionary format used if values carry metadata (description, sort order, score)
-- [ ] Simple list format used if values are labels only
+- An H3 under `## Enums`, in a file rooted at the domain H1.
+- Values are natural language (`Politically Exposed`, not `PT` or `HI_CONF`).
+- Use dictionary format when values carry metadata (description, sort order, score),
+  and a simple list when they're labels only.
+- For external standards, include a representative subset (5 to 15 values) plus a
+  reference to the full standard.

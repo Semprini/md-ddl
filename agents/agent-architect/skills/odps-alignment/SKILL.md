@@ -19,11 +19,7 @@ what requires additional business input.
 
 ## Load ODPS Reference
 
-Read `skills/odps-alignment/references/odps-v4.0.md` before generating manifests.
-
-Platform note: `{{INCLUDE}}` blocks are only processed by include-aware
-platforms (for example, VS Code Copilot custom agents). In other platforms,
-open the reference file directly.
+Read `references/odps-v4.0.md` (field names and enum vocabularies) before generating manifests.
 
 ## Pre-Requisites
 
@@ -66,12 +62,12 @@ MD-DDL Field | ODPS Component | Mapping Notes
 Product name | `product.details.en.name` | Direct mapping
 Description | `product.details.en.description` | Direct mapping
 `class` | `product.details.en.type` | `source-aligned` → `raw data`; `domain-aligned` → `dataset`; `consumer-aligned` → `derived data`
-`status` | `product.details.en.status` | `Draft` → `draft`; `Production` → `production`; `Deprecated` → `sunset`
+`status` | `product.details.en.status` | `Draft` → `draft`; `Active` → `production`; `Deprecated` → `sunset`; `Retired` → `retired`
 `version` | `product.details.en.productVersion` | Direct mapping
 `owner` | `product.dataHolder.en.email` | Owner email maps to dataHolder contact
 `consumers` | `product.details.en.visibility` | If consumers are named internal teams → `organisation`; if cross-org → `dataspace`; if public → `public`
 `entities` | `product.details.en.description` | Entity list is included in the description. No direct ODPS field for entity-level scoping.
-`schema_type` | `product.dataAccess.default.format` | `normalized` → `JSON`; `dimensional` → `SQL`; `wide-column` → `CSV` or `Parquet`; `knowledge-graph` → `GraphQL`
+`schema_type` | `product.dataAccess.default.outputPorttype` and `format` | `schema_type` suggests the channel but doesn't decide it. For example: dimensional or normalized warehouse tables → port `SQL`; a file export → port `file` with a CSV or Parquet format; knowledge-graph → port `API` with `GraphQL`. Propose one and mark it `# TODO: confirm delivery channel`.
 
 #### Governance → ODPS Mapping
 
@@ -202,9 +198,12 @@ product:
 
 ### Step 4 — Infer Data Quality Dimensions
 
-Before marking data quality as TODO, attempt to derive ODPS dimensions from
-MD-DDL entity constraints. This reduces the number of TODOs and produces a
-more useful starting manifest.
+MD-DDL declares *which* quality rules exist (constraints, identifiers, temporal
+tracking), not target percentages. Use the rules below to propose which dimensions to
+include and a starting objective. Mark every inferred objective
+`# PROPOSED: confirm with the product owner`, because the numbers are heuristics, not
+facts derived from the model. Where Agent Test runs the product's data tests, their
+pass rates are the better evidence for setting objectives.
 
 #### Constraint-Based Inference Rules
 
@@ -214,7 +213,7 @@ MD-DDL Constraint | ODPS Dimension | Inference Logic
 `check` constraints | `validity` | Presence of CHECK constraints implies data rules exist. Set objective: 95 (high confidence in source validation).
 `unique` constraints | `uniqueness` | Presence of UNIQUE key attributes implies deduplication. Add a uniqueness dimension with objective: 99.
 `temporal.tracking` declared | `timeliness` | If entities declare temporal tracking, infer a timeliness dimension. Map `refresh` cadence: `real-time` → objective 1 minute; `hourly` → 60 minutes; `daily` → 24 hours.
-`pii: true` on entities | `accuracy` | PII-bearing entities typically require higher accuracy. Add accuracy dimension with objective: 98 when PII is present.
+`pii: true` on entities | `accuracy` | Propose an accuracy dimension, since errors in personal data carry regulatory risk. Leave the objective for the owner to set.
 No constraints found | Generic fallback | Use completeness: 90 as baseline. Add TODO for user to define explicit DQ dimensions.
 
 #### Example Inference
@@ -223,7 +222,7 @@ Given a product including `Customer` entity with:
 
 - 12 attributes, 8 marked NOT NULL → completeness objective: 95%
 - `customer_id` marked unique → uniqueness objective: 99%
-- `pii: true`, `pii_fields: [Full Name, Date of Birth, Tax ID]` → accuracy objective: 98%
+- `pii: true`, `pii_fields: [Full Name, Date of Birth, Tax ID]` → accuracy dimension, objective left for the owner
 - `refresh: daily` → timeliness objective: 24 hours
 
 Generated ODPS:
@@ -236,22 +235,22 @@ dataQuality:
         - dimension: completeness
           displaytitle:
             en: Data Completeness
-          objective: 95
+          objective: 95        # PROPOSED: confirm with the product owner
           unit: percentage
         - dimension: uniqueness
           displaytitle:
             en: Record Uniqueness
-          objective: 99
+          objective: 99        # PROPOSED: confirm with the product owner
           unit: percentage
         - dimension: accuracy
           displaytitle:
             en: Data Accuracy
-          objective: 98
+          objective:           # TODO: set by the product owner (PII present)
           unit: percentage
         - dimension: timeliness
           displaytitle:
             en: Data Timeliness
-          objective: 24
+          objective: 24        # from refresh: daily
           unit: hours
 ```
 

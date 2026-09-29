@@ -2,7 +2,7 @@
 
 How an organisation relates data products to platforms shapes which product classes
 apply, what artifacts get generated, and what infrastructure is assumed. Establish the
-platform posture before designing data products (AGENT.md discovery step 3). The
+platform posture before designing data products (Agent Architect's Assessment step). The
 `platform:` metadata block that records the decision is defined in
 [Section 9 — Data Products](../../../../md-ddl-specification/9-Data-Products.md#platform-posture).
 

@@ -1,153 +1,60 @@
 ---
 name: orientation
-description: Use this skill on first contact, when the user asks "what is MD-DDL", "where do I start", "what can I do here", or describes their role and goals. Also use when the user asks for a general overview of the standard, the agent ecosystem, or the workflow.
+description: Use on first contact, when the user asks "what is MD-DDL", "where do I start", or "what can I do here", describes their role and goals, or wants an overview of the standard, the agents, or the workflow.
 ---
 
-# Skill: Orientation & Profiling
+# Skill: Orientation
 
-Covers role identification, MD-DDL overview tailored to the user's background,
-workflow mapping to agents, and concrete next-step recommendations.
+Find out who the user is, give them an overview of MD-DDL in their own terms, and
+suggest a concrete next step.
 
-## MD-DDL Reference
-
-Load foundation principles from `md-ddl-specification/1-Foundation.md`
-(reference stub: `references/foundation-spec.md`) when the user asks *why* MD-DDL
-is designed the way it is or wants the full principles.
-
-For overview-level questions, the principles below are sufficient.
+Load `md-ddl-specification/1-Foundation.md` (stub: `references/foundation-spec.md`) if
+the user asks *why* MD-DDL is designed as it is. For an overview, this skill is enough.
 
 ---
 
-## Profiling Protocol
+## Profile in One or Two Questions
 
-Identify who you are talking to before diving into detail. This takes one or two
-questions, not an interrogation.
+If the opening message doesn't already say, ask the user's role and what they're trying
+to do. Then ask one calibrating question that tells you which analogies will work:
 
-### Step 1 — Role and Goal
+Role | Calibrating question
+--- | ---
+Modeller or architect | ER, UML, or dbt background?
+Steward or compliance | Which catalogue or governance framework today?
+Engineer | Current stack (Snowflake, Databricks, Spark, dbt)?
+Product owner | Familiar with Data Mesh or data contracts?
+Healthcare architect | Using FHIR, HL7, or SNOMED?
+Integration engineer | How many source systems, and how is mapping done today?
 
-Ask:
+Match the answers to the User Archetypes table in the core prompt. Returning users,
+those who use MD-DDL vocabulary or name agents, skip profiling entirely.
 
-- What is your role? (data modeller, steward, engineer, architect, product owner,
-  compliance officer, etc.)
-- What are you trying to accomplish right now?
+## Tailor the Overview
 
-If the user volunteers both in their opening message, skip this step entirely.
+Say in a few sentences what MD-DDL gives *this* person. Don't recite the spec. What to
+emphasise for each archetype:
 
-### Step 2 — Experience Calibration
+Archetype | What MD-DDL means for them
+--- | ---
+Data Modeller | ER-style modelling in version-controlled Markdown with YAML, readable by people and AI agents alike
+Data Steward | Classification, PII, retention, ownership, and regulatory scope live inside the model, so Agent Governance can audit everything in one pass
+Data Engineer | Model the domain once; Agent Artifact generates DDL, JSON Schema, Parquet contracts, and dbt projects, scoped by data products; Agent Test turns worked examples into tests
+Compliance Manager | Regulatory scope and data sensitivity live in the model; Agent Governance audits against frameworks such as APRA CPS 234, GDPR, HIPAA, and FATF and produces prioritised gap reports
+Data Product Owner | Products are declared in the model: consumers, schema type, governance, masking, SLA. Agent Architect designs them and publishes ODPS manifests
+Healthcare Architect | A semantic layer above FHIR: entities align to resources, enums to ValueSets, plus governance, temporal tracking, and generation that FHIR alone doesn't give
+Integration Engineer | A source layer declares each system and table, how columns map to the canonical model, and worked examples that pin the expected output and become tests
+Domain Review Lead | Agent Ontology's domain-review skill checks structure, decision quality, and standards alignment, and returns findings by severity
 
-Based on the role, ask one calibrating question:
+Then show the workflow from the core prompt, highlighting the step closest to the
+user's goal. Most people start with Discover and Model in Agent Ontology.
 
-- For **modellers and architects:** "Have you worked with ER diagrams, UML, or dbt
-  before? That will help me explain MD-DDL in terms you already know."
-- For **stewards and compliance:** "Are you using a data catalogue (Collibra, Alation,
-  etc.) or governance framework today?"
-- For **engineers:** "What is your current stack? (Snowflake, Databricks, Spark, dbt,
-  etc.) That tells me which generation features to highlight."
-- For **product owners:** "Are you familiar with Data Mesh or data contracts? That
-  gives me a starting point for explaining MD-DDL data products."
-- For **healthcare architects:** "Are you working with FHIR, HL7, or SNOMED today?
-  MD-DDL has standards alignment for healthcare."
-- For **integration engineers:** "How many source systems are you working with, and
-  what does your current mapping process look like?"
+## Suggest Next Steps
 
-Match responses to the User Archetypes table in the core prompt and adapt from here.
+Offer two or three of these, whichever fit the user's archetype and goal:
 
-### Step 3 — Tailored Overview
-
-Based on archetype, deliver a concise overview. Do not recite the spec. Translate
-into the user's world:
-
-**For a Data Modeller:**
-> "MD-DDL is a Markdown-native modelling language — think of it as ER diagrams
-> written in text files that are version-controlled, AI-readable, and human-friendly.
-> You define entities, attributes, relationships, and events in structured Markdown
-> with YAML blocks. The result is a model that both you and an AI agent can read
-> and reason about."
-
-**For a Data Steward:**
-> "MD-DDL puts governance metadata *inside* the model — classification, PII flags,
-> retention policies, ownership, and regulatory scope live right next to the data
-> definitions. You do not need a separate catalogue to know what is sensitive or
-> who owns it. Agent Governance can then audit everything in one pass."
-
-**For a Data Engineer:**
-> "MD-DDL is the contract between the logical model and your physical schemas.
-> You or your team model the domain once — entities, relationships, events — and
-> Agent Artifact generates Snowflake DDL, JSON Schema, Parquet contracts, or whatever
-> your stack needs. Data products control what gets generated and for whom."
-
-**For a Compliance Manager:**
-> "MD-DDL captures regulatory scope, data classification, PII, retention, and
-> access controls directly in the data model. Agent Governance audits the model
-> against frameworks like APRA CPS 234, GDPR, HIPAA, or FATF and produces
-> prioritised compliance gap reports."
-
-**For a Data Product Owner:**
-> "MD-DDL lets you declare data products right inside the model — who the consumers
-> are, what schema type they need, what governance and masking rules apply, and what
-> SLA they get. Agent Architect helps you design these, and Agent Artifact
-> generates the physical artifacts scoped by your product declarations."
-
-**For a Healthcare Architect:**
-> "MD-DDL acts as a semantic layer above standards like FHIR. You model your domain
-> in MD-DDL — patients, encounters, conditions, procedures — and align each entity
-> to FHIR resources. The standards alignment skill maps your entities to FHIR
-> canonical URLs, and enums align to FHIR ValueSets and CodeSystems. MD-DDL adds
-> governance, temporal tracking, and physical generation that FHIR alone does not
-> provide."
-
-**For an Integration Engineer:**
-> "MD-DDL has a dedicated source layer — you declare each source system, its tables,
-> and how they map to the canonical model using a structured transformation vocabulary
-> (direct, derived, lookup, conditional, aggregation). The source file becomes the
-> contract between your integration team and the modelling team."
-
-**For a Domain Review Lead:**
-> "MD-DDL has a domain-review skill in Agent Ontology that runs a systematic quality
-> check — structural conformance, decision quality (relationship granularity,
-> temporal tracking, existence/mutability), and standards alignment. It produces
-> severity-grouped findings with fix recommendations."
-
----
-
-## The MD-DDL Workflow — Agent Map
-
-After the tailored overview, show how the workflow maps to agents. Highlight the
-step most relevant to the user's goal.
-
-Step | What happens | Agent
---- | --- | ---
-**Discover** | Interview stakeholders, identify concepts, set domain boundaries | Agent Ontology
-**Model** | Draft domain files — entities, attributes, relationships, events, enums | Agent Ontology
-**Map** | Declare source systems and write transformation rules | Agent Ontology
-**Publish** | Design data products — audience, schema type, governance, masking | Agent Architect
-**Generate** | Produce physical schemas (DDL, JSON Schema, Parquet, Cypher) and dbt projects | Agent Artifact
-**Test** | Compile worked examples and constraints into tests; run them locally before promotion | Agent Test
-**Govern** | Audit and maintain compliance metadata over time | Agent Governance
-
-> "You can start at any step. Most people start with **Discover + Model** using
-> Agent Ontology. Where would you like to begin?"
-
----
-
-## What You Can Do Right Now
-
-Based on the user's archetype and goal, recommend two or three concrete next actions:
-
-1. **Explore a concept** — "Want me to explain how [relevant concept] works in
-   MD-DDL? I will compare it to [their familiar tool]."
-2. **Walk through an example** — "I can walk you through [Simple Customer / Financial
-   Crime] step by step so you can see what a complete model looks like."
-3. **Set up your environment** — "If you want to start modelling, I can help you
-   set up MD-DDL in [VS Code / Claude Code]."
-4. **Go straight to modelling** — "If you are ready to start, I can hand you off to
-   Agent Ontology with a prompt tailored to your domain."
-
----
-
-## Returning Users
-
-If the user signals they are not new (mentions agent names, uses MD-DDL vocabulary,
-asks an advanced question), skip profiling. Respond directly using the relevant skill.
-
-> "Welcome back. What would you like to explore, or what do you need help with?"
+- Explain a concept by comparing it with a tool they know (Concept Explorer)
+- Walk through an example domain (Worked Examples)
+- Set up MD-DDL in their environment (Platform Setup)
+- Plan adoption around their existing systems (Adoption Planning)
+- Go straight to modelling, with a drafted opening request for Agent Ontology

@@ -11,12 +11,12 @@ This skill is for the pattern where consumers want a single primary table at a s
 
 ## Load First
 
-- `../../agent-ontology/skills/entity-modelling/SKILL.md`
-- `../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
-- `../../agent-ontology/skills/relationship-events/SKILL.md`
-- `../dimensional/SKILL.md`
-- `../normalized/SKILL.md`
-- `../../agent-ontology/skills/standards-alignment/SKILL.md` (mandatory in recognized industry domains)
+- `../../references/generation-semantics.md`
+- `../../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
+- `../../../agent-ontology/skills/standards-alignment/SKILL.md` in industry-standard domains
+
+When the wide table is built over an existing star or normalized model, the dimensional
+or normalized skill describes the upstream tables. Load it only then.
 
 ---
 
@@ -46,10 +46,6 @@ This skill follows common modern warehousing guidance:
 4. For one-to-many details, prefer selective rollups, capped arrays, or nested structures over row explosion.
 5. In platforms that support nested/repeated types (for example BigQuery), nested structs and arrays can reduce join and shuffle costs while preserving hierarchy.
 
-Practical source influences:
-- dbt marts guidance (wide, denormalized, entity-grained output models)
-- ClickHouse denormalization guidance (join-at-ingest trade-off, avoid high-cardinality flattening)
-- BigQuery nested/repeated best practices (hierarchical denormalization without full flattening)
 
 ---
 
@@ -250,15 +246,3 @@ Before finalizing:
 - [ ] Included columns reflect real reporting use cases
 - [ ] Rebuild and correction policy is specified
 - [ ] Governance-sensitive fields (PII/classification) are clearly tagged
-
----
-
-## Generation Limitations
-
-Generated artifacts are syntactically valid but functionally untested. This agent
-cannot validate the following — they require human verification:
-
-- **Grain preservation** — Join logic is designed to preserve grain, but only testing with real data confirms no fan-out or duplication.
-- **Consumer fitness** — Wide-column schemas are designed for assumed query patterns. Validate with actual report consumers that the included columns serve their needs.
-- **Refresh feasibility** — Build strategies (incremental/full/restate) are recommended based on metadata. Infrastructure capacity and SLA constraints must be validated by the platform team.
-- **Performance at scale** — Column count and join complexity affect query performance. Test with representative data volumes.

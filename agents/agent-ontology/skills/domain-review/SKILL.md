@@ -41,13 +41,21 @@ If the domain is in a recognized industry (banking, payments, insurance, healthc
 
 ## Review Protocol
 
-Run this protocol in order. Do not skip sections.
+Run the sections in order. Each catches a different class of problem.
+
+### 0) Pre-Flight
+
+If `md-ddl lint` is available, run it on the domain folder first (`md-ddl lint <folder>`,
+or `python scripts/md_ddl_lint.py <folder>` in the MD-DDL repo). Its errors are the
+mechanical tier: syntax, links, references, and representation agreement. Report them
+as Critical and don't re-derive them by eye. Its warnings and observations feed the
+sections below.
 
 ### 1) Inventory and Coverage
 
 Confirm all modeled artifacts are present and navigable:
 
-- Domain file exists and includes Metadata, Diagram, and all four summary tables
+- Domain file exists and includes Metadata, the overview diagram, and the Entities, Enums, Relationships, and Events tables (plus Data Products where declared)
 - Every summary table Name link resolves to an existing detail file anchor
 - Every referenced entity/enum/relationship/event appears exactly once in the expected section
 - No orphaned detail files that are not represented in summary tables (unless explicitly marked draft)
@@ -207,6 +215,7 @@ Each finding must include:
 
 Also include:
 
+- **Observations**: vocabulary deviations and convention differences, each noted as a possible spec contribution rather than a defect
 - **Pass Summary**: what is already correct
 - **Decision Summary**: per requested dimension (granularity, temporal, existence, mutability, conceptual→logical, standards, regulations)
 - **Readiness Verdict**: `Not Ready`, `Conditionally Ready`, or `Ready`
@@ -215,22 +224,9 @@ Also include:
 
 ## Semantic Validation
 
-Structural readiness is necessary but not sufficient. The review protocol above
-validates what AI can check — spec conformance, internal consistency, declared
-metadata. The following aspects require human domain expertise to validate and
-**cannot be reliably assessed by AI alone**:
-
-Aspect | Why AI Cannot Validate | Required SME
---- | --- | ---
-**Entity completeness** | AI cannot know which real-world concepts are missing from the model — only which declared ones are malformed | Domain subject matter expert
-**Relationship accuracy** | AI can verify cardinality syntax; it cannot verify that "Customer owns Account" is the correct business relationship (vs. "Customer holds Account") | Business analyst or domain owner
-**Business process coverage** | AI cannot assess whether the modelled events and relationships capture the actual business workflow | Process owner or operations lead
-**Governance correctness** | AI can verify governance YAML structure; it cannot verify that "7 years" is the correct retention period for a given jurisdiction | Legal or compliance counsel
-**Standards alignment substance** | AI can verify a Reference column value exists; it cannot verify that the mapping is semantically correct for the organisation's use of that standard | Standards specialist
-**Enum completeness** | AI can verify enum structure; it cannot know whether the listed values cover all real-world cases | Domain subject matter expert
-
-When issuing a readiness verdict, mark semantic aspects as **Pending SME Review**
-unless the user has explicitly confirmed them during the modelling session.
+A review checks conformance, internal consistency, and declared metadata. It can't check
+the following, which need people who know the domain. Mark them **Pending SME Review** in
+the verdict unless the user confirmed them during the session.
 
 ### SME Review Checklist
 
@@ -259,7 +255,7 @@ All of the following must be true:
 - Zero Critical findings
 - Zero Major findings
 - All entities have `existence` and `mutability` declared
-- All entities have at least one `identifier: true` attribute
+- All entities have an `identifier: primary` attribute, or are deliberately Logic Objects
 - All relationships have `cardinality`, `granularity`, and `ownership`
 - Domain metadata includes `classification`, `pii`, `regulatory_scope`, and `default_retention`
 - Governance blocks on entities with PII or elevated classification are present
@@ -283,13 +279,9 @@ A Not Ready verdict must include a prioritised remediation plan.
 
 ### Handoff to Downstream Agents
 
-When the verdict is **Ready**, tell the user which agents can now consume the model:
-
-> "This domain is ready for physical artifact generation (Agent Artifact) and data product design (Agent Architect)."
-
-When **Conditionally Ready**, specify the safe scope:
-
-> "This domain can proceed to [specific artifact type] but [listed conditions] must be resolved before [other artifact type]."
+**Ready:** tell the user the model can go to Agent Artifact (physical generation) and
+Agent Architect (product design). **Conditionally Ready:** state which artifacts can proceed
+now, and which conditions must be resolved first for the rest.
 
 ---
 

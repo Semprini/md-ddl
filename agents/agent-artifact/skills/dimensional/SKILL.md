@@ -11,43 +11,22 @@ For normalized operational physical designs, use `../normalized/SKILL.md`.
 
 ## Load First
 
-- `../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
-- `../../agent-ontology/skills/entity-modelling/SKILL.md`
-- `../../agent-ontology/skills/relationship-events/SKILL.md`
-- `../../agent-ontology/skills/standards-alignment/SKILL.md` (mandatory for industry-standard domains)
+- `../../references/generation-semantics.md`: the `existence`, `mutability`, and
+  `temporal.tracking` mappings (dimension, fact, bridge; SCD; temporal columns). They
+  are not repeated here.
+- `../../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`:
+  ownership vs existence, and many-to-many bridges
+- `../../../agent-ontology/skills/standards-alignment/SKILL.md` in industry-standard
+  domains, before finalising the physical shape
 
-Use this skill only after domain-level conceptual structure is stable enough to map.
+Dimensional specifics beyond the shared mapping:
 
----
-
-## Core Mapping Matrix
-
-### Existence → Physical Candidate
-
-`existence` | Primary physical candidate | Typical shape
---- | --- | ---
-`independent` | Dimension | `dim_*` with surrogate key and SCD controls where needed
-`dependent` | Fact | `fact_*` row per event/measurement/context occurrence
-`associative` | Bridge | `bridge_*` for many-to-many + relationship attributes/effective dates
-
-### Mutability → Storage/History Strategy
-
-`mutability` | Typical dimensional treatment | Notes
---- | --- | ---
-`reference` | Small static/conformed dimension | Rarely changes; controlled admin updates
-`slowly_changing` | SCD Type 2 style dimension | `valid_from`, `valid_to`, `is_current`
-`frequently_changing` | Fact or mini-dimension pattern | Avoid excessive SCD churn in wide dimensions
-`append_only` | Fact/event table | Immutable inserts, no in-place updates
-`immutable` | Ledger/event-style fact | Strict non-update semantics
-
-### Temporal Tracking → Physical Columns
-
-`temporal.tracking` | Minimum physical expectation
---- | ---
-`valid_time` | effective start/end dates/timestamps for business validity
-`transaction_time` | record created/superseded timestamps for system capture timeline
-`bitemporal` | both valid-time and transaction-time columns
-`point_in_time` | event timestamp and ordering surrogate (if needed)
+- `frequently_changing` attributes on a wide dimension cause SCD churn. Split them into a
+  mini-dimension or carry them on the fact.
+- `reference` entities become small conformed dimensions, updated only through controlled
+  admin changes.
+- SCD Type 2 columns are `valid_from`, `valid_to`, and `is_current`. Bitemporal entities
+  add the transaction-time pair.
 
 ---
 
@@ -250,30 +229,3 @@ Before finalizing physical shape:
 - Ensure temporal strategy is sufficient for audit reconstruction.
 - Ensure sensitive classifications are enforceable in downstream physical design.
 - In regulated domains, prefer explicit history over overwrite when obligations require traceability.
-
----
-
-## Output Contract for Physical Modelling Requests
-
-When producing a physical model proposal or SQL DDL, always include:
-
-- Mapping summary (entity → dim/fact/bridge)
-- Justification for each non-obvious mapping
-- Temporal strategy summary
-- Enum handling strategy summary
-- Inheritance strategy summary
-- Assumptions and open questions
-
-If user asks for SQL, keep naming deterministic and implementation-ready for requested dialect.
-
----
-
-## Generation Limitations
-
-Generated artifacts are syntactically valid but functionally untested. This agent
-cannot validate the following — they require human verification:
-
-- **Execution correctness** — DDL has not been run against an actual database. Type mismatches, platform-specific syntax edge cases, and constraint violations surface only at execution time.
-- **Performance fitness** — Fact/dimension grain, clustering keys, and partitioning choices are heuristic. Validate against actual data volumes and query patterns.
-- **Mapping accuracy** — Entity-to-fact/dimension assignments are based on `existence` and `mutability` heuristics. Only a data warehouse architect serving real consumers can confirm mappings serve the actual use case.
-- **Temporal strategy** — SCD type selection is inferred from metadata. Confirm the chosen approach meets actual audit, replay, and correction requirements.

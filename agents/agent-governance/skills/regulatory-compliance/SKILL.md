@@ -1,214 +1,102 @@
 ---
 name: regulatory-compliance
-description: Apply regulatory and compliance metadata to MD-DDL entities based on applicable jurisdictions and frameworks. Use when modeling domains with regulatory requirements or when user mentions compliance, regulations, or specific regulatory bodies (APRA, RBNZ, GDPR, Basel, etc.).
+description: Use whenever governance metadata is applied, reviewed, or evaluated for a jurisdiction or framework (APRA, RBNZ, GDPR, CCPA, Basel, EBA, FATF, Federal Reserve, OCC, FDIC, HIPAA, SOX), when the user mentions compliance or a regulator, and before stating any retention period, notification timeframe, or regulatory obligation. Shared with Agent Ontology for first-pass governance while modelling.
 ---
 
-# Regulatory Compliance
+# Skill: Regulatory Compliance
 
-## Identify Applicable Regulators
+Apply governance metadata from the regulator guidance files in `regulators/`. They are
+the authority for specific obligations; training knowledge is not. Load only the files
+that apply.
 
-Ask user: "What regulatory jurisdictions and compliance frameworks apply to this data?"
+## Choosing Regulator Files
 
-Common regulators by jurisdiction:
+Ask which jurisdictions and frameworks apply, then load the matching files:
 
-Jurisdiction | Regulators | Regulator Files to Load
--------------|-----------|------------------------
-Australia/NZ Banking | APRA, RBNZ, Basel, FATF | [apra.md](regulators/apra.md), [rbnz.md](regulators/rbnz.md), [basel.md](regulators/basel.md), [fatf.md](regulators/fatf.md)
-EU | GDPR, Basel, EBA | [gdpr.md](regulators/gdpr.md), [basel.md](regulators/basel.md), [eba.md](regulators/eba.md)
-US Banking | Federal Reserve, OCC, FDIC, Basel | [federal-reserve.md](regulators/federal-reserve.md), [occ.md](regulators/occ.md), [fdic.md](regulators/fdic.md), [basel.md](regulators/basel.md)
-US General | CCPA, SOX | [ccpa.md](regulators/ccpa.md), [sox.md](regulators/sox.md)
-Global AML/CTF | FATF | [fatf.md](regulators/fatf.md)
-Healthcare (US) | HIPAA | [hipaa.md](regulators/hipaa.md)
-Healthcare (Global) | Various | Depends on jurisdiction
+Jurisdiction | Files
+--- | ---
+Australia and NZ banking | `apra.md`, `rbnz.md`, `basel.md`, `fatf.md`
+EU | `gdpr.md`, `basel.md`, `eba.md`
+US banking | `federal-reserve.md`, `occ.md`, `fdic.md`, `basel.md`
+US general | `ccpa.md`, `sox.md`
+AML/CTF (global) | `fatf.md`
+US healthcare | `hipaa.md`
+Other healthcare | (no file yet) Say so, and don't infer obligations.
 
-## Load Only Relevant Regulators
+Load another file mid-session only when the user asks, or when a clear trigger appears
+(EU customers suggest GDPR; health data suggests HIPAA) and the user confirms it applies.
 
-**Critical**: Only load regulator guidance files that apply to the user's jurisdiction and industry.
+Before citing a file, check its `last_verified` date. If it's older than 12 months, warn
+the user and ask them to confirm current obligations with their compliance team.
 
-**Example**:
-```
-User: "We're a New Zealand bank owned by an Australian parent, need APRA and RBNZ compliance"
-AI: Loading regulators/apra.md, regulators/rbnz.md, regulators/basel.md, regulators/fatf.md...
-AI: (Does NOT load gdpr.md, ccpa.md, hipaa.md, etc.)
-```
+---
 
-**If user mentions specific compliance frameworks**:
-```
-User: "We need to comply with GDPR for EU customers and APRA for Australian operations"
-AI: Loading regulators/gdpr.md and regulators/apra.md...
-```
+## The Governance Schema
 
-## Apply Regulatory Metadata
+**Core fields.** These are defined by `md-ddl-specification/3-Entities.md § Governance
+Metadata Schema`, which holds the full rules:
 
-Once relevant regulator(s) loaded:
+Level | Field | Notes
+--- | --- | ---
+Domain metadata (top level, no `governance:` wrapper) | `classification`, `pii`, `regulatory_scope`, `default_retention` | Defaults inherited by every entity, relationship, event, and product
+Entity `governance:` (overrides only) | `pii`, `pii_fields`, `classification`, `retention`, `retention_basis`, `access_role`, `description` | Only fields that differ from the domain. A weaker posture needs a justification.
+Entity `governance:` (entity-specific) | `compliance_relevance` (the acts and standards that apply), `regulatory_reporting` (named reports and submissions) | Map domain frameworks to specific obligations
 
-1. User defines entity: "We need to model Customer"
-2. Consult loaded regulator guidance for metadata requirements
-3. Set domain-level governance defaults first (classification, pii, regulatory_scope, default_retention)
-4. Add entity-level `governance:` only for stricter or exceptional overrides
+**Extension fields.** These are used by the regulator files and compliance-audit but
+aren't yet in the spec schema. Use them where a regulator file requires them, and treat
+them as candidates for the spec:
 
-**Example with APRA loaded (domain defaults first)**:
-```
-User: "Model Customer entity"
-AI: Checks regulators/apra.md → identifies PII requirements, CPS 234 scope
-AI: Applies domain metadata defaults:
-  governance:
-    classification: "Highly Confidential"
-    pii: true
-    regulatory_scope:
-      - APRA CPS 234
-      - APRA APS 222
-AI: Adds entity `governance:` only if Customer needs stricter settings than domain defaults.
-```
+Field | Meaning
+--- | ---
+`data_residency` | Jurisdictions where the data must be stored, e.g. `["Australia", "New Zealand"]`
+`cross_border_transfer` | Whether the data crosses jurisdictional borders
+`audit_all_access` | Every access must be logged
+`breach_notification_required` | Breaches must be notified to a regulator
+`notification_timeframe` | The notification deadline, e.g. `"72 hours"` under GDPR, taken from the regulator file
 
-If an entity has no exception, omit its `governance:` block and inherit domain defaults.
+Don't invent further fields. Express reports and AML/CTF scope through
+`regulatory_reporting` and `compliance_relevance`, not new keys.
 
-**Example entity override (only when needed)**:
-```
-AI: Applies metadata override:
-  governance:
-    retention: "10 years post relationship end"
-    retention_basis: "APRA record keeping requirements"
-```
+## Applying It
 
-## Common Regulatory Metadata Properties
+1. Set domain defaults first, from the loaded regulator files:
 
-Property | Description | Example Values
----------|-------------|---------------
-`classification` | Data sensitivity level | "Public", "Internal", "Confidential", "Highly Confidential"
-`pii` | Contains personally identifiable information | `true`, `false`
-`regulatory_scope` | Which regulations apply | List of regulations
-`retention` | How long data must be kept | "7 years", "10 years post closure"
-`data_residency` | Where data must be stored | `["Australia", "New Zealand"]`
-`cross_border_transfer` | Data crosses jurisdictional borders | `true`, `false`
-`audit_all_access` | All access must be logged | `true`, `false`
-`breach_notification_required` | Must notify regulator of breaches | `true`, `false`
+   ```yaml
+   # domain.md, ## Metadata
+   classification: "Highly Confidential"
+   pii: true
+   regulatory_scope:
+     - APRA CPS 234
+     - RBNZ BS13
+     - FATF Recommendations
+   default_retention: "7 years post relationship end"
+   ```
 
-## Domain-Level Regulatory Metadata
+2. Give an entity a `governance:` block only where it differs from the domain or has
+   entity-specific obligations:
 
-Set default regulatory posture at domain level:
+   ```yaml
+   # entities/customer.md
+   governance:
+     retention: "10 years post relationship end"
+     retention_basis: "APRA record-keeping requirements"   # cite the regulator file
+     compliance_relevance:
+       - AUSTRAC AML/CTF Act 2006
+     regulatory_reporting:
+       - Suspicious Matter Report (SMR)
+     audit_all_access: true
+     breach_notification_required: true
+     notification_timeframe: "72 hours"
+   ```
 
-```yaml
-# In domain.md Metadata section
-governance:
-  classification: "Highly Confidential"  # Default for all entities
-  pii: true
-  regulatory_scope:
-    - APRA CPS 234
-    - RBNZ BS13
-    - Basel III
-    - FATF AML/CTF
-  default_retention: "7 years post relationship end"
-  data_residency: ["Australia", "New Zealand"]
-```
+3. Before applying anything, check that the regulator's scope covers the entity (e.g. CPS 234
+   applies to material information assets), that retention fits the business lifecycle,
+   and that residency is feasible.
 
-Entities can override domain defaults when needed.
+**Multiple jurisdictions.** List every framework in `regulatory_scope`, noting which
+entity or operation each applies to. Where two frameworks conflict (for example,
+different retention periods), apply the more conservative value and record the conflict
+in a `# NOTE:` comment for the compliance team.
 
-## Entity-Level Regulatory Metadata
-
-Apply only entity-specific overrides that differ from domain defaults:
-
-```yaml
-# In entities/customer.md
-governance:
-  retention: "10 years post relationship end"
-  retention_basis: "APRA record keeping requirements"
-  audit_all_access: true
-  breach_notification_required: true
-  notification_timeframe: "72 hours"
-```
-
-## Dual/Multiple Jurisdiction Scenarios
-
-For organizations operating in multiple jurisdictions:
-
-```yaml
-governance:
-  regulatory_scope:
-    - APRA CPS 234 (parent company - Australia)
-    - RBNZ BS13 (local subsidiary - New Zealand)
-    - Basel III (international capital standards)
-  
-  data_residency: ["Australia", "New Zealand"]
-  
-  dual_reporting: true
-  reporting_frameworks:
-    - APRA ARF 320 (quarterly)
-    - RBNZ Financial Statements (quarterly)
-```
-
-## Compliance Framework Mapping
-
-Map entities to specific reporting frameworks:
-
-```yaml
-governance:
-  apra_reporting:
-    arf_320_0: true   # Statement of Financial Position
-    arf_320_1a: true  # Balance Sheet
-  
-  rbnz_reporting:
-    financial_statements: true
-    capital_adequacy: true
-  
-  basel_reporting:
-    credit_risk_exposure: true
-    operational_risk: true
-```
-
-## AML/CTF Specific Metadata
-
-For financial crime monitoring (FATF requirements):
-
-```yaml
-governance:
-  aml_relevant: true
-  ctf_relevant: true
-  fatf_scope: true
-  
-  monitoring_required: true
-  screening_required: true
-  screening_lists:
-    - UN Sanctions
-    - OFAC
-    - Local Sanctions
-  
-  enhanced_due_diligence: false  # Default, override for high-risk
-  pep_screening: true
-```
-
-## Loading Additional Regulators Mid-Modeling
-
-If during modeling you discover need for another regulator:
-
-**Ask user**:
-"I notice you're modeling {concept} which may be subject to {additional regulator}. Should we include that compliance framework?"
-
-**Example**:
-```
-User modeling customer data (APRA loaded)
-AI: "I notice you're collecting EU customer data. Should we also apply GDPR requirements?"
-User: "Yes, we have EU operations"
-AI: Loading regulators/gdpr.md...
-AI: Applying GDPR-specific metadata (right to erasure, consent tracking, etc.)
-```
-
-**Only load when**:
-- User explicitly requests
-- Clear regulatory trigger identified (e.g., cross-border data, specific data types)
-- User confirms the additional regulator applies
-
-## Validation
-
-Before applying regulatory metadata:
-1. Confirm loaded regulator guidance applies to this entity
-2. Check entity type against regulator requirements (e.g., APRA CPS 234 applies to "material information assets")
-3. Verify retention periods align with business lifecycle
-4. Ensure data residency requirements are feasible
-
-## When No Regulatory Requirements
-
-If entity has no specific regulatory requirements:
-- Omit detailed regulatory metadata
-- May still include basic classification and retention
-- Document in detail file: "No specific regulatory requirements identified"
+**No requirements.** If an entity has no specific obligations, it gets no block. It
+inherits the domain defaults.

@@ -1,663 +1,251 @@
 ---
 name: concept-explorer
-description: Use this skill when the user asks "what is [concept]", "how does [feature] work", "explain [section]", "compare MD-DDL to [tool]", "why does MD-DDL [design choice]", or any question about a specific part of the standard. Also use when the user wants to understand the reasoning behind a design decision or the trade-offs between alternatives (entity vs enum, canonical vs bounded context, etc.). Also use when the user asks about "linting", "validation", "conformance checking", "why no linter", "how do I check my model", "is there a validator", or any question about how MD-DDL enforces or checks correctness. Also use for eventual consistency, strong consistency, consistency posture, propagation lag, freshness SLA, convergence, null handling, partial rows, NOT NULL constraints under eventual consistency, storage format null semantics (Parquet, Avro, Protobuf), transport protocol null handling, how to model or validate eventual consistency in MD-DDL. Also use when the user asks about synthetic data generation, Faker factories, test data, enterprise profiles, demographic weights, product catalogues, how to generate realistic or tailored test data, or how to make synthetic data reflect a specific industry, geography, customer mix, or product portfolio.
+description: Use when the user asks what an MD-DDL concept is, how a feature works, why the standard makes a design choice, or how it compares with another tool (ER/UML, dbt, Data Mesh, FHIR, catalogues). Also use for validation and linting, multi-viewpoint reviews, lifecycle and versioning, eventual consistency and null handling, synthetic data and enterprise profiles, and trade-offs such as entity vs enum.
 ---
 
 # Skill: Concept Explorer
 
-Covers interactive teaching of any MD-DDL concept — entities, relationships, events,
-enums, domains, sources, transformations, data products, and governance metadata.
-Teaches through analogy, progressive depth, and guided self-discovery.
+Teach any MD-DDL concept through analogy and progressive depth, as described under
+Teach in the core prompt. This skill supplies the analogies, the comparisons, and the
+explanations of topics users ask about often.
 
 ## Spec References
 
-Load the canonical spec section in `md-ddl-specification/` that matches the
-user's question. Reference stubs in `references/` document dependencies for
-`{{INCLUDE}}`-aware platforms — do not rely on the stub content alone.
+Load the spec section that matches the question before explaining rules. The stubs in
+`references/` pull these in on `{{INCLUDE}}`-aware platforms. Elsewhere, read the spec
+file directly.
 
-Reference | When to load
+Section | Covers
 --- | ---
-`md-ddl-specification/1-Foundation.md` (stub: `references/foundation-spec.md`) | Core principles, document structure, two-layer model
-`md-ddl-specification/2-Domains.md` (stub: `references/domains-spec.md`) | Domain file format, metadata, overview diagrams, summary tables
-`md-ddl-specification/3-Entities.md` (stub: `references/entities-spec.md`) | Entity YAML, attributes, types, constraints, inheritance
-`md-ddl-specification/4-Enumerations.md` (stub: `references/enumerations-spec.md`) | Enum formats, naming, dictionary vs simple list
-`md-ddl-specification/5-Relationships.md` (stub: `references/relationships-spec.md`) | Relationship types, cardinality, granularity, constraints
-`md-ddl-specification/6-Events.md` (stub: `references/events-spec.md`) | Event structure, payload, temporal rules, actor/entity
-`md-ddl-specification/7-Sources.md` (stub: `references/sources-spec.md`) | Source file format, change models, domain feed tables
-`md-ddl-specification/8-Transformations.md` (stub: `references/transformations-spec.md`) | Transformation types, expression language, mapping rules
-`md-ddl-specification/9-Data-Products.md` (stub: `references/dataproducts-spec.md`) | Data product classes, declaration, governance, masking
+`md-ddl-specification/1-Foundation.md` | Principles, document structure, two-layer model, validation and verification
+`md-ddl-specification/2-Domains.md` | Domain file, metadata, overview diagram, summary tables, lifecycle
+`md-ddl-specification/3-Entities.md` | Entity YAML, attributes, types, constraints, inheritance, temporal tracking
+`md-ddl-specification/4-Enumerations.md` | Enum formats and naming
+`md-ddl-specification/5-Relationships.md` | Relationship types, cardinality, granularity
+`md-ddl-specification/6-Events.md` | Event structure, payload, actor and entity
+`md-ddl-specification/7-Sources.md` | Source summaries, change models, transform detail, fan-out
+`md-ddl-specification/8-Transformations.md` | Transformation types, expressions, worked examples, fan-in
+`md-ddl-specification/9-Data-Products.md` | Product classes, declaration, masking, SLA
+`md-ddl-specification/10-Adoption.md` | Adoption metadata and baselines
 
 ---
 
-## Teaching Protocol
+## Analogies
 
-Follow this sequence for every concept question. Adjust depth based on user signals.
+Pick the column that matches the user's background.
 
-### Step 1 — Anchor to the Familiar
-
-Before explaining the MD-DDL concept, connect it to something the user already knows.
-Use the archetype from the core prompt to select the right analogy:
-
-MD-DDL Concept | ER / UML analogy | dbt / SQL analogy | Data Mesh analogy | FHIR analogy | Governance analogy
+MD-DDL concept | ER / UML | dbt / SQL | Data Mesh | FHIR | Governance
 --- | --- | --- | --- | --- | ---
-**Eventual Consistency** | — | Incremental model with overlapping refresh windows | Data product SLA / freshness window | — | Freshness SLA declaration; convergence audit trail
-**Entity** | ER entity, UML class | dbt model, table | Domain aggregate | FHIR Resource (Patient, Encounter) | Governed data asset
-**Attribute** | Column, field | Column in model | Property | Resource element (e.g. `Patient.name`) | Data element with classification
-**Enum** | Lookup table, code table | Seed file, static reference | Reference data | ValueSet, CodeSystem | Controlled vocabulary
-**Relationship** | ER relationship, FK | ref() in dbt, join | Cross-aggregate reference | FHIR Reference type | Lineage link
-**Event** | — (no direct ER equivalent) | CDC event, incremental model | Domain event | FHIR AuditEvent, Provenance | Audit trail trigger
-**Domain** | Subject area, schema | Project, package | Bounded context | Implementation Guide | Data domain in catalogue
-**Source** | — | Source in dbt, raw table | External system feed | Integration endpoint | System of record
-**Transformation** | — | dbt transformation, SQL expression | Mapping rule | ConceptMap | ETL specification
-**Data Product** | — | Exposure in dbt | Data product / data contract | — | Published data asset
-**Lineage** | — | Source/ref lineage in dbt | Data provenance chain | — | Data flow audit trail
-**Logical Model** | Logical ER diagram | — | Product schema contract | — | Governed data structure
-**Attribute Mapping** | — | Column-level lineage | Field-level data contract | ConceptMap | Attribute provenance
-**Version / Lifecycle** | Schema version in migration tool | dbt project version, model deprecation | Domain version, contract versioning | Resource version history | Change control record
-**Change Manifest** | Change log with typed impacts | dbt `state:modified` selector | Contract change record | — | Audit change register
-**Reconciliation** | Schema compare tool | Compare generated model to deployed relation | Contract compatibility check | — | Control attestation compare
-**Synthetic Data Factory** | Test fixture, factory class | dbt seed, `generate_series()` | Consumer test dataset generator | — | Governance-safe test dataset
-**Enterprise Profile** | Test data seed configuration | Faker locale + custom providers | Domain product consumer config | — | Demographic and product-catalogue constraint set
+**Entity** | ER entity, UML class | Model, table | Domain aggregate | Resource (Patient, Encounter) | Governed data asset
+**Attribute** | Column, field | Column | Property | Resource element (`Patient.name`) | Classified data element
+**Enum** | Lookup / code table | Seed, static reference | Reference data | ValueSet, CodeSystem | Controlled vocabulary
+**Relationship** | ER relationship, FK | `ref()`, join | Cross-aggregate reference | Reference type | Lineage link
+**Event** | (no ER equivalent) | CDC event, incremental model | Domain event | AuditEvent, Provenance | Audit trail trigger
+**Domain** | Subject area, schema | Project, package | Bounded context | Implementation Guide | Catalogue data domain
+**Source** | (none) | Source, raw table | External feed | Integration endpoint | System of record
+**Transformation** | (none) | SQL expression, staging model | Mapping rule | ConceptMap | ETL specification
+**Worked Example** | (none) | Unit test `given`/`expect` | Contract test | Example instance | Control test evidence
+**Data Product** | (none) | Exposure | Data product, data contract | (none) | Published data asset
+**Attribute Mapping** | (none) | Column-level lineage | Field-level contract | ConceptMap | Attribute provenance
+**Version / Lifecycle** | Migration schema version | Model versions, deprecation | Contract versioning | Resource version history | Change control record
+**Reconciliation** | Schema compare | Generated vs deployed relation | Contract compatibility check | (none) | Control attestation
+**Eventual Consistency** | (none) | Incremental model with overlapping windows | Product freshness window | (none) | Freshness SLA and convergence audit trail
 
-> "In ER modelling, you would call this an entity with attributes. In MD-DDL, it is
-> the same idea — but defined in Markdown with YAML blocks, version-controlled, and
-> AI-readable."
+## Showing Structure
 
-### Step 2 — Two-Sentence Summary
-
-Give a concise definition. Do not quote the spec verbatim — rephrase for clarity.
-
-Examples:
-
-- **Entity:** "An entity represents a distinct business concept — something your
-  organisation needs to identify, describe, and track over time. In MD-DDL, each
-  entity has a name, attributes with types and constraints, and metadata about
-  how it behaves (mutable or immutable, independent or dependent)."
-
-- **Relationship:** "A relationship connects two entities and describes how they
-  relate in the business domain — who owns what, who participates in what. MD-DDL
-  captures the cardinality, whether it is identifying, and what attributes belong
-  to the relationship itself."
-
-- **Data Product:** "A data product declares what data is published, for whom, in
-  what shape, and under what governance rules. Domain-aligned products are projections
-  of the canonical model with lineage to source system tables. Consumer-aligned
-  products define their own logical model — with attribute-level mapping back to
-  canonical entities — and never source from source systems directly."
-
-### Step 3 — Check Understanding
-
-After the summary, check before going deeper:
-
-> "Does that match how you think about [concept]? Or would you like me to go into
-> the structure and rules?"
-
-If the user wants more depth, proceed to Step 4. If they are satisfied, stop or
-move to their next question.
-
-### Step 4 — Structure and Syntax
-
-Show the concept's MD-DDL structure with a brief, annotated example. Use the
-examples from `examples/Simple Customer/` or `examples/Financial Crime/` where
-possible — do not invent examples when real ones exist.
-
-For each structural element, explain:
-
-- **What it is** — the field name and its purpose
-- **Why it matters** — what goes wrong if it is missing or wrong
-- **Common choices** — the typical values and when to use each
-
-### Step 5 — Rules and Edge Cases
-
-Only reach this level if the user asks for it or hits a specific edge case.
-Load the relevant spec reference stub and present the applicable rules with
-context:
-
-> "The spec says [rule]. The reason is [rationale]. In practice, this means
-> [implication for what the user is doing]."
-
-### Step 6 — Try It Yourself
-
-Invite the user to apply the concept to their own domain:
-
-> "Describe a concept from your domain and I will show you how it would look
-> in MD-DDL."
-
-When the user describes something, sketch it in MD-DDL as a **demonstration** —
-mark it clearly as an illustration, not a production artifact. Then discuss:
-
-- Does this capture the concept correctly?
-- What would you change?
-- Are there edge cases or alternatives we should consider?
-
-If the user is ready to create production artifacts, transition to Navigate mode
-and hand off to Agent Ontology.
+When the user wants more than the summary, show the concept's structure with a short
+annotated excerpt from a real example (`examples/`; the coverage matrix in
+`examples/README.md` shows which example exercises which feature). Don't invent an
+example when a real one exists. For each element, cover what it is, what goes wrong if
+it's missing or wrong, and the common choices. Rules come last and only on request:
+state the rule, its reason, and what it means for the user's work.
 
 ---
 
-## Comparing MD-DDL to Other Tools
+## Comparisons
 
-When a user asks "how does MD-DDL compare to [tool]", structure the comparison around
-what they care about most:
+Structure a comparison around what the user cares about.
 
-### vs ER Diagrams / UML
+**ER / UML.** Same: entities, attributes, relationships, inheritance. Different:
+Markdown-native and diff-friendly, governance built in, events first-class, no GUI.
+Added: sources, transformations, data products, and compliance in one model.
 
-- **Same:** Entities, attributes, relationships, inheritance
-- **Different:** Markdown-native (version-controlled, diff-friendly); governance
-  metadata built in; events as first-class concepts; AI-agent-friendly structure;
-  no GUI dependency
-- **Added value:** Source mappings, transformations, data products, regulatory
-  compliance — all in one model
+**dbt.** Same: text-based and version-controlled. Different: MD-DDL defines what the
+data *means*; dbt defines how to build it. Complementary: Agent Artifact generates a dbt
+project per data product from the organisation's template, and Agent Test compiles
+worked examples into dbt unit tests.
 
-### vs dbt
+**Data Mesh / data contracts.** Same: domain ownership and data as a product. Different:
+MD-DDL is a concrete language with formal product declarations (schema type,
+governance, masking, SLA) that drive generation, not a conceptual framework.
 
-- **Same:** Text-based, version-controlled, describes data
-- **Different:** MD-DDL is the *logical* model; dbt is the *physical* transformation
-  layer. MD-DDL defines *what the data means*; dbt defines *how to build it*
-- **Complementary:** Agent Artifact can generate dbt-compatible output from MD-DDL
-  data products
+**FHIR.** FHIR is a healthcare interoperability standard; MD-DDL is domain-agnostic.
+Entities align to FHIR resources and enums to ValueSets, and MD-DDL adds governance,
+temporal tracking, source mapping, and generation.
 
-### vs Data Mesh / Data Contracts
-
-- **Same:** Domain ownership, data-as-a-product thinking, consumer focus
-- **Different:** MD-DDL is a concrete modelling language with structured syntax, not
-  a conceptual framework. Data products in MD-DDL have formal declaration syntax
-  with schema type, governance, masking, and generation rules
-- **Added value:** MD-DDL provides the *implementation* of Data Mesh principles in a
-  format that drives automated generation
-
-### vs FHIR
-
-- **Same:** Structured data definitions, coded concepts, resource types
-- **Different:** FHIR is a healthcare interoperability standard; MD-DDL is a
-  domain-agnostic modelling language. MD-DDL adds governance, temporal tracking,
-  source mapping, and physical generation that FHIR does not cover
-- **Complementary:** MD-DDL entities align to FHIR resources via standards alignment;
-  enums align to ValueSets; the model adds a semantic governance layer above FHIR
-
-### vs Data Catalogues (Collibra, Alation)
-
-- **Same:** Metadata management, ownership, classification
-- **Different:** Catalogues index existing data; MD-DDL *defines* data from the
-  start. Governance metadata lives in the model, not in a separate system
-- **Complementary:** MD-DDL data product manifests (ODPS) can publish to catalogues
+**Catalogues (Collibra, Alation).** Catalogues index existing data; MD-DDL defines data
+from the start, with governance in the model. ODPS manifests can publish products to a
+catalogue.
 
 ---
 
-## Explaining the Validation Model
+## Validation and Linting
 
-When a user asks about linting, validation, conformance checking, or why MD-DDL has no traditional linter, explain the two-tier model clearly. Load `md-ddl-specification/1-Foundation.md` (stub: `references/foundation-spec.md`) to access the normative definition.
+Load `md-ddl-specification/1-Foundation.md § Validation Model`, and
+`guides/validation-tooling.md` for detail.
 
-### Core explanation to give
+MD-DDL uses two tiers:
 
-MD-DDL uses a **two-tier validation model**:
+1. **Pre-flight checks.** These are mechanical and implemented by `md-ddl lint
+   <domain-folder>`. They cover what breaks AI interpretation (YAML and Mermaid syntax,
+   links, entity references, the domain `version`) and what the model contradicts
+   about itself (diagram, tables, and YAML disagreeing).
+2. **Agent-driven review.** This covers convention, quality, and domain fitness: Agent
+   Ontology's domain-review and Agent Governance's compliance-audit skills.
 
-1. **Mechanical pre-flight checks** — syntax-level only. Five checks: YAML syntax, Mermaid syntax, internal link integrity, entity reference consistency, and domain version field. These are binary (broken or not broken) and have no exceptions.
+Explain why the linter stops at tier 1 using the guide's five validation levels: only
+syntax is mechanically decidable without false positives. Convention and quality need
+context, and domain fitness needs people. Vocabulary deviations (`phi` for `pii`) are
+signal, not errors. Agents work with them and note them as possible spec contributions.
 
-2. **Agent-driven quality review** — everything above syntax. Structure, convention, governance completeness, domain fitness. This is handled by Agent Ontology's domain-review skill and Agent Governance's compliance-audit skill, because these concerns require context and judgment that no rule engine can provide.
-
-### Why MD-DDL doesn't have a traditional linter
-
-Use this 5-level categorisation to explain why each level is — or isn't — mechanically checkable:
-
-Level | Category | Example | Mechanically checked?
---- | --- | --- | ---
-1 | Syntax | YAML parses, links resolve | Yes — no wiggle room; broken syntax corrupts agent interpretation
-2 | Structure | Required sections present | Partially — legitimate exceptions exist (governance inheritance, minimal domains)
-3 | Convention | Naming patterns, vocabulary choices | No — organisational adaptations are valuable signal, not errors
-4 | Quality | Governance completeness, relationship coverage | No — requires judgment about intent and context
-5 | Domain fitness | Is this the right model for the business? | Never — requires human domain expertise
-
-The key insight: **the primary consumer of an MD-DDL model is more sophisticated than any linter**. Agent Ontology already reads intent, identifies gaps, and produces contextual feedback. A linter saying "missing `mutability` key" adds less than the agent — with less context about whether the omission was intentional.
-
-### Handling vocabulary deviations
-
-When an organisation uses `phi` instead of `pii`, or `data_class` instead of `classification`, that is not an error — it is signal. Agents work with deviations and flag them as potential spec vocabulary gaps. This is how the standard improves.
-
-> "In your domain, what terminology do you use for data sensitivity classification? MD-DDL uses `classification`, but if you have existing vocabulary, your agents will understand it and can note the gap for spec consideration."
+Validation checks the model. **Verification** checks what's generated from it
+(Foundation § Verification of Generated Artefacts): worked examples become unit tests,
+constraints become data tests, and SLAs become integration tests. That's Agent Test.
 
 ---
 
-## Explaining Multi-Viewpoint Reviews (Generic)
+## Multi-Viewpoint Reviews
 
-When a user asks for "second opinions", "different viewpoints", "stress testing",
-or broader review quality, teach a multi-viewpoint protocol they can apply to any
-artifact (spec, domain model, architecture proposal, migration plan, or governance
-design).
+For "second opinion" or stress-testing requests on any artifact: define the target and
+question, choose three to five viewpoints with different concerns, run each as an
+independent pass that ends with "what I cannot evaluate", then consolidate agreements,
+disagreements, and blind spots into a prioritised action list with owners.
 
-### Core explanation to give
+Viewpoint | Question
+--- | ---
+Structural | Is it coherent and mechanically sound?
+Adversarial | How could it fail in production?
+Stakeholder | Would practitioners actually use it?
+Operator | Can it be run and maintained safely?
+Governance | Would it satisfy audit and policy obligations?
+New user | Can someone new follow it?
 
-A single review pass often misses issues because each reviewer has blind spots.
-Quality improves when the same artifact is reviewed from different explicit
-viewpoints, then findings are compared.
-
-### Generic multi-viewpoint protocol
-
-1. Define the review target and question clearly.
-2. Select 3 to 5 viewpoints with intentionally different concerns.
-3. Run each viewpoint as an independent pass with a fixed lens.
-4. Require each pass to include "What I Cannot Evaluate".
-5. Consolidate findings: agreement, disagreement, blind spots, and priorities.
-6. Convert the consolidated findings into an action list with owners.
-
-### Viewpoint menu (generic)
-
-Viewpoint | Lens | Typical question
---- | --- | ---
-Structural | Internal consistency, completeness, broken references | "Is this coherent and mechanically sound?"
-Adversarial | Failure modes, contradictions, abuse cases | "How could this fail in production?"
-Stakeholder | Usability and adoption by real roles | "Would practitioners actually use this?"
-Operator | Runability, migration risk, operational burden | "Can this be implemented and maintained safely?"
-Governance | Compliance, controls, accountability | "Would this satisfy audit and policy obligations?"
-New User | Learnability and onboarding friction | "Can someone new follow this successfully?"
-
-### Practical teaching template
-
-Use this script when users ask how to run better reviews:
-
-> "Pick your target artifact, then run three passes: structural, adversarial,
-> and stakeholder. Keep each pass independent, force a limitations section,
-> and only then merge findings into one prioritised action list."
-
-### Handoff guidance
-
-- For MD-DDL standard/agent/example reviews: route to `review-md-ddl` for layered execution.
-- For a domain model quality check: route to Agent Ontology (`domain-review`) and Agent Governance (`compliance-audit`) for complementary viewpoints.
-- For architecture and product decision stress testing: route to Agent Architect and ask for explicit trade-off framing per viewpoint.
+Route execution: MD-DDL standard, agents, or examples → `review-md-ddl`; a domain model →
+Agent Ontology (domain-review) and Agent Governance (compliance-audit); architecture or
+product decisions → Agent Architect.
 
 ---
 
-## Explaining Lifecycle and Evolution
+## Lifecycle and Evolution
 
-When a user asks about versioning, lifecycle, change history, migration planning,
-or how model changes propagate to generated artifacts, load both
-`md-ddl-specification/2-Domains.md` and `md-ddl-specification/9-Data-Products.md`.
+Load `2-Domains.md` and `9-Data-Products.md`. The key point: the authoritative diff is at
+the **logical** layer. Regenerated physical output can differ without any change in meaning.
 
-### Core explanation to give
+The change workflow:
 
-MD-DDL separates **logical evolution** from **physical regeneration**.
+1. Change the model.
+2. Classify the change: breaking, additive, or corrective.
+3. Bump the version.
+4. Record the change in `LIFECYCLE.md` with its change manifest.
+5. Regenerate.
+6. Reconcile against deployed state, using the manifest to separate intended change
+   from regeneration noise.
 
-- **Logical evolution** is the intentional change to the domain model: adding an
-  entity, deprecating an entity, changing a relationship, or updating a product
-  contract. This is what domain and product semantic versions describe.
-- **Physical regeneration** is the act of generating a new schema, graph, or file
-  contract from the updated logical model. Generated output may differ physically
-  even when the logical meaning has not changed.
+Products may lag their domain (a `Draft` product in an `Active` domain) but never lead it.
 
-The key teaching point is: **the authoritative diff lives at the logical layer, not
-the physical layer**.
+Analogy: the model is source code, `LIFECYCLE.md` is typed release notes, and
+reconciliation compares the new build with what's running.
 
-### Workflow to explain
-
-Use this sequence whenever the user asks how MD-DDL handles change:
-
-1. Make the logical change in the MD-DDL model.
-2. Classify it as breaking, additive, or corrective.
-3. Bump the domain or product version accordingly.
-4. Record the change in `LIFECYCLE.md`, including the machine-readable change manifest.
-5. Regenerate physical artifacts from the updated model.
-6. Reconcile generated output against deployed or baseline state.
-7. Use the change manifest to distinguish intentional changes from regeneration noise.
-8. Hand the annotated gap report to the user's migration toolchain if a deployment change is needed.
-
-### Product and Domain Lifecycle Relationship
-
-Explain the relationship this way:
-
-- Domains and products both have lifecycle states and versions.
-- Products can lag behind a domain. A product may stay `Draft` while its domain is `Active`.
-- Products cannot lead a domain. A product cannot be `Active` if its domain is still `Draft` or `Review`.
-- Products referencing deprecated entities or deprecated upstream domains need either deprecation or an explicit migration note.
-
-### Handoff Guidance
-
-When the user moves from explanation to action, route them explicitly:
-
-- **Domain promotion, version bump, entity lifecycle** → Agent Ontology
-- **Product promotion, product version bump, deprecation planning** → Agent Architect
-- **Generated vs deployed schema comparison** → Agent Artifact
-- **Lifecycle consistency or governance audit** → Agent Governance
-
-### Short analogy to use
-
-> "Think of MD-DDL like source code plus release notes for data meaning. The model is the source, `LIFECYCLE.md` is the typed release history, and reconciliation is the step where you compare the newly built artifact to what is already running."
+Route: domain versioning → Agent Ontology; product versioning → Agent Architect;
+generated vs deployed → Agent Artifact (reconciliation); lifecycle audit → Agent Governance.
 
 ---
 
-## Explaining Eventual Consistency in Canonical Data Products
+## Eventual Consistency
 
-When a user asks about eventual consistency, propagation lag, freshness SLA,
-partial rows, or null handling for multi-source canonical entities, follow this
-teaching protocol. Load `md-ddl-specification/9-Data-Products.md` and
-`md-ddl-specification/7-Sources.md` before responding substantively.
+Load `7-Sources.md` and `9-Data-Products.md`. Agent Architect's architecture skill has
+the full architectural treatment. Here, teach what it is and how to express it.
 
-For deep architectural discussion or product design decisions, hand off to
-Agent Architect. For implementation work (declaring the product, updating DDL
-generation), hand off to Agent Architect then Agent Artifact.
+**Summary.** Sources update a canonical entity with different lags. The product declares
+the window within which the entity converges. Bitemporal tracking makes the lag
+measurable: `valid_from` is when something became true, `recorded_at` is when the
+canonical system learned it, and the gap between them is the lag.
 
-### Step 1 — Anchor to the Familiar
+**Analogies:** Kafka consumer groups at different offsets (engineer); DNS propagation
+within a TTL (architect); a master record whose fields different feeds update
+(steward); CDC fan-out at different cadences (integration).
 
-Select the analogy that matches the user's background:
+**How it's declared:**
 
-| User type | Analogy |
-| --- | --- |
-| Data engineer | "Like Kafka consumer groups at different offsets — the canonical entity is the eventually-consistent view all consumers converge to. Each source is a producer at its own throughput; the canonical product's SLA is the guaranteed catch-up window." |
-| Data architect | "Like DNS propagation — a record change propagates to different resolvers at different speeds, but within the TTL window all resolvers agree. The canonical data product's `freshness` SLA is the TTL." |
-| Data steward | "Like a master record in a catalogue where different source systems update different fields — the catalogue view is eventually correct once all feeds have processed. The governance question is: what does the record look like mid-update?" |
-| Integration engineer | "Like CDC fan-out where downstream consumers subscribe at different cadences. The canonical entity accumulates updates from each source as they arrive; the bitemporal record shows exactly when each arrived." |
+1. Each source's `change_model` sets its expected lag.
+2. Bitemporal tracking on the entity records when each update arrived.
+3. The product's `sla.freshness` is the convergence window.
+4. The product records its consistency posture and null strategy (Agent Architect
+   product-design, Step 8).
+5. Fan-in worked examples with `interim` states pin what a partly converged instance
+   looks like.
 
-### Step 2 — Two-Sentence Summary
+**The null problem.** Mid-convergence, some attributes are null because they haven't
+arrived yet, not because they are genuinely empty. That matters in three places:
 
-Eventual consistency in a canonical data product means that updates from different
-source systems arrive with different propagation lags, and the canonical entity
-converges to the correct state within a declared SLA window. MD-DDL makes this
-measurable: the `recorded_at` timestamp (transaction time) captures when the
-canonical system received each update, while `valid_from` (valid time) captures
-when it was true in the real world — the gap between them is the observable
-propagation lag.
+- **Storage.** Parquet and Arrow can't tell the two kinds of null apart.
+- **Transport.** JSON, Avro, and Protobuf each handle "absent" differently; only
+  Protobuf's `hasField()` distinguishes it cleanly.
+- **DDL.** A hard `NOT NULL` blocks partial rows.
 
-### Step 3 — How to Declare It in MD-DDL
+The strategies are:
 
-Teach this four-step pattern:
+- `nullable-staging`: a nullable base table, with a converged view for consumers (the
+  usual choice)
+- `reject-partial`: effectively strong consistency
+- `nullable-final`: consumers handle nulls themselves
 
-1. **Source `change_model`** — each source declares how it propagates changes.
-   This governs expected lag per source:
-   ```yaml
-   change_model: real-time-cdc      # < 1 minute lag
-   change_model: batch-intraday     # 15–60 minute lag
-   ```
+**When not to use it.** Real-time fraud decisioning, payment authorisation, and
+sanctions hard-stops, where acting on stale data is the failure.
 
-2. **Entity temporal tracking** — bitemporal entities record both when a fact
-   was true (`valid_from`/`valid_to`) and when the system received it
-   (`recorded_at`/`superseded_at`). This is the audit trail for convergence.
-
-3. **Product `freshness` SLA** — the convergence window the product commits to:
-   ```yaml
-   sla:
-     freshness: "< 1 hour"   # slowest source is batch-intraday at 60 min
-   ```
-
-4. **Consistency posture comment** — records the architectural decision:
-   ```yaml
-   # Consistency posture: eventual (convergence SLA: < 1 hour)
-   # Null strategy: nullable-staging (partial rows in base; converged view for consumers)
-   ```
-
-### Step 4 — The Null Handling Problem
-
-This is the hardest practical consequence of eventual consistency. Teach it
-progressively — lead with the engineering reality, not the theory.
-
-**The problem:** During the convergence lag window, a canonical row may be
-partially populated. One source has delivered its attributes; another hasn't
-yet. The row exists but some fields are `NULL` — not because they are genuinely
-null, but because they haven't arrived yet.
-
-**Three layers where this bites:**
-
-*Storage (Parquet / Arrow):* These columnar formats cannot distinguish `null`
-(explicitly set to null) from *absent* (not yet received). Both encode as `null`.
-Any downstream reader sees identical bytes for "genuinely unknown" and
-"temporarily missing". If downstream ML models or analytics treat `null` as
-"genuinely absent", they may draw incorrect conclusions from in-flight rows.
-
-*Transport protocols:* Each protocol handles absent-vs-null differently. JSON
-omits absent keys but most deserializers collapse the distinction. Avro requires
-a `union [null, <type>]` schema for optional fields. Protobuf's `hasField()` is
-the most expressive — it can distinguish "not set" from "set to zero or empty".
-The **choice of transport protocol is an architectural dependency** of the
-consistency posture: if the user needs to distinguish absent-from-null, they
-must choose Protobuf or a custom Avro convention.
-
-*DDL constraints:* A hard `NOT NULL` column in the physical schema blocks partial
-row insertion entirely. MD-DDL's `not_null` attribute constraint declares business
-intent ("Legal Name must never be permanently null"). The physical `NOT NULL`
-constraint is a separate choice — and under eventual consistency, it may need to
-be relaxed on the staging table and enforced only at the view layer.
-
-**Three design patterns, teach the trade-offs:**
-
-| Pattern | How it works | When to choose |
-| --- | --- | --- |
-| Nullable staging + converged view | Base table has `NULL` columns; a view exposes only rows where all expected fields are populated | Best for most eventual-consistency canonical products |
-| Reject-partial inserts | Application blocks insert until all sources have contributed | Equivalent to strong consistency; use only if all sources can coordinate |
-| Nullable final schema | Base table nullable permanently; consumers handle nulls themselves | Avoid unless consumers are explicitly designed for it |
-
-### Step 5 — How to Validate It
-
-Point the user to the faker runtime for concrete demonstration:
-
-- **`consistency_scenario.py`** (in `agents/agent-artifact/skills/faker/runtime/`)
-  simulates what each source feed has delivered at a given moment and shows which
-  entity instances are still in-flight vs fully converged.
-- **`examples/Financial Crime/consistency_example.py`** is a runnable end-to-end
-  demonstration: three source feeds (5 min, 30 min, 60 min lag) converging on
-  the Party entity, with SLA validation and a convergence report.
-- **`check_temporal_chain()`** in `integrity_check.py` validates that the
-  bitemporal chain for each entity instance is coherent (no duplicate current
-  rows, no inverted valid-time periods, monotonically increasing `recorded_at`).
-
-### Step 6 — When Not to Use Eventual Consistency
-
-Teach the conditions where **strong consistency is required**:
-- Real-time fraud decisioning — a transaction must not be approved against a
-  stale risk rating
-- Payment authorisation — account status must be current at the moment of authorisation
-- Regulatory hard-stops — a party with `sanctions_screen_status: Confirmed Match`
-  must not transact; eventual lag could allow a blocked transaction through
-
-In these cases, either all source systems must support synchronous propagation
-(real-time-cdc with sub-minute lag), or the product must be scoped to exclude
-the slow-source attributes and rely on real-time enrichment at query time.
-
-### Step 7 — Handoff Guidance
-
-| Next step | Route to |
-| --- | --- |
-| Architect wants to *discuss* the consistency posture decision | Agent Architect (architecture skill) |
-| User wants to *declare* the product with consistency posture and null strategy | Agent Architect (product-design skill, Step 8) |
-| User wants to *generate DDL* for a nullable-staging pattern | Agent Artifact (dimensional or normalized skill, with consistency posture handoff note) |
-| User wants to *validate* eventual consistency with synthetic data | Agent Artifact (faker skill) — generate factories then run `consistency_example.py` |
+**Validation:** `agents/agent-artifact/skills/faker/runtime/consistency_scenario.py`,
+the runnable `examples/Financial Crime/consistency_example.py`, and Agent Test for
+fan-in examples.
 
 ---
 
-## Explaining Synthetic Data Generation and Enterprise Profiles
+## Synthetic Data and Enterprise Profiles
 
-When a user asks about synthetic data, Faker factories, test data generation,
-or how to make generated data reflect their enterprise's characteristics, follow
-this protocol. Load `agents/agent-artifact/skills/faker/SKILL.md` to access the
-full generation specification before responding substantively.
+Agent Artifact's faker skill generates Python Faker factories from entity definitions.
+They produce referentially consistent, PII-safe datasets with correct temporal
+patterns. An optional **enterprise profile** weights the generated values toward the
+enterprise's real geography, age mix, customer types, products, and value ranges. It
+helps when data must look believable to stakeholders (demos, UAT). It doesn't matter
+when only structural validity is being tested.
 
-For production generation work (producing factory files, running the factories,
-validating integrity), hand off to Agent Artifact. Your role here is to help the
-user understand the concepts well enough to answer the discovery questions Agent
-Artifact will ask — particularly around enterprise profiles.
+Your role is to help the user answer the profile questions before handing off.
+Ask them conversationally, and rough answers are fine:
 
-### Step 1 — Anchor to the Familiar
+Question | Drives
+--- | ---
+Industry and primary market? | Which pre-built profile to start from
+Geographies served, in rough proportions? | Per-record Faker locale; country and region fields
+Customer age distribution (rough bands)? | Date of birth
+Customer type mix (individual, corporate, SME)? | Party type and product eligibility
+Main products, which customer types they're restricted to, typical values? | Product, amount, balance, premium, currency
 
-Select the analogy that fits the user's background:
-
-| User type | Analogy |
-| --- | --- |
-| Data engineer | "Like pytest fixtures with a `faker` provider — a factory class that builds a realistic row on demand. The enterprise profile is like a custom Faker provider that constrains the random draw to your actual distribution." |
-| Data modeller | "Like a population model for your domain: instead of `random.choice()` on any value, you weight the draws to reflect the enterprise's real customer mix, product split, and geographic spread." |
-| Data steward | "Like test data governance — the enterprise profile documents *what kind of data* the enterprise handles, so synthetic records look like real ones without containing real ones. You get plausibility without PII risk." |
-| QA / test engineer | "Like parameterised test data factories where the parameters come from the business. Instead of inventing values, you declare the distribution once and every generated row conforms to it." |
-| Business analyst | "Like describing your customer base in a config file: 70% UK, 20% EU, 10% rest; average age 42; mostly individual accounts with a small SME book. The factory then generates records that fit that description." |
-
-### Step 2 — Two-Sentence Summary
-
-MD-DDL's synthetic data system generates Python Faker factory classes from entity
-definitions — producing referentially consistent, PII-safe test datasets with correct
-temporal patterns, FK relationships, and constraint encoding. An enterprise profile is
-an optional configuration layer on top of those factories that weights field generation
-toward the enterprise's actual geographic distribution, customer age mix, customer-type
-split, product catalogue, and monetary value ranges.
-
-### Step 3 — The Five Discovery Questions
-
-Before handing off to Agent Artifact for generation, help the user answer these
-five questions. They correspond directly to the five fields of `EnterpriseProfile`.
-Walk through them conversationally — do not present them as a form.
-
-**1. What industry and primary market(s) does the enterprise operate in?**
-
-This determines the broadest framing — a UK bank, a US fintech, and an APAC insurer
-each have fundamentally different customer bases, products, and value ranges. If the
-user describes their industry, you can often suggest the closest pre-built profile
-as a starting point.
-
-*If the user is unsure:* "What sector do you work in, and which country is the primary
-market? That's enough to get started."
-
-**2. Which geographies does the enterprise serve, and roughly what proportion each?**
-
-Geography drives two things: the Faker locale (which produces locale-appropriate
-names, addresses, and phone numbers per record) and the `*country*` / `*region*`
-field values. Ask for relative proportions, not exact percentages — they will be
-normalised automatically.
-
-*Teaching note:* When `geo_weights` is active, each generated record picks a locale
-from the distribution and instantiates a locale-specific Faker — so a 70/20/10
-UK/EU/Other split produces records with British, French/German, and globally diverse
-names and addresses in those proportions.
-
-*If the user is unsure:* "Roughly, what share of your customers are domestic vs.
-international? Even a rough split like '80% domestic, 20% international' is enough."
-
-**3. What does the customer age distribution look like?**
-
-Age bands drive `*date_of_birth*` and `*dob*` fields. Ask for rough bands (18–34,
-35–54, 55+) and relative weights (heavy, moderate, light) rather than precise
-statistics. The profile translates these into sampled ages that land within each band.
-
-*If the user is unsure:* "Is your customer base younger (say, digital-first), older
-(traditional bank or insurer), or broadly spread? Any skew helps."
-
-**4. What is the customer type mix — individual vs. corporate vs. other segments?**
-
-Customer type drives `*party_type*`, `*entity_type*`, and product eligibility.
-Some products are individual-only (personal loan, motor insurance); others are
-corporate-only (group life, business current account). The profile enforces these
-eligibility rules automatically during generation.
-
-*If the user is unsure:* "Roughly what proportion of your customers are individual
-people vs. businesses? And are there smaller segments like sole traders or SMEs
-worth separating out?"
-
-**5. What products does the enterprise offer, and are any restricted by customer type?**
-
-This is the product catalogue — the most domain-specific part of the profile. Ask the
-user to list their main product types and indicate which are retail-only vs.
-commercial-only. Value ranges (what are typical balances or premium amounts?) drive
-`*amount*`, `*balance*`, `*premium*`, and `*limit*` fields. Currency comes with the
-product.
-
-*If the user is unsure:* "List your main product lines — savings account, mortgage,
-insurance policy, and so on. Don't worry about exact value ranges; approximate bands
-(e.g. 'mortgages typically £50k–£500k') are enough to constrain the distribution."
-
-### Step 4 — Pre-built Profile Selection
-
-If the user's enterprise fits one of the three pre-built profiles, recommend it
-directly and explain what adjustments they might need. Pre-built profiles are
-starting points — the user should copy and modify them, not treat them as fixed.
-
-| User describes | Suggest | Likely adjustments |
-| --- | --- | --- |
-| UK-based bank, building society, or credit union | `uk_retail_bank_profile()` | Adjust SME vs. individual split; add product types specific to their offer |
-| US-based neobank, BNPL, payments, or digital wallet | `us_fintech_profile()` | Adjust age skew and product weights; add crypto or investment products if relevant |
-| APAC insurer, life / health / general lines | `apac_insurance_profile()` | Adjust market mix (AU vs. JP vs. SG weighting); add lines specific to their portfolio |
-| None of the above | Custom `EnterpriseProfile(...)` | Walk through each field; Agent Artifact will build the inline definition |
-
-> "The pre-built profile for a UK retail bank is a reasonable starting point. It has
-> a 75% GB / 10% IE / 15% EU geographic split, an age distribution skewed toward
-> 25–64, and GBP products across current account, savings, mortgage, and credit card.
-> Do any of those need adjusting for your actual book?"
-
-### Step 5 — Connecting Profile to Entity Attributes
-
-Help the user see how the profile connects to their specific entity definitions.
-The profile does not replace entity-defined enum values — it *weights* the generation
-of fields that are sensitive to distributional realism.
-
-| Entity attribute pattern | How the profile influences it |
-| --- | --- |
-| `country`, `region`, `locale` | Sampled from `geo_weights`; Faker locale set per record |
-| `date_of_birth`, `age` | Age drawn from `age_bands`; date derived from today minus sampled age |
-| `party_type`, `customer_type`, `entity_type` | Sampled from `customer_type_weights` |
-| `product_code`, `product_name`, `product_type` | Sampled from `products` catalogue, filtered by customer type eligibility |
-| `amount`, `balance`, `premium`, `limit` | Drawn from `product.value_range` for the sampled product |
-| `currency` | From `product.currency` for the sampled product |
-| `sector`, `industry` | Sampled from `sector_weights` (B2B and commercial domains only) |
-
-*Teaching note:* The profile only influences fields that match these patterns. Fields
-not in the table are unaffected and follow the base Faker mapping rules. The profile
-is additive, not restrictive — no existing generation behaviour is removed.
-
-### Step 6 — When No Profile Is Needed
-
-Make clear that enterprise profiles are optional. They add value when:
-
-- The user needs data that looks believable to domain stakeholders, not just
-  technically valid
-- Value ranges, currencies, or product eligibility matter for testing
-- The generated data will be used in demos, UAT, or stakeholder walkthroughs
-  rather than just unit tests
-
-They do not add value when:
-
-- The test only needs structural validity (FK resolution, not-null, enum membership)
-- The entity domain has no geographic, demographic, or product-catalogue dimension
-- The cardinality and temporal patterns are what matters, not distributional realism
-
-> "If your goal is to check that FK relationships hold and temporal chains are coherent,
-> the base Faker factories are sufficient. The enterprise profile matters when the data
-> needs to be believable to a product manager or business analyst reviewing it."
-
-### Step 7 — Handoff to Agent Artifact
-
-When the user is ready to generate, hand off explicitly with the discovery answers
-packaged as context:
-
-> "You have enough to hand off to Agent Artifact. Tell it:
-> - Scope: canonical (or source / destination — whichever applies)
-> - PII mode: safe or realistic
-> - Cardinality: how many root-entity rows
-> - Enterprise profile: [summarise the five answers, or name the pre-built profile]
->
-> Agent Artifact will generate a Python module with factory classes and a
-> DatasetBuilder that accepts your profile. You can then run `integrity_check.py`
-> to validate referential integrity and temporal chain coherence."
-
-| Next step | Route to |
-| --- | --- |
-| User wants to *generate* factory classes | Agent Artifact (faker skill) — provide scope, PII mode, cardinality, and profile answers |
-| User wants to *validate* generated data against integrity rules | Agent Artifact (faker skill) — `integrity_check.py` and `test_template.py` |
-| User wants to *demonstrate* eventual consistency with the generated data | Agent Artifact (faker skill) — `consistency_scenario.py` and `consistency_example.py` |
-| User wants to *understand* how the model should be structured first | Agent Ontology — model the domain, declare entities and enums, then return for generation |
+Then hand off to Agent Artifact (faker skill) with the scope (source, canonical, or
+destination), PII mode, cardinality, and these answers. Its skill lists the pre-built
+profiles and how each field is influenced.
 
 ---
 
-## Design Decision Guidance
+## Design Trade-offs
 
-When users ask about trade-offs ("should I use X or Y?"), explain both options
-and the decision criteria. Do not make the choice for them — present the trade-off
-and let them decide.
+Present both options and the criteria. Let the user decide.
 
-Common trade-offs to be ready for:
+- **Entity vs enum.** Own attributes, relationships, or lifecycle → entity. A fixed set of
+  labels → enum. Unsure → start as an enum and promote it if it grows.
+- **Entity vs attribute.** Can it exist on its own → entity. Always a property of
+  something else → attribute.
+- **Canonical vs bounded context.** Must mean the same everywhere → canonical. Has
+  meaningfully different attributes per context → bounded context.
+- **Inheritance vs discriminator.** Subtypes add attributes or constraints →
+  inheritance. Just a label → discriminator attribute.
 
-- **Entity vs Enum** — Does the concept have its own attributes, relationships, or
-  lifecycle? → Entity. Is it a fixed set of labels with no independent behaviour?
-  → Enum. Uncertain? → Start as enum, promote to entity if it grows.
-- **Entity vs Attribute** — Could it exist independently? → Entity. Is it always
-  a property of something else? → Attribute.
-- **Canonical vs Bounded Context** — Must the concept mean the same thing everywhere?
-  → Canonical. Does it have meaningfully different attributes in different contexts?
-  → Bounded context.
-- **Inheritance vs Discriminator** — Do subtypes add meaningful attributes or
-  constraints? → Inheritance. Is the distinction just a label? → Discriminator
-  attribute.
-
-For deeper trade-off analysis, load the relevant spec reference and/or defer to
-Agent Ontology's entity-modelling skill.
+For deeper analysis, load the spec section or route to Agent Ontology's entity-modelling skill.

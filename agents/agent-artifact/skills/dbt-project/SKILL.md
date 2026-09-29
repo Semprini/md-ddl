@@ -28,9 +28,9 @@ Load before responding:
 - `md-ddl-specification/7-Sources.md` — source schema tables, Entity Fan-Out, source idiosyncrasies
 - `md-ddl-specification/8-Transformations.md` — transformation types, expression language, worked examples
 - `md-ddl-specification/9-Data-Products.md` — `schema_type`, logical model, attribute mapping, masking, SLA
-- `references/generation-semantics.md` (Agent Artifact) — `existence`, `mutability`, `temporal`, `change_model` to physical structure
-- The generation skill that matches the product's `schema_type` (`skills/normalized/`, `skills/dimensional/`, `skills/wide-column/`)
-- `skills/dialects/snowflake.md` when the cloud tier is Snowflake
+- `../../references/generation-semantics.md` — `existence`, `mutability`, `temporal`, `change_model` to physical structure
+- The generation skill that matches the product's `schema_type` (`../normalized/`, `../dimensional/`, `../wide-column/`)
+- `../dialects/snowflake.md` when the cloud tier is Snowflake
 
 ---
 

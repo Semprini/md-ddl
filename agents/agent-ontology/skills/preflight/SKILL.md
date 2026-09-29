@@ -89,6 +89,7 @@ Common fixes by rule:
 | `entity-references` | Match the value to an entity name in the `## Entities` table in `domain.md` |
 | `domain-version` | Add `version: "x.y.z"` to the `## Metadata` YAML block in `domain.md` |
 | `domain-diagram-coverage` | Add the drawn concept to the Entities or Enums table, or fix the `Specializes` column to match an `is a` edge |
+| `domain-table-coverage` | A table entry missing from the overview diagram (warning): add the node, or leave it if the diagram is deliberately partial |
 | `domain-link-consistency` | Point the summary link at the detail heading of the same name, or rename one of them so they agree |
 | `entity-heading-link` | Make the level-1 heading a link back to the domain, e.g. `# [My Domain](../domain.md)` |
 | `entity-diagram-links` | Declare the referenced class with a link: `class Foo["<a href='foo.md'>Foo</a>"]` |

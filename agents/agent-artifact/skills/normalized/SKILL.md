@@ -15,39 +15,15 @@ This is **pragmatic/practical 3NF**:
 
 ## Load First
 
-- `../../agent-ontology/skills/entity-modelling/SKILL.md`
-- `../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
-- `../../agent-ontology/skills/relationship-events/SKILL.md`
-- `../../agent-ontology/skills/standards-alignment/SKILL.md` (mandatory in recognized industry domains)
+- `../../references/generation-semantics.md`: `existence` (core, child, or intersection
+  table), `mutability` (versioned or history tables, append-only, current state), and the
+  temporal column sets. They are not repeated here.
+- `../../../agent-ontology/skills/entity-modelling/conceptual-to-physical-realisation.md`
+- `../../../agent-ontology/skills/standards-alignment/SKILL.md` in industry-standard domains
 
----
-
-## Core Mapping Rules
-
-### Entity Realization
-
-`existence` | Typical 3NF realization | Notes
---- | --- | ---
-`independent` | Core table | Stable business object with primary key
-`dependent` | Child/transaction table | Exists in context of parent or process
-`associative` | Intersection table | Resolves many-to-many and carries link attributes
-
-### Mutability and Temporal Realization
-
-`mutability` | Practical relational strategy
---- | ---
-`reference` | Reference table with controlled updates and audit metadata
-`slowly_changing` | Versioned table or history companion table
-`frequently_changing` | Current-state table with optional change log/audit table
-`append_only` | Append-only transaction/event table
-`immutable` | Immutable ledger/event table
-
-`temporal.tracking` | Minimum column expectation
---- | ---
-`valid_time` | business valid-from / valid-to
-`transaction_time` | recorded-at / superseded-at
-`bitemporal` | both valid-time and transaction-time sets
-`point_in_time` | event timestamp (+ sequence when needed)
+3NF specifics: `slowly_changing` is realised as a versioned table or a history companion
+table. `frequently_changing` is a current-state table with an optional change log.
+`reference` tables carry audit metadata for their controlled updates.
 
 ---
 
@@ -138,7 +114,6 @@ with a FK back to the parent.
 
 - `extends:` with subtypes adding ≥3 distinct attributes
 - Subtypes with different constraints or lifecycle
-- Entity YAML uses classDiagram `--|>` (inheritance arrow)
 
 **DDL template:**
 
@@ -301,26 +276,3 @@ Before finalizing a pragmatic 3NF design, confirm:
 - [ ] Inheritance strategy is selected and justified
 - [ ] Regulatory retention/audit requirements are reflected
 - [ ] Output artifacts are consistent across requested targets (DDL/JSON/Parquet)
-
----
-
-## Output Contract
-
-When returning a pragmatic 3NF design, include:
-
-- mapping summary (entity/relationship → table[s])
-- strict-vs-pragmatic decisions list
-- assumptions and open questions
-- generated artifacts in requested format(s): DDL, JSON Schema, Parquet schema contract
-
----
-
-## Generation Limitations
-
-Generated artifacts are syntactically valid but functionally untested. This agent
-cannot validate the following — they require human verification:
-
-- **Execution correctness** — DDL has not been run against an actual database. Test against a real environment before deployment.
-- **Type appropriateness** — Type mappings follow dialect conventions but may not be optimal for actual data characteristics (precision, scale, string lengths).
-- **Denormalization trade-offs** — Pragmatic 3NF decisions are based on heuristics. Validate that denormalized structures serve actual query patterns.
-- **JSON Schema / Parquet fidelity** — Generated contracts reflect the logical model. Validate against actual API payloads or data files.

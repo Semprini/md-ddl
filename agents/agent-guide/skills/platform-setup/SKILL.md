@@ -1,274 +1,83 @@
 ---
 name: platform-setup
-description: Use this skill when the user mentions VS Code, Claude Code, Copilot, or any IDE; asks about setup, installation, or configuration; asks "how do I use the agents"; asks "getting started with [platform]"; or needs help with platform-specific workflows, troubleshooting, or effective prompt patterns.
+description: Use when the user asks how to install, set up, or configure MD-DDL; mentions VS Code, Copilot, Claude Code, or an IDE; asks "how do I use the agents" or "getting started with [platform]"; or needs help with invocation, troubleshooting, or effective prompts.
 ---
 
 # Skill: Platform Setup
 
-Covers environment setup, agent invocation, and daily workflow patterns for
-VS Code Copilot and Claude Code. Teaches users how to get productive in their
-specific environment.
+Get the user from nothing to a working agent in their environment. The setup steps
+below match `README.md § Quick Start`. If the two ever disagree, the README is current.
 
 ---
 
-## VS Code Copilot
+## Install
 
-### Prerequisites
-
-- VS Code with GitHub Copilot extension installed and active
-- GitHub Copilot Chat enabled
-- Git (for submodule setup)
-
-### Setup Steps
-
-#### Step 1 — Add MD-DDL as a Submodule
-
-MD-DDL is consumed as a git submodule in your project. This keeps the standard
-updatable independently of your model files.
+**Recommended: PyPI.** Works in an existing project or an empty directory, and through a
+corporate artifactory:
 
 ```bash
-# Add the submodule
-git submodule add https://github.com/[org]/md-ddl .md-ddl
-
-# Initialize and fetch
-git submodule update --init
+pip install md-ddl
+md-ddl init                 # --ai claude|copilot|both (default both)
 ```
 
-Update to latest version later:
+`md-ddl init`:
 
-```bash
-git submodule update --remote .md-ddl
-```
+- unpacks the standard into `.md-ddl/`, which is git-ignored by default (`--track` commits it)
+- installs the agent wrappers with paths rewritten to `.md-ddl/`: Claude Code slash
+  commands in `.claude/commands/`, Copilot custom agents in `.github/agents/`
+- writes `CLAUDE.md` or `.github/copilot-instructions.md` (skip with `--no-instructions`)
+- creates `.md-ddlignore`
+- checks that every agent prompt's includes resolve
 
-#### Step 2 — Install Agent Wrapper Files
+Upgrade with `pip install --upgrade md-ddl && md-ddl init`. Use `--force` to overwrite
+wrappers and instructions.
 
-Copy the VS Code custom-agent wrappers from the submodule into your project's
-`.github/agents/` directory:
+**Alternative: bootstrap a new project with a git submodule.**
+`scripts/start-project.sh` (or `.ps1` on Windows) sets up git, adds the standard as a
+submodule at `.md-ddl/`, and installs the wrappers for the chosen tool. The README has
+the one-line `curl` / `Invoke-WebRequest` commands.
 
-```bash
-# Create the agents directory
-mkdir -p .github/agents
+**Other tools installed with the package:**
 
-# Copy the wrapper files
-cp .md-ddl/.github/agents/agent-guide.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-ontology.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-artifact.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-architect.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-governance.agent.md .github/agents/
-cp .md-ddl/.github/agents/agent-test.agent.md .github/agents/
-```
+- `md-ddl lint <domain-folder>`: pre-flight checks, honouring `.md-ddlignore`
+- `md-ddl check`: re-verifies the agent prompts' includes
 
-These are lightweight wrappers that include the full agent prompts from the
-submodule. Consider copying all even if you don't plan to use all immediately.
+## Using the Agents
 
-#### Step 3 — Verify Agent Availability
-
-Open VS Code, start a Copilot Chat session, and type `@`. You should see the
-agents listed:
-
-- `@agent-guide` — Learning and navigation (start here)
-- `@agent-ontology` — Domain modelling
-- `@agent-artifact` — Physical schema generation
-- `@agent-architect` — Data product design
-- `@agent-governance` — Compliance auditing
-- `@agent-test` — Test generation and local runs
-
-If agents do not appear, check:
-
-- `.github/agents/` directory exists in your workspace root
-- Wrapper files have valid YAML frontmatter (check for syntax errors)
-- Copilot Chat is using the latest version with custom-agent support
-- Workspace is opened at the root where `.github/agents/` lives
-
-### Daily Workflow in VS Code
-
-#### Invoking Agents
-
-Type `@agent-name` in Copilot Chat to invoke a specific agent:
-
-- `@agent-guide What is an entity in MD-DDL?` — Learn a concept
-- `@agent-ontology Model a Customer domain for retail banking` — Start modelling
-- `@agent-artifact Generate Snowflake DDL for the Customer domain` — Generate schemas
-- `@agent-architect Design a data product for the analytics team` — Design products
-- `@agent-governance Audit the Customer domain against GDPR` — Run compliance audit
-- `@agent-test Compile the worked examples for the Customer product into dbt unit tests` — Generate and run tests
-
-#### Context Tips
-
-Agents work best when they have the right files in context:
-
-- **Open your domain file** before asking modelling questions — the agent can read it
-- **Reference files by path** in your prompt: "Review `domains/customer/domain.md`"
-- **Start with Agent Guide** if you are unsure which agent to use — it will direct you
-- **One domain at a time** — keep conversations focused on a single domain for best results
-
-#### Workspace Structure
-
-A well-organized workspace makes agent interactions more effective:
-
-```text
-your-project/
-  .md-ddl/                    ← MD-DDL submodule (do not edit)
-  .github/
-    agents/                   ← Copied wrapper files
-      agent-guide.agent.md
-      agent-ontology.agent.md
-      agent-artifact.agent.md
-      agent-architect.agent.md
-      agent-governance.agent.md
-      agent-test.agent.md
-  domains/
-    customer/
-      domain.md               ← Your domain models
-      entities/
-        party.md
-        customer.md
-    financial-crime/
-      domain.md
-      entities/
-  sources/
-    salesforce-crm/
-      source.md
-```
-
----
-
-## Claude Code
-
-### Prerequisites
-
-- Claude Code CLI installed and authenticated
-- Git (for submodule setup)
-
-### Setup Steps
-
-#### Step 1 — Add MD-DDL as a Submodule
-
-Same as VS Code — MD-DDL is a git submodule:
-
-```bash
-git submodule add https://github.com/[org]/md-ddl .md-ddl
-git submodule update --init
-```
-
-#### Step 2 — Create CLAUDE.md
-
-Claude Code uses a `CLAUDE.md` file at the project root for configuration.
-Create or update it to reference the MD-DDL agents:
-
-```markdown
-# Project Context
-
-This project uses the MD-DDL standard for data modelling.
-
-## MD-DDL Agents
-
-For learning and guidance, read: `.md-ddl/agents/agent-guide/AGENT.md`
-For domain modelling, read: `.md-ddl/agents/agent-ontology/AGENT.md`
-For physical schema generation, read: `.md-ddl/agents/agent-artifact/AGENT.md`
-For data product design, read: `.md-ddl/agents/agent-architect/AGENT.md`
-For compliance auditing, read: `.md-ddl/agents/agent-governance/AGENT.md`
-For testing generated output, read: `.md-ddl/agents/agent-test/AGENT.md`
-
-## Key References
-
-- MD-DDL specification: `.md-ddl/md-ddl-specification/`
-- Examples: `.md-ddl/examples/`
-- Foundation principles: `.md-ddl/md-ddl-specification/1-Foundation.md`
-- Complete spec (single file): `.md-ddl/md-ddl-specification/MD-DDL-Complete.md`
-```
-
-#### Step 3 — Verify Setup
-
-Start a Claude Code session in your project directory:
-
-```bash
-claude
-```
-
-Ask Claude to read the agent guide:
-
-```
-Read .md-ddl/agents/agent-guide/AGENT.md and help me get started with MD-DDL
-```
-
-### Daily Workflow in Claude Code
-
-#### Invoking Agents
-
-Claude Code does not have the `@agent` syntax of VS Code. Instead, ask Claude
-to adopt an agent's role by reading its prompt:
-
-```
-Read .md-ddl/agents/agent-ontology/AGENT.md and model a Customer domain for
-retail banking.
-```
-
-Or set up the agent at the start of a session:
-
-```
-Read .md-ddl/agents/agent-guide/AGENT.md — I need help understanding MD-DDL.
-```
-
-#### Context Management
-
-Claude Code reads files when asked. Effective patterns:
-
-- **Provide file paths** — "Read `domains/customer/domain.md` and review it"
-- **Load the spec when needed** — "Read `.md-ddl/md-ddl-specification/3-Entities.md`
-  for the entity rules"
-- **Use CLAUDE.md** — Claude automatically reads this at session start, so your
-  agent references are always available
-- **Keep prompts specific** — "Generate a Snowflake star schema from
-  `domains/customer/domain.md`" is better than "generate a schema"
-
-#### Differences from VS Code
-
-Feature | VS Code Copilot | Claude Code
+Tool | Invoke | Example
 --- | --- | ---
-Agent invocation | `@agent-name` in chat | Ask Claude to read AGENT.md
-Wrapper files | `.github/agents/*.agent.md` | `CLAUDE.md` at project root
-File context | Automatically from open tabs | Explicitly via file paths or tool use
-Skill loading | Automatic via triggers in AGENT.md | Same — triggers still apply once agent prompt is loaded
-Output | In chat panel | In terminal
+Claude Code | Slash command | `/agent-guide I'm new to MD-DDL, where do I start?`
+VS Code Copilot | `@` mention | `@agent-ontology Model a Customer domain for retail banking`
 
----
+Agents: `agent-guide` (start here), `agent-ontology`, `agent-artifact`,
+`agent-architect`, `agent-governance`, `agent-test`. If commands don't appear, check
+that the wrappers exist (`.claude/commands/` or `.github/agents/`), that the workspace
+is opened at the project root, and that Copilot Chat supports custom agents. Run
+`md-ddl check` to confirm the prompts load completely.
 
-## Effective Prompt Patterns
+## Working Effectively
 
-These patterns work across both platforms:
+- **Name files by path.** For example: "Review `domains/customer/domain.md`."
+- **Keep one domain per conversation.** Handoffs between agents carry decisions
+  across sessions (handoff files in the domain folder).
+- **Be specific.** "Generate a Snowflake star schema for the Customer 360 product" beats
+  "generate a schema".
+- **Start with Agent Guide if you're unsure** which agent fits.
 
-### Starting a New Domain
+Useful opening requests:
 
-> "I need to model a [domain name] domain for [industry/purpose]. The key
-> business concepts are [list 3-5 concepts]. We use [source systems] and need
-> to comply with [regulations]."
+- **New domain.** Name the domain, its purpose, three to five key concepts, the source
+  systems, and the regulations that apply.
+- **Concept.** Name the concept and a tool you already know to compare it with.
+- **Review.** Give the path to `domain.md` and ask for structural and decision-quality
+  findings by severity.
+- **Generation.** Give the style, the platform, and the data product that scopes it.
 
-### Asking About a Concept
+## Troubleshooting
 
-> "Explain how [concept] works in MD-DDL. I am familiar with [tool/standard]
-> so compare it to what I already know."
-
-### Reviewing Existing Work
-
-> "Review [path to domain.md] for structural conformance and decision quality.
-> Flag any issues by severity."
-
-### Generating Physical Schemas
-
-> "Generate [schema type] for [platform] from [path to domain.md]. Scope it
-> to the [product name] data product."
-
-### Troubleshooting
-
-If an agent is not behaving as expected:
-
-- **Agent seems generic** — Make sure the wrapper file or CLAUDE.md reference
-  is loading the correct AGENT.md. Check that skill triggers match your request.
-- **Agent skipped governance** — Explicitly mention regulatory scope or
-  governance requirements in your prompt.
-- **Output does not match spec** — Ask Agent Guide to explain the relevant spec
-  rule, then re-engage the specialist agent with the rule clarified.
-- **Agent generated production MD-DDL when it should not have** — You may be
-  talking to Agent Guide (which only demonstrates). Switch to Agent Ontology
-  for production modelling.
+Symptom | Likely cause
+--- | ---
+Agent seems generic or ignores MD-DDL rules | The wrapper isn't loading `AGENT.md`, or includes failed. Run `md-ddl check`.
+Governance was skipped | The request didn't mention regulatory scope. State the jurisdictions.
+Output contradicts the spec | Ask Agent Guide to explain the rule, then re-engage the specialist with it.
+Got a demonstration instead of production files | You're talking to Agent Guide. Switch to Agent Ontology.

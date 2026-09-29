@@ -21,7 +21,7 @@ regulatory_scope:
 default_retention: "10 years post relationship end"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "1.0.0"
 tags:
   - Core

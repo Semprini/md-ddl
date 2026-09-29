@@ -153,10 +153,10 @@ Field | Purpose
 Field | Purpose
 --- | ---
 `version` | Semantic version of the product definition.
-`governance` | Governance overrides that differ from domain defaults. Only declare fields that differ.
-`masking` | Attribute-level masking rules for sensitive data. Each entry names the product attribute and a masking strategy.
+`governance` | Governance overrides that differ from domain defaults, and the product's `masking` rules. Only declare fields that differ. `masking` is a list under `governance`: each entry names a product attribute and a masking strategy (see [Masking Strategies](#masking-strategies)).
 `sla` | Service-level attributes (freshness, availability, latency).
 `refresh` | Refresh cadence: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
+`consistency` | How the product converges when its sources update at different speeds: `posture` (`strong` or `eventual`) and, for eventual, `null_strategy`. See [SLA Declaration](#sla-declaration).
 
 #### Source-Aligned Metadata
 
@@ -357,7 +357,7 @@ Domain-aligned products do not require an attribute mapping because their entiti
 
 ### **Masking Strategies**
 
-When a data product exposes PII or sensitive attributes, `masking` entries define how those attributes are protected in the published output.
+When a data product exposes PII or sensitive attributes, `governance.masking` entries define how those attributes are protected in the published output.
 
 Strategy | Behaviour
 --- | ---
@@ -394,6 +394,27 @@ sla:
 ```
 
 SLA fields are informational — they document expectations but do not generate runtime enforcement. Monitoring and alerting are orchestration concerns outside MD-DDL's scope.
+
+A product fed by sources with different change models declares its consistency posture, because it decides the physical schema:
+
+```yaml
+consistency:
+  posture: eventual                 # strong | eventual
+  null_strategy: nullable-staging   # eventual only: nullable-staging | reject-partial | nullable-final
+```
+
+Posture | Meaning
+--- | ---
+`strong` | The product updates only once every contributing source has propagated. `freshness` is bounded by the slowest source.
+`eventual` | Sources propagate independently, and the product converges within `sla.freshness`.
+
+Null strategy | Physical effect
+--- | ---
+`nullable-staging` | Attributes that may arrive late are nullable in the base structure. Consumers read a converged view that enforces completeness.
+`reject-partial` | A row is held until every source has contributed. `NOT NULL` applies to the base structure.
+`nullable-final` | The published structure stays nullable, and consumers handle incomplete rows.
+
+Generation reads `consistency` to decide where `NOT NULL` constraints go: an attribute declared `not_null` in the model may be nullable in a `nullable-staging` base structure.
 
 ---
 

@@ -223,6 +223,8 @@ The `Transform: ` prefix distinguishes mapping rules from the fixed sections. Th
 
 Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
+Each source row is mapped on its own. MD-DDL doesn't declare joins between source tables, so where a mapping needs a value held on another table of the same source — typically the parent's key, so a child row can reference its parent's canonical instance — the extract must carry it. Record a missing key as an Open Decision rather than implying a join.
+
 ---
 
 #### Entity Fan-Out
@@ -256,6 +258,8 @@ produces:
 ```
 ````
 
+`Address Uniqueness Merge` and `Location Involvement Mapping` stand for transformations declared under the same table's `##### Transform:` headings; they are not shown here.
+
 Key | Purpose
 --- | ---
 `entity` | The canonical entity produced. Must resolve in the domain model. Use `Parent · Subtype` where the target is a subtype.
@@ -263,9 +267,15 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which produced instance satisfies a relationship to another produced instance.
+`references` | Which instance satisfies each relationship from this entry to another entity. Declare it on the entry whose entity relates to at most one instance of the other (the many side of a one-to-many or many-to-one, where a foreign key would sit), whichever side `ownership` names; for a many-to-many relationship either side may declare it. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A transformation used only here computes a key: its `target` names the referenced entity's identifier, which it matches rather than writes. A reference never creates the referenced instance, and may point to reference data (mutability `reference`) maintained outside the sources.
+`contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
+`when_absent` | For a contributing entry: `hold` (default) keeps the row until the instance exists; `reject` drops and reports it.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
+
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype. A worked example for such a table assumes the instance exists and asserts only the attributes the row contributes; a fan-in example shows the establishing and contributing rows together.
+
+A contribution never edits history. It follows the target entity's temporal tracking: on an entity with transaction-time or bitemporal tracking, including an `append_only` one, each contribution records a new version that carries the earlier attributes forward; on a `slowly_changing` or `frequently_changing` entity it updates the instance as the entity's tracking prescribes. An `immutable` entity accepts no contributions; model late-arriving facts about it as a separate dependent entity.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -300,6 +310,14 @@ A source column may legitimately feed more than one canonical attribute — a ty
 ```
 
 The one-mapping-path constraint applies per *target attribute*, not per source column. Two rules may read the same column; two rules must not write the same attribute.
+
+##### Reference-only columns
+
+A column that only identifies a related instance — a parent's key used in `references` — populates no attribute of this table's entities. Its Destination is `Reference: <Entity>`, naming the entity it identifies:
+
+```markdown
+2|PARTY_ID|VARCHAR2|40|||NO|Owning party|Reference: Party
+```
 
 ##### Unmapped columns
 
@@ -443,7 +461,7 @@ tags:
 
 Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Full Name, Email Address, Country Code | real-time-cdc
 ````
 
 #### Transform detail — `sources/salesforce-crm/table_CONTACT.md`
@@ -464,7 +482,7 @@ Pos|Column Name|Data Type|Max Len|Precision|Scale|Nulls|Description|Destination
 1|AccountNumber|Text|32|||NO|Salesforce account identifier|Customer.Customer Number
 2|FirstName|Text|100|||YES|Given name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
 3|LastName|Text|100|||YES|Family name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
-4|Email|Text|255|||YES|Primary email; "N/A" used for missing|Customer.Email Address
+4|Email|Text|255|||YES|Primary email; "N/A" used for missing|[Transform: Email Address](#transform-email-address)
 5|MailingCountry|Text|2|||YES|Legacy two-character country code|[Transform: Resolve Country Code](#transform-resolve-country-code)
 6|InternalSyncFlag|Boolean||||NO|Salesforce replication marker|
 
@@ -481,6 +499,18 @@ inputs:
     field: Contact.FirstName
   Last Name:
     field: Contact.LastName
+```
+
+##### Transform: Email Address
+
+Salesforce writes "N/A" where no email is held, so that value is read as null.
+
+```yaml
+type: direct
+target: Customer · Email Address
+source:
+  field: Contact.Email
+  null_as: "N/A"
 ```
 
 ##### Transform: Resolve Country Code

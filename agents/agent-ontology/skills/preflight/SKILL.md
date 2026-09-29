@@ -95,6 +95,8 @@ Common fixes by rule:
 | `entity-diagram-links` | Declare the referenced class with a link: `class Foo["<a href='foo.md'>Foo</a>"]` |
 | `entity-enum-in-diagram` | Add the enum to the diagram: `class FooType["<a href='...'>Foo Type</a>"]{<<enumeration>>}` |
 | `entity-attribute-consistency` | Bring the `classDiagram` attributes and types into line with the YAML — the YAML is authoritative |
+| `transform-target-resolve` | Point the target at the attribute the entity declares (check inherited ones), or record the gap in `Open Decisions` and raise it with the domain owner. Don't add attributes from within source mapping. |
+| `transform-case-values` | Use values from the target enum (or `true`/`false` for a boolean), mapping several source codes to one value where needed |
 
 **Exit code 2 — invocation error:**
 

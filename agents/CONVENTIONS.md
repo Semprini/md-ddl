@@ -13,6 +13,9 @@ Agents own distinct parts of the work (see each agent's Boundaries table). When 
 1. Produce a **handoff block** (format below) in the conversation. It carries what was decided, so the next agent does not ask again.
 2. Name the receiving agent (`@agent-<id>` or `/agent-<id>`), suggest an opening request, and tell the user to paste the block into it.
 3. If the user will continue in a new session, also write the block to a **handoff file** (below) with `status: pending`.
+4. When work goes to more than one agent (e.g. Agent Ontology for a declaration defect and
+   Agent Architect for a missing consistency posture), write one block per recipient, each
+   with only that agent's task, and say which order they should run in.
 
 ### Receiving
 
@@ -21,6 +24,9 @@ At session start, before loading domain files:
 1. If the user names a domain, look in its folder for `handoff-to-<your-id>.md` with `status: pending`. Read it, then set `status: consumed`.
 2. If the opening message contains a `## Handoff Context —` block, read it.
 3. Don't re-ask questions the handoff answers. Treat anything under "Do not re-open" as settled.
+4. Handoff files with status `consumed` or `archived` are history. Read them for context
+   if useful, but don't act on their Task, and don't re-open the decisions they record
+   without saying why.
 
 ### Returned work
 

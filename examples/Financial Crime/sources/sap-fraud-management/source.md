@@ -1,8 +1,12 @@
-# SAP Fraud Management
+# [Financial Crime](../../domain.md)
 
-SAP Fraud Management is the analytical source for fraud and suspicious activity detection signals. It contributes risk outcomes and case-oriented enrichment used by AML, KYC, and transaction monitoring controls.
+## Sources
 
-## Metadata
+### SAP Fraud Management
+
+SAP Fraud Management is the analytical source for fraud and suspicious activity detection signals. It contributes screening outcomes, customer risk assessments, and transaction monitoring alerts used by AML, KYC, and transaction monitoring controls.
+
+#### Metadata
 
 ```yaml
 id: sap-fraud-management
@@ -19,7 +23,7 @@ change_events:
 update_frequency: real-time
 data_quality_tier: 2
 status: Production
-version: "1.0.0"
+version: "2.0.0"
 
 tags:
   - Fraud
@@ -27,10 +31,28 @@ tags:
   - Financial Crime
 ```
 
-## [Financial Crime](../../domain.md) Feeds
+SAP doesn't know whether a party is a person or a company. Its screening and risk rows add attributes to the Party and Customer that Salesforce CRM establishes, matched on the enterprise party identifier.
 
-Canonical Entity | Transform File | Attributes Contributed | Change Model
+#### Source Overview Diagram
+
+```mermaid
+---
+config:
+  layout: elk
+---
+graph LR
+  SAP[SAP Fraud Management]
+  SAP -->|batch-intraday| Party["<a href='../../entities/party.md'>Party</a>"]
+  SAP -->|event-driven| Customer["<a href='../../entities/customer.md'>Customer</a>"]
+  SAP -->|event-driven| TransactionAlert["<a href='../../entities/transaction-alert.md'>Transaction Alert</a>"]
+```
+
+#### Feeds
+
+Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Transaction](../../entities/transaction.md#transaction) | [table_alert_case](transforms/table_alert_case.md) | Financial Crime Risk Score, Monitoring Outcome, Alert Reference | event-driven
-[Party](../../entities/party.md#party) | [table_sanctions_screening](transforms/table_sanctions_screening.md) | Sanctions Screen Status, Watchlist Match Indicator | batch-intraday
-[Customer](../../entities/customer.md#customer) | [table_customer_risk_profile](transforms/table_customer_risk_profile.md) | Risk Review Flag, Enhanced Due Diligence Trigger | event-driven
+[Transaction Alert](../../entities/transaction-alert.md#transaction-alert) | [table_alert_case](transforms/table_alert_case.md#alertcase) | Alert Reference, Financial Crime Risk Score, Monitoring Outcome, Raised Date Time | event-driven
+[Party](../../entities/party.md#party) | [table_sanctions_screening](transforms/table_sanctions_screening.md#sanctionsscreening) | Sanctions Screen Status | batch-intraday
+[Customer](../../entities/customer.md#customer) | [table_customer_risk_profile](transforms/table_customer_risk_profile.md#customerriskprofile) | Risk Review Required, Enhanced Due Diligence Trigger | event-driven
+
+Screening results are produced by intraday rescreening batches, not by SAP's alert events, which is why that feed differs from the source's event-driven default.

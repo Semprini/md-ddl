@@ -130,13 +130,14 @@ constraints:
 
 ```yaml
 governance:
-  pii: true
   classification: Highly Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
+  retention: "10 years from Valid To"
+  retention_basis: >
+    AUSTRAC AML/CTF Act 2006 requires 7 years; the domain's conservative 10 years applies,
+    counted from the end of the address association.
   description: >
-    Address association records must be retained for 7 years from Valid To
-    date, aligned to AUSTRAC and RBNZ record-keeping obligations. Records
+    Links a person or organisation to where they live or trade, so it inherits the domain's
+    PII marking. Records
     must never be deleted — closure via Valid To is the only permitted
     termination mechanism.
   access_role:

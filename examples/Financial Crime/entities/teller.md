@@ -13,9 +13,8 @@ config:
 ---
 classDiagram
   class Teller{
-    * Teller Identifier : string
+    Teller Identifier : string
     Employee Number : string
-    Assigned Branch Identifier : string
   }
 
   Teller --|> PartyRole
@@ -34,16 +33,12 @@ mutability: slowly_changing
 attributes:
   Teller Identifier:
     type: string
-    identifier: primary
+    identifier: alternate
     description: Unique identifier for the teller role instance.
 
   Employee Number:
     type: string
     description: Internal identifier of the staff member acting as teller.
-
-  Assigned Branch Identifier:
-    type: string
-    description: Branch identifier where the teller is primarily assigned.
 ```
 
 ```yaml

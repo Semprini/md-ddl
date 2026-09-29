@@ -39,20 +39,22 @@ key column:
 
 Cardinality | Physical pattern
 --- | ---
-`many-to-many` | Bridge table with `source_[pk]`, `target_[pk]`, and `relationship_attributes` columns
+`many-to-many` | Bridge table with `source_<key column>`, `target_<key column>`, and `relationship_attributes` columns
 `one-to-many` (hierarchy) | Bridge table preferred; adjacency list (parent FK on entity) is acceptable for shallow hierarchies where the generation skill supports it explicitly
 Any | Unbounded recursion depth is the default; document when depth is bounded and recommend recursive CTE query patterns in platform-specific notes
 
 Directionality is preserved by generating two FK columns pointing to the same entity
-table:
+table. Each is named `source_` or `target_` plus the referenced table's key column, so the
+dialect's key naming carries through:
 
-- `source_[entity_identifier]` — FK referencing the source instance
-- `target_[entity_identifier]` — FK referencing the target instance
+- `source_<key column>`: FK referencing the source instance
+- `target_<key column>`: FK referencing the target instance
 
-For a Party with identifier `Party Identifier`, the bridge table contains
-`source_party_identifier` and `target_party_identifier`. For bidirectional
-relationships where direction is not meaningful (e.g., "sibling of"), document that
-either column may be treated as the source.
+With the PostgreSQL 3NF convention (`party_id` as the key), the bridge has
+`source_party_id` and `target_party_id`. Where the business identifier is the key
+(`party_identifier`), it has `source_party_identifier` and `target_party_identifier`. For
+bidirectional relationships where direction isn't meaningful (e.g. "sibling of"), document
+that either column may be treated as the source.
 
 ## Source: `change_model`
 

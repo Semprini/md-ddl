@@ -10,8 +10,8 @@ This directory now supports side-by-side BIAN versions:
 
 Version | Purpose | Path
 --- | --- | ---
-v13 | Current production mapping baseline | `v13/`
-v14 | Planned default when source snapshots are available | `v14/`
+v13 | Current production mapping baseline | The index files directly in this folder (`bo-classes.md` and so on). `v13/` holds only a README until they're regenerated into it.
+v14 | Planned default when source snapshots are available | `v14/` (not yet populated)
 
 ## Version Selection Rules
 
@@ -28,7 +28,7 @@ Use version-scoped endpoints only during lookup or extraction workflows.
 
 ## Local Reference Files
 
-Each version folder should contain generated indexes:
+Each version's generated indexes (today, the v13 set sits directly in this folder):
 
 - `bo-classes.md`
 - `bo-classes-detail.md`
@@ -40,12 +40,12 @@ Use local files first. API lookup is fallback for unresolved details only.
 ## Deterministic Lookup Process
 
 1. Pick target BIAN version (v13 default — see Version Selection Rules above).
-2. Search `v{n}/bo-classes.md` for exact/near class candidates.
-3. Validate inheritance and attributes in `v{n}/bo-classes-detail.md` when available.
-4. Use `v{n}/hierarchy.md` to verify taxonomy context.
+2. Search `bo-classes.md` (v13, in this folder; use `v{n}/bo-classes.md` once a version folder is populated) for exact or near class candidates.
+3. Validate inheritance and attributes in `bo-classes-detail.md` when available.
+4. Use `hierarchy.md` to verify taxonomy context.
 5. If still unresolved, use API fallback with explicit version:
    - `GET https://bian-modelapi-v4.azurewebsites.net/BOClassByName/{ExactBianName}/BIAN/{version}`
-6. For enums, resolve with `v{n}/enumerations.md` first, then optional API fallback:
+6. For enums, resolve with `enumerations.md` first, then optional API fallback:
    - `GET https://bian-modelapi-v4.azurewebsites.net/BOEnumerationByName/{ExactEnumName}/BIAN/{version}`
 
 ## Mapping Quality Rules

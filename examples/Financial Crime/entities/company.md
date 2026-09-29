@@ -85,12 +85,11 @@ constraints:
 governance:
   pii: false
   classification: Highly Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
   description: >
-    10-year retention from the end of the business relationship, aligned to AUSTRAC and
-    RBNZ record-keeping obligations. The regulatory minimum is 7 years under AUSTRAC
-    AML/CTF Act 2006; the domain default of 10 years is applied as the conservative standard.
+    A company is a legal person, so its attributes are not personal information. Individuals
+    connected to it (directors, beneficial owners) are Persons linked through Party Related
+    To Party, and carry the PII marking. Retention inherits the domain default (10 years post
+    relationship end, above the 7-year AUSTRAC minimum).
   access_role:
     - FINANCIAL_CRIME_ANALYST
     - KYC_OFFICER

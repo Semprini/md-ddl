@@ -47,9 +47,25 @@ Run the sections in order. Each catches a different class of problem.
 
 If `md-ddl lint` is available, run it on the domain folder first (`md-ddl lint <folder>`,
 or `python scripts/md_ddl_lint.py <folder>` in the MD-DDL repo). Its errors are the
-mechanical tier: syntax, links, references, and representation agreement. Report them
-as Critical and don't re-derive them by eye. Its warnings and observations feed the
-sections below.
+mechanical tier: syntax, links, references, and representation agreement. Don't
+re-derive them by eye. Classify them by what they break:
+
+- **Critical:** errors that stop the YAML being read or resolved: `yaml-syntax`,
+  `entity-references`, `domain-version`, `link-resolve` on a detail or type reference,
+  `transform-target-resolve`, and `transform-case-values` (the last two break pipeline
+  generation, not DDL).
+- **Major:** errors where a representation disagrees with the YAML:
+  `domain-diagram-coverage`, `domain-link-consistency`, `entity-heading-link`,
+  `entity-diagram-links`, `entity-enum-in-diagram`, `entity-attribute-consistency`, and
+  `mermaid-syntax`. The YAML is authoritative for generation, so these block promotion to
+  Active but not generation from the YAML.
+
+Warnings and observations feed the sections below.
+
+Findings the linter can't see are classified by effect. **Critical:** the model contradicts
+itself or the spec so that no correct artifact can be generated. **Major:** generation would
+be non-deterministic or wrong for some artifact type (for example, pipelines but not DDL).
+**Minor:** clarity and consistency.
 
 ### 1) Inventory and Coverage
 
@@ -173,7 +189,7 @@ This is the part a structural check misses. Ask whether a generating agent would
 
 - **Fan-out declared** — wherever one source row produces more than one canonical instance, an `Entity Fan-Out` section with a `produces:` block exists
 - **Abstract targets bound** — any transform targeting an attribute on an abstract entity has a fan-out entry binding it to a concrete subtype
-- **Identity derived** — wherever an instance identifier is not a direct map from a source column, a `deduplication` transform declares how it is derived
+- **Identity derived** — wherever an instance identifier is not a direct map from a source column, a transform declares how it is derived: `derived` when it comes deterministically from the row, `deduplication` when rows must collapse into one instance
 - **Survivorship declared** — wherever rows can merge, a `survivorship` rule exists; without one, output is order-dependent
 - **Key branches exhaustive** — a `deduplication` key has a branch covering the case where the external identifier is absent
 - **Evaluation order declared** — wherever `conditional` cases can overlap, `evaluation` is stated
@@ -274,6 +290,10 @@ When issuing a Conditionally Ready verdict, list the specific conditions under w
 
 - One or more Critical findings, OR
 - Major findings that would produce incorrect physical artifacts (wrong dimensional grain, missing identifiers, contradictory temporal strategy)
+
+**Which representation wins.** When the diagram, the summary tables, and the entity YAML
+disagree, the YAML is authoritative for generation. The disagreement is still a finding,
+because readers trust the diagram.
 
 A Not Ready verdict must include a prioritised remediation plan.
 

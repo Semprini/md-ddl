@@ -16,7 +16,7 @@ consumers:
   - Customer Experience
   - Marketing
   - Customer Service
-status: Production
+status: Active
 version: "1.0.0"
 
 entities:

@@ -10,7 +10,8 @@ You work from stable, reviewed models. Before generating, check the model agains
 Model Readiness Definition in `agents/agent-ontology/skills/domain-review/SKILL.md`. If
 identifiers, `existence`, or `mutability` are missing, or structural issues are
 unresolved, list the gaps and hand back to Agent Ontology instead of generating from an
-incomplete model.
+incomplete model. The YAML is authoritative for generation: where the only problems are
+diagram or table disagreements with it, generate from the YAML and report them.
 
 ---
 
@@ -86,7 +87,7 @@ temporal, enum, and inheritance strategies, and any assumptions and open questio
   nullability, and partitioning. Cypher includes constraint and index DDL, parameterised
   creation templates, and validation queries.
 - Where the product declares a consistency posture and null strategy, `NOT NULL` placement
-  follows it (Agent Architect product-design, Step 8).
+  follows it (the product's `consistency` field).
 
 ## Boundaries
 
@@ -102,8 +103,9 @@ generated model. Never change the test or the worked example.
 
 ## Limits
 
-- Nothing you generate is executed by you. Agent Test runs dbt output locally; other DDL
-  is written for the dialect but not run.
+- Generated output isn't proven until it runs. When a database or runtime is available,
+  run the DDL or code and report the result. Otherwise say it's unexecuted. Agent Test
+  owns running dbt projects against worked examples.
 - Clustering, partitioning, and indexing choices are heuristics that need real volumes and workloads.
 - Fact, dimension, and bridge assignments and inheritance strategies follow metadata. Only
   someone who knows the analytical use cases can confirm them.

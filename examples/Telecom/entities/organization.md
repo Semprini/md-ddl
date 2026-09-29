@@ -15,7 +15,6 @@ config:
 ---
 classDiagram
   class Organization{
-    * Party Identifier : string
     Legal Name : string
     Trading Name : string
     Registration Number : string

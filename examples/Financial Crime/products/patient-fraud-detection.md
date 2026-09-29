@@ -64,23 +64,23 @@ governance:
     - HITECH Act
     - 21st Century Cures Act
 
-masking:
-  - attribute: "Patient.Given Name"
-    strategy: redact
-  - attribute: "Patient.Family Name"
-    strategy: redact
-  - attribute: "Patient.Date of Birth"
-    strategy: year-only
-  - attribute: "Practitioner.Given Name"
-    strategy: tokenize
-  - attribute: "Practitioner.Family Name"
-    strategy: tokenize
-  - attribute: "Party.Legal Name"
-    strategy: hash
-  - attribute: "Party.Also Known As"
-    strategy: hash
-  - attribute: "Transaction.Reference"
-    strategy: truncate
+  masking:
+    - attribute: "Patient.Given Name"
+      strategy: redact
+    - attribute: "Patient.Family Name"
+      strategy: redact
+    - attribute: "Patient.Date of Birth"
+      strategy: year-only
+    - attribute: "Practitioner.Given Name"
+      strategy: tokenize
+    - attribute: "Practitioner.Family Name"
+      strategy: tokenize
+    - attribute: "Party.Legal Name"
+      strategy: hash
+    - attribute: "Party.Also Known As"
+      strategy: hash
+    - attribute: "Transaction.Reference"
+      strategy: truncate
 
 sla:
   freshness: "< 4 hours"

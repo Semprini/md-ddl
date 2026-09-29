@@ -587,6 +587,8 @@ governance:
 ```
 ````
 
+An entity that is never instantiated directly — only through its subtypes — declares `abstract: true` in its YAML. The `<<abstract>>` stereotype in the diagram renders that declaration; as everywhere, the YAML is authoritative. Sources that populate an abstract entity's attributes must bind them to a concrete subtype (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)).
+
 ### Governance Metadata Schema
 
 Governance metadata is declared at the domain level (in the `## Metadata` block) and optionally overridden per entity (in a `governance:` block within the entity's definition). Entities inherit all governance fields from the domain. Include a `governance:` block on an entity only when specifying an override or stricter requirement than the domain default.
@@ -618,6 +620,18 @@ Field | Type | Required | Description
 `regulatory_reporting` | string[] | No | Named regulatory reports or submissions that include data from this entity (e.g., `"Suspicious Matter Report (SMR)"`, `"Threshold Transaction Report (TTR)"`).
 `description` | string | No | Free-text explanation of the governance posture for this entity — why the override exists and what regulatory obligation drives it.
 
+#### Security and Residency Fields
+
+These fields record obligations that come from data-protection, prudential, and breach-notification rules. They may be declared in the domain metadata as defaults, or in an entity's `governance:` block where the entity differs.
+
+Field | Type | Required | Description
+--- | --- | --- | ---
+`data_residency` | string[] | No | Jurisdictions in which the data must be stored (e.g., `["Australia", "New Zealand"]`).
+`cross_border_transfer` | boolean | No | Whether the data is transferred across jurisdictional borders. Declare `data_residency` alongside it.
+`audit_all_access` | boolean | No | Whether every access to the data must be logged.
+`breach_notification_required` | boolean | No | Whether a breach involving the data must be notified to a regulator or data subjects.
+`notification_timeframe` | string | No | The notification deadline from the applicable rule (e.g., `"72 hours"`). Declare it whenever `breach_notification_required` is true.
+
 #### Governance Inheritance Rules
 
 1. **Domain defaults apply everywhere.** Every entity, relationship, and event inherits the domain's `classification`, `pii`, `regulatory_scope`, and `default_retention` unless explicitly overridden.
@@ -625,6 +639,7 @@ Field | Type | Required | Description
 3. **Strictness direction.** An entity may declare a higher `classification` or longer `retention` than the domain default. Declaring a weaker posture requires a documented justification in the `description` or `retention_basis` field.
 4. **`access_role` is additive context.** It restricts who may access entity data. It does not exist at the domain level — it is entity-specific.
 5. **`compliance_relevance` and `regulatory_reporting` are entity-specific.** They document which specific regulations and reports apply to a particular entity. Domain-level `regulatory_scope` declares the applicable frameworks; entity-level fields map those frameworks to specific obligations.
+6. **Security and residency fields inherit like the core fields.** A domain default applies to every entity unless the entity overrides it.
 
 #### Example: Domain-Level Governance (in domain metadata)
 
@@ -1021,7 +1036,7 @@ self_referential: true
 
 #### Edge Attributes
 
-When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. These become columns on the bridge table in physical generation:
+When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. This applies to any relationship whose link has attributes (typically many-to-many, such as a holder type on Customer Holds Account), not only self-referential ones. These become columns on the bridge or association table in physical generation:
 
 ```yaml
 self_referential: true
@@ -1418,6 +1433,8 @@ The `Transform: ` prefix distinguishes mapping rules from the fixed sections. Th
 
 Transform detail may cover multiple canonical entities when mappings originate from the same source table.
 
+Each source row is mapped on its own. MD-DDL doesn't declare joins between source tables, so where a mapping needs a value held on another table of the same source — typically the parent's key, so a child row can reference its parent's canonical instance — the extract must carry it. Record a missing key as an Open Decision rather than implying a join.
+
 ---
 
 #### Entity Fan-Out
@@ -1451,6 +1468,8 @@ produces:
 ```
 ````
 
+`Address Uniqueness Merge` and `Location Involvement Mapping` stand for transformations declared under the same table's `##### Transform:` headings; they are not shown here.
+
 Key | Purpose
 --- | ---
 `entity` | The canonical entity produced. Must resolve in the domain model. Use `Parent · Subtype` where the target is a subtype.
@@ -1458,9 +1477,15 @@ Key | Purpose
 `condition` | Expression selecting when this instance is produced. Required when two entries are alternatives.
 `identity` | The transformation that determines this instance's identifier, or a source field and the attribute it maps to.
 `deduplicated` | `true` when instances collapse across source rows. Requires a `deduplication` transformation.
-`references` | Which produced instance satisfies a relationship to another produced instance.
+`references` | Which instance satisfies each relationship from this entry to another entity. Declare it on the entry whose entity relates to at most one instance of the other (the many side of a one-to-many or many-to-one, where a foreign key would sit), whichever side `ownership` names; for a many-to-many relationship either side may declare it. The value is either another entry's identity transformation (an instance produced from the same row) or the source field or transformation that yields an existing instance's identifier. A transformation used only here computes a key: its `target` names the referenced entity's identifier, which it matches rather than writes. A reference never creates the referenced instance, and may point to reference data (mutability `reference`) maintained outside the sources.
+`contributes` | `true` when the row adds attributes to an instance that another source establishes, rather than creating it. Requires `identity`, which must match the establishing source's identity for the same instance.
+`when_absent` | For a contributing entry: `hold` (default) keeps the row until the instance exists; `reject` drops and reports it.
 
 A `produces:` block is also what binds a transformation to a concrete instance when its `target` names an attribute declared on an abstract supertype. `target: Party · Legal Name` states which attribute is populated; the fan-out entry whose `condition` matched states which concrete subtype receives it.
+
+A source that only contributes attributes to an existing instance may not know its subtype: a screening system updates a Party that the CRM has already established as a Person or a Company. Such an entry declares `contributes: true` and may name the abstract entity. It never creates an instance; if no instance with that identity exists, the row is held or rejected rather than loaded under a guessed subtype. A worked example for such a table assumes the instance exists and asserts only the attributes the row contributes; a fan-in example shows the establishing and contributing rows together.
+
+A contribution never edits history. It follows the target entity's temporal tracking: on an entity with transaction-time or bitemporal tracking, including an `append_only` one, each contribution records a new version that carries the earlier attributes forward; on a `slowly_changing` or `frequently_changing` entity it updates the instance as the entity's tracking prescribes. An `immutable` entity accepts no contributions; model late-arriving facts about it as a separate dependent entity.
 
 Entities listed in `produces:` should appear in the source summary's Feeds table.
 
@@ -1495,6 +1520,14 @@ A source column may legitimately feed more than one canonical attribute — a ty
 ```
 
 The one-mapping-path constraint applies per *target attribute*, not per source column. Two rules may read the same column; two rules must not write the same attribute.
+
+##### Reference-only columns
+
+A column that only identifies a related instance — a parent's key used in `references` — populates no attribute of this table's entities. Its Destination is `Reference: <Entity>`, naming the entity it identifies:
+
+```markdown
+2|PARTY_ID|VARCHAR2|40|||NO|Owning party|Reference: Party
+```
 
 ##### Unmapped columns
 
@@ -1638,7 +1671,7 @@ tags:
 
 Canonical Entity | Transform | Attributes Contributed | Change Model
 --- | --- | --- | ---
-[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Email Address, Full Name, Date of Birth | real-time-cdc
+[Customer](../entities/customer.md#customer) | [table_CONTACT](salesforce-crm/table_CONTACT.md#contact) | Customer Number, Full Name, Email Address, Country Code | real-time-cdc
 ````
 
 #### Transform detail — `sources/salesforce-crm/table_CONTACT.md`
@@ -1659,7 +1692,7 @@ Pos|Column Name|Data Type|Max Len|Precision|Scale|Nulls|Description|Destination
 1|AccountNumber|Text|32|||NO|Salesforce account identifier|Customer.Customer Number
 2|FirstName|Text|100|||YES|Given name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
 3|LastName|Text|100|||YES|Family name|[Transform: Concatenate Full Name](#transform-concatenate-full-name)
-4|Email|Text|255|||YES|Primary email; "N/A" used for missing|Customer.Email Address
+4|Email|Text|255|||YES|Primary email; "N/A" used for missing|[Transform: Email Address](#transform-email-address)
 5|MailingCountry|Text|2|||YES|Legacy two-character country code|[Transform: Resolve Country Code](#transform-resolve-country-code)
 6|InternalSyncFlag|Boolean||||NO|Salesforce replication marker|
 
@@ -1676,6 +1709,18 @@ inputs:
     field: Contact.FirstName
   Last Name:
     field: Contact.LastName
+```
+
+##### Transform: Email Address
+
+Salesforce writes "N/A" where no email is held, so that value is read as null.
+
+```yaml
+type: direct
+target: Customer · Email Address
+source:
+  field: Contact.Email
+  null_as: "N/A"
 ```
 
 ##### Transform: Resolve Country Code
@@ -1775,7 +1820,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
 
-Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A transformation targeting an abstract entity without a corresponding fan-out declaration is a validation error.
+Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A source that only contributes attributes to an instance another source established declares `contributes: true` on its fan-out entry instead (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)). A transformation targeting an abstract entity with neither is a validation error.
 
 Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
@@ -1883,6 +1928,7 @@ Strategy | Behaviour
 `priority_non_null` | Take the highest-priority non-null value
 `priority_always` | Always take the highest-priority value, even if null
 `most_recent` | Take the value with the most recent timestamp; requires `timestamp_field` on each source
+`earliest` | Take the value with the earliest timestamp; requires `timestamp_field` on each source. Suits immutable reference data, where the first recorded value stands.
 `consensus` | Take a value only when all sources agree; otherwise null
 
 These strategies cover the common cases and are not a closed list — an organisation may declare another strategy, described in the transformation's prose, and the generating agent should confirm its interpretation rather than guess.
@@ -1941,7 +1987,9 @@ Key | Purpose
 `normalise` | Normalisation applied to each field before composition: `trim`, `uppercase`, `lowercase`, `collapse_whitespace`, `strip_punctuation`.
 `prefix` | Literal prefix distinguishing keys from different branches, so a composite key can never collide with an external-identifier key.
 
-`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `consensus` — with `most_recent` requiring a `timestamp_field`. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+The key is composed as the `prefix`, a colon, and the normalised `using` values joined with `|` in declaration order. A null value contributes an empty string. The Address example above therefore yields `DPID:1234567` or `COMP:12 HARBOUR ST|6011|NZ`.
+
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Its `timestamp_field` must be a creation time: a last-modified time lets an edited original lose to a newer duplicate. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
 
 An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
 
@@ -1989,7 +2037,7 @@ lookup:
 fallback: reject
 ```
 
-`inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
+`fallback: reject` rejects the source row: no instance is produced from it, and it is reported. `inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
 
 Use `inline` when the mapping is an opaque code table with no logic in it. Use `conditional` when a case needs a predicate rather than an equality match — a range, a compound test, or several codes collapsing to one value.
 
@@ -2115,7 +2163,7 @@ given:
 produces:
   - entity: Address · Postal Address
     Address Identifier: "DPID:1234567"
-    Delivery Point ID: 1234567
+    Delivery Point ID: "1234567"
   - entity: Location Involvement
     Location Involvement Identifier: "8c14-p001:3f2b-aaa1"
     Address Purpose: Residential
@@ -2125,7 +2173,8 @@ produces:
     Legal Name: "Jane Whitcombe"
 notes: >
   Party is abstract, so the concrete instance is an Individual, selected by the
-  OWNER_TYPE_ENUM condition in Entity Fan-Out.
+  OWNER_TYPE_ENUM condition in Entity Fan-Out. (The identity transformations this
+  example relies on are declared in the same transform detail; see Entity Fan-Out.)
 ```
 ````
 
@@ -2136,7 +2185,7 @@ Key | Purpose
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
-Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump.
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way. An entry with `cardinality: 0` asserts that the entity is not produced from the given rows. A fan-in example is needed wherever rows from more than one source table converge on an instance, whether the tables belong to one source or several.
 
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 
@@ -2216,9 +2265,9 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use declared input names:** In `derived` and multi-input `conditional` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype.
+7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype, or by a `contributes: true` entry when the source only adds attributes to an instance whose subtype another source establishes.
 
-8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
+8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a transformation must declare how it is derived. A `derived` transformation suffices when the identifier comes deterministically from the row itself (for example a prefix plus a source key) and no two rows describe the same instance. Where rows must collapse into one instance, a `deduplication` transformation is required, with its conflict resolution.
 
 9. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 
@@ -2419,10 +2468,10 @@ Field | Purpose
 Field | Purpose
 --- | ---
 `version` | Semantic version of the product definition.
-`governance` | Governance overrides that differ from domain defaults. Only declare fields that differ.
-`masking` | Attribute-level masking rules for sensitive data. Each entry names the product attribute and a masking strategy.
+`governance` | Governance overrides that differ from domain defaults, and the product's `masking` rules. Only declare fields that differ. `masking` is a list under `governance`: each entry names a product attribute and a masking strategy (see [Masking Strategies](#masking-strategies)).
 `sla` | Service-level attributes (freshness, availability, latency).
 `refresh` | Refresh cadence: `real-time`, `hourly`, `daily`, `weekly`, `on-demand`.
+`consistency` | How the product converges when its sources update at different speeds: `posture` (`strong` or `eventual`) and, for eventual, `null_strategy`. See [SLA Declaration](#sla-declaration).
 
 #### Source-Aligned Metadata
 
@@ -2623,7 +2672,7 @@ Domain-aligned products do not require an attribute mapping because their entiti
 
 ### **Masking Strategies**
 
-When a data product exposes PII or sensitive attributes, `masking` entries define how those attributes are protected in the published output.
+When a data product exposes PII or sensitive attributes, `governance.masking` entries define how those attributes are protected in the published output.
 
 Strategy | Behaviour
 --- | ---
@@ -2660,6 +2709,27 @@ sla:
 ```
 
 SLA fields are informational — they document expectations but do not generate runtime enforcement. Monitoring and alerting are orchestration concerns outside MD-DDL's scope.
+
+A product fed by sources with different change models declares its consistency posture, because it decides the physical schema:
+
+```yaml
+consistency:
+  posture: eventual                 # strong | eventual
+  null_strategy: nullable-staging   # eventual only: nullable-staging | reject-partial | nullable-final
+```
+
+Posture | Meaning
+--- | ---
+`strong` | The product updates only once every contributing source has propagated. `freshness` is bounded by the slowest source.
+`eventual` | Sources propagate independently, and the product converges within `sla.freshness`.
+
+Null strategy | Physical effect
+--- | ---
+`nullable-staging` | Attributes that may arrive late are nullable in the base structure. Consumers read a converged view that enforces completeness.
+`reject-partial` | A row is held until every source has contributed. `NOT NULL` applies to the base structure.
+`nullable-final` | The published structure stays nullable, and consumers handle incomplete rows.
+
+Generation reads `consistency` to decide where `NOT NULL` constraints go: an attribute declared `not_null` in the model may be nullable in a `nullable-staging` base structure.
 
 ---
 

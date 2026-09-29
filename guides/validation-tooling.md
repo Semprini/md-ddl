@@ -50,6 +50,8 @@ Rule id | What it validates | Why it is mechanical
 `entity-diagram-links` | Outgoing and inheritance targets in a `classDiagram` link to their detail markdown | An unlinked reference class is a dead end for navigation
 `entity-enum-in-diagram` | Every enum used by an attribute is declared in the entity diagram | An attribute typed to an enum the diagram never shows contradicts its own rendering
 `entity-attribute-consistency` | Attribute names and types agree between the `classDiagram` and the YAML | The YAML is authoritative and the diagram renders it; where they differ, one of them is lying
+`transform-target-resolve` | Every transform `target` and every direct `Entity.Attribute` Destination in source transform detail names an attribute declared on that entity or inherited from its parents | A mapping to an attribute the model doesn't have fails only at generation time, far from where it was written
+`transform-case-values` | A `conditional` transform's case keys and `fallback` are valid values of its target: members of the target enum, or `true`/`false` for a boolean. Enums that declare a `standard:` (representative subsets) are skipped. | A case value outside the target's domain generates code that writes invalid data
 
 **Structural observations** — these report but do not fail:
 

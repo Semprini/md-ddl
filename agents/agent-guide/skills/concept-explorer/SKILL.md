@@ -73,7 +73,10 @@ Added: sources, transformations, data products, and compliance in one model.
 **dbt.** Same: text-based and version-controlled. Different: MD-DDL defines what the
 data *means*; dbt defines how to build it. Complementary: Agent Artifact generates a dbt
 project per data product from the organisation's template, and Agent Test compiles
-worked examples into dbt unit tests.
+worked examples into dbt unit tests. The same project runs in two tiers: locally on
+dbt-core + DuckLake for fast unit and data tests, then in dbt Cloud on the warehouse
+(Snowflake by default) for everything plus masking, grants, and source freshness. Only
+the profile differs.
 
 **Data Mesh / data contracts.** Same: domain ownership and data as a product. Different:
 MD-DDL is a concrete language with formal product declarations (schema type,
@@ -180,8 +183,7 @@ within a TTL (architect); a master record whose fields different feeds update
 1. Each source's `change_model` sets its expected lag.
 2. Bitemporal tracking on the entity records when each update arrived.
 3. The product's `sla.freshness` is the convergence window.
-4. The product records its consistency posture and null strategy (Agent Architect
-   product-design, Step 8).
+4. The product declares `consistency` (posture and null strategy).
 5. Fan-in worked examples with `interim` states pin what a partly converged instance
    looks like.
 

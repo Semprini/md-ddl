@@ -24,7 +24,7 @@ regulatory_scope:
 default_retention: "5 years post last interaction"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "1.0.0"
 tags:
   - Retail
@@ -96,6 +96,6 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Service Domain Model](products/domain-aligned.md#service-domain-model) | domain-aligned | Cross-domain Integration | Production
+[Service Domain Model](products/domain-aligned.md#service-domain-model) | domain-aligned | Cross-domain Integration | Active
 
 ---

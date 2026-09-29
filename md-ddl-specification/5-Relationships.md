@@ -96,7 +96,7 @@ self_referential: true
 
 #### Edge Attributes
 
-When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. These become columns on the bridge table in physical generation:
+When the relationship instance itself carries attributes — not the entities it connects — declare them under `relationship_attributes`. This applies to any relationship whose link has attributes (typically many-to-many, such as a holder type on Customer Holds Account), not only self-referential ones. These become columns on the bridge or association table in physical generation:
 
 ```yaml
 self_referential: true

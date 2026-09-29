@@ -51,7 +51,7 @@ A transformation may also declare `quality_check: false` to indicate that a null
 
 `target` uses `Entity · Attribute` notation. The entity name must match an entity in the canonical domain model. The attribute name must match an attribute declared in that entity's YAML block, or one inherited from its parent. Both are validated during generation.
 
-Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A transformation targeting an abstract entity without a corresponding fan-out declaration is a validation error.
+Where `target` names an attribute declared on an **abstract** entity, the transformation states which attribute is populated but not which concrete instance receives it. That binding comes from the `produces:` block described under [Entity Fan-Out](./7-Sources.md#entity-fan-out) — the fan-out entry whose `condition` matched determines the concrete subtype. A source that only contributes attributes to an instance another source established declares `contributes: true` on its fan-out entry instead (see [Entity Fan-Out](./7-Sources.md#entity-fan-out)). A transformation targeting an abstract entity with neither is a validation error.
 
 Within transform detail, `source.system` is **omitted** — it is implicit from the owning source. Only the field path within the source system is declared:
 
@@ -159,6 +159,7 @@ Strategy | Behaviour
 `priority_non_null` | Take the highest-priority non-null value
 `priority_always` | Always take the highest-priority value, even if null
 `most_recent` | Take the value with the most recent timestamp; requires `timestamp_field` on each source
+`earliest` | Take the value with the earliest timestamp; requires `timestamp_field` on each source. Suits immutable reference data, where the first recorded value stands.
 `consensus` | Take a value only when all sources agree; otherwise null
 
 These strategies cover the common cases and are not a closed list — an organisation may declare another strategy, described in the transformation's prose, and the generating agent should confirm its interpretation rather than guess.
@@ -217,7 +218,9 @@ Key | Purpose
 `normalise` | Normalisation applied to each field before composition: `trim`, `uppercase`, `lowercase`, `collapse_whitespace`, `strip_punctuation`.
 `prefix` | Literal prefix distinguishing keys from different branches, so a composite key can never collide with an external-identifier key.
 
-`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `consensus` — with `most_recent` requiring a `timestamp_field`. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
+The key is composed as the `prefix`, a colon, and the normalised `using` values joined with `|` in declaration order. A null value contributes an empty string. The Address example above therefore yields `DPID:1234567` or `COMP:12 HARBOUR ST|6011|NZ`.
+
+`survivorship` declares which row supplies attribute values when merged rows disagree. It reuses the `reconciliation` strategy vocabulary — `priority_non_null`, `priority_always`, `most_recent`, `earliest`, `consensus` — with `most_recent` and `earliest` requiring a `timestamp_field`. Use `earliest` for immutable entities, so later rows never overwrite the first recorded values. Its `timestamp_field` must be a creation time: a last-modified time lets an edited original lose to a newer duplicate. Without a survivorship rule, merge output is order-dependent and generation is not reproducible.
 
 An entity produced by a `deduplication` transformation should be marked `deduplicated: true` in the source table's `produces:` block.
 
@@ -265,7 +268,7 @@ lookup:
 fallback: reject
 ```
 
-`inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
+`fallback: reject` rejects the source row: no instance is produced from it, and it is reported. `inline` and `reference` are mutually exclusive. Where the target is an `enum:` type, every value on the right-hand side must be a valid enum value.
 
 Use `inline` when the mapping is an opaque code table with no logic in it. Use `conditional` when a case needs a predicate rather than an equality match — a range, a compound test, or several codes collapsing to one value.
 
@@ -391,7 +394,7 @@ given:
 produces:
   - entity: Address · Postal Address
     Address Identifier: "DPID:1234567"
-    Delivery Point ID: 1234567
+    Delivery Point ID: "1234567"
   - entity: Location Involvement
     Location Involvement Identifier: "8c14-p001:3f2b-aaa1"
     Address Purpose: Residential
@@ -401,7 +404,8 @@ produces:
     Legal Name: "Jane Whitcombe"
 notes: >
   Party is abstract, so the concrete instance is an Individual, selected by the
-  OWNER_TYPE_ENUM condition in Entity Fan-Out.
+  OWNER_TYPE_ENUM condition in Entity Fan-Out. (The identity transformations this
+  example relies on are declared in the same transform detail; see Entity Fan-Out.)
 ```
 ````
 
@@ -412,7 +416,7 @@ Key | Purpose
 `produces` | The canonical instances emitted, each naming its entity and the attributes the example fixes. `cardinality` may be declared where the count itself is the point.
 `notes` | Why the output is what it is. Written for the reader who expected something else.
 
-Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump.
+Only the columns and attributes that matter to the example need to be listed — an example is an assertion about behaviour, not a complete row dump. A source column not listed in `given` is null. An attribute not listed under `produces` is not asserted either way. An entry with `cardinality: 0` asserts that the entity is not produced from the given rows. A fan-in example is needed wherever rows from more than one source table converge on an instance, whether the tables belong to one source or several.
 
 `produces:` here asserts values for one concrete case; the identically-named block under [Entity Fan-Out](./7-Sources.md#entity-fan-out) declares the general shape. The example must be consistent with the fan-out: an entity it produces that the fan-out does not declare is a validation error.
 
@@ -492,9 +496,9 @@ Existing ETL/ELT logic documented in `baselines/etl/` serves as the reference fo
 
 6. **Expression operands use declared input names:** In `derived` and multi-input `conditional` expressions, operands match the keys declared in `inputs:`, not raw source field names. This keeps expressions readable and decoupled from physical source schema.
 
-7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype.
+7. **Abstract targets require a fan-out:** A transformation whose `target` names an attribute on an abstract entity must be accompanied by an `Entity Fan-Out` declaration binding it to a concrete subtype, or by a `contributes: true` entry when the source only adds attributes to an instance whose subtype another source establishes.
 
-8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a `deduplication` transformation must declare how it is derived and how conflicts are resolved.
+8. **Identity is derived, never assumed:** Where a canonical instance's identifier is not a direct map from a source field, a transformation must declare how it is derived. A `derived` transformation suffices when the identifier comes deterministically from the row itself (for example a prefix plus a source key) and no two rows describe the same instance. Where rows must collapse into one instance, a `deduplication` transformation is required, with its conflict resolution.
 
 9. **Transformations are optional:** A source may be declared without any transform detail if mappings have not yet been authored. Transform detail is added when integration lineage is needed.
 

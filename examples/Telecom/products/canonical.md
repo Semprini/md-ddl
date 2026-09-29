@@ -39,11 +39,11 @@ governance:
   pii: true
   retention: "7 years post contract end"
 
-masking:
-  - attribute: "Individual.Date of Birth"
-    strategy: year-only
-  - attribute: "Individual.Identity Document Number"
-    strategy: hash
+  masking:
+    - attribute: "Individual.Date of Birth"
+      strategy: year-only
+    - attribute: "Individual.Identity Document Number"
+      strategy: hash
 
 sla:
   freshness: "< 5 minutes"

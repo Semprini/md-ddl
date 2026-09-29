@@ -103,8 +103,9 @@ Rules:
   The example routes around it. If the fan-out entry has cardinality `1`, do not
   assert. Flag the example as incomplete instead.
 - **`cardinality` stated in the example:** expect exactly that many rows.
-- **Time:** override the project's current-time macro with a fixed value. Never let
-  an expected value depend on the clock.
+- **Time:** when the model reads the current time, override the project's current-time
+  macro with a fixed value. Never let an expected value depend on the clock. Omit the
+  override for models that don't use it.
 - **Incremental models:** compile the non-incremental path. Add an
   `is_incremental: true` variant only when the example is about incremental behaviour.
 
@@ -163,7 +164,9 @@ accepted**. Hand drafts to Agent Ontology. Drafts are never compiled as
 ## Boundary Rules
 
 - Never change an expected value to match generated output. Only the domain changes a contract.
-- Never compile an example that fails Step 1. Report it instead.
+- Never compile an example that fails Step 1. Report it instead. You may draft a `derived`
+  test against a defective declaration to show what would be asserted, but mark it blocked
+  and don't add it to the runnable suite.
 - Assert only what the example states. Extra assertions belong in `derived` or
   `declared` tests, not inside a compiled example.
 - Drafted examples are proposals until the user accepts them into transform detail.

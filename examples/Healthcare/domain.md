@@ -25,7 +25,7 @@ regulatory_scope:
 default_retention: "7 years post last encounter"
 
 # Lifecycle & Discovery
-status: "Production"
+status: "Active"
 version: "1.0.0"
 tags:
   - Clinical
@@ -153,9 +153,9 @@ Name | Actor | Entity | Description
 
 Name | Class | Consumers | Status
 --- | --- | --- | ---
-[Clinical Patient Record](products/canonical.md#clinical-patient-record) | domain-aligned | Cross-domain Integration | Production
-[Clinical Outcomes Dashboard](products/analytics.md#clinical-outcomes-dashboard) | consumer-aligned | Clinical Analytics | Production
-[Clinical Billing Fraud Detection](products/billing-fraud-detection.md#clinical-billing-fraud-detection) | consumer-aligned | Revenue Integrity; Clinical Compliance; Financial Crime Operations | Production
-[Lab Results Raw Feed](products/source-feeds.md#lab-results-raw-feed) | source-aligned | Data Engineering | Production
+[Clinical Patient Record](products/canonical.md#clinical-patient-record) | domain-aligned | Cross-domain Integration | Active
+[Clinical Outcomes Dashboard](products/analytics.md#clinical-outcomes-dashboard) | consumer-aligned | Clinical Analytics | Active
+[Clinical Billing Fraud Detection](products/billing-fraud-detection.md#clinical-billing-fraud-detection) | consumer-aligned | Revenue Integrity; Clinical Compliance; Financial Crime Operations | Active
+[Lab Results Raw Feed](products/source-feeds.md#lab-results-raw-feed) | source-aligned | Data Engineering | Active
 
 ---

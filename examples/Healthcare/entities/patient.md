@@ -30,13 +30,7 @@ classDiagram
   Patient "1" --> "0..*" CarePlan : has
   Patient "1" --> "0..*" Appointment : has
 
-  class AdministrativeGender{
-    <<enumeration>>
-    Male
-    Female
-    Other
-    Unknown
-  }
+  class AdministrativeGender["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/enums.md#administrative-gender'>Administrative Gender</a>"]{<<enumeration>>}
 
   class Encounter["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/encounter.md'>Encounter</a>"]
   class Condition["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Healthcare/entities/condition.md'>Condition</a>"]

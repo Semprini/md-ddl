@@ -53,7 +53,7 @@ for the user's question:
    Then ask whether the user's domain has a similar either/or choice.
 4. **Connections.** Show how the entity links to the rest: relationship YAML
    (cardinality, identifying or not), events that affect it, data products that publish
-   it (`data_products/`), and sources that feed it, including transform detail and
+   it (`products/`), and sources that feed it, including transform detail and
    worked examples where present (`sources/`).
 5. **Their own concept.** Invite the user to describe a concept from their domain and
    sketch it in MD-DDL, marked as a demonstration. When they're ready to build it for

@@ -107,11 +107,13 @@ constraints:
 governance:
   pii: false
   classification: Highly Confidential
-  retention: 10 years
-  retention_basis: Domain default retention aligned to AML/CTF record-keeping obligations
+  retention: "10 years from Closed Date"
+  retention_basis: >
+    AUSTRAC AML/CTF Act 2006 requires 7 years; the domain's conservative 10 years applies,
+    counted from account closure rather than relationship end.
   description: >
-    Account records must be retained for 7 years from Closed Date, aligned to AUSTRAC
-    AML/CTF Act 2006 record-keeping obligations. Accounts must not be deleted — closure
+    Account attributes identify a product holding, not a person, so the entity is not PII
+    (holders are linked through Customer Holds Account). Accounts must not be deleted — closure
     via Closed Date and status update is the only permitted termination mechanism.
   access_role:
     - FINANCIAL_CRIME_ANALYST

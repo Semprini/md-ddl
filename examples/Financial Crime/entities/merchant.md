@@ -13,17 +13,14 @@ config:
 ---
 classDiagram
   class Merchant{
-    * Merchant Identifier : string
+    Merchant Identifier : string
     Merchant Category Code : string
-    Settlement Account Identifier : string
   }
 
   Merchant --|> PartyRole
-  Merchant "1" --> "0..*" Transaction : processes
   Merchant "0..*" --> "0..1" Account : settles into
 
   class PartyRole["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/party_role.md'>Party Role</a>"]
-  class Transaction["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/transaction.md'>Transaction</a>"]
   class Account["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Financial%20Crime/entities/account.md'>Account</a>"]  
 ```
 
@@ -34,7 +31,7 @@ mutability: slowly_changing
 attributes:
   Merchant Identifier:
     type: string
-    identifier: primary
+    identifier: alternate
     description: Unique identifier for the merchant role instance.
 
   Merchant Category Code:
@@ -43,10 +40,6 @@ attributes:
       ISO 18245 Merchant Category Code (MCC) representing the merchant's primary
       business type. Used in transaction monitoring rule segmentation — certain MCCs
       (e.g., cash-intensive businesses, money services) attract heightened scrutiny.
-
-  Settlement Account Identifier:
-    type: string
-    description: Account identifier used for merchant settlement.
 ```
 
 ```yaml
@@ -55,19 +48,6 @@ governance:
 ```
 
 ## Relationships
-
-### Merchant Receives Payment
-
-A Merchant receives funds through one or more Transactions.
-
-```yaml
-source: Merchant
-type: associates_with
-target: Transaction
-cardinality: one-to-many
-granularity: atomic
-ownership: Merchant
-```
 
 ### Merchant Has Settlement Account
 A Merchant may have a designated Account into which settlement funds are credited by the institution.

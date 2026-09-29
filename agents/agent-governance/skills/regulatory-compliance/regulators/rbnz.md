@@ -24,13 +24,9 @@ RBNZ is the central bank and prudential regulator for New Zealand, regulating:
 
 ### BS13 - Governance
 
-**Metadata to include**:
-
-```yaml
-governance:
-  board_oversight: true
-  risk_committee_scope: true
-```
+Board oversight and risk committee scope are organisational controls, not model metadata.
+Add `RBNZ BS13` to `regulatory_scope` for in-scope domains, and to `compliance_relevance`
+on entities that feed board risk reporting.
 
 ### BS2B - Capital Adequacy
 
@@ -39,42 +35,34 @@ governance:
 - Loan (credit risk weighted assets)
 - Capital positions
 
-**Metadata to include**:
-
-```yaml
-governance:
-  capital_adequacy_reporting: true
-  risk_weight_category: "Residential Mortgage" | "Corporate" | "Retail"
-```
+Name the capital adequacy return in `regulatory_reporting`. Model the risk-weight
+category (Residential Mortgage, Corporate, Retail) as an attribute or enum on the exposure
+(see `basel.md`), not as governance metadata.
 
 ### Data Residency Requirements
 
 RBNZ requires certain data to be stored in New Zealand.
 
-**Metadata to include**:
-
 ```yaml
-governance:
-  data_residency: ["New Zealand"]
-  rbnz_data_sovereignty: true
+data_residency: ["New Zealand"] ; domain default or entity override
 ```
 
 ## Dual Regulation (APRA + RBNZ)
 
 For NZ subsidiaries of Australian banks:
 
-**Both regulators apply**:
+Both regulators apply. List both in the domain metadata (top level, not under
+`governance:`), and record where each applies:
 
 ```yaml
-governance:
-  regulatory_scope:
-    - APRA CPS 234 (parent company)
-    - RBNZ BS13 (local subsidiary)
-  
-  data_residency: ["Australia", "New Zealand"]
-  
-  dual_reporting: true
+regulatory_scope:
+  - APRA CPS 234   # parent company
+  - RBNZ BS13      # local subsidiary
+data_residency: ["Australia", "New Zealand"]
 ```
+
+Reporting to both regulators is expressed by naming each return in `regulatory_reporting`
+on the entities that feed it.
 
 ## RBNZ Reporting
 
@@ -84,46 +72,15 @@ governance:
 - Capital adequacy (quarterly)
 - Liquidity (monthly)
 
-**Metadata to include**:
-
 ```yaml
 governance:
-  rbnz_reporting:
-    financial_statements: true
-    capital_adequacy: true
-    liquidity: true
-  reporting_frequency: "Quarterly" | "Monthly"
+  regulatory_reporting:
+    - RBNZ Financial Statements (quarterly)
+    - RBNZ Capital Adequacy (quarterly)
+    - RBNZ Liquidity (monthly)
 ```
 
 ## Resources
 
 - RBNZ Website: <https://www.rbnz.govt.nz>
 - Banking Supervision Handbook: <https://www.rbnz.govt.nz/regulation-and-supervision/banks/banking-supervision-handbook>
-
----
-
-## **How AI Uses This Architecture**
-
-### **Scenario: User starts modeling**
-
-```text
-
-User: "I'm modeling financial crime for a New Zealand bank owned by an Australian parent. We need to align with BIAN."
-
-AI:
-
-1. Loads domain-discovery/SKILL.md
-2. Asks: "What regulatory jurisdictions apply?"
-3. User says: "APRA and RBNZ, plus FATF for AML"
-4. AI loads:
-  - agents/agent-ontology/skills/standards-alignment/standards/bian/README.md
-  - regulatory-compliance/regulators/apra.md
-  - regulatory-compliance/regulators/rbnz.md
-  - regulatory-compliance/regulators/fatf.md
-5. AI now has context to:
-   - Find BIAN BOM references
-   - Apply APRA CPS 234 metadata
-   - Apply RBNZ data residency requirements
-   - Apply FATF AML requirements
-6. AI does NOT load ACORD, TM Forum, GDPR, CCPA (not relevant)
-```

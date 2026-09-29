@@ -46,11 +46,9 @@ Confirm before generating:
    so and use the default layout in Step 3. Do not make one up.
 3. **Cloud tier**: warehouse and dbt Cloud or dbt-core in CI. Default: Snowflake.
 4. **dbt version** available locally. Unit tests need dbt-core 1.8 or later.
-5. **Consistency posture and null strategy** from the product declaration (see
-   Agent Architect product-design Step 8). These decide whether `NOT NULL` goes into
+5. **Consistency posture and null strategy** from the product declaration (its `consistency` field). These decide whether `NOT NULL` goes into
    contracts or only into tests.
 
-Transition phrase: "I have enough context to generate the dbt project for [product]. Shall I proceed?"
 
 ### Step 2 — Read the Template Project
 
@@ -88,6 +86,9 @@ Canonical entity with several contributing sources (fan-in) | Canonical model un
 Data product `schema_type` + logical model | Product models shaped by the matching generation skill | template's mart/serve layer
 Product `masking` | Organisation masking macro or warehouse masking policy via `post-hook`; recorded in `meta` | product models
 Entity and product governance | `meta:` on models and columns (`classification`, `pii`, `retention`) | model YAML
+
+`<source_id>` in model and file names is the source's `id` with hyphens replaced by
+underscores (`salesforce-crm` becomes `salesforce_crm`), since dbt names must be valid identifiers.
 
 Every model and column carries `meta.md_ddl` with the declaration it came from
 (file path and heading anchor). This is how Agent Test and reconciliation trace a

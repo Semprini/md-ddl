@@ -9,7 +9,7 @@ Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls | Comment | 
 3 | EncounterId | Text | 64 | | | yes | Identifies which Encounter this order was created in | Encounter.Encounter Identifier
 4 | StatusCode | Text | 20 | | | no | Medication order lifecycle status | [Map Medication Status](#map-medication-status)
 5 | DrugName | Text | 255 | | | no | Generic or brand medication name | Medication Request.Medication Name
-6 | DosageInstruction | Text | 500 | | | yes | Dosage and administration instructions | Medication Request.Dosage
+6 | DosageInstruction | Text | 500 | | | yes | Dosage and administration instructions | Medication Request.Dosage Instructions
 7 | OrderedDate | Date | | | | no | Date the order was created | Medication Request.Authored On
 
 ### Map Medication Status

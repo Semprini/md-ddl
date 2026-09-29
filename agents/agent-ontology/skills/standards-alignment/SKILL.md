@@ -71,21 +71,22 @@ or they overlap with distinct extensions.
 
 ## Worked Example: Verifying Financial Crime Against BIAN v13
 
-Financial Crime's Entities table references BIAN classes. Checking each one against
-`standards/bian/bo-classes.md` (v13):
+Financial Crime 1.0.0 cited BIAN classes in its Entities table. Checking each one against
+`standards/bian/bo-classes.md` (v13) showed that references which look plausible can still
+fail the lookup:
 
-Entity | Referenced class | In v13 index? | Action
+Entity | Cited in 1.0.0 | In v13 index? | Resolution in 2.0.0
 --- | --- | --- | ---
-Party | Party | Yes | Keep
-Person | Person | Yes | Keep
-Party Role, Customer | PartyRole | Yes | Keep. Customer specialises it.
-Account | Account | Yes | Keep
-Company | LegalEntity | **No** | Look for the v13 equivalent (`Organisation` is present). Confirm its definition before changing anything.
-Transaction | Payment | **No** | Look for candidates (e.g. `AccountEntry`, a posting to an account, which is narrower than Transaction) and record any match as a partial alignment
+Party, Person, Party Role, Account | Party, Person, PartyRole, Account | Yes | Kept
+Company | LegalEntity | **No** | `Organisation`, marked partial: BIAN has no legal-person class
+Transaction | Payment | **No** | `PaymentTransaction`, whose definition matches
+Product | Product | **No** | `BankingProduct`
+Customer Preferences | PartyPreference | **No** | `AccessPreferenceArrangement`, marked partial (channel preferences only)
+Exchange Rate | ExchangeRate | **No** | Reference removed: no class fits
+Currency | Currency | **No** | ISO 4217 cited instead
 
-The lesson: references that look plausible can still fail the lookup. Run every
-reference through the index, and for the ones that fail, apply the Judge-the-fit step
-with the user rather than guessing a replacement.
+Run every reference through the index. For the ones that fail, work through the Judge-the-fit
+step with the user. Don't swap in the nearest-sounding name.
 
 ## Regulatory Scope Prompt
 

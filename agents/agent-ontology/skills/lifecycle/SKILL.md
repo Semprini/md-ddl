@@ -40,7 +40,7 @@ From | To | Gate
 Before promoting from `Draft` → `Review`, verify:
 
 - [ ] All entities in the domain summary table have corresponding detail files
-- [ ] Every entity has at least one `identifier: true` attribute
+- [ ] Every entity has an `identifier: primary` attribute, or is deliberately a Logic Object
 - [ ] All relationships declared in the summary table have YAML definitions with `source`, `target`, `cardinality`, and `granularity`
 - [ ] The Domain Overview Diagram includes all declared entities
 - [ ] Domain metadata has `owners`, `stewards`, `classification`, and `regulatory_scope`
@@ -53,7 +53,7 @@ Before promoting from `Review` → `Active`, additionally verify:
 - [ ] Governance metadata is complete at domain level (`classification`, `pii`, `regulatory_scope`, `default_retention`)
 - [ ] Entity governance overrides are declared where entity obligations differ from domain defaults
 - [ ] All entity `status` values are consistent with the target domain status (no entity can be more advanced than its domain)
-- [ ] The structured review process (Layer 1/2/3) has been completed or the user confirms it is not required
+- [ ] A Domain Review has returned **Ready**, and Preflight passes with no errors
 
 ### Promotion Output
 
@@ -73,11 +73,10 @@ When a promotion fails one or more checks, produce:
 
 ### Demotion
 
-Reverting from `Active` to `Draft` or `Review` is permitted only when accompanied by a major version bump. This signals to consumers that the domain is undergoing significant rework. Warn the user:
-
-> "Reverting an Active domain to [Draft/Review] is a breaking change. This will require
-> a major version bump (current: x.y.z → next: (x+1).0.0). All consumers should be
-> notified. Proceed?"
+Reverting from `Active` to `Draft` or `Review` is allowed only with a major version bump,
+which signals significant rework to consumers. Warn the user that it's a breaking change,
+show the new version (x.y.z becomes (x+1).0.0), remind them to notify consumers, and
+confirm before proceeding.
 
 ---
 

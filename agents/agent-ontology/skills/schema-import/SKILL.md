@@ -22,8 +22,9 @@ Load before responding:
 
 Also reference (do not load unless needed for detailed decisions):
 
-- `skills/entity-modelling/SKILL.md` — for attribute type mapping
-- `skills/domain-scoping/SKILL.md` — for domain file checklist
+- `../entity-modelling/SKILL.md`, for attribute types and classification
+- `../domain-scoping/SKILL.md`, for the domain file checklist
+- `../source-mapping/SKILL.md`, before drafting transform detail from ETL
 
 ---
 
@@ -114,13 +115,13 @@ Schema signal | MD-DDL inference | Confidence
 --- | --- | ---
 Table name | Candidate entity name (de-snake-cased, singularised) | High
 Column names + types | Candidate attributes with MD-DDL types | High
-Primary key | `identifier: true` attribute | High
-Foreign keys | Candidate relationships (direction, cardinality from constraint type) | Medium-High
-Nullability | `required: true/false` | High
-Unique constraints | Candidate identifier or alternate key | Medium
+Primary key | `identifier: primary` attribute | High
+Foreign keys | Candidate relationships (direction, cardinality from constraint type). The FK column itself is **not** an attribute: MD-DDL entities carry no foreign keys. | Medium-High
+NOT NULL columns | `not_null` constraint on the entity (there is no per-attribute `required` property) | High
+Unique constraints | `identifier: alternate` or `unique: true` | Medium
 Enum-like columns (low cardinality, varchar, FK to lookup table) | Candidate enums | Medium
 Junction/bridge tables (composite PK of two FKs) | Many-to-many relationship | High
-Timestamp columns (`created_at`, `updated_at`, `deleted_at`) | Mutability signal (mutable if `updated_at` exists), soft-delete pattern | Medium
+Timestamp columns (`created_at`, `updated_at`, `deleted_at`) | Mutability signal (`updated_at` suggests slowly or frequently changing; none suggests append-only or immutable), soft-delete pattern | Medium
 Audit columns (`created_by`, `modified_by`) | Governance signal but not canonical attributes | Medium
 Naming patterns (`dim_*`, `fact_*`, `stg_*`) | Dimensional vs staging vs operational classification | High
 Column prefixes matching table names (`customer_id`, `customer_name`) | Table-scoped naming convention (strip prefix in canonical) | Medium
@@ -170,10 +171,9 @@ Everything else comes from the schema.
 
 From the schema plus minimal interview answers, produce:
 
-1. **Draft `domain.md`** — domain name, description, metadata (with
-   `adoption.maturity: mapped`), overview diagram (Mermaid), and all four
-   summary tables (Entities, Enums, Relationships, Events) inferred from
-   the schema
+1. **Draft `domain.md`**: name, description, metadata, overview diagram, and the
+   Entities, Enums, Relationships, and Events tables inferred from the schema. Don't set
+   `adoption.maturity: mapped` yet, because Mapped requires source transform detail (Part 5).
 
 2. **Draft entity detail files** — one per inferred entity, with attributes,
    types, constraints, and identifier. Attributes use MD-DDL naming
@@ -251,8 +251,9 @@ After producing the draft, enter a conversational refinement loop:
 
 - User reviews, corrects, adds business context
 - Agent applies changes, re-explains trade-offs when relevant
-- When the user is satisfied, set `adoption.maturity: mapped` and hand off
-  to domain-review or entity-modelling for deeper work
+- When the user is satisfied and every entity has source transform detail, set
+  `adoption.maturity: mapped`, then run Preflight and hand off to domain-review or
+  entity-modelling for deeper work
 
 This loop should feel collaborative, not interrogative. The agent has already
 done the heavy lifting; the user is steering, not answering a questionnaire.

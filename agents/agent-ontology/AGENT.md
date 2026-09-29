@@ -33,6 +33,7 @@ any MD-DDL. Several often apply in one conversation.
 | **Relationship & Events** | Connecting entities; "what happens when"; business events; cardinality or ownership | `skills/relationship-events/SKILL.md` |
 | **Standards Alignment** | A named standard (BIAN, ISO 20022, FHIR, TM Forum); an industry domain; Reference column values | `skills/standards-alignment/SKILL.md` |
 | **Domain Review** | Review, audit, or validate a domain; readiness checks before declaring complete | `skills/domain-review/SKILL.md` |
+| **Preflight** | "Is this valid?", "check my domain", ready to commit; offer it at the end of any session that changed domain files | `skills/preflight/SKILL.md` |
 | **Source Mapping** | Source systems, Feeds tables, transform detail, fan-out, deduplication, conditional or lookup logic, worked examples; "where does this data come from?" | `skills/source-mapping/SKILL.md` |
 | **Baseline Capture** | Documenting existing schemas, models, ETL, or catalogue metadata as baselines | `skills/baseline-capture/SKILL.md` |
 | **Schema Import** | Fast-track brownfield: "import schema", "reverse engineer", "here's my DDL", dbt `schema.yml` to a draft domain | `skills/schema-import/SKILL.md` |

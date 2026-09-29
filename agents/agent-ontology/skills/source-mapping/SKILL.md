@@ -111,47 +111,17 @@ Flag governance findings for the domain owner. Do not modify entity governance m
 
 ## Authoring: Source Summary
 
-Source summaries are small. Collect them in a single `sources/sources.md` and split a source into its own file only once it grows large enough to warrant it.
+Collect summaries in one `sources/sources.md`, rooted at the domain H1, with each system as
+an H3 under `## Sources`. Split a system into its own file only once it grows large. Follow
+the layout in `7-Sources.md § Source Summary`:
 
-```markdown
-# [Domain Name](../domain.md)
-
-## Sources
-
-### System Name
-
-One or two sentences: what this system does and why it feeds this domain.
-
-#### Metadata
-
-​```yaml
-id: system-id
-owner: team@bank.com
-steward: data.governance@bank.com
-change_model: real-time-cdc
-change_events:
-  - Customer Created
-  - Customer Updated
-update_frequency: real-time
-data_quality_tier: 1
-status: Production
-version: "1.0.0"
-​```
-
-#### Source Overview Diagram
-
-A Mermaid `graph LR` showing which canonical entities this source feeds, edges labelled with the change model, nodes linked to entity detail.
-
-#### Feeds
-
-Canonical Entity | Transform | Attributes Contributed | Change Model
---- | --- | --- | ---
-[Entity](../entities/entity.md#anchor) | [table_NAME](system-id/table_NAME.md#name) | Attribute One, Attribute Two | real-time-cdc
-```
-
-Because the file is rooted at the domain, the domain name is not repeated in the Feeds heading.
-
-Where a source row produces the concrete subtypes of an abstract entity, list the subtypes actually instantiated — not the abstract parent — and note that their attributes are inherited.
+- a one- or two-sentence business description
+- `#### Metadata`: `id`, `owner`, `steward`, `change_model`, `change_events`,
+  `update_frequency`, `data_quality_tier`, `status`, `version`
+- `#### Source Overview Diagram`: a `graph LR` of the fed entities, with edges labelled by
+  change model
+- `#### Feeds`: Canonical Entity, Transform, Attributes Contributed, Change Model. List
+  the concrete subtypes actually instantiated, not their abstract parent.
 
 ---
 
@@ -194,39 +164,14 @@ Columns are `Pos | Column Name | Data Type | Max Len | Precision | Scale | Nulls
 
 ## Entity Fan-Out
 
-Required whenever one source row produces more than one canonical instance. Without it, the number and identity of outputs is left to the generating agent to infer.
+Required whenever one row produces more than one canonical instance. The `produces:` keys
+(`entity`, `cardinality`, `condition`, `identity`, `deduplicated`, `references`) are
+defined in `7-Sources.md § Entity Fan-Out`. Alternative entries, such as one subtype or
+another, each need a `condition`.
 
-```yaml
-produces:
-  - entity: Address · Postal Address
-    cardinality: 0..1
-    deduplicated: true
-    identity: Address Uniqueness Merge
-
-  - entity: Location Involvement
-    cardinality: 1
-    identity: Location Involvement Mapping
-    references:
-      Address: Address Uniqueness Merge
-
-  - entity: Individual
-    cardinality: 0..1
-    condition: "OWNER_TYPE_ENUM == 1"
-    identity:
-      field: ADDRESS.OWNER_ID
-      maps_to: Party · Party Identifier
-```
-
-Key | Purpose
---- | ---
-`entity` | Canonical entity produced. `Parent · Subtype` where the target is a subtype.
-`cardinality` | Instances per source row: `1`, `0..1`, `0..*`
-`condition` | Selects when this instance is produced. Required when entries are alternatives.
-`identity` | The transformation determining the identifier, or a source field and what it maps to.
-`deduplicated` | `true` when instances collapse across rows. Requires a `deduplication` transform.
-`references` | Which produced instance satisfies a relationship to another.
-
-**Abstract targets.** A transform targeting an attribute on an abstract entity — `target: Party · Legal Name` — states which attribute is populated but not which instance receives it. The fan-out entry whose `condition` matched supplies that binding. A transform targeting an abstract entity with no fan-out declaration is a validation error.
+**Abstract targets.** `target: Party · Legal Name` says which attribute is populated, not
+which instance receives it. The fan-out entry whose `condition` matched supplies that
+binding. A transform targeting an abstract entity without a fan-out is a validation error.
 
 ---
 
@@ -300,29 +245,21 @@ survivorship:
 
 ## Worked Examples
 
-For anything beyond a direct map, this is the only device that pins behaviour. Declare a source row and the exact instances it must produce.
+For anything beyond a direct map, worked examples are the only device that pins
+behaviour, and they become tests (Agent Test). The format is in
+`8-Transformations.md § Worked Examples`: `given` rows, the exact instances they
+`produces`, and `notes` explaining why. List only what matters to the case. It's an
+assertion, not a row dump.
 
-```yaml
-example: Individual with a DPID-matched, customer-confirmed residential address
-given:
-  ADDRESS_ID: "3f2b-aaa1"
-  OWNER_ID: "8c14-p001"
-  OWNER_TYPE_ENUM: 1
-  DPID_N: "1234567"
-produces:
-  - entity: Address · Postal Address
-    Address Identifier: "DPID:1234567"
-  - entity: Individual
-    Party Identifier: "8c14-p001"
-    Legal Name: "Jane Whitcombe"
-notes: >
-  Party is abstract, so the concrete instance is an Individual, selected by the
-  OWNER_TYPE_ENUM condition in Entity Fan-Out.
-```
+Cover:
 
-`given` accepts a list of rows where the example demonstrates cross-row behaviour such as deduplication. `produces` may declare `cardinality` where the count itself is the point. Only list what matters to the example — it is an assertion about behaviour, not a row dump.
+- each fan-out `condition` branch, including the zero case of `0..1` entries
+- each deduplication key branch, with at least one example where two rows merge
+- each conditional case where evaluation order matters
+- for entities fed by several sources, a fan-in example (§ Fan-in examples), with
+  `interim` states if the consuming product accepts eventual consistency
 
-An example producing an entity the fan-out does not declare is a validation error.
+An example that produces an entity the fan-out doesn't declare is a validation error.
 
 ---
 
@@ -373,20 +310,14 @@ If source tables carry PII not yet declared in entity governance, flag it for do
 
 ### Transform detail
 
-- [ ] File named for the source table, matching source casing
-- [ ] Hierarchy repeated from the domain down; source heading links to its summary
-- [ ] `Entity Fan-Out` present wherever a row produces more than one instance
-- [ ] Source schema table uses the `Description` column and covers every column
-- [ ] Every `target` resolves to a real entity and attribute — verified, not assumed
-- [ ] Every non-direct mapping has a `Transform: ` heading and YAML block
-- [ ] Identity derived by `deduplication` wherever it is not a direct map
-- [ ] `survivorship` declared wherever rows can merge
-- [ ] `evaluation` declared wherever cases can overlap
-- [ ] Every field referenced by a predicate is declared in `inputs:`
-- [ ] Blank `Destination` cells are decisions, and the convention is stated in the file
-- [ ] Worked examples cover each fan-out branch and each key branch
-- [ ] Entities fed by more than one source have a fan-in example covering each reachable `reconciliation` branch
-- [ ] Unresolved items recorded in `Open Decisions`, not left blank
+- [ ] File named for the source table, matching its casing. Hierarchy repeated from the
+      domain down, with the source heading linking to its summary.
+- [ ] The source schema table covers every column, including the `Description` column.
+- [ ] Every non-direct mapping has a `Transform: ` heading, a prose description, and YAML.
+- [ ] The Determinism Test passes: fan-out, identity, survivorship, evaluation order,
+      declared inputs, resolving targets, and deliberate blanks.
+- [ ] Worked examples cover the cases above.
+- [ ] Anything unresolved is in `Open Decisions`.
 
 ---
 

@@ -92,9 +92,7 @@ Name | Description
 
 ## Enums
 
-Name | Description
---- | ---
-Product Categories | Hierarchical classification of retail products (e.g., Electronics, Apparel, Grocery).
+No enums are modelled yet. Product Category is held as a string on Product; whether it becomes an enum or a category hierarchy is an open decision raised by the [dim_product baseline](baselines/dimensional/dim_product.md).
 
 ## Relationships
 
@@ -107,7 +105,7 @@ Name | Description
 
 Name | Actor | Entity | Description
 --- | --- | --- | ---
-Sale Completed | POS System | Sale | Emitted when a sales transaction is finalised at the point of sale.
+[Sale Completed](events/sale-completed.md#sale-completed) | POS System | Sale | Emitted when a sales transaction is finalised at the point of sale.
 
 ## Data Products
 

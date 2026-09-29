@@ -1406,6 +1406,14 @@ def _check_diagram_links(report: Report, doc: Doc, heading: Heading,
                         f"its detail markdown")
 
 
+def _enums_detailed_here(doc: Doc) -> set[str]:
+    """Enums defined in this file's own `## Enums` section (may be drawn with values, unlinked)."""
+    span = doc.section(2, "Enums")
+    if not span:
+        return set()
+    return {normalise(link_text_and_target(h.text)[0] or h.text) for h, _ in doc.subsections(span, 3)}
+
+
 def _check_enums_in_diagram(report: Report, doc: Doc, heading: Heading, diagram: ClassDiagram,
                             data: dict, yaml_block: CodeBlock) -> None:
     """Every enum used by an attribute must be shown in the diagram."""
@@ -1430,7 +1438,7 @@ def _check_enums_in_diagram(report: Report, doc: Doc, heading: Heading, diagram:
                          f"attribute '{attr_name}' uses enum '{enum_name}', which is not declared "
                          f"in the '{heading.text}' diagram (add: class {re.sub(r'[^A-Za-z0-9]', '', enum_name)}"
                          f"[\"<a href='...'>{enum_name}</a>\"]{{<<enumeration>>}})")
-        elif key not in linked:
+        elif key not in linked and key not in _enums_detailed_here(doc):
             report.warn(doc.path, line, "entity-enum-in-diagram",
                         f"enum '{enum_name}' is shown in the diagram but has no link to its "
                         f"detail definition")

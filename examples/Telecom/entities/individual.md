@@ -15,7 +15,6 @@ config:
 ---
 classDiagram
   class Individual{
-    * Party Identifier : string
     Given Name : string
     Family Name : string
     Date of Birth : date

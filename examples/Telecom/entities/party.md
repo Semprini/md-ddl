@@ -22,8 +22,8 @@ classDiagram
 
   class PartyType["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/enums.md#party-type'>Party Type</a>"]{<<enumeration>>}
 
-  class Individual
-  class Organization
+  class Individual["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/individual.md'>Individual</a>"]
+  class Organization["<a href='https://github.com/Semprini/md-ddl/blob/main/examples/Telecom/entities/organization.md'>Organization</a>"]
 
   Individual --|> Party
   Organization --|> Party

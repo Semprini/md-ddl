@@ -54,7 +54,7 @@ graph TD
 
   Party --> |has|Customer
   Customer --> |owns|BillingAccount
-  Customer --> |subscribes via|Subscription
+  Customer --> |has|Subscription
   Subscription --> |activates|ProductOffering
   Subscription --> |triggers|ServiceOrder
   ServiceOrder --> |provisions|Service

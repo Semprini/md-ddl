@@ -15,7 +15,7 @@ md-ddl is: **AI‑native · Human‑friendly · Version‑controlled · Semantic
 ## What MD-DDL covers
 
 - **Domain layer** — domains, entities, enums, relationships, events, and constraints
-- **Source layer** — source system declarations and column-level transformation rules (direct, derived, conditional, lookup, reconciliation, aggregation)
+- **Source layer** — source system declarations and column-level transformation rules (direct, derived, conditional, lookup, reconciliation, deduplication, aggregation), entity fan-out, and worked examples that become tests
 - **Data products** — source-aligned, domain-aligned, and consumer-aligned products declaring scope, shape, consumers, SLA, governance, and masking — driving automated artifact generation
 - **Governance** — classification, PII, retention, regulatory scope, access roles, and masking strategies living with the model, not in a separate system
 - **Physical artifacts** — dimensional star schemas, normalized 3NF DDL, wide-column schemas, knowledge graph (Cypher), JSON Schema, Parquet contracts
@@ -126,7 +126,7 @@ Then copy the agent wrappers for your AI tool:
 - **Copilot**: `.md-ddl/.github/agents/*.agent.md` → `.github/agents/`
 - **Claude**: `.md-ddl/.claude/commands/*.md` → `.claude/commands/`
 
-If you use Claude, you need to update `./claude/commands/*.md` files. The `agents/` path needs to be `.md-ddl/agents`
+If you use Claude, update the copied `.claude/commands/*.md` files so their `agents/` paths read `.md-ddl/agents/` (`md-ddl init` and the bootstrap scripts do this for you).
 
 Next, create your `copilot-instructions.md` or `CLAUDE.md`. See the start project scripts for examples.
 
@@ -140,7 +140,7 @@ git submodule update --remote .md-ddl
 
 ```text
 your-project/
-  .md-ddl/                   ← submodule (this repo)
+  .md-ddl/                   ← the standard: unpacked by `md-ddl init`, or a git submodule
   .github/agents/            ← Copilot agent wrappers  (Copilot users)
   .claude/commands/          ← Claude slash commands    (Claude users)
   domains/
@@ -155,6 +155,7 @@ your-project/
   generated/                 ← Agent Artifact output (commit alongside the model)
     customer/
       ddl/                   ← SQL DDL, JSON Schema, Parquet contracts, Cypher
+      dbt/                   ← dbt project per data product (models from Agent Artifact, tests from Agent Test)
       synthetic/
         factories.py         ← Faker factory classes
         test_factories.py    ← integrity and consistency tests
@@ -202,6 +203,7 @@ agents/                      Canonical agent prompts and skills
 
 examples/                    Reference examples
   Simple Customer/
+  Brownfield Retail/
   Financial Crime/
   Healthcare/
   Telecom/
@@ -213,7 +215,7 @@ references/                  Architecture and industry reference data
   architecture/              Data Autonomy blog series, external references, Mermaid diagrams
 
 src/md_ddl/                  The `md-ddl` PyPI package
-  cli.py                     `md-ddl init` / `md-ddl lint` / `md-ddl path`
+  cli.py                     `md-ddl init` / `md-ddl lint` / `md-ddl check` / `md-ddl path`
   lint.py                    Pre-flight linter (also `python scripts/md_ddl_lint.py`)
 ```
 

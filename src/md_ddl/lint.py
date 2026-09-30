@@ -36,7 +36,8 @@ Options:
     --list-rules         Print the rule ids and exit
 
 `.md-ddlignore` in the current working directory excludes matching paths from
-target discovery and lint traversal.
+target discovery and lint traversal. A path named on the command line is linted
+even when it is ignored, so `md-ddl lint .md-ddl/examples/...` still works.
 
 Requires: Python 3.9+, pyyaml   (installed with the md-ddl package)
 
@@ -54,7 +55,7 @@ import json
 import re
 import sys
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -116,12 +117,17 @@ IGNORE_FILE = ".md-ddlignore"
 class IgnoreConfig:
     root: Path
     patterns: tuple[str, ...] = ()
+    # Ignored paths the user named explicitly; they and their contents are linted.
+    explicit: tuple[Path, ...] = ()
 
     def ignores(self, path: Path) -> bool:
         if not self.patterns:
             return False
+        resolved = path.resolve()
+        if any(resolved == e or e in resolved.parents for e in self.explicit):
+            return False
         try:
-            rel = path.resolve().relative_to(self.root).as_posix()
+            rel = resolved.relative_to(self.root).as_posix()
         except ValueError:
             return False
 
@@ -1719,7 +1725,12 @@ def main(argv: list[str] | None = None, prog: str | None = None) -> int:
         return 2
 
     ignore = load_ignore_config(Path.cwd().resolve())
-    domains, file_filter = discover_targets(args.paths or ["."], ignore)
+    targets = args.paths or ["."]
+    explicit = tuple(
+        Path(t).resolve() for t in targets if ignore.ignores(Path(t))
+    )
+    ignore = replace(ignore, explicit=explicit)
+    domains, file_filter = discover_targets(targets, ignore)
     report = Report(disabled)
     for domain_file in domains:
         lint_domain(report, domain_file, ignore, file_filter.get(domain_file))

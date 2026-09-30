@@ -14,7 +14,7 @@ from __future__ import annotations
 from importlib import resources
 from pathlib import Path
 
-__version__ = "0.9.2"
+__version__ = "0.10.0"
 
 __all__ = [
     "DOCS_DIRNAME",

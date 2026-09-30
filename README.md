@@ -2,7 +2,7 @@
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
-> **Version 0.9.2**
+> **Version 0.10.0**
 
 MD-DDL is a simple, standard way to organise domain ontology & semantic data models. Data modelling historically uses complex tools which have equally complex underlying data stores. These components are not very 'accessible' for both AI and humans.
 
